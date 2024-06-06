@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\apicontroller;
+use App\Http\Controllers\SkillsController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -43,4 +45,4 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::post('upload-photos', 'apicontroller@uploadImage')
 });
 
-Route::resource('skills', SkillsController::class);
+Route::resource('skills', SkillsController::class)->middleware(['auth:sanctum']);

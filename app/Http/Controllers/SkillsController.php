@@ -10,21 +10,16 @@ use Illuminate\Support\Facades\Gate;
 
 class SkillsController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Skills::class, 'skill');
-    }
-
     public function index(): JsonResponse
     {   
-        $this->authorize('viewAny', Skill::class);
+        $this->authorize('viewAny', Skills::class);
         $skills = Skills::all();
         return response()->json($skills);
     }
 
     public function store(Request $request): JsonResponse
     {   
-        $this->authorize('create', Skill::class);
+        $this->authorize('create', Skills::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -57,7 +52,7 @@ class SkillsController extends Controller
     public function destroy(Skills $skill): JsonResponse
     {   
         $this->authorize('delete', $skill);
-        
+
         $skill->delete();
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
