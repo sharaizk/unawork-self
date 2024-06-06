@@ -30,7 +30,7 @@ class SkillsController extends Controller
         return response()->json($skills, Response::HTTP_CREATED);
     }
 
-    public function show(Skills $skill): JsonResponse
+    public function show(Skills $skills): JsonResponse
     {   
         $this->authorize('view', $skills);
         return response()->json($skills);
