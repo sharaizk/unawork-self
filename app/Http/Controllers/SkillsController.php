@@ -25,35 +25,35 @@ class SkillsController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $skill = Skills::create($validated);
+        $skills = Skills::create($validated);
 
-        return response()->json($skill, Response::HTTP_CREATED);
+        return response()->json($skills, Response::HTTP_CREATED);
     }
 
     public function show(Skills $skill): JsonResponse
     {   
-        $this->authorize('view', $skill);
-        return response()->json($skill);
+        $this->authorize('view', $skills);
+        return response()->json($skills);
     }
 
-    public function update(Request $request, Skills $skill): JsonResponse
+    public function update(Request $request, Skills $skills): JsonResponse
     {   
-        $this->authorize('update', $skill);
+        $this->authorize('update', $skills);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        $skill->update($validated);
+        $skills->update($validated);
 
-        return response()->json($skill);
+        return response()->json($skills);
     }
 
-    public function destroy(Skills $skill): JsonResponse
+    public function destroy(Skills $skills): JsonResponse
     {   
-        $this->authorize('delete', $skill);
+        $this->authorize('delete', $skills);
 
-        $skill->delete();
+        $skills->delete();
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
