@@ -25,27 +25,26 @@ class apicontroller extends Controller
     public function login(Request $request)
     {   
         $attr = $request->validate([
-            'email' => 'required|string|email|',
+            'email' => 'required|string|email',
             'password' => 'required|string'
         ]);
 
-        if (!\Auth::attempt($attr)) {
-            return $this->error('Credentials not match', 401);
+        if (!Auth::attempt($attr)) {
+            return response()->json(['error' => 'Credentials not match'], 401);
         }
 
         $user = Auth::user();
         $workspace_id =$user->currant_workspace ;
-        $getworkspace=Workspace::where("id",$workspace_id)->first();
+        $getworkspace = Workspace::find($workspace_id);
 
         $settings = [
-
             'shot_time'=> isset($getworkspace->interval_time)?$getworkspace->interval_time:10,
-        ];
+        ]; 
 
         return $this->success([
-            'token' => auth()->user()->createToken('API Token')->plainTextToken,
-            'user'=>auth()->user(),
-            'settings' =>$settings,
+            'token' => $user->createToken('API Token')->plainTextToken,
+            'user' => $user,
+            'settings' => $settings,
         ],'Login successfully.');
     }
     public function logout()
