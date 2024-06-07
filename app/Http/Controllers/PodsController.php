@@ -13,7 +13,7 @@ class PodsController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        $pods = Pods::with('skills')->get();
+        $pods = Pods::get();
 
         return PodResource::collection($pods);
     }
