@@ -6,17 +6,18 @@ use Illuminate\Http\Request;
 use App\Models\Pods;
 use App\Models\Utility;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\PodResource;
 
 class PodsController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(): AnonymousResourceCollection
     {
         $pods = Pods::with('skills')->get();
 
-        return response()->json(['pods' => $pods]);
+        return PodResource::collection($pods);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse | PodResource
     {   
         $data = $request->validate([
             'title' => 'required|string',
@@ -47,17 +48,17 @@ class PodsController extends Controller
             $pod->skills()->sync($data['skills']);
         }
 
-        return response()->json(['pod' => $pod], 201);
+        return new PodResource($pod);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(int $id): PodResource
     {   
-        $pod = Pods::findOrFail($id);
+        $pod = Pods::with('skills')->findOrFail($id);
 
-        return response()->json(['pod' => $pod]);
+        return new PodResource($pod);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, int $id): JsonResponse | PodResource
     {   
         $pod = Pods::findOrFail($id);
 
@@ -90,7 +91,7 @@ class PodsController extends Controller
             $pod->skills()->sync($data['skills']);
         }
 
-        return response()->json(['pod' => $pod]);
+        return new PodResource($pod);
     }
 
     public function destroy(int $id): JsonResponse
