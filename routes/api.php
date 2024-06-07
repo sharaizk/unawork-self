@@ -48,4 +48,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::resource('skills', SkillsController::class)->middleware(['auth:sanctum']);
 
+
 Route::get('/pods', [PodsController::class, 'index']);
+Route::post('/pods', [PodsController::class, 'store']);
+Route::get('/pods/{id}', [PodsController::class, 'show']);
+Route::post('/pods/{id}', [PodsController::class, 'update']);
+Route::delete('/pods/{id}', [PodsController::class, 'destroy']);
