@@ -21,7 +21,7 @@ class PodResource extends JsonResource
             'description' => $this->description,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'skills' => $this->whenLoaded('skills'), // Assuming you have SkillResource created
+            'skills' => $this->skills, // Assuming you have SkillResource created
         ];
     }
 }

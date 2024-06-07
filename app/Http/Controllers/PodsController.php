@@ -91,6 +91,8 @@ class PodsController extends Controller
             $pod->skills()->sync($data['skills']);
         }
 
+        $pod->refresh();
+        
         return new PodResource($pod);
     }
 
