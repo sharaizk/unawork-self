@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\apicontroller;
+use App\Http\Controllers\PodsController;
 use App\Http\Controllers\SkillsController;
 
 /*
@@ -46,3 +47,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::resource('skills', SkillsController::class)->middleware(['auth:sanctum']);
+
+Route::get('/pods', [PodsController::class, 'index']);

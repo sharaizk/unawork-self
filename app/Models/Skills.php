@@ -16,4 +16,9 @@ class Skills extends Model
     {
         return $this->belongsToMany(User::class, 'user_skills');
     }
+
+    public function pods()
+    {
+        return $this->belongsToMany(Pods::class, 'pods_skills', 'skill_id', 'pod_id');
+    }
 }
