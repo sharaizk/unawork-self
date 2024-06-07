@@ -21,7 +21,9 @@ class PodsController extends Controller
         $data = $request->validate([
             'title' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'nullable|string|max:2048'
+            'description' => 'nullable|string|max:2048',
+            'skills' => 'nullable|array', // Додаємо валідацію для скілів
+            'skills.*' => 'integer|exists:skills,id' // Перевірка, що кожен скіл існує в таблиці skills
         ]);
 
         //upload image with personal driver settings (for each user)
@@ -41,6 +43,10 @@ class PodsController extends Controller
 
         $pod = Pods::create($data);
 
+        if (isset($data['skills'])) {
+            $pod->skills()->sync($data['skills']);
+        }
+
         return response()->json(['pod' => $pod], 201);
     }
 
@@ -58,7 +64,9 @@ class PodsController extends Controller
         $data = $request->validate([
             'title' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'nullable|string|max:2048'
+            'description' => 'nullable|string|max:2048',
+            'skills' => 'nullable|array', // skills validation
+            'skills.*' => 'integer|exists:skills,id' // skills existing
         ]);
 
         //upload image with personal driver settings (for each user)
@@ -77,6 +85,10 @@ class PodsController extends Controller
         }
 
         $pod->update($data);
+
+        if (isset($data['skills'])) {
+            $pod->skills()->sync($data['skills']);
+        }
 
         return response()->json(['pod' => $pod]);
     }
