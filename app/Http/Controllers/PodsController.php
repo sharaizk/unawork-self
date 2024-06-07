@@ -7,6 +7,7 @@ use App\Models\Pods;
 use App\Models\Utility;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\PodResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PodsController extends Controller
 {
@@ -53,7 +54,7 @@ class PodsController extends Controller
 
     public function show(int $id): PodResource
     {   
-        $pod = Pods::with('skills')->findOrFail($id);
+        $pod = Pods::findOrFail($id);
 
         return new PodResource($pod);
     }
