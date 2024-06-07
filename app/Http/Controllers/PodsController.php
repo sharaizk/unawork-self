@@ -32,7 +32,9 @@ class PodsController extends Controller
             if ($path['flag'] == 1) {
                 $image = $path['url'];
             } else {
-                return redirect()->back()->with('error', __($path['msg']));
+                return response()->json([
+                    'message' => $path['msg']
+                ], 400);
             }
             $data['image'] = $image;
         }
@@ -67,7 +69,9 @@ class PodsController extends Controller
             if ($path['flag'] == 1) {
                 $image = $path['url'];
             } else {
-                return redirect()->back()->with('error', __($path['msg']));
+                return response()->json([
+                    'message' => $path['msg']
+                ], 400);
             }
             $data['image'] = $image;
         }
