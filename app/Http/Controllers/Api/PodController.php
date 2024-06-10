@@ -23,7 +23,7 @@ class PodController extends Controller
     
     public function index(): AnonymousResourceCollection
     {
-        $pod = Pod::get();
+        $pod = Pod::all();
 
         return PodResource::collection($pod);
     }
@@ -31,10 +31,9 @@ class PodController extends Controller
     public function store(StorePodRequest $request): JsonResponse | PodResource
     {   
         $data = $request->validated();
-        $image = $request->file('image');
 
         try {
-            $pod = $this->podService->createPod($data, $image);
+            $pod = $this->podService->createPod($data);
             return new PodResource($pod);
         } catch (\Exception $e) {
             return response()->json([
@@ -54,10 +53,9 @@ class PodController extends Controller
     {   
         $pod = Pod::findOrFail($id);
         $data = $request->validated();
-        $image = $request->file('image') ?? null;
     
         try {
-            $updatedPod = $this->podService->updatePod($pod, $data, $image);
+            $updatedPod = $this->podService->updatePod($pod, $data);
             return new PodResource($updatedPod);
         } catch (\Exception $e) {
             return response()->json([
