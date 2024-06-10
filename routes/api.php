@@ -24,6 +24,7 @@ use App\Http\Controllers\SkillsController;
 Route::get('login', 'apicontroller@login');
 
 Route::post('login', [apicontroller::class, 'login']);
+Route::post('register', [apicontroller::class, 'register']);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {

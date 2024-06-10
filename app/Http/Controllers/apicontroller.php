@@ -15,12 +15,71 @@ use App\Models\Task;
 use App\Models\UserWorkspace;
 use App\Models\TimeTracker;
 use App\Models\TrackPhoto;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
 class apicontroller extends Controller
 {
     use ApiResponser;
+
+    public function register(Request $request)
+    {           
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'workspace' => 'required', 'string', 'max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        do {
+            $code = rand(100000, 999999);
+        } while (DB::table('users')->where('referral_code', $code)->exists());
+
+        $setting = Utility::getAdminPaymentSetting();
+
+        $user = User::create([
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'workspace' => $request->workspace,
+            'password'  => Hash::make($request->password),
+            'plan'      => 1,
+            'lang'      => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en',
+            'referral_code' => $code,
+            'referral_used' => !empty($request->ref_code) ? $request->ref_code : '0',
+        ]);
+
+        $objWorkspace = Workspace::create([
+            'lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 
+            'created_by' => $user->id, 
+            'name' => $request->workspace, 
+            'currency_code' => 'USD', 'paypal_mode' => 'sandbox'
+        ]);
+
+        $userWorkspace               =   new UserWorkspace();
+        $userWorkspace->user_id      =     $user->id;
+        $userWorkspace->workspace_id =    $objWorkspace->id;
+        $userWorkspace->permission  = 'Owner';
+
+        if (empty($userWorkspace)) {
+            $errorArray[] = $userWorkspace;
+        } else {
+            $userWorkspace->save();
+        }
+
+        $user->currant_workspace = $objWorkspace->id;
+        $user->save();
+
+
+        User::userDefaultDataRegister($user);
+
+
+        return $this->success([
+            'token' => $user->createToken('API Token')->plainTextToken,
+            'user' => $user,
+        ],'Login successfully.');
+    }
 
     public function login(Request $request)
     {   
