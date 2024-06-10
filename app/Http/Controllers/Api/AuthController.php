@@ -8,9 +8,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\ApiResponser;
+
 
 class AuthController extends Controller
-{
+{   
+    use ApiResponser;
+
     public function register(Request $request): JsonResponse
     {           
         $request->validate([
