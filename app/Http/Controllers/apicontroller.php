@@ -18,6 +18,8 @@ use App\Models\TrackPhoto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules;
+
 
 
 class apicontroller extends Controller
@@ -104,7 +106,7 @@ class apicontroller extends Controller
             'token' => $user->createToken('API Token')->plainTextToken,
             'user' => $user,
             'settings' => $settings,
-        ],'Login successfully.');
+        ],'Registered successfully.');
     }
     public function logout()
     {
