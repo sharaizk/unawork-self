@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Skills extends Model
+class Skill extends Model
 {
     use HasFactory;
 
@@ -19,6 +19,6 @@ class Skills extends Model
 
     public function pods()
     {
-        return $this->belongsToMany(Pods::class, 'pods_skills', 'skill_id', 'pod_id');
+        return $this->belongsToMany(Pod::class, 'pods_skills', 'skill_id', 'pod_id');
     }
 }

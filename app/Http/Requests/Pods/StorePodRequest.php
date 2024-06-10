@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Http\Requests\Pods;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StorePodRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'title' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string|max:2048',
+            'skills' => 'nullable|array', // Додаємо валідацію для скілів
+            'skills.*' => 'integer|exists:skills,id' // Перевірка, що кожен скіл існує в таблиці skills
+        ];
+    }
+}

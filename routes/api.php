@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\apicontroller;
-use App\Http\Controllers\PodsController;
-use App\Http\Controllers\SkillsController;
+use App\Http\Controllers\Api\PodController;
+use App\Http\Controllers\Api\SkillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,11 +46,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::post('upload-photos', 'apicontroller@uploadImage')
 });
 
-Route::resource('skills', SkillsController::class)->middleware(['auth:sanctum']);
+Route::resource('skill', SkillController::class)->middleware(['auth:sanctum']);
 
 
-Route::get('/pods', [PodsController::class, 'index']);
-Route::post('/pods', [PodsController::class, 'store']);
-Route::get('/pods/{id}', [PodsController::class, 'show']);
-Route::post('/pods/{id}', [PodsController::class, 'update']);
-Route::delete('/pods/{id}', [PodsController::class, 'destroy']);
+Route::get('/pod', [PodController::class, 'index']);
+Route::post('/pod', [PodController::class, 'store']);
+Route::get('/pod/{id}', [PodController::class, 'show']);
+Route::post('/pod/{id}', [PodController::class, 'update']);
+Route::delete('/pod/{id}', [PodController::class, 'destroy']);

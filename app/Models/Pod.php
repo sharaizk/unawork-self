@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Pods extends Model
+class Pod extends Model
 {
     use HasFactory;
 
@@ -16,6 +16,6 @@ class Pods extends Model
 
     public function skills()
     {
-        return $this->belongsToMany(Skills::class, 'pods_skills', 'pod_id', 'skill_id');
+        return $this->belongsToMany(Skill::class, 'pods_skills', 'pod_id', 'skill_id');
     }
 }
