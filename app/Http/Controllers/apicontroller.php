@@ -26,50 +26,7 @@ class apicontroller extends Controller
 {
     use ApiResponser;
 
-    public function register(Request $request)
-    {           
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
 
-        $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-        ]);
-
-        return $this->success([
-            'token' => $user->createToken('API Token')->plainTextToken,
-            'user' => $user,
-        ],'Login successfully.');
-    }
-
-    public function login(Request $request)
-    {   
-        $attr = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ]);
-
-        if (!Auth::attempt($attr)) {
-            return response()->json(['error' => 'Credentials not match'], 401);
-        }
-
-        $user = Auth::user();
-
-        return $this->success([
-            'token' => $user->createToken('API Token')->plainTextToken,
-            'user' => $user,
-        ],'Registered successfully.');
-    }
-
-    public function logout()
-    {
-        auth()->user()->tokens()->delete();
-        return $this->success([],'Tokens Revoked');
-    }
 
     public function getworkspace(Request $request){
 
