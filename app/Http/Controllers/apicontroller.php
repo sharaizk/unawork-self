@@ -30,52 +30,15 @@ class apicontroller extends Controller
     {           
         $request->validate([
             'name' => 'required|string|max:255',
-            'workspace' => 'required', 'string', 'max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
-
-        do {
-            $code = rand(100000, 999999);
-        } while (DB::table('users')->where('referral_code', $code)->exists());
-
-        $setting = Utility::getAdminPaymentSetting();
 
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
-            'workspace' => $request->workspace,
             'password'  => Hash::make($request->password),
-            'plan'      => 1,
-            'lang'      => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en',
-            'referral_code' => $code,
-            'referral_used' => !empty($request->ref_code) ? $request->ref_code : '0',
         ]);
-
-        $objWorkspace = Workspace::create([
-            'lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 
-            'created_by' => $user->id, 
-            'name' => $request->workspace, 
-            'currency_code' => 'USD', 'paypal_mode' => 'sandbox'
-        ]);
-
-        $userWorkspace               =   new UserWorkspace();
-        $userWorkspace->user_id      =     $user->id;
-        $userWorkspace->workspace_id =    $objWorkspace->id;
-        $userWorkspace->permission  = 'Owner';
-
-        if (empty($userWorkspace)) {
-            $errorArray[] = $userWorkspace;
-        } else {
-            $userWorkspace->save();
-        }
-
-        $user->currant_workspace = $objWorkspace->id;
-        $user->save();
-
-
-        User::userDefaultDataRegister($user);
-
 
         return $this->success([
             'token' => $user->createToken('API Token')->plainTextToken,
@@ -95,19 +58,13 @@ class apicontroller extends Controller
         }
 
         $user = Auth::user();
-        $workspace_id =$user->currant_workspace ;
-        $getworkspace = Workspace::find($workspace_id);
-
-        $settings = [
-            'shot_time'=> isset($getworkspace->interval_time)?$getworkspace->interval_time:10,
-        ]; 
 
         return $this->success([
             'token' => $user->createToken('API Token')->plainTextToken,
             'user' => $user,
-            'settings' => $settings,
         ],'Registered successfully.');
     }
+
     public function logout()
     {
         auth()->user()->tokens()->delete();
