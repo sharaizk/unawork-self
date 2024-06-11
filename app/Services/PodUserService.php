@@ -42,16 +42,15 @@ class PodUserService
     private function createNewUser(array $data): User
     {
         return User::create([
-            'name' => $data['username'],
-            'email' => $data['useremail'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'plan' => NULL,
-            'password' => !is_null($data['userpassword']) ? Hash::make($data['userpassword']) : null, // should use bcrypt for hashing password
+            'password' => Hash::make($data['password']), // should use bcrypt for hashing password
             'email_verified_at' => date('Y-m-d i:h:s'),
-            'is_enable_login' => !empty($data['password_switch']) && $data['password_switch'] == 'on' ? 1 : 0,
+            'is_enable_login' => 1,
         ]);
     }
     
-
     private function isUserAssignedToPod(User $user, int $podId): bool
     {
         return $user->pods()

@@ -22,10 +22,9 @@ class InviteNewUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'useremail' => 'required|unique:users,email',
-            'username' => 'required|string',
-            'userpassword' => 'string',
-            'password_switch' => 'bool',
+            'email' => 'required|unique:users,email',
+            'name' => 'required|string',
+            'password' => 'required|string',
         ];
     }
 }
