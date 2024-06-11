@@ -23,9 +23,9 @@ class PodController extends Controller
     
     public function index(): AnonymousResourceCollection
     {
-        $pod = Pod::all();
+        $pods = Pod::all();
 
-        return PodResource::collection($pod);
+        return PodResource::collection($pods);
     }
 
     public function store(StorePodRequest $request): JsonResponse | PodResource

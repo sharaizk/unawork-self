@@ -14,8 +14,8 @@ class SkillController extends Controller
     public function index(): JsonResponse
     {   
         $this->authorize('viewAny', Skill::class);
-        $skill = Skill::all();
-        return response()->json($skill);
+        $skills = Skill::all();
+        return response()->json($skills);
     }
 
     public function store(Request $request): JsonResponse
