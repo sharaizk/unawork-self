@@ -29,17 +29,40 @@ class PodUserController extends Controller
             'user_id' => 'integer|exists:users,id',
         ]);
     
-        $response = $this->podUserService->inviteExistedUser($data['email'] ?? null, $data['user_id'] ?? null, $podId);
-    
-        return response()->json($response);
+        try {
+            $this->podUserService->inviteExistedUser($data['email'] ?? null, $data['user_id'] ?? null, $podId);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => 'An error occurred while processing the request.'
+            ], 500);
+        }
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'message' => 'User invited successfully'
+        ]);
     }
 
     public function inviteNewUser(InviteNewUserRequest $request, $podId): JsonResponse
     {   
         $data = $request->validated();
 
-        $response = $this->podUserService->inviteNewUser($data, $podId);
+        try {
+            $this->podUserService->inviteNewUser($data, $podId);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
 
-        return response()->json($response);
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'message' => 'User invited successfully'
+        ]);
     }
 }

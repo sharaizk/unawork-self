@@ -18,7 +18,7 @@ class PodService
         $pod = Pod::create($data);
         
         if($pod){
-            $this->attachPodToOwner($data['created_by'], $pod->id);
+            $this->attachOwnerToPod($data['created_by'], $pod->id);
         }
 
         if (isset($data['skills'])) {
@@ -61,7 +61,7 @@ class PodService
         }
     }
 
-    protected function attachPodToOwner(int $userId, int $podId): void
+    protected function attachOwnerToPod(int $userId, int $podId): void
     {
         $pod = Pod::find($podId);
         $pod->users()->attach($userId, [

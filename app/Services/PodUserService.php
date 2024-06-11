@@ -10,64 +10,35 @@ use Illuminate\Support\Facades\Mail;
 
 class PodUserService
 {
-    public function inviteExistedUser(string $email = null, int $userId = null, int $podId): array
+    public function inviteExistedUser(string $email = null, int $userId = null, int $podId): void
     {
-        $response = [
-            'code' => 404,
-            'status' => 'Error',
-            'error' => __('This User is not connected with our system. Please fill out the below details to invite.'),
-        ];
-
         $user = !is_null($email) ? User::where('email', $email)->first() 
             : (!is_null($userId) ? User::find($userId) 
                 : null);
 
-        if (!is_null($user)) {
-            if (!$this->isUserAssignedToPod($user, $podId)) {
-                $this->attachUserToPod($user, $podId);
-
-                try {
-                    $this->sendInvitationEmail($user, $podId);
-                } catch (\Exception $e) {
-                    $smtp_error = __('E-Mail has not been sent due to SMTP configuration');
-                }
-
-                $response = [
-                    'code' => 200,
-                    'status' => 'Success',
-                    'message' => __('User Invited Successfully!') . ((isset($smtp_error)) ? $smtp_error : ''),
-                ];
-            } else {
-                $response = [
-                    'code' => 202,
-                    'status' => 'error',
-                    'message' => __('This user is already a member of this pod.'),
-                ];
-            }
+        if (is_null($user)) {
+            throw new \Exception(__('This User is not connected with our system. Please fill out the below details to invite.'));
         }
 
-        return $response;
+        if ($this->isUserAssignedToPod($user, $podId)) {
+            throw new \Exception(__('This user is already a member of this pod.'));
+        }
+
+        $this->attachUserToPod($user, $podId);
+        $this->sendInvitationEmail($user, $podId);
     }
 
-    public function inviteNewUser(array $data, int $podId): array
+    public function inviteNewUser(array $data, int $podId): void
     {
         $user = $this->createNewUser($data);
-
         $this->attachUserToPod($user, $podId);
 
         try {
             $this->sendInvitationEmail($user, $podId);
-            $this->sendRegistrationEmail($user, $podId);
-
+            $this->sendRegistrationEmail($user);
         } catch (\Exception $e) {
-            $smtp_error = __('E-Mails has not been sent due to SMTP configuration');
+            throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
         }
-
-        return [
-            'code' => 200,
-            'status' => 'Success',
-            'message' => __('User Invited Successfully!') . (isset($smtp_error) ? $smtp_error : ''),
-        ];
     }
 
     private function createNewUser(array $data): User
