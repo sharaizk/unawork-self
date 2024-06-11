@@ -10,11 +10,9 @@ use Illuminate\Support\Facades\Mail;
 
 class PodUserService
 {
-    public function inviteExistedUser(string $email = null, int $userId = null, int $podId): void
+    public function inviteExistedUser(int $userId = null, int $podId): void
     {
-        $user = !is_null($email) ? User::where('email', $email)->first() 
-            : (!is_null($userId) ? User::find($userId) 
-                : null);
+        $user = User::find($userId);
 
         if (is_null($user)) {
             throw new \Exception(__('This User is not connected with our system. Please fill out the below details to invite.'));

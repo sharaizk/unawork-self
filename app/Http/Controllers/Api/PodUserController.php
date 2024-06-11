@@ -25,8 +25,7 @@ class PodUserController extends Controller
     public function inviteExistedUser(Request $request, $podId): JsonResponse
     {
         $data = $request->validate([
-            'email' => 'string|exists:users,email',
-            'user_id' => 'integer|exists:users,id',
+            'user_id' => 'required|integer|exists:users,id'
         ]);
     
         try {
