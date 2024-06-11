@@ -23,7 +23,12 @@ class PodUserService
         }
 
         $this->attachUserToPod($user, $podId);
-        $this->sendInvitationEmail($user, $podId);
+        
+        try {
+            $this->sendInvitationEmail($user, $podId);
+        } catch (\Exception $e) {
+            throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
+        }
     }
 
     public function inviteNewUser(array $data, int $podId): void

@@ -29,12 +29,12 @@ class PodUserController extends Controller
         ]);
     
         try {
-            $this->podUserService->inviteExistedUser($data['email'] ?? null, $data['user_id'] ?? null, $podId);
+            $this->podUserService->inviteExistedUser($data['user_id'], $podId);
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
                 'status' => 'error',
-                'message' => 'An error occurred while processing the request.'
+                'message' => $e->getMessage()
             ], 500);
         }
         return response()->json([
