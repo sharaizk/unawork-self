@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_pods', function (Blueprint $table) {
+        Schema::create('pod_users', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('pod_id');
@@ -30,11 +30,11 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
-    {
-        Schema::table('user_pods', function (Blueprint $table) {
+    {   
+        Schema::table('pod_users', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
             $table->dropForeign(['pod_id']);
         });
-        Schema::dropIfExists('user_pods');
+        Schema::dropIfExists('pod_users');
     }
 };

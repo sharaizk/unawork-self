@@ -1021,7 +1021,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function pods()
     {
         return $this->belongsToMany(Pod::class, 'user_pods')
-                    ->using(UserPod::class)
+                    ->using(PodUser::class)
                     ->withPivot('permission', 'status', 'reason')
                     ->withTimestamps();
     }

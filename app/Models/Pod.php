@@ -27,7 +27,7 @@ class Pod extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_pods')
-                    ->using(UserPod::class)
+                    ->using(PodUser::class)
                     ->withPivot('permission', 'status', 'reason')
                     ->withTimestamps();
     }
