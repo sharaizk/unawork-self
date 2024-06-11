@@ -58,3 +58,4 @@ Route::delete('/pod/{id}', [PodController::class, 'destroy']);
 
 
 Route::post('/pod/{id}/invite', [PodUserController::class, 'inviteExistedUser']);
+Route::post('/pod/{id}/inviteN', [PodUserController::class, 'inviteNewUser']);
