@@ -63,8 +63,8 @@ class PodService
 
     protected function attachPodToOwner(int $userId, int $podId): void
     {
-        $user = User::find($userId);
-        $user->pods()->attach($podId, [
+        $pod = Pod::find($podId);
+        $pod->users()->attach($userId, [
             'permission' => 'Owner',
             'status' => 'active'
         ]);
