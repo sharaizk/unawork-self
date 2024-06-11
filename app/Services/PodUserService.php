@@ -23,7 +23,7 @@ class PodUserService
         }
 
         $this->attachUserToPod($user, $podId);
-        
+
         try {
             $this->sendInvitationEmail($user, $podId);
         } catch (\Exception $e) {
@@ -59,8 +59,7 @@ class PodUserService
     private function isUserAssignedToPod(User $user, int $podId): bool
     {
         return $user->pods()
-            ->wherePivot('user_id', $user->id)
-            ->wherePivot('pod_id', $podId)
+            ->where('pods.id', $podId)
             ->exists();
     }
 
