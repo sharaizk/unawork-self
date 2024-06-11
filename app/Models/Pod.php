@@ -18,4 +18,9 @@ class Pod extends Model
     {
         return $this->belongsToMany(Skill::class, 'pods_skills', 'pod_id', 'skill_id');
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }
