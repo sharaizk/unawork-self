@@ -23,4 +23,12 @@ class Pod extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_pods')
+                    ->using(UserPod::class)
+                    ->withPivot('permission', 'status', 'reason')
+                    ->withTimestamps();
+    }
 }
