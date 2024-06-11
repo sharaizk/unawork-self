@@ -15,43 +15,18 @@ use App\Models\Task;
 use App\Models\UserWorkspace;
 use App\Models\TimeTracker;
 use App\Models\TrackPhoto;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules;
+
 
 
 class apicontroller extends Controller
 {
     use ApiResponser;
 
-    public function login(Request $request)
-    {   
-        $attr = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ]);
 
-        if (!Auth::attempt($attr)) {
-            return response()->json(['error' => 'Credentials not match'], 401);
-        }
-
-        $user = Auth::user();
-        $workspace_id =$user->currant_workspace ;
-        $getworkspace = Workspace::find($workspace_id);
-
-        $settings = [
-            'shot_time'=> isset($getworkspace->interval_time)?$getworkspace->interval_time:10,
-        ]; 
-
-        return $this->success([
-            'token' => $user->createToken('API Token')->plainTextToken,
-            'user' => $user,
-            'settings' => $settings,
-        ],'Login successfully.');
-    }
-    public function logout()
-    {
-        auth()->user()->tokens()->delete();
-        return $this->success([],'Tokens Revoked');
-    }
 
     public function getworkspace(Request $request){
 

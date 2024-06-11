@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\apicontroller;
@@ -21,13 +22,12 @@ use App\Http\Controllers\SkillsController;
 // });
 //Route::get('login', [LoginController::class, 'login']);
 
-Route::get('login', 'apicontroller@login');
-
-Route::post('login', [apicontroller::class, 'login']);
+Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('logout', [apicontroller::class, 'logout']);
+    Route::post('logout', [AuthController::class, 'logout']);
     Route::get('/get-projects', [apicontroller::class, 'getProjects']);
     Route::get('/get-workspace', [apicontroller::class, 'getworkspace']);
     Route::post('add-tracker', [apicontroller::class, 'addTracker']);
