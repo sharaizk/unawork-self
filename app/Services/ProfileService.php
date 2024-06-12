@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\Storage;
 class ProfileService
 {
     public function createProfile(User $user, array $data): Profile
-    {
+    {   
+        $exist = $user->profile()->exists();
+
+        if ($exist) {
+            throw new \Exception('User can\t have more than one profile.');
+        }
+
         if (isset($data['cv'])) {
             $data['cv'] = $this->uploadFile($data['cv']);
         }

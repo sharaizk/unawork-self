@@ -18,20 +18,20 @@ class ProfileController extends Controller
         $this->profileService = $profileService;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         $profile = auth('sanctum')->user()->profile;
 
         return response()->json($profile);
     }
 
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request): JsonResponse
     {   
         $data = $request->validated();
         $user = auth('sanctum')->user();
 
         try {
-            $profile = $this->profileService->createPod($user, $data);
+            $profile = $this->profileService->createProfile($user, $data);
             return response()->json($profile, 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -54,7 +54,7 @@ class ProfileController extends Controller
         return response()->json($profile);
     }
 
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $profile = auth('sanctum')->user()->profile();
         
