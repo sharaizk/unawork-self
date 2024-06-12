@@ -57,5 +57,5 @@ Route::post('/pod/{id}', [PodController::class, 'update']);
 Route::delete('/pod/{id}', [PodController::class, 'destroy']);
 
 
-Route::post('/pod/{id}/invite', [PodUserController::class, 'inviteExistedUser']);
-Route::post('/pod/{id}/inviteN', [PodUserController::class, 'inviteNewUser']);
+Route::post('/pod/{id}/users', [PodUserController::class, 'inviteExistedUser']);
+Route::post('/pod/{id}/users/new', [PodUserController::class, 'inviteNewUser']);
