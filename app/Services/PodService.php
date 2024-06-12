@@ -18,7 +18,7 @@ class PodService
         $pod = Pod::create($data);
         
         if ($pod) {
-            $this->attachOwnerToPod($data['created_by'], $pod->id);
+            $this->attachOwnerToPod($data['created_by'], $pod);
         }
 
         if (isset($data['skills'])) {
