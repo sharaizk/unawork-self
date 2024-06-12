@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PodUser\InviteNewUserRequest;
+use App\Http\Requests\PodUser\UpdateRequest;
 use App\Services\PodUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -60,7 +61,7 @@ class PodUserController extends Controller
         ]);
     }
 
-    public function requestJoinPod(Request $request, $podId): JsonResponse
+    public function join(Request $request, $podId): JsonResponse
     {
         try {
             $userId = auth('sanctum')->user()->id; 
@@ -80,7 +81,7 @@ class PodUserController extends Controller
         }
     }
 
-    public function viewJoinRequests($podId): JsonResponse
+    public function listing($podId): JsonResponse
     {
         try {
             $requests = $this->podUserService->getAllJoinRequests($podId);
@@ -99,12 +100,9 @@ class PodUserController extends Controller
         }
     }
 
-    public function moderateJoinRequest(Request $request, $requestId): JsonResponse
+    public function update(UpdateRequest $request, $podId, $requestId): JsonResponse
     {
-        $data = $request->validate([
-            'action' => 'required|string|in:accept,decline',
-            'reason' => 'required_if:action,decline|string'
-        ]);
+        $data = $request->validated();
 
         try {
             $this->podUserService->moderateJoinRequest($requestId, $data['action'], $data['reason'] ?? null);
