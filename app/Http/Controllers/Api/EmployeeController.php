@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employee\FilterRequest;
 use App\Http\Resources\EmployeeResource;
-use App\Models\User;
 use App\Services\EmployeeService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Request;
