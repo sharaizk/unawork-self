@@ -30,7 +30,8 @@ class FilterRequest extends FormRequest
             'zip_code' => 'string|max:10',
             'address' => 'string|max:255',
             'phone_number' => 'string|max:20',
-            'skill_id' => 'integer|exists:skills,id',
+            'skill_id' => 'nullable|array',
+            'skill_id.*' => 'integer|exists:skills,id',
         ];
     }
 }

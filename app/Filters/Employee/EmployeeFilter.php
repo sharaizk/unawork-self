@@ -88,7 +88,7 @@ class EmployeeFilter
     protected function skill_id($value)
     {
         $this->builder->whereHas('skills', function ($query) use ($value) {
-            $query->where('skills.id', $value);
+            $query->whereIn('skills.id', $value);
         });
     }
 }
