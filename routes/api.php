@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\apicontroller;
 use App\Http\Controllers\Api\PodController;
+use App\Http\Controllers\Api\PodUserController;
 use App\Http\Controllers\Api\SkillController;
 
 /*
@@ -54,3 +55,7 @@ Route::post('/pod', [PodController::class, 'store']);
 Route::get('/pod/{id}', [PodController::class, 'show']);
 Route::post('/pod/{id}', [PodController::class, 'update']);
 Route::delete('/pod/{id}', [PodController::class, 'destroy']);
+
+
+Route::post('/pod/{id}/users', [PodUserController::class, 'inviteExistedUser']);
+Route::post('/pod/{id}/users/new', [PodUserController::class, 'inviteNewUser']);

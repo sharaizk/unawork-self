@@ -11,11 +11,23 @@ class Pod extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'image', 'description'
+        'title', 'image', 'description', 'created_by'
     ];
 
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'pods_skills', 'pod_id', 'skill_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'pod_users')
+                    ->withPivot('permission', 'status', 'reason')
+                    ->withTimestamps();
     }
 }

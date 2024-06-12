@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Pod;
-use App\Models\Utility;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +16,11 @@ class PodService
         }
     
         $pod = Pod::create($data);
-    
+        
+        if ($pod) {
+            $this->attachOwnerToPod($data['created_by'], $pod);
+        }
+
         if (isset($data['skills'])) {
             $pod->skills()->sync($data['skills']);
         }
@@ -55,5 +59,13 @@ class PodService
         } else {
             throw new \Exception('Failed to upload image.');
         }
+    }
+
+    protected function attachOwnerToPod(int $userId, Pod $pod): void
+    {
+        $pod->users()->attach($userId, [
+            'permission' => 'Owner',
+            'status' => 'active'
+        ]);
     }
 }

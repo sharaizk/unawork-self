@@ -31,7 +31,8 @@ class PodController extends Controller
     public function store(StorePodRequest $request): JsonResponse | PodResource
     {   
         $data = $request->validated();
-
+        $data['created_by'] = auth('sanctum')->user()->id;
+        
         try {
             $pod = $this->podService->createPod($data);
             return new PodResource($pod);
