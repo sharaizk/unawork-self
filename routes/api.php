@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\apicontroller;
 use App\Http\Controllers\Api\PodController;
 use App\Http\Controllers\Api\PodUserController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SkillController;
 
 /*
@@ -45,7 +46,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::post('add-tracker', 'apicontroller@addTracker');
     // Route::post('stop-tracker', 'apicontroller@stopTracker');
     // Route::post('upload-photos', 'apicontroller@uploadImage')
-});
 
 Route::resource('skill', SkillController::class)->middleware(['auth:sanctum']);
 
@@ -63,3 +63,10 @@ Route::post('/pod/{id}/users/new', [PodUserController::class, 'inviteNewUser']);
 Route::post('/pods/{id}/requests', [PodUserController::class, 'join']);
 Route::get('/pods/{id}/requests', [PodUserController::class, 'listing']);
 Route::post('pods/{id}/requests/{requestId}', [PodUserController::class, 'update']);
+
+Route::get('/profile', [ProfileController::class, 'index']);
+Route::post('/profile', [ProfileController::class, 'store']);
+Route::post('/profile/{id}', [ProfileController::class, 'update']);
+Route::delete('/profile/{id}', [ProfileController::class, 'destroy']);
+    
+});
