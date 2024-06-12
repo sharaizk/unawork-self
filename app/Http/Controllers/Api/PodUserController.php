@@ -84,4 +84,47 @@ class PodUserController extends Controller
             ], 500);
         }
     }
+
+    public function viewJoinRequests($podId): JsonResponse
+    {
+        try {
+            $requests = $this->podUserService->getAllJoinRequests($podId);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'data' => $requests
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function moderateJoinRequest(Request $request, $requestId): JsonResponse
+    {
+        $data = $request->validate([
+            'action' => 'required|string|in:accept,decline',
+            'reason' => 'required_if:action,decline|string'
+        ]);
+
+        try {
+            $this->podUserService->moderateJoinRequest($requestId, $data['action'], $data['reason'] ?? null);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Join request moderated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

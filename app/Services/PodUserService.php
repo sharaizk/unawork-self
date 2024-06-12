@@ -62,6 +62,34 @@ class PodUserService
         ]);
     }
 
+    public function getAllJoinRequests(int $podId)
+    {
+        return PodUser::where('pod_id', $podId)->where('status', 'pending')->get();
+    }
+
+    public function moderateJoinRequest(int $requestId, string $action, ?string $reason = null): void
+    {
+        $request = PodUser::findOrFail($requestId);
+
+        if ($request->status != 'pending') {
+            throw new \Exception('You can moderate only pending requests');
+        }
+
+        if ($action === 'accept') {
+            $request->status = 'active';
+        } elseif ($action === 'decline') {
+            if (is_null($reason)) {
+                throw new \Exception('Reason is required for declining a request');
+            }
+            $request->status = 'declined';
+            $request->reason = $reason;
+        } else {
+            throw new \Exception('Invalid action');
+        }
+
+        $request->save();
+    }
+
     private function createNewUser(array $data): User
     {
         return User::create([
