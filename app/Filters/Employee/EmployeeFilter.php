@@ -33,59 +33,59 @@ class EmployeeFilter
         return $this->request;
     }
 
-    protected function name($value)
+    protected function name(string $value): void
     {
         $this->builder->where('name', 'like', "%$value%");
     }
 
-    protected function email($value)
+    protected function email(string $value): void
     {
         $this->builder->where('email', 'like', "%$value%");
     }
 
-    protected function country($value)
+    protected function country(string $value): void
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
             $query->where('country', 'like', "%$value%");
         });
     }
 
-    protected function state($value)
+    protected function state(string $value): void
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
             $query->where('state', 'like', "%$value%");
         });
     }
 
-    protected function city($value)
+    protected function city(string $value): void
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
             $query->where('city', 'like', "%$value%");
         });
     }
 
-    protected function zip_code($value)
+    protected function zip_code(string $value): void
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
             $query->where('zip_code', 'like', "%$value%");
         });
     }
 
-    protected function address($value)
+    protected function address(string $value): void
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
             $query->where('address', 'like', "%$value%");
         });
     }
 
-    protected function phone_number($value)
+    protected function phone_number(string $value): void
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
             $query->where('phone_number', 'like', "%$value%");
         });
     }
 
-    protected function skill_id($value)
+    protected function skill_ids(array $value): void
     {
         $this->builder->whereHas('skills', function ($query) use ($value) {
             $query->whereIn('skills.id', $value);
