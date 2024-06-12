@@ -4,14 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PodUser\InviteNewUserRequest;
-use App\Models\Pod;
-use App\Models\User;
 use App\Services\PodUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 
 class PodUserController extends Controller
 {   
