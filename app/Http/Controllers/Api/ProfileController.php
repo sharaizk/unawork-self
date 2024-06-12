@@ -42,16 +42,16 @@ class ProfileController extends Controller
 
     public function update(UpdateRequest $request, $profileId): JsonResponse
     {   
-
         $data = $request->validated();
-        $userId =auth('sanctum')->user()->id;
-        $profile = Profile::find($profileId);
 
-        return response()->json($profile);
-        
-        $profile->update($data);
-
-        return response()->json($profile);
+        try {
+            $profile = $this->profileService->updateProfile($profileId, $data);
+            return response()->json($profile, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function destroy(string $id): JsonResponse

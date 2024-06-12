@@ -49,16 +49,16 @@ class ProfileService
         return $profile;
     }
 
-    protected function uploadFile(UploadedFile $image): string
+    protected function uploadFile(UploadedFile $file): string
     {
         $dir = 'profile-files';
-        $imgName = uniqid() . '.pdf';
-        $path = $image->storeAs($dir, $imgName);
+        $fileName = uniqid() . '.pdf';
+        $path = $file->storeAs($dir, $fileName);
 
         if ($path) {
             return $path;
         } else {
-            throw new \Exception('Failed to upload image.');
+            throw new \Exception('Failed to upload file.');
         }
     }
 }

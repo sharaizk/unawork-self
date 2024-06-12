@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PodController;
 use App\Http\Controllers\Api\PodUserController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SkillController;
+use App\Http\Controllers\Api\EmployeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,5 +69,7 @@ Route::get('/profile', [ProfileController::class, 'index']);
 Route::post('/profile', [ProfileController::class, 'store']);
 Route::post('/profile/{id}', [ProfileController::class, 'update']);
 Route::delete('/profile/{id}', [ProfileController::class, 'destroy']);
-    
+
 });
+
+Route::get('/employees', [EmployeeController::class, 'index']);
