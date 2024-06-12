@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Pod;
 use App\Models\PodUser;
 use App\Models\User;
+use App\Enums\PodUser\Permission;
+use App\Enums\PodUser\Status;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -57,14 +59,14 @@ class PodUserService
         PodUser::create([
             'user_id' => $userId,
             'pod_id' => $podId,
-            'permission' => 'Member',
-            'status' => 'pending'
+            'permission' => Permission::MEMBER->value,
+            'status' => Status::PENDING->value
         ]);
     }
 
     public function getAllJoinRequests(int $podId)
     {
-        return PodUser::where('pod_id', $podId)->where('status', 'pending')->get();
+        return PodUser::where('pod_id', $podId)->where('status', Status::PENDING->value)->get();
     }
 
     public function moderateJoinRequest(int $requestId, string $action, ?string $reason = null): void
@@ -76,12 +78,12 @@ class PodUserService
         }
 
         if ($action === 'accept') {
-            $request->status = 'active';
+            $request->status = Status::ACTIVE->value;
         } elseif ($action === 'decline') {
             if (is_null($reason)) {
                 throw new \Exception('Reason is required for declining a request');
             }
-            $request->status = 'declined';
+            $request->status = Status::DECLINED->value;
             $request->reason = $reason;
         } else {
             throw new \Exception('Invalid action');
@@ -112,7 +114,7 @@ class PodUserService
     private function attachUserToPod(User $user, int $podId): void
     {
         $user->pods()->attach($podId, [
-            'permission' => 'Member',
+            'permission' => Permission::MEMBER->value,
             'status' => 'active'
         ]);
     }
