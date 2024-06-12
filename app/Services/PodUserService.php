@@ -44,6 +44,24 @@ class PodUserService
         }
     }
 
+    public function requestJoinPod(int $userId, int $podId): void
+    {
+        $exists = PodUser::where('user_id', $userId)
+            ->where('pod_id', $podId)
+            ->exists();
+
+        if ($exists) {
+            throw new \Exception('You have already submitted a join request for this pod.');
+        }
+
+        PodUser::create([
+            'user_id' => $userId,
+            'pod_id' => $podId,
+            'permission' => 'Member',
+            'status' => 'pending'
+        ]);
+    }
+
     private function createNewUser(array $data): User
     {
         return User::create([

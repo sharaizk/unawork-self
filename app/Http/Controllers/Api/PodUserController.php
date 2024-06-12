@@ -64,4 +64,24 @@ class PodUserController extends Controller
             'message' => 'User invited successfully'
         ]);
     }
+
+    public function requestJoinPod(Request $request, $podId): JsonResponse
+    {
+        try {
+            $userId = auth('sanctum')->user()->id; 
+            $this->podUserService->requestJoinPod($userId, $podId);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Join request submitted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

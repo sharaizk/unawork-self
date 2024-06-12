@@ -59,3 +59,7 @@ Route::delete('/pod/{id}', [PodController::class, 'destroy']);
 
 Route::post('/pod/{id}/users', [PodUserController::class, 'inviteExistedUser']);
 Route::post('/pod/{id}/users/new', [PodUserController::class, 'inviteNewUser']);
+
+Route::post('/pod/{id}/request', [PodUserController::class, 'requestJoinPod']);
+Route::get('/pod/{id}/requests', [PodUserController::class, 'viewJoinRequests']);
+Route::post('/pod/request/{requestId}/moderate', [PodUserController::class, 'moderateJoinRequest']);
