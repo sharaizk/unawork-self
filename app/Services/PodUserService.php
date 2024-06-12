@@ -115,7 +115,7 @@ class PodUserService
     {
         $user->pods()->attach($podId, [
             'permission' => Permission::MEMBER->value,
-            'status' => 'active'
+            'status' => Status::ACTIVE->value
         ]);
     }
 
