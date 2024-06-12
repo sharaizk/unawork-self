@@ -4,14 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PodUser\InviteNewUserRequest;
-use App\Models\Pod;
-use App\Models\User;
+use App\Http\Requests\PodUser\UpdateRequest;
 use App\Services\PodUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 
 class PodUserController extends Controller
 {   
@@ -63,5 +59,65 @@ class PodUserController extends Controller
             'status' => 'success',
             'message' => 'User invited successfully'
         ]);
+    }
+
+    public function join(Request $request, $podId): JsonResponse
+    {
+        try {
+            $userId = auth('sanctum')->user()->id; 
+            $this->podUserService->requestJoinPod($userId, $podId);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Join request submitted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function listing($podId): JsonResponse
+    {
+        try {
+            $requests = $this->podUserService->getAllJoinRequests($podId);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'data' => $requests
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(UpdateRequest $request, $podId, $requestId): JsonResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $this->podUserService->moderateJoinRequest($requestId, $data['action'], $data['reason'] ?? null);
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Join request moderated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 500,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
