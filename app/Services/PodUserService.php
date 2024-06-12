@@ -73,7 +73,7 @@ class PodUserService
     {
         $request = PodUser::findOrFail($requestId);
 
-        if ($request->status != 'pending') {
+        if ($request->status != Status::PENDING->value) {
             throw new \Exception('You can moderate only pending requests');
         }
 
