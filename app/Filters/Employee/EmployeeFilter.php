@@ -10,7 +10,7 @@ class EmployeeFilter
     protected $request;
     protected $builder;
 
-    public function __construct(Request $request)
+    public function __construct(array $request)
     {
         $this->request = $request;
     }
@@ -30,7 +30,7 @@ class EmployeeFilter
 
     public function filters(): array
     {
-        return $this->request->all();
+        return $this->request;
     }
 
     protected function name($value)
@@ -46,42 +46,42 @@ class EmployeeFilter
     protected function country($value)
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
-            $query->where('profile.country', 'like', "%$value%");
+            $query->where('country', 'like', "%$value%");
         });
     }
 
     protected function state($value)
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
-            $query->where('profile.state', 'like', "%$value%");
+            $query->where('state', 'like', "%$value%");
         });
     }
 
     protected function city($value)
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
-            $query->where('profile.city', 'like', "%$value%");
+            $query->where('city', 'like', "%$value%");
         });
     }
 
     protected function zip_code($value)
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
-            $query->where('profile.zip_code', 'like', "%$value%");
+            $query->where('zip_code', 'like', "%$value%");
         });
     }
 
     protected function address($value)
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
-            $query->where('profile.address', 'like', "%$value%");
+            $query->where('address', 'like', "%$value%");
         });
     }
 
     protected function phone_number($value)
     {
         $this->builder->whereHas('profile', function ($query) use ($value) {
-            $query->where('profile.phone_number', 'like', "%$value%");
+            $query->where('phone_number', 'like', "%$value%");
         });
     }
 

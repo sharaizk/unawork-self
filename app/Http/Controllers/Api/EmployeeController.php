@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Filters\Employee\EmployeeFilter;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Employee\ListRequest;
 use App\Http\Resources\EmployeeResource;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Services\EmployeeService;
 
 class EmployeeController extends Controller
 {
-    public function index(Request $request)
+    protected $employeeService;
+
+    public function __construct(EmployeeService $employeeService)
     {
-        $filter = new EmployeeFilter($request);
-        $employees = $filter->apply(User::with(['profile', 'skills']));
-        return EmployeeResource::collection($employees->get());
+        $this->employeeService = $employeeService;
+    }
+
+    public function index(ListRequest $request)
+    {
+        $data = $request->validated();
+        $employees = $this->employeeService->getEmployees($data);
+        return EmployeeResource::collection($employees);
     }
 }
