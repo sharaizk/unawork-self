@@ -18,5 +18,12 @@ class EmployeeService
         return $employees->get();
     }
 
-
+    public function show(int $id)
+    {
+        try {
+            return User::find($id);
+        } catch (\Exception $e) {
+            throw new \Exception(__($e->getMessage()));
+        }
+    }
 }

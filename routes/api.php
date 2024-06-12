@@ -73,3 +73,4 @@ Route::delete('/profile/{id}', [ProfileController::class, 'destroy']);
 });
 
 Route::get('/employees', [EmployeeController::class, 'index']);
+Route::get('/employees/{id}', [EmployeeController::class, 'show']);
