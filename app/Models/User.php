@@ -1024,4 +1024,9 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withPivot('permission', 'status', 'reason')
                     ->withTimestamps();
     }
+    
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
 }
