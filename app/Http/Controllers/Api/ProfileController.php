@@ -25,21 +25,6 @@ class ProfileController extends Controller
         return response()->json($profile);
     }
 
-    public function store(StoreRequest $request): JsonResponse
-    {   
-        $data = $request->validated();
-        $user = auth('sanctum')->user();
-
-        try {
-            $profile = $this->profileService->createProfile($user, $data);
-            return response()->json($profile, 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
-
     public function update(UpdateRequest $request, $profileId): JsonResponse
     {   
         $data = $request->validated();

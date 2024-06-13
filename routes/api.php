@@ -66,7 +66,6 @@ Route::get('/pods/{id}/requests', [PodUserController::class, 'listing']);
 Route::post('pods/{id}/requests/{requestId}', [PodUserController::class, 'update']);
 
 Route::get('/profile', [ProfileController::class, 'index']);
-Route::post('/profile', [ProfileController::class, 'store']);
 Route::post('/profile/{id}', [ProfileController::class, 'update']);
 Route::delete('/profile/{id}', [ProfileController::class, 'destroy']);
 

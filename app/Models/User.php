@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\PlanRequest;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -1025,8 +1026,8 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withTimestamps();
     }
     
-    public function profile()
+    public function profile(): HasOne
     {
-        return $this->hasOne(Profile::class);
+        return $this->hasOne(Profile::class)->withDefault();
     }
 }
