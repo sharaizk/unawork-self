@@ -40,6 +40,15 @@ class ProfileService
             }
             $data['cv'] = $this->uploadFile($data['cv']);
         }
+
+        if (isset($data['skill_ids'])) {
+            try {
+                $this->linkSkills($data['skill_ids'], $profile->user_id);
+            } catch (\Exception $e) {
+                throw new \Exception('Failed to update skills.'.$e->getMessage());
+            }
+        }
+
         try {
             $profile->update($data);
         } catch (\Exception $e) {
@@ -60,5 +69,11 @@ class ProfileService
         } else {
             throw new \Exception('Failed to upload file.');
         }
+    }
+
+    protected function linkSkills(array $skills, int $user_id): void
+    {
+        $user = User::find($user_id);
+        $user->skills()->sync($skills);
     }
 }

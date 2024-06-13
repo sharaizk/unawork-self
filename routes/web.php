@@ -60,6 +60,7 @@ use App\Http\Controllers\ReferralProgramController;
 use App\Http\Controllers\PaiementproController;
 use App\Http\Controllers\NepalsteController;
 use App\Http\Controllers\CinetPayController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\PayHerePaymentController;
 
@@ -76,6 +77,12 @@ use App\Http\Controllers\PayHerePaymentController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/employee/profile', [EmployeeController::class, 'showProfile'])->name('employee.profile');
+    Route::get('/employee/profile/update', [EmployeeController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/employee/chats', [EmployeeController::class, 'showChats'])->name('employee.chats');
+});
 
 Route::get('/', function () {
     return view('welcome');

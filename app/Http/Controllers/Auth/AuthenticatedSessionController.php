@@ -40,7 +40,7 @@ class AuthenticatedSessionController extends Controller
         if ($checkUser) {
             if ($checkUser->is_enable_login == 1) {
                 $currentWorkspace = UserWorkspace::where('workspace_id', '=', $checkUser->currant_workspace)->where('user_id', $checkUser->id)->first();
-                if ($currentWorkspace->is_active == 0) {
+                if ($currentWorkspace && $currentWorkspace->is_active == 0) {
                     $userOtherWorkspace = UserWorkspace::where('user_id', $checkUser->id)->where('is_active', 1)->get();
 
                     if (count($userOtherWorkspace)) {
@@ -109,7 +109,7 @@ class AuthenticatedSessionController extends Controller
                 'date' => date('Y-m-d H:i:s'),
                 'details' => $json,
                 'type' => 'user',
-                'created_by' => $user->currant_workspace,
+                'created_by' => $user->currant_workspace ?? null,
             ]);
         }
 
