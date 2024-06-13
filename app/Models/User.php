@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\PlanRequest;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -1023,5 +1024,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Pod::class, 'pod_users')
                     ->withPivot('permission', 'status', 'reason')
                     ->withTimestamps();
+    }
+    
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class)->withDefault();
     }
 }
