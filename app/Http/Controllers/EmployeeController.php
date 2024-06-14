@@ -2,34 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Skill;
-use Illuminate\Http\Request;
-use Auth;
+use App\Http\Requests\Profile\UpdateRequest;
+use App\Services\ProfileService;
 
 class EmployeeController extends Controller
 {
-    public function showProfile()
+    public function updateProfile(UpdateRequest $request, $profileId)
     {
-        $employee = Auth::user();
-        $profile = $employee->profile;
-        $skills = $employee->skills;
+        $data = $request->validated();
 
-        return view('employee.profile', compact('employee', 'profile', 'skills'));
-    }
-
-    public function updateProfile()
-    {
-        $employee = Auth::user();
-        $profile = $employee->profile;
-        $skills = Skill::all(); 
-
-        return view('employee.edit_profile', compact('employee', 'profile', 'skills'));
-    }
-
-    public function showChats()
-    {
-        $employee = Auth::user();
-        $chats = []; 
-        return view('employee.chats', compact('employee', 'chats'));
+        try {
+            $profileService = new ProfileService;
+            $profileService->updateProfile($profileId, $data);
+            return redirect()->back()->with('success', __('Profile Updated Successfully!'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', __($e->getMessage()));
+        }
     }
 }

@@ -79,7 +79,7 @@
                                </a>
                            </li>
                        @endif
-                       @if (isset($currentWorkspace) && $currentWorkspace)
+                       @if (isset($currentWorkspace) && $currentWorkspace && !Auth::user()->isEmployee)
                            @auth('web')
                                <li class="dash-item dash-hasmenu">
                                    <a href="{{ route('users.index', $currentWorkspace->slug) }}"
@@ -345,6 +345,21 @@
                            </li>
                        @endif
 
+                       @if (Auth::user()->isEmployee)
+                            @if ($adminSetting['enable_chat'] == 'on')
+                                <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
+                                    <a href="{{ route('chats') }}" class="dash-link"><span class="dash-micon"><i
+                                                class="ti ti-message-circle"></i></span><span
+                                            class="dash-mtext">{{ __('Messenger') }}</span></a>
+                                </li>
+                                
+                            @endif
+                            <li class="dash-item ">
+                                <a href="" class="dash-link"><span class="dash-micon"><i
+                                            class="ti ti-message-circle"></i></span><span
+                                        class="dash-mtext">{{ __('PODS') }}</span> </a>
+                            </li>
+                       @endif
                </div>
            </div>
        </nav>

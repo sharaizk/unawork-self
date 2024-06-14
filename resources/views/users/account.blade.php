@@ -25,6 +25,12 @@
                     <a href="#v-pills-profile"
                         class="list-group-item list-group-item-action border-0">{{ __('Change Password') }} <div
                             class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+                    
+                    @if ($user->isEmployee)
+                        <a href="#v-pills-profiler"
+                            class="list-group-item list-group-item-action border-0">{{ __('Employee Profile') }} <div
+                                class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+                    @endif
 
                     @auth('client')
                         <a href="#v-pills-billing"
@@ -210,6 +216,21 @@
             </form>
         </div>
     </div>
+    @if ($user->isEmployee)
+        <div class="card" id="v-pills-profiler">
+            <div class="card-header">
+                <h5>{{ __('Employee Profile') }}</h5>
+            </div>
+            <div class="card-body">
+                @php 
+                    $profile = $user->profile;
+                    $skills = \App\Models\Skill::all();
+                @endphp
+                @include('employee.edit_profile', ['user' => $user, 'profile' => $profile, 'skills' => $skills])
+            
+            </div>
+        </div>
+    @endif
     @auth('client')
         <div class="card" id="v-pills-billing">
 

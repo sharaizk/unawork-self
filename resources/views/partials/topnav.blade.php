@@ -106,6 +106,9 @@
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
+                    
+                    <!--all about workspaces, not for employee -->
+                    @if (!Auth::user()->isEmployee)
                         {{-- @foreach (Auth::user()->workspace as $workspace)
                             @if ($workspace->is_active)
                                 <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
@@ -274,7 +277,7 @@
                                 @endif
                             @endauth
                         @endif
-
+                    @endif
                         <a href="@auth('web'){{ route('users.my.account') }}@elseauth{{ route('client.users.my.account') }}@endauth"
                             class="dropdown-item">
                             <i class="ti ti-user"></i>
@@ -547,8 +550,10 @@
         </div>
     </div>
 </header>
-@if (\Auth::user()->type != 'admin' && $login_status == false)
-    <script>
-        document.getElementById('logout-form1').submit();
-    </script>
+@if (isset($login_status))
+    @if (\Auth::user()->type != 'admin' && $login_status == false)
+        <script>
+            document.getElementById('logout-form1').submit();
+        </script>
+    @endif
 @endif

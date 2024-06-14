@@ -79,9 +79,7 @@ use App\Http\Controllers\PayHerePaymentController;
 */
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/employee/profile', [EmployeeController::class, 'showProfile'])->name('employee.profile');
-    Route::get('/employee/profile/update', [EmployeeController::class, 'updateProfile'])->name('profile.update');
-    Route::get('/employee/chats', [EmployeeController::class, 'showChats'])->name('employee.chats');
+    Route::post('/employee/profile/{id}/update', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
 });
 
 Route::get('/', function () {
