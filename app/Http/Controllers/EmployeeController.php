@@ -11,7 +11,7 @@ class EmployeeController extends Controller
     {
         $data = $request->validated();
 
-        $profileId = auth('snctum')->user()->profile->id;
+        $profileId = auth('sanctum')->user()->profile->id;
 
         try {
             $profileService = new ProfileService;
