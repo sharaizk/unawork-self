@@ -80,7 +80,7 @@ use App\Http\Controllers\PodController;
 Route::middleware(['auth'])->group(function () {
     Route::post('/employee/profile', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
     
-    Route::get('/pod', [PodController::class, 'index'])->name('pods.index');
+    Route::get('/pods', [PodController::class, 'index'])->name('pods.index');
 });
 
 Route::get('/hiring', [HirePageController::class, 'index']);
