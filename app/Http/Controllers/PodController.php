@@ -13,9 +13,4 @@ class PodController extends Controller
         $currentWorkspace = $user->currentWorkspace;
         return view('users.pod', compact('currentWorkspace', 'user'));
     }
-
-    public function store(Request $request)
-    {   
-        return redirect()->back()->with('success', __('Payment Approved Successfully!'));
-    }
 }
