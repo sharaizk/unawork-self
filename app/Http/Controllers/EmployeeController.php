@@ -11,11 +11,11 @@ class EmployeeController extends Controller
     {
         $data = $request->validated();
 
-        $profileId = auth('sanctum')->user()->profile->id;
+        $profile = auth('sanctum')->user()->profile;
 
         try {
             $profileService = new ProfileService;
-            $profileService->updateProfile($profileId, $data);
+            $profileService->updateProfile($profile, $data);
             return redirect()->back()->with('success', __('Profile Updated Successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', __($e->getMessage()));

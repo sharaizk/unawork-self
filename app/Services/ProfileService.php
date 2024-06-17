@@ -29,10 +29,8 @@ class ProfileService
     
     }
 
-    public function updateProfile(int $profileId, array $data): Profile
+    public function updateProfile(Profile $profile, array $data): Profile
     {
-        $profile = Profile::find($profileId);
-
         if (isset($data['cv'])) {
             //del old image if it was
             if ($profile->cv) {
