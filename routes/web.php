@@ -64,9 +64,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\HirePageController;
 use App\Http\Controllers\PayHerePaymentController;
-
-
-
+use App\Http\Controllers\PodController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +79,9 @@ use App\Http\Controllers\PayHerePaymentController;
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/employee/profile', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
+    
+    Route::get('/pod', [PodController::class, 'index'])->name('pod');
+    Route::post('/pod', [PodController::class, 'store'])->name('pod.create');
 });
 
 Route::get('/hiring', [HirePageController::class, 'index']);
