@@ -80,7 +80,7 @@ use App\Http\Controllers\PayHerePaymentController;
 */
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/employee/profile/{id}/update', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
+    Route::post('/employee/profile', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
 });
 
 Route::get('/hiring', [HirePageController::class, 'index']);

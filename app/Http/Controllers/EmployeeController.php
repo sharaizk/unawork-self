@@ -7,9 +7,11 @@ use App\Services\ProfileService;
 
 class EmployeeController extends Controller
 {
-    public function updateProfile(UpdateRequest $request, $profileId)
+    public function updateProfile(UpdateRequest $request)
     {
         $data = $request->validated();
+
+        $profileId = auth('snctum')->user()->profile-id;
 
         try {
             $profileService = new ProfileService;
