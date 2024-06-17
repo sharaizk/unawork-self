@@ -1,4 +1,4 @@
-<form action="{{ route('employee.profile.update', ['id' => $profile->id]) }}" method="POST">
+<form action="{{ route('employee.profile.update') }}" method="POST">
         @csrf
 
     <div class="col-lg-12">
