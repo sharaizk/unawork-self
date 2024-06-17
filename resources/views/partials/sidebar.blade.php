@@ -354,7 +354,7 @@
                                 </li>
                                 
                             @endif
-                            <li class="dash-item {{ Request::route()->getName() == 'pod' ? ' active' : '' }}">
+                            <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
                                 <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
                                             class="ti ti-message-circle"></i></span><span
                                         class="dash-mtext">{{ __('PODS') }}</span> </a>
