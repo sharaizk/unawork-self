@@ -29,6 +29,8 @@ class AuthController extends Controller
             'password'  => Hash::make($request->password),
         ]);
 
+        $user->assignRole('employee');
+        
         return $this->success([
             'token' => $user->createToken('API Token')->plainTextToken,
             'user' => $user,

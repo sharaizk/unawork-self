@@ -29,6 +29,8 @@ class UpdateRequest extends FormRequest
             'address' => 'string|max:255',
             'phone_number' => 'string|max:20',
             'cv_file' => 'file|mimes:pdf|max:10240',
+            'skill_ids' => 'nullable|array',
+            'skill_ids.*' => 'integer|exists:skills,id',
         ];
     }
 }

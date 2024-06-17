@@ -1,0 +1,116 @@
+.container-master {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+.hire__title {
+    font-size: 40px;
+    margin: 40px 0;
+    margin-bottom: 3rem;
+    padding: 0;
+    border: 0;
+    box-sizing: inherit;
+    outline: none !important;
+    text-decoration: none !important;
+}
+.hire-card {
+    overflow: hidden;
+    flex-wrap: wrap;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #fff;
+    border: 3px solid #CFAA40;
+    margin-bottom: 30px;
+    font: inherit;
+}
+
+.hire-card .card__header {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.hire-card .card__image {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.hire-card .card__title {
+    margin-left: 15px;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    font-size: 2rem;
+    color: #000;
+}
+
+.hire-card .card__body {
+    margin: 20px 0;
+}
+
+.hire-card .card__footer {
+    width: 100%;
+}
+
+.hire-card .card__actions a {
+    margin-right: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.hire-card .card__actions a:hover {
+    text-decoration: underline;
+}
+
+.hire__wrapper {
+    margin: 40px 0;
+    background-color: #fff;
+    height: 100%;
+}
+
+.card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+.card__footer a {
+    font-family: "Averta", Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    border-radius: 1rem;
+    height: 4rem;
+    width: 47%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background: #022d4d;
+}
+.sendMessageButton {
+    font-family: "Averta", Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    border-radius: 1rem;
+    height: 4rem;
+    width: 47%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background: #022d4d;
+}
+.hire-card .card__body {
+    margin: 20px 0;
+}
+.hire-card .card__copy {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    height: 6rem;
+    overflow: hidden;
+    color: #000;
+}

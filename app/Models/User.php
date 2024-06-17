@@ -15,11 +15,12 @@ use App\Models\Order;
 use App\Models\PlanRequest;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Lab404\Impersonate\Models\Impersonate;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
 
-    use Notifiable, HasApiTokens;
+    use Notifiable, HasApiTokens, HasRoles;
     use HasApiTokens, HasFactory, Notifiable, Impersonate;
 
 

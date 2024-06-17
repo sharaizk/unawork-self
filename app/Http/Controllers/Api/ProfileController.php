@@ -29,8 +29,10 @@ class ProfileController extends Controller
     {   
         $data = $request->validated();
 
+        $profile = auth('sanctum')->user()->profile;
+
         try {
-            $profile = $this->profileService->updateProfile($profileId, $data);
+            $profile = $this->profileService->updateProfile($profile, $data);
             return response()->json($profile, 200);
         } catch (\Exception $e) {
             return response()->json([
