@@ -45,9 +45,9 @@
                                                 class="ti ti-pencil"></i> <span>{{ __('Edit') }}</span>
                                         </a>
                                     @endif
-                                    <!-- <a href="#" class="dropdown-item" data-size="md"
+                                    <a href="{{ route('pods.show', $podId=$pod->id) }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Reset Password') }}"><i 
-                                            class="ti ti-pencil"></i> <span>{{ __('Edit Pod') }}</span></a> -->
+                                            class="ti ti-pencil"></i> <span>{{ __('Go to Pod') }}</span></a> 
                                 </div>
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                         document.getElementById('success-message').style.display = 'block';
                         setTimeout(function() {
                             // document.getElementById('success-message').style.display = 'none';
-                            location.reload(); // Перезавантаження сторінки після 5 секунд
+                            location.reload(); 
                         }, 3000);
                     } catch (error) {
                         console.error(error); 

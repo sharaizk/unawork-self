@@ -30,4 +30,13 @@ class PodController extends Controller
         $skills = Skill::all();
         return view('pod.edit_form', compact('pod', 'skills'));
     }
+
+    public function show(int $podId)
+    {
+        $user = Auth::user();
+        $currentWorkspace = $user->currentWorkspace;
+        $pod = Pod::find($podId);
+        return view('pod.manage.index', compact('currentWorkspace', 'pod'));
+    }
+    
 }
