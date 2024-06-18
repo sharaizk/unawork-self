@@ -23,6 +23,14 @@
             <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="card   text-center">
                     <div class="card-header border-0 pb-0">
+                            @if (isset($pod->pivot->permission))
+                                @if ($pod->pivot->permission == 'Owner')
+                                    <span
+                                        class="badge bg-primary">{{ __($pod->pivot->permission) }}</span>
+                                @else
+                                    <span class="badge bg-dark">{{ __('Member') }}</span>
+                                @endif
+                            @endif
                         <div class="card-header-right">
                             <div class="btn-group card-option">
                                 <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
