@@ -27,7 +27,7 @@ class PodController extends Controller
     public function edit(int $podId)
     {
         $pod = Pod::find($podId);
-        $skills = Skill::all(); // Припустимо, що у вас є модель Skill
+        $skills = Skill::all();
         return view('pod.edit_form', compact('pod', 'skills'));
     }
 }
