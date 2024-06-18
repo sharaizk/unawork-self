@@ -38,11 +38,13 @@
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" 
-                                         data-title="{{ __('Edit') }}"
-                                        data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i 
-                                            class="ti ti-pencil"></i> <span>{{ __('Edit') }}</span>
-                                    </a>
+                                    @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
+                                        <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" 
+                                            data-title="{{ __('Edit') }}"
+                                            data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i 
+                                                class="ti ti-pencil"></i> <span>{{ __('Edit') }}</span>
+                                        </a>
+                                    @endif
                                     <!-- <a href="#" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Reset Password') }}"><i 
                                             class="ti ti-pencil"></i> <span>{{ __('Edit Pod') }}</span></a> -->
