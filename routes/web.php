@@ -83,6 +83,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pods', [PodController::class, 'index'])->name('pods.index');
     Route::get('/pods/create', [PodController::class, 'create'])->name('pods.create');
     Route::get('/pods/{podId}/edit', [PodController::class, 'edit'])->name('pods.edit');
+
+    Route::get('/pods/{podId}', [PodController::class, 'show'])->name('pods.show');
 });
 
 Route::get('/hiring', [HirePageController::class, 'index']);
