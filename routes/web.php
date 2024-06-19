@@ -88,8 +88,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pods/{podId}', [PodController::class, 'show'])->name('pods.show');
     Route::get('/pods/{podId}/users', [PodUserController::class, 'index'])->name('pods.users');
     Route::get('/pods/{podId}/invite', [PodUserController::class, 'create'])->name('pods.invite');
-    Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');
+    Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
 });
 
 Route::get('/hiring', [HirePageController::class, 'index']);
