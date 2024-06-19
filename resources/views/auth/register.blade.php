@@ -52,10 +52,16 @@
                     <div class="">
                         <div class="form-group mb-3">
                             <label for="role" class="form-label">{{ __('Register as:') }}</label>
-                            <select name="role" id="role" class="form-control">
-                                <option value="employee" selected>{{ __('Employee') }}</option>
-                                <option value="employer">{{ __('Employer') }}</option>
-                            </select>
+                            <div class="d-flex justify-content-between">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="role" id="employee" value="employee" checked>
+                                    <label class="form-check-label" for="employee">{{ __('Employee') }}</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="role" id="company" value="company">
+                                    <label class="form-check-label" for="company">{{ __('Company') }}</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label for="fullname" class="form-label">{{ __('Full Name') }}</label>
@@ -63,17 +69,6 @@
                                 id="fullname" value="{{ old('name') }}" required autocomplete="name" autofocus
                                 placeholder="{{ __('Enter Your Name') }}">
                             @error('name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="workspace_name" class="form-label">{{ __('Workspace Name') }}</label>
-                            <input type="text" class="form-control  @error('workspace_name') is-invalid @enderror"
-                                name="workspace" id="workspace_name" value="{{ old('workspace') }}" required
-                                autocomplete="workspace" placeholder="{{ __('Enter Your Workspace Name') }}">
-                            @error('company')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
