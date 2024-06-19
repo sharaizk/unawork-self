@@ -50,7 +50,13 @@
                     @endif
                     @csrf
                     <div class="">
-
+                        <div class="form-group mb-3">
+                            <label for="role" class="form-label">{{ __('Register as:') }}</label>
+                            <select name="role" id="role" class="form-control">
+                                <option value="employee" selected>{{ __('Employee') }}</option>
+                                <option value="employer">{{ __('Employer') }}</option>
+                            </select>
+                        </div>
                         <div class="form-group mb-3">
                             <label for="fullname" class="form-label">{{ __('Full Name') }}</label>
                             <input type="text" class="form-control  @error('name') is-invalid @enderror" name="name"

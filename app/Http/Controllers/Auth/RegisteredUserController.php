@@ -16,6 +16,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Mail\SendLoginDetail;
+use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
 
 
@@ -214,6 +215,11 @@ class RegisteredUserController extends Controller
 
         $user->currant_workspace = $objWorkspace->id;
         $user->save();
+
+        if ($request->role == "employee") {
+            $employeeService = new EmployeeService;
+            $employeeService->makeEmployee($user);
+        }
 
         User::userDefaultDataRegister($user);
         // dd($user,$setting,$setting['email_verification']);
