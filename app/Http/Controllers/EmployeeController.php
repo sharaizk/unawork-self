@@ -12,10 +12,10 @@ class EmployeeController extends Controller
         $data = $request->validated();
 
         $user = auth('sanctum')->user();
+        $profileService = new ProfileService;
 
         if ($user->profile->exists === false) {
             try {
-                $profileService = new ProfileService;
                 $profileService->createProfile($user, $data);
                 return redirect()->back()->with('success', __('Profile Created and Updated Successfully!'));
             } catch (\Exception $e) {
@@ -23,7 +23,6 @@ class EmployeeController extends Controller
             }
         } else {
             try {
-                $profileService = new ProfileService;
                 $profileService->updateProfile($user->profile, $data);
                 return redirect()->back()->with('success', __('Profile Updated Successfully!'));
             } catch (\Exception $e) {
