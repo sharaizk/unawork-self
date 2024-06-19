@@ -46,7 +46,7 @@
     
     <div class="row">
         <div class="text-end">
-            <button type="submit" class="btn-submit btn btn-primary ">Update POD</button>
+            <button type="submit" class="btn-submit btn btn-primary ">Create POD</button>
         </div>
     </div>
 </form>
