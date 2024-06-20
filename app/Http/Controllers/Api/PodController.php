@@ -53,6 +53,7 @@ class PodController extends Controller
     public function update(UpdatePodRequest $request, int $id): JsonResponse | PodResource
     {   
         $pod = Pod::findOrFail($id);
+        $this->authorize('update', $pod);
         $data = $request->validated();
     
         try {

@@ -16,6 +16,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Mail\SendLoginDetail;
+use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
 
 
@@ -176,7 +177,6 @@ class RegisteredUserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'workspace' => 'required', 'string', 'max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -188,7 +188,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
-            'workspace' => $request->workspace,
+            'workspace' => $request->name,
             'password'  => Hash::make($request->password),
             'plan'      => 1,
             'lang'      => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en',
@@ -196,7 +196,7 @@ class RegisteredUserController extends Controller
             'referral_used' => !empty($request->ref_code) ? $request->ref_code : '0',
         ]);
 
-        $objWorkspace = Workspace::create(['lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 'created_by' => $user->id, 'name' => $request->workspace, 'currency_code' => 'USD', 'paypal_mode' => 'sandbox']);
+        $objWorkspace = Workspace::create(['lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 'created_by' => $user->id, 'name' => $request->name, 'currency_code' => 'USD', 'paypal_mode' => 'sandbox']);
 
         $setting = Utility::getAdminPaymentSetting();
 
@@ -214,6 +214,13 @@ class RegisteredUserController extends Controller
 
         $user->currant_workspace = $objWorkspace->id;
         $user->save();
+
+        if ($request->role == "employee") {
+            $employeeService = new EmployeeService;
+            $employeeService->makeEmployee($user);
+        } elseif ($request->role == "company") {
+            $user->assignRole('company');
+        }
 
         User::userDefaultDataRegister($user);
         // dd($user,$setting,$setting['email_verification']);
