@@ -18,6 +18,15 @@
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
+                    <label for="image" class="form-label">Image:</label>
+                    <input type="file" class="form-control" name="image" id="image">
+                </div>
+                @if ($post->image)
+                    <img src="{{ asset('storage/' . $post->image) }}" alt="post Image" class="img-fluid mt-2">
+                @endif
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
                     <label for="content" class="form-label">Content:</label>
                     <textarea class="form-control" name="content" id="content" rows="3">{{ old('content', $post->content ?? '') }}</textarea>
                 </div>

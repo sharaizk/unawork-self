@@ -27,6 +27,7 @@ class StoreRequest extends FormRequest
             'short_content' => 'string|max:255',
             'newsable_type' => 'required|string',
             'newsable_id' => 'required|integer',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

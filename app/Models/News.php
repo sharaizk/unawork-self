@@ -15,7 +15,8 @@ class News extends Model
         'short_content',
         'newsable_id',
         'newsable_type',
-        'created_by'
+        'created_by',
+        'image'
     ];
 
     public function newsable()

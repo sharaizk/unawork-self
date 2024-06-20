@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\News;
 use App\Models\Pod;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class NewsService
 {
@@ -22,6 +24,10 @@ class NewsService
             throw new \Exception('Newsable entity not found');
         }
 
+        if (isset($data['image'])) {
+            $data['image'] = $this->uploadImage($data['image']);
+        }
+
         $newsObj = new News($data);
         $news = $newsable->news()->save($newsObj);
         return $news;
@@ -29,6 +35,15 @@ class NewsService
 
     public function update(array $data, News $news)
     {
+        if (isset($data['image'])) {
+            //del old image if it was
+            if ($news->image) {
+                Storage::delete($news->image);
+            }
+            
+            $data['image'] = $this->uploadImage($data['image']);    
+        }
+
         if ($news) {
             $news->update($data);
             return $news;
@@ -44,6 +59,19 @@ class NewsService
             return true;
         } else {
             throw new \Exception('News not found');
+        }
+    }
+
+    protected function uploadImage(UploadedFile $image): string
+    {
+        $dir = 'news-images';
+        $imgName = uniqid() . '.png';
+        $path = $image->storeAs($dir, $imgName);
+
+        if ($path) {
+            return $path;
+        } else {
+            throw new \Exception('Failed to upload image.');
         }
     }
 }

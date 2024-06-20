@@ -20,6 +20,12 @@
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
+                    <label for="image" class="form-label">Image:</label>
+                    <input type="file" class="form-control" name="image" id="image">
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
                     <label for="content" class="form-label">Content:</label>
                     <textarea class="form-control" name="content" id="content" rows="3"></textarea>
                 </div>
@@ -39,5 +45,6 @@
         </div>
     </div>
 </form>
+
 
 

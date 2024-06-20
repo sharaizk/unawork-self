@@ -30,8 +30,9 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size" avatar="{{ $new->title }}" >
-                            
+                    <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
+                            @if ($new->image) src="{{ asset ('storage/'. $new->image) }}" @else avatar="{{ $new->title }}" @endif>
+                        
                     <h4 class="mt-2">{{ $new->title }}</h4>
                     <span>{{ $new->short_content }}</span>
                     <!-- <br>
