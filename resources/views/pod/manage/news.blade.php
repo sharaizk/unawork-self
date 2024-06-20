@@ -34,10 +34,10 @@
                             
                     <h4 class="mt-2">{{ $new->title }}</h4>
                     <span>{{ $new->short_content }}</span>
-                    <br>
+                    <!-- <br>
                     <small>
                         {{ $new->content }}
-                    </small>
+                    </small> -->
                 </div>
             </div>
         </div>
@@ -55,10 +55,22 @@
     </div>
 </div>
 
+<script src="{{ asset('assets/js/plugins/tinymce/tinymce.min.js') }}"></script>
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         console.log (0);
         $(document).on('shown.bs.modal', function (e) {
+            tinymce.init({
+                selector: 'textarea#content',
+                plugins: 'lists link image charmap print preview hr anchor pagebreak',
+                toolbar_mode: 'floating',
+                setup: function (editor) {
+                    editor.on('init', function (e) {
+                        console.log('Editor initialized');
+                    });
+                }
+            });
+
             const form = document.querySelector('.edit-news-form');
             if (form) {console.log (1);}
 
@@ -67,6 +79,8 @@
 
                 const formData = new FormData(form);
                 const dataUrl = form.getAttribute('data-url');
+                const content = tinymce.get('content').getContent();
+                formData.append('content', content);
 
                 try {
                     const response = await axios.post(dataUrl, formData);

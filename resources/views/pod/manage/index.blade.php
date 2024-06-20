@@ -31,6 +31,17 @@
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         $(document).on('shown.bs.modal', function (e) {
+            tinymce.init({
+                selector: 'textarea#content',
+                plugins: 'lists link image charmap print preview hr anchor pagebreak',
+                toolbar_mode: 'floating',
+                setup: function (editor) {
+                    editor.on('init', function (e) {
+                        console.log('Editor initialized');
+                    });
+                }
+            });
+
             const form = document.querySelector('.invite-user-form');
             const inviteUserButton = document.getElementById('inviteUserButton');
             const podId = {{ $pod->id }};
@@ -83,5 +94,6 @@
 });
 </script>
 
+<script src="{{ asset('assets/js/plugins/tinymce/tinymce.min.js') }}"></script>
 
 @endpush
