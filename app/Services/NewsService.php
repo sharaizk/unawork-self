@@ -27,9 +27,8 @@ class NewsService
         return $news;
     }
 
-    public function update(array $data, int $id)
+    public function update(array $data, News $news)
     {
-        $news = News::find($id);
         if ($news) {
             $news->update($data);
             return $news;
@@ -38,9 +37,8 @@ class NewsService
         }
     }
 
-    public function destroy(int $id)
+    public function destroy(News $news)
     {
-        $news = News::find($id);
         if ($news) {
             $news->delete();
             return true;
