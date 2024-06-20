@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PodUserController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\NewsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,3 +74,7 @@ Route::delete('/profile/{id}', [ProfileController::class, 'destroy']);
 
 Route::get('/employees', [EmployeeController::class, 'index']);
 Route::get('/employees/{id}', [EmployeeController::class, 'show']);
+
+
+Route::resource('news', NewsController::class)->except('update');
+Route::post('/news/{id}', [NewsController::class, 'update']);

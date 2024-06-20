@@ -30,4 +30,9 @@ class Pod extends Model
                     ->withPivot('permission', 'status', 'reason')
                     ->withTimestamps();
     }
+
+    public function news()
+    {
+        return $this->morphMany(News::class, 'newsable');
+    }
 }
