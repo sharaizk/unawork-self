@@ -11,14 +11,23 @@ class EmployeeController extends Controller
     {
         $data = $request->validated();
 
-        $profile = auth('sanctum')->user()->profile;
+        $user = auth('sanctum')->user();
+        $profileService = new ProfileService;
 
-        try {
-            $profileService = new ProfileService;
-            $profileService->updateProfile($profile, $data);
-            return redirect()->back()->with('success', __('Profile Updated Successfully!'));
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', __($e->getMessage()));
+        if ($user->profile->exists === false) {
+            try {
+                $profileService->createProfile($user, $data);
+                return redirect()->back()->with('success', __('Profile Created and Updated Successfully!'));
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', __($e->getMessage()));
+            }
+        } else {
+            try {
+                $profileService->updateProfile($user->profile, $data);
+                return redirect()->back()->with('success', __('Profile Updated Successfully!'));
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', __($e->getMessage()));
+            }
         }
     }
 }

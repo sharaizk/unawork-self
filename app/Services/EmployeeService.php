@@ -26,4 +26,13 @@ class EmployeeService
             throw new \Exception(__($e->getMessage()));
         }
     }
+
+    public function makeEmployee(User $user)
+    {
+        try {
+            $user->assignRole('employee');
+        } catch (\Exception $e) {
+            throw new \Exception(__($e->getMessage()));
+        }
+    }
 }
