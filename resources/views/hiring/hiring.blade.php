@@ -59,7 +59,7 @@
                     _token: '{{ csrf_token() }}'
                 };
 
-                fetch('./chatify/api/sendMessage', {
+                fetch('{{ ENV("APP_URL") }}chatify/api/sendMessage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

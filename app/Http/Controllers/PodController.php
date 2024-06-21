@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\News;
 use App\Models\Pod;
 use App\Models\Skill;
 use App\Models\User;
@@ -36,7 +37,19 @@ class PodController extends Controller
         $user = Auth::user();
         $currentWorkspace = $user->currentWorkspace;
         $pod = Pod::find($podId);
-        return view('pod.manage.index', compact('currentWorkspace', 'pod'));
+        return view('pod.landing.index', compact('currentWorkspace', 'pod'));
     }
-    
+
+    public function showOuter(int $podId)
+    {
+        $pod = Pod::find($podId);
+        return view('pod.landing.index', compact('pod'));
+    }
+
+    public function showOnePost(int $podId, int $postId)
+    {
+        $pod = Pod::find($podId);
+        $post = News::find($postId);
+        return view('news.one_post', compact('pod', 'post'));
+    }
 }

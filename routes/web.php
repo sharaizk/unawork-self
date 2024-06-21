@@ -98,7 +98,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
 });
 
-Route::get('/hiring', [HirePageController::class, 'index']);
+Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
+Route::get('/pods/{podId}', [PodController::class, 'showOuter'])->name('landing.pods.show');
+Route::get('/pods/{podId}/news/{newsId}', [PodController::class, 'showOnePost'])->name('landing.pods.news.show');
 
 
 Route::get('/', function () {
