@@ -26,14 +26,14 @@
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
-                    <label for="content" class="form-label">Content:</label>
-                    <textarea class="form-control" name="content" id="content" rows="3"></textarea>
+                    <label for="short_content" class="form-label">Short Content:</label>
+                    <textarea class="form-control" name="short_content" id="short_content" rows="3"></textarea>
                 </div>
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
-                    <label for="short_content" class="form-label">Short Content:</label>
-                    <textarea class="form-control" name="short_content" id="short_content" rows="3"></textarea>
+                    <label for="content" class="form-label">Content:</label>
+                    <textarea class="form-control" name="content" id="content" rows="3"></textarea>
                 </div>
             </div>
         </div>
