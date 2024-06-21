@@ -1,13 +1,13 @@
 <div class="boxarchives__content">
     <h3 class="title_box">Industry based info</h3>
-    <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+    <!-- <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a> -->
     <div class="boxarchives__content__list">
         @foreach($news as $post)
             <div class="boxarchives__content__list__item">
             
             <h3 class="boxarchives__content__list__item__title">
                 <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" 
-                    data-title="{{ __('Edit') }}" 
+                    data-title="Open post no {{ $post->id }}" 
                     data-url="{{ route('landing.pods.news.show', ['podId' => $podId, 'newsId' => $post->id]) }}""
                     data-title="{{ __('Edit this post') }}">
                     <i class="ti ti-pencil"></i> 

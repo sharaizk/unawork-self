@@ -37,7 +37,7 @@ class PodController extends Controller
         $user = Auth::user();
         $currentWorkspace = $user->currentWorkspace;
         $pod = Pod::find($podId);
-        return view('pod.landing.index', compact('currentWorkspace', 'pod'));
+        return view('pod.manage.index', compact('currentWorkspace', 'pod'));
     }
 
     public function showOuter(int $podId)
