@@ -100,6 +100,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
 Route::get('/pods/{podId}', [PodController::class, 'showOuter'])->name('landing.pods.show');
+Route::get('/pods/{podId}/news', [PodController::class, 'showNews'])->name('landing.pods.news.list');
+
 Route::get('/pods/{podId}/news/{newsId}', [PodController::class, 'showOnePost'])->name('landing.pods.news.show');
 
 

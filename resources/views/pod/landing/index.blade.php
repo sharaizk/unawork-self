@@ -9,14 +9,14 @@
 <link rel="stylesheet" href="http://unawork.net/styles/scss/outer-pods.css">
 <section class="section__titlepage">
     <div class="container-master">
-        <h1 class="section__titlepage--headertitle"><span>Outer Pods</span></h1>
+        <h1 class="section__titlepage--headertitle"><span>{{ $pod->title }}</span></h1>
     </div>
 </section>
 <section class="section__tasksmeeting">
     <div class="container-master">
         <div class="row-master">            
             <div class="boxarchives col-12 col-xl-6">
-                @include('pod.landing.news', ['news' => $pod->news, 'podId' => $pod->id])
+                @include('pod.landing.news', ['news' => $news, 'podId' => $pod->id])
                 
             </div>
             <div class="members col-12 col-xl-6">
@@ -47,6 +47,15 @@
 
 @push('scripts')
 @section('scripts')
+<script type="text/javascript">
+    $(document).ready(function(){
+    $('.section__general_info .buttonViewAll').on('click', function(e){
+        e.preventDefault();
+        $('.members__info_list--item').css('display', '');
+        $(this).hide();
+    });
+});
+</script>
 @endsection
 
 

@@ -4,7 +4,7 @@
                 <div class="header__container">
                     <div class="logoHeader">
                         <a href="/" title="UnaWork">
-                            <img src="./images/header/logo.png" alt="Logo UnaWork">
+                            <img src="http://unawork.net/images/header/logo.png" alt="Logo UnaWork">
                         </a>
                     </div>
                     <div class="header__main">
@@ -12,7 +12,7 @@
                             <ul class="nav__list">
                                 <li class="logoHeaderMenu">
                                     <a href="/">
-                                        <img src="./images/header/logo.png" alt="Logo UnaWork">
+                                        <img src="http://unawork.net/images/header/logo.png" alt="Logo UnaWork">
                                     </a>
                                 </li>
                                 <li class="">
@@ -29,7 +29,7 @@
                                 <li class="">
                                     <a href="{{ route('landing.hiring') }}">Hire</a>
                                 </li>
-                                                                    <li class="">
+                                    <li class="">
                                         <a href="/manage-plate.php" title="Manage">Manage</a>
                                     </li>
                                     <li class="">
@@ -38,11 +38,10 @@
                                     <li class="">
                                         <a href="/signup.php" title="Manage">Register</a>
                                     </li>
-                                                            </ul>
+                            </ul>
                         </nav>
                     </div>
-
-                                    </div>
+                </div>
             </div>
         </div>
     </header>

@@ -1,12 +1,17 @@
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
 <div class="section__general_info">
     <h3 class="title_box">Members</h3>
-    <!-- <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a> -->
+    <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right">&raquo;</i></a>
 
     <div class="members__info_list">
 
-        @foreach($users as $user)
+        @foreach($users as $index => $user)
                     
-        <div class="members__info_list--item">
+        <div class="members__info_list--item" {!! $index > 2 ? 'style="display: none;"' : '' !!}>
             <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
                             @if ($user->image) src="{{ asset ('storage/'. $user->avatar) }}" @else avatar="{{ $user->name }}" @endif>
                         

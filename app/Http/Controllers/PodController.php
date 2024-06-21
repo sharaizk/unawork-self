@@ -43,7 +43,15 @@ class PodController extends Controller
     public function showOuter(int $podId)
     {
         $pod = Pod::find($podId);
-        return view('pod.landing.index', compact('pod'));
+        $news = $pod->news()->latest('created_at')->get();
+        return view('pod.landing.index', compact('pod', 'news'));
+    }
+
+    public function showNews(int $podId)
+    {
+        $pod = Pod::find($podId);
+        $news = $pod->news()->latest('created_at')->get();
+        return view('news.list', compact('pod', 'news'));
     }
 
     public function showOnePost(int $podId, int $postId)
