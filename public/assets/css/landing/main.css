@@ -2642,7 +2642,7 @@ html {
 @font-face {
   font-family: "Averta";
   src: local("Averta"),
-    url("../fonts/Averta/Averta-Regular.otf") format("truetype");
+    url("/assets/fonts/Averta/Averta-Regular.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -2650,14 +2650,14 @@ html {
 @font-face {
   font-family: "Averta-Light";
   src: local("Averta-Light"),
-    url("../fonts/Averta/Averta-Light.otf") format("truetype");
+    url("/assets/fonts/Averta/Averta-Regular.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Caros";
-  src: local("Caros"), url("../fonts/Caros/Caros.otf") format("truetype");
+  src: local("Caros"), url("/assets/fonts/Caros/Caros-Medium.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -2665,7 +2665,7 @@ html {
 @font-face {
   font-family: "Caros-Thin";
   src: local("Caros-Thin"),
-    url("../fonts/Caros/Caros-Thin.otf") format("truetype");
+    url("/assets/fonts/Caros/Caros-Thin.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -2673,7 +2673,7 @@ html {
 @font-face {
   font-family: "Caros-Medium";
   src: local("Caros-Medium"),
-    url("../fonts/Caros/Caros-Medium.otf") format("truetype");
+    url("/assets/fonts/Caros/Caros-Medium.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -2681,7 +2681,7 @@ html {
 @font-face {
   font-family: "Caros-Bold";
   src: local("Caros-Bold"),
-    url("../fonts/Caros/Caros-Bold.otf") format("truetype");
+    url("/assets/fonts/Caros/Caros-Bold.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

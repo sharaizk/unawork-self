@@ -4,6 +4,7 @@
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
+    
 }
 .hire__title {
     font-size: 40px;
@@ -29,6 +30,7 @@
 .hire-card .card__header {
     align-items: center;
     justify-content: flex-start;
+    display: flex;
 }
 
 .hire-card .card__image {
@@ -38,7 +40,7 @@
     overflow: hidden;
 }
 
-.hire-card .card__title {
+.hire-card .card__title a{
     margin-left: 15px;
     font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
     font-size: 2rem;
@@ -55,7 +57,12 @@
 
 .hire-card .card__actions a {
     margin-right: 10px;
-    color: #007bff;
+    color: #fff;
+    text-decoration: none;
+}
+.hire-card .card__actions button {
+    margin-right: 10px;
+    color: #fff;
     text-decoration: none;
 }
 
@@ -77,6 +84,20 @@
     border: 0;
 }
 .card__footer a {
+    font-family: "Averta", Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    border-radius: 1rem;
+    height: 4rem;
+    width: 47%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background: #022d4d;
+}
+.card__footer button {
     font-family: "Averta", Arial, Helvetica, sans-serif;
     font-size: 1rem;
     text-transform: uppercase;
