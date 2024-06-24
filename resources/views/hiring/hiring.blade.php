@@ -1,11 +1,57 @@
 @extends('layouts.landing')
 
 @section('content')
-<section class="hire__banner">
-    <img src="{{ asset('assets/images/landing/bannerHire.jpg') }}" alt="">
-  </section>
-  <br>
-            <!-- filter form -->
+<style>
+    .header__search{
+        background-color: #022d4d;
+        font-size: 1.8rem;
+    }
+
+    .search__wrap {
+        display: flex;
+        align-items: center;
+        font-size: 1.8rem;
+    }
+
+    .search__box {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-right: 15px;
+        font-size: 1.8rem;
+    }
+
+    .search__field {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+        font-size: 1.8rem;
+    }
+
+    .search__icon {
+        margin-right: 5px;
+    }
+
+    .search__list {
+        flex: 1;
+        margin-right: 15px;
+        font-size: 1.8rem;
+    }
+
+    .form-control {
+        flex: 1;
+        margin-right: 5px;
+        font-size: 1.8rem;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        font-size: 1.8rem;
+    }
+</style>
+<!-- filter form -->
 <section class="header__search">
     <div class="container-master">
         <div class="search__wrap">
@@ -16,7 +62,7 @@
                     </span>
                     <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') }}">
                 </div>
-                <div class="search__list">
+                <div class="search__field">
                     <select name="country" id="country" class="form-control">
                         <option value="">Select Country</option>
                         @foreach($countries as $country)
@@ -24,7 +70,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="search__list">
+                <div class="search__field">
                     <select name="skill" id="skill" class="form-control">
                         <option value="">Select Skill</option>
                         @foreach($skills as $skill)
@@ -37,26 +83,24 @@
         </div>
     </div>
 </section>
-
-    <section class="hire__wrapper">
-        <div class="container-master">
-            <h1 class="hire__title">
-                <span>Employees</span>
-            </h1>
-
-
-
-            <div class="row-master">
-                @foreach($employees as $employee)
-                    <div class="col-12 col-md-6">
-                        @include('hiring.employeecard', ['employee' => $employee])
-                    </div>
-                @endforeach
-            </div>
+<section class="hire__banner">
+    <img src="{{ asset('assets/images/landing/bannerHire.jpg') }}" alt="">
+</section>
+<section class="hire__wrapper">
+    <div class="container-master">
+        <h1 class="hire__title">
+            <span>Employees</span>
+        </h1>
+        <div class="row-master">
+            @foreach($employees as $employee)
+                <div class="col-12 col-md-6">
+                    @include('hiring.employeecard', ['employee' => $employee])
+                </div>
+            @endforeach
         </div>
-    </section>
-    
-    <div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
+    </div>
+</section>
+<div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -72,7 +116,6 @@
   </div>
 </div>
 @endsection
-
 
 @section('scripts')
 <script type="text/javascript">
@@ -114,5 +157,4 @@
             });
         });
     </script>
-
 @endsection
