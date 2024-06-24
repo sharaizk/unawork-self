@@ -20,7 +20,7 @@
                                     <a href="#">Home</a>
                                 </li>
                                                                 <li class="">
-                                    <a href="/find-work.php">Find Work</a>
+                                    <a href="{{ route('landing.hiring') }}">Find Work</a>
                                 </li>
                             </ul>
                         </nav>

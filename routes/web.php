@@ -62,6 +62,7 @@ use App\Http\Controllers\NepalsteController;
 use App\Http\Controllers\CinetPayController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
+use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PayHerePaymentController;
@@ -97,6 +98,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
 });
+
+Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
+
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
 Route::get('/pods/{podId}', [PodController::class, 'showOuter'])->name('landing.pods.show');
