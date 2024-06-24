@@ -86,7 +86,7 @@
                     <span class="search__icon">
                         <i class="fa fa-search"></i>
                     </span>
-                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') }}">
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') ? request('name') : '' }}"">
                 </div>
                 <div class="search__field">
                     <select name="country" id="country" class="form-control">
@@ -154,6 +154,21 @@
 
 @section('scripts')
 <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.search__box');
+    form.addEventListener('submit', function(event) {
+        const name = document.getElementById('name');
+        const country = document.getElementById('country');
+        if (name.value.trim() === '') {
+            name.remove();
+        }
+        if (country.value.trim() === '') {
+            country.remove();
+        }
+    });
+});
+</script>
+<script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".sendMessageButton").forEach(button => {
                 button.addEventListener("click", function() {
@@ -192,4 +207,8 @@
             });
         });
     </script>
+
+
+
+
 @endsection
