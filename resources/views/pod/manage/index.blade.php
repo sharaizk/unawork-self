@@ -24,6 +24,8 @@
 @endsection
 
 @push('scripts')
+@section('scripts')
+@endsection
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script type="text/javascript">
@@ -80,5 +82,6 @@
     });
 });
 </script>
+
 
 @endpush

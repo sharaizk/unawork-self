@@ -63,6 +63,7 @@ use App\Http\Controllers\CinetPayController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\HirePageController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PayHerePaymentController;
 use App\Http\Controllers\PodController;
 use App\Http\Controllers\PodUserController;
@@ -85,8 +86,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pods/create', [PodController::class, 'create'])->name('pods.create');
     Route::get('/pods/{podId}/edit', [PodController::class, 'edit'])->name('pods.edit');
 
-    Route::get('/pods/{podId}', [PodController::class, 'show'])->name('pods.show');
-    Route::get('/pods/{podId}/users', [PodUserController::class, 'index'])->name('pods.users');
+    Route::get('/account/pods/{podId}', [PodController::class, 'show'])->name('pods.show');
+    Route::get('/account/pods/{podId}/users', [PodUserController::class, 'index'])->name('pods.users');
+
+    Route::get('/account/pods/{podId}/news', [NewsController::class, 'index'])->name('pods.news');
+    Route::get('/account/pods/{podId}/news/create', [NewsController::class, 'create'])->name('pods.news.create');
+    Route::get('/account/pods/{podId}/news/{NewsId}', [NewsController::class, 'edit'])->name('pods.news.edit');
+
     Route::get('/pods/{podId}/invite', [PodUserController::class, 'create'])->name('pods.invite');
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
