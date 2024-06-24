@@ -5,36 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\Skill;
+use App\Filters\Employee\EmployeeFilter;
+use App\Http\Requests\Employee\FilterRequest;
 use Illuminate\Http\Request;
 use Chatify\Http\Controllers\Api\MessageController;
 use Illuminate\Support\Facades\Auth;
 
 class HirePageController extends Controller
 {
-    public function index(Request $request)
+    public function index(FilterRequest $request)
     {   
         $countries = Profile::distinct()->pluck('country');
-        $skills = Skill::distinct()->pluck('name');
+        $skills = Skill::all();
 
-        $query = User::role('employee')->with(['profile', 'skills']);
+        $data = $request->all();
+        $employees = User::role('employee');
 
-        if ($request->has('name') && $request->name != '') {
-            $query->where('name', 'LIKE', '%' . $request->name . '%');
-        }
-        
-        if ($request->has('country') && $request->country != '') {
-            $query->whereHas('profile', function($q) use ($request) {
-                $q->where('country', $request->country);
-            });
-        }
+        $filter = new EmployeeFilter($data);
+        $employees = $filter->apply($employees->with(['profile', 'skills']));
+        $employees = $employees->get();
 
-        if ($request->has('skill') && $request->skill != '') {
-            $query->whereHas('skills', function($q) use ($request) {
-                $q->where('name', $request->skill);
-            });
-        }
-
-        $employees = $query->get();
 
         return view('hiring.hiring', compact('employees', 'countries', 'skills'));
     }

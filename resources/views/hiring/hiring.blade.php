@@ -50,6 +50,32 @@
         padding: 10px 20px;
         font-size: 1.8rem;
     }
+
+    .dropdown-menu-xl {
+        min-width: 200px; 
+        width: 300px; 
+        max-height: 400px; 
+        overflow-y: auto; 
+    }
+
+    .dropdown-menu-xl li {
+        padding: 10px 20px; 
+    }
+
+    .dropdown-menu-xl .form-check-input {
+        width: 20px; 
+        height: 20px; 
+        margin-right: 10px; 
+    }
+
+    .dropdown-menu-xl .form-check-label {
+        font-size: 16px; 
+    }
+
+    .btn-xl {
+        font-size: 1.5rem;
+        padding: 10px 20px; 
+    }
 </style>
 <!-- filter form -->
 <section class="header__search">
@@ -70,13 +96,22 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="search__field">
-                    <select name="skill" id="skill" class="form-control">
-                        <option value="">Select Skill</option>
-                        @foreach($skills as $skill)
-                            <option value="{{ $skill }}" {{ request('skill') == $skill ? 'selected' : '' }}>{{ $skill }}</option>
-                        @endforeach
-                    </select>
+                <div class="search__list">
+                    <div class="dropdown">
+                        <button class="btn btn-xl btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            Select Skills
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-xl">
+                            @foreach($skills as $skill)
+                            <li>
+                                <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="skill_{{ $skill->id }}">
+                                    {{ $skill->name }}
+                                </label>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Filter</button>
             </form>
@@ -93,7 +128,7 @@
         </h1>
         <div class="row-master">
             @foreach($employees as $employee)
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-6 col-xl-3">
                     @include('hiring.employeecard', ['employee' => $employee])
                 </div>
             @endforeach

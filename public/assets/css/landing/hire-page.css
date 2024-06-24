@@ -22,7 +22,7 @@
     padding: 20px;
     border-radius: 20px;
     background-color: #fff;
-    border: 3px solid #CFAA40;
+    border: 2px solid #CFAA40;
     margin-bottom: 30px;
     font: inherit;
 }
@@ -82,6 +82,7 @@
     margin: 0;
     padding: 0;
     border: 0;
+    gap: 10px;
 }
 .card__footer a {
     font-family: "Averta", Arial, Helvetica, sans-serif;
@@ -89,13 +90,11 @@
     text-transform: uppercase;
     border-radius: 1rem;
     height: 4rem;
-    width: 47%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
-    margin-right: 10px;
     background: #022d4d;
+    flex: 0 0 calc(50% - 15px);
 }
 .card__footer button {
     font-family: "Averta", Arial, Helvetica, sans-serif;
@@ -103,13 +102,11 @@
     text-transform: uppercase;
     border-radius: 1rem;
     height: 4rem;
-    width: 47%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
-    margin-right: 10px;
     background: #022d4d;
+    flex: 0 0 calc(50% - 15px);
 }
 .sendMessageButton {
     font-family: "Averta", Arial, Helvetica, sans-serif;
