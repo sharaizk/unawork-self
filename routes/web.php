@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
+Route::get('/pods/list', [PodController::class, 'list'])->name('pods.list');
 
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');

@@ -1,0 +1,2158 @@
+.tpl-find-work .section__project .project__card,
+.header-2 .nav-sub__menu li a,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit {
+    transition: all 0.3s !important;
+    -o-transition: all 0.3s !important;
+    -ms-transition: all 0.3s !important;
+    -webkit-transition: all 0.3s !important;
+    -moz-transition: all 0.3s !important;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header,
+.tpl-find-work .section__water .water-add__status .add__features ul li a,
+.tpl-find-work .section__water .water-add__status .add__features ul,
+.tpl-find-work .section__water .water-add__status .add__features,
+.tpl-find-work .section__water .water-add__status .add__form,
+.tpl-find-work .section__water .water-add__status .add__status,
+.tpl-find-work .section__water .water-list__project ul li,
+.tpl-find-work .section__water .water-project__title,
+.tpl-find-work .section__water .water__content,
+.tpl-find-work .section__member .member-project,
+.tpl-find-work .section__member .member__header,
+.tpl-find-work .section__chat .chat-person .person__title,
+.tpl-find-work .section__chat .chat-person .person__card,
+.tpl-find-work .section__chat .chat__search,
+.tpl-find-work .section__chat .chat__input,
+.tpl-find-work .section__chat .chat-actions,
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body,
+.tpl-find-work .section__chat .chat__text,
+.tpl-find-work .section__chat .chat__wrap,
+.tpl-find-work .section__project .project-person__link,
+.tpl-find-work .section__project .project-list__person,
+.tpl-find-work .section__project .project__header,
+.tpl-find-work .section__layout .teams__title,
+.header-2 .nav__item>a,
+.header-2 .nav__list {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    background: #022d4d;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 50%;
+    width: 0;
+    background: #005391;
+    opacity: 0.6;
+    transition: width 0.3s ease-in-out;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+    padding: 10px 30px;
+    display: block;
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover span {
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:before {
+    width: 100%;
+}
+
+.tpl-find-work .section__title,
+.section__titlepage {
+    margin: 40px 0;
+}
+
+.tpl-find-work .section__title span,
+.section__titlepage span {
+    font-size: 4rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+    border-bottom: 5px solid #88a6b5;
+}
+
+@media (max-width: 1200px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 3rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 3rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 2.6rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 2.4rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+/*Mixin Responsive*/
+.tpl-find-work .section__project .project__card,
+.header-2 .nav-sub__menu li a,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    transition: all 0.3s !important;
+    -o-transition: all 0.3s !important;
+    -ms-transition: all 0.3s !important;
+    -webkit-transition: all 0.3s !important;
+    -moz-transition: all 0.3s !important;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header,
+.tpl-find-work .section__water .water-add__status .add__features ul li a,
+.tpl-find-work .section__water .water-add__status .add__features ul,
+.tpl-find-work .section__water .water-add__status .add__features,
+.tpl-find-work .section__water .water-add__status .add__form,
+.tpl-find-work .section__water .water-add__status .add__status,
+.tpl-find-work .section__water .water-list__project ul li,
+.tpl-find-work .section__water .water-project__title,
+.tpl-find-work .section__water .water__content,
+.tpl-find-work .section__member .member-project,
+.tpl-find-work .section__member .member__header,
+.tpl-find-work .section__chat .chat-person .person__title,
+.tpl-find-work .section__chat .chat-person .person__card,
+.tpl-find-work .section__chat .chat__search,
+.tpl-find-work .section__chat .chat__input,
+.tpl-find-work .section__chat .chat-actions,
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body,
+.tpl-find-work .section__chat .chat__text,
+.tpl-find-work .section__chat .chat__wrap,
+.tpl-find-work .section__project .project-person__link,
+.tpl-find-work .section__project .project-list__person,
+.tpl-find-work .section__project .project__header,
+.tpl-find-work .section__layout .teams__title,
+.header-2 .nav__item>a,
+.header-2 .nav__list {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    background: #022d4d;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 50%;
+    width: 0;
+    background: #005391;
+    opacity: 0.6;
+    transition: width 0.3s ease-in-out;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+    padding: 10px 30px;
+    display: block;
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover span {
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:before {
+    width: 100%;
+}
+
+.tpl-find-work .section__title,
+.section__titlepage {
+    margin: 40px 0;
+}
+
+.tpl-find-work .section__title span,
+.section__titlepage span {
+    font-size: 4rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+    border-bottom: 5px solid #88a6b5;
+}
+
+@media (max-width: 1200px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 3rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 3rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 2.6rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 2.4rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+.tpl-find-work .section__project .project__card,
+.header-2 .nav-sub__menu li a,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    transition: all 0.3s !important;
+    -o-transition: all 0.3s !important;
+    -ms-transition: all 0.3s !important;
+    -webkit-transition: all 0.3s !important;
+    -moz-transition: all 0.3s !important;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header,
+.tpl-find-work .section__water .water-add__status .add__features ul li a,
+.tpl-find-work .section__water .water-add__status .add__features ul,
+.tpl-find-work .section__water .water-add__status .add__features,
+.tpl-find-work .section__water .water-add__status .add__form,
+.tpl-find-work .section__water .water-add__status .add__status,
+.tpl-find-work .section__water .water-list__project ul li,
+.tpl-find-work .section__water .water-project__title,
+.tpl-find-work .section__water .water__content,
+.tpl-find-work .section__member .member-project,
+.tpl-find-work .section__member .member__header,
+.tpl-find-work .section__chat .chat-person .person__title,
+.tpl-find-work .section__chat .chat-person .person__card,
+.tpl-find-work .section__chat .chat__search,
+.tpl-find-work .section__chat .chat__input,
+.tpl-find-work .section__chat .chat-actions,
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body,
+.tpl-find-work .section__chat .chat__text,
+.tpl-find-work .section__chat .chat__wrap,
+.tpl-find-work .section__project .project-person__link,
+.tpl-find-work .section__project .project-list__person,
+.tpl-find-work .section__project .project__header,
+.tpl-find-work .section__layout .teams__title,
+.header-2 .nav__item>a,
+.header-2 .nav__list {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    background: #022d4d;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 50%;
+    width: 0;
+    background: #005391;
+    opacity: 0.6;
+    transition: width 0.3s ease-in-out;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+    padding: 10px 30px;
+    display: block;
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover span {
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:before {
+    width: 100%;
+}
+
+.tpl-find-work .section__title,
+.section__titlepage {
+    margin: 40px 0;
+}
+
+.tpl-find-work .section__title span,
+.section__titlepage span {
+    font-size: 4rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+    border-bottom: 5px solid #88a6b5;
+}
+
+@media (max-width: 1200px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 3rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 3rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 2.6rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 2.4rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+/*Mixin Responsive*/
+.tpl-find-work .section__project .project__card,
+.header-2 .nav-sub__menu li a,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    transition: all 0.3s !important;
+    -o-transition: all 0.3s !important;
+    -ms-transition: all 0.3s !important;
+    -webkit-transition: all 0.3s !important;
+    -moz-transition: all 0.3s !important;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header,
+.tpl-find-work .section__water .water-add__status .add__features ul li a,
+.tpl-find-work .section__water .water-add__status .add__features ul,
+.tpl-find-work .section__water .water-add__status .add__features,
+.tpl-find-work .section__water .water-add__status .add__form,
+.tpl-find-work .section__water .water-add__status .add__status,
+.tpl-find-work .section__water .water-list__project ul li,
+.tpl-find-work .section__water .water-project__title,
+.tpl-find-work .section__water .water__content,
+.tpl-find-work .section__member .member-project,
+.tpl-find-work .section__member .member__header,
+.tpl-find-work .section__chat .chat-person .person__title,
+.tpl-find-work .section__chat .chat-person .person__card,
+.tpl-find-work .section__chat .chat__search,
+.tpl-find-work .section__chat .chat__input,
+.tpl-find-work .section__chat .chat-actions,
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body,
+.tpl-find-work .section__chat .chat__text,
+.tpl-find-work .section__chat .chat__wrap,
+.tpl-find-work .section__project .project-person__link,
+.tpl-find-work .section__project .project-list__person,
+.tpl-find-work .section__project .project__header,
+.tpl-find-work .section__layout .teams__title,
+.header-2 .nav__item>a,
+.header-2 .nav__list {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    background: #022d4d;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 50%;
+    width: 0;
+    background: #005391;
+    opacity: 0.6;
+    transition: width 0.3s ease-in-out;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:before {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit a {
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+    padding: 10px 30px;
+    display: block;
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover {
+    transform: translateY(-2px);
+    box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover span {
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:after,
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit:hover:before {
+    width: 100%;
+}
+
+.tpl-find-work .section__title,
+.section__titlepage {
+    margin: 40px 0;
+}
+
+.tpl-find-work .section__title span,
+.section__titlepage span {
+    font-size: 4rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+    border-bottom: 5px solid #88a6b5;
+}
+
+@media (max-width: 1200px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 3rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 3rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .tpl-find-work .section__title,
+    .section__titlepage {
+        margin-bottom: 2.6rem;
+    }
+
+    .tpl-find-work .section__title span,
+    .section__titlepage span {
+        font-size: 2.4rem;
+        border-bottom: 3px solid #88a6b5;
+    }
+}
+
+.header-2 {
+    background-color: #022d4d;
+}
+
+.header-2 .container-master {
+    height: 8.3rem;
+}
+
+.header-2 .nav__menu,
+.header-2 .nav__list {
+    height: 100%;
+}
+
+.header-2 .nav__list {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.header-2 .nav__item {
+    position: relative;
+    height: 100%;
+}
+
+.header-2 .nav__item.active>a {
+    color: #cfaa40;
+}
+
+.header-2 .nav__item>a {
+    font-size: 1.6rem;
+    color: #fff;
+    height: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 9px;
+}
+
+.header-2 .nav__item>a:hover {
+    background-color: #0c3a63;
+}
+
+.header-2 .nav__item>a.active {
+    background-color: #0c3a63;
+}
+
+.header-2 .nav__item svg {
+    margin-top: 3px;
+    margin-left: 3px;
+}
+
+.header-2 .nav__item.dropdown .nav-sub__menu {
+    display: block;
+}
+
+.header-2 .nav__item.dropdown svg {
+    transform: rotate(-180deg);
+}
+
+.header-2 .nav-sub__menu {
+    position: absolute;
+    display: none;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    min-width: 28rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 0.4rem 0;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.header-2 .nav-sub__menu li a {
+    padding: 1rem 1.2rem;
+    color: #022d4d;
+    display: block;
+}
+
+.header-2 .nav-sub__menu li a:hover {
+    background-color: #cfa94052;
+}
+
+@media (max-width: 1200px) {
+    .header-2 .container-master {
+        height: 5.4rem;
+    }
+
+    .header-2 .nav__item>a {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-2 .container-master {
+        height: unset;
+        padding: 0;
+    }
+
+    .header-2 .nav__list {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.4rem 0;
+    }
+
+    .header-2 .nav__item {
+        width: 100%;
+    }
+
+    .header-2 .nav__item>a {
+        padding: 1rem 1.4rem;
+        justify-content: space-between;
+    }
+
+    .header-2 .nav__item>a:hover {
+        background-color: #125285;
+    }
+
+    .header-2 .nav__item:not(:last-child) {
+        margin-right: 0;
+    }
+
+    .header-2 .nav-sub__menu {
+        position: unset;
+        border: 0;
+    }
+
+    .header-2 .nav-sub__menu li a {
+        padding: 1rem 2.7rem;
+    }
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__header,
+.tpl-find-work .section__chat .chat-calendar .calendar__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 1rem;
+    background-color: #fff;
+    border-bottom: 0.9px solid rgba(2, 45, 77, 0.1);
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__header button,
+.tpl-find-work .section__chat .chat-calendar .calendar__header button {
+    cursor: pointer;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__header i,
+.tpl-find-work .section__chat .chat-calendar .calendar__header i {
+    color: #cfaa40;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__year,
+.tpl-find-work .section__chat .chat-calendar .calendar__year {
+    font-size: 1.4rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__content,
+.tpl-find-work .section__chat .chat-calendar .calendar__content {
+    padding: 1.9rem 1.8rem 2rem;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table,
+.tpl-find-work .section__chat .chat-calendar .calendar__table {
+    width: 100%;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table th,
+.tpl-find-work .section__chat .chat-calendar .calendar__table th,
+.tpl-find-work .section__water .water__calendar .calendar__table td,
+.tpl-find-work .section__chat .chat-calendar .calendar__table td {
+    text-align: center;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table th,
+.tpl-find-work .section__chat .chat-calendar .calendar__table th {
+    font-size: 1.2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #022d4d;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table th,
+.tpl-find-work .section__chat .chat-calendar .calendar__table th {
+    padding: 1rem 0;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table td,
+.tpl-find-work .section__chat .chat-calendar .calendar__table td {
+    padding: 1.4rem 0.8rem;
+    font-size: 1.2rem;
+    color: #022d4d;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table td.other,
+.tpl-find-work .section__chat .chat-calendar .calendar__table td.other {
+    opacity: 0;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table td.active,
+.tpl-find-work .section__chat .chat-calendar .calendar__table td.active {
+    position: relative;
+    color: #fff;
+}
+
+.tpl-find-work .section__water .water__calendar .calendar__table td.active::after,
+.tpl-find-work .section__chat .chat-calendar .calendar__table td.active::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    z-index: -1;
+    background: #cfaa40;
+    box-shadow: 0 7px 10px #00000040;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .btn-head button,
+.tpl-find-work .section__water .water-project__title button,
+.tpl-find-work .section__member .member__header button,
+.tpl-find-work .section__project .project__header button {
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .btn-head button i,
+.tpl-find-work .section__water .water-project__title button i,
+.tpl-find-work .section__member .member__header button i,
+.tpl-find-work .section__project .project__header button i {
+    font-size: 4px;
+    color: #cfaa40;
+}
+
+.tpl-find-work .section__member .member__status span,
+.tpl-find-work .section__project .project__status span {
+    display: inline-block;
+    margin: 1.4rem 0 1rem;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    background-color: #cfaa40;
+    border-radius: 10rem;
+}
+
+.tpl-find-work .section__water .water-newfeed__item,
+.tpl-find-work .section__water .water-add__status,
+.tpl-find-work .section__water .water-list__project {
+    box-shadow: 0 2px 6px rgba(0, 128, 221, 0.1);
+    border-radius: 0.4rem;
+}
+
+.tpl-find-work .section__water .water-add__status .add__input,
+.tpl-find-work .section__chat .chat__search input,
+.tpl-find-work .section__chat .chat__input .input {
+    color: rgba(2, 45, 77, 0.7);
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+}
+
+.tpl-find-work .section__water .water-add__status .add__input:focus,
+.tpl-find-work .section__chat .chat__search input:focus,
+.tpl-find-work .section__chat .chat__input .input:focus {
+    border: 0;
+    outline: 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__input::-webkit-input-placeholder,
+.tpl-find-work .section__chat .chat__search input::-webkit-input-placeholder,
+.tpl-find-work .section__chat .chat__input .input::-webkit-input-placeholder {
+    /* Edge */
+    color: rgba(2, 45, 77, 0.7);
+}
+
+.tpl-find-work .section__water .water-add__status .add__input:-ms-input-placeholder,
+.tpl-find-work .section__chat .chat__search input:-ms-input-placeholder,
+.tpl-find-work .section__chat .chat__input .input:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: rgba(2, 45, 77, 0.7);
+}
+
+.tpl-find-work .section__water .water-add__status .add__input::placeholder,
+.tpl-find-work .section__chat .chat__search input::placeholder,
+.tpl-find-work .section__chat .chat__input .input::placeholder {
+    color: rgba(2, 45, 77, 0.7);
+}
+
+.tpl-find-work .section__header {
+    margin: 50px 0;
+}
+
+.tpl-find-work main {
+    margin-bottom: 14rem;
+}
+
+.tpl-find-work form,
+.tpl-find-work form input {
+    width: 100%;
+}
+
+.tpl-find-work .section__layout {
+    margin-top: 3rem;
+}
+
+.tpl-find-work .section__layout .teams__title {
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.tpl-find-work .section__layout .teams__title h2 {
+    font-size: 2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+.tpl-find-work .section__layout .teams__title a {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+.tpl-find-work .section__layout .teams__title a:hover {
+    color: #cfaa40;
+}
+
+.tpl-find-work .section__layout .teams__title i {
+    color: #cfaa40;
+    margin-left: 8px;
+}
+
+.tpl-find-work .section__project {
+    margin-top: 4.5rem;
+    border-radius: 2rem;
+    padding: 2rem;
+    border: 1px solid rgba(136, 166, 181, 0.4);
+}
+
+.tpl-find-work .section__project .container-master {
+    padding: 0;
+}
+
+.tpl-find-work .section__project .project__card {
+    background-color: #022d4d;
+    border-radius: 1rem;
+    padding: 1.6rem;
+}
+
+.tpl-find-work .section__project .project__card:hover {
+    box-shadow: 0 0 10px 6px rgba(100, 100, 111, 0.2);
+}
+
+.tpl-find-work .section__project .project__header {
+    justify-content: space-between;
+}
+
+.tpl-find-work .section__project .project__header h4 {
+    font-size: 1.6rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #fff;
+}
+
+.tpl-find-work .section__project .project__text {
+    font-size: 1.4rem;
+    height: 76px;
+    overflow: hidden;
+    color: #fff;
+    margin-bottom: 2.4rem;
+    line-height: 1.9rem;
+}
+
+.tpl-find-work .section__project .project-list__person {
+    flex-wrap: wrap;
+}
+
+.tpl-find-work .section__project .project-list__person li {
+    margin-right: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+
+.tpl-find-work .section__project .project-list__person li:last-child {
+    margin-right: 0;
+}
+
+.tpl-find-work .section__project .project-list__person li span {
+    color: #fff;
+}
+
+.tpl-find-work .section__project .project-person__link {
+    width: 2.2rem;
+    height: 2.2rem;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.tpl-find-work .section__project .project-person__link img {
+    width: 100%;
+    object-fit: cover;
+}
+
+.tpl-find-work .section__chat {
+    padding: 2rem 2rem 0;
+    border: 1px solid #cfaa40;
+    border-radius: 2rem;
+}
+
+.tpl-find-work .section__chat .container-master {
+    padding: 0;
+}
+
+.tpl-find-work .section__chat .chat__wrap {
+    flex-wrap: wrap;
+}
+
+.tpl-find-work .section__chat .chat__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 3.8rem;
+}
+
+.tpl-find-work .section__chat .chat__list {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 276px;
+    flex: 0 0 276px;
+    max-width: 276px;
+    margin-left: 4.4rem;
+    padding: 1.7rem 1rem 0;
+    background-color: rgba(0, 128, 221, 0);
+    box-shadow: inset -1px 0 20px 0 #5281f01a;
+}
+
+.tpl-find-work .section__chat .chat .chat-text__wrap {
+    max-height: 680px;
+    overflow-y: auto;
+}
+
+.tpl-find-work .section__chat .chat__text {
+    margin-top: 45px;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.tpl-find-work .section__chat .chat__text .chat__avatar {
+    margin-left: 0;
+    margin-right: 1.6rem;
+}
+
+.tpl-find-work .section__chat .chat__text .chat-text__body {
+    margin-right: 2.4rem;
+    padding: 1rem 2.4rem;
+    font-size: 1.4rem;
+    color: #000;
+    background-color: rgba(0, 128, 221, 0.1);
+    border-radius: 0 1.8rem 1.8rem 1.8rem;
+    max-width: 57.4rem;
+}
+
+.tpl-find-work .section__chat .chat__text .chat-text__date {
+    font-size: 1.3rem;
+    color: #022d4d;
+    opacity: 0.7;
+    min-width: 6.4rem;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__self {
+    margin-top: 45px;
+    flex-direction: row-reverse;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__self .chat__avatar {
+    margin-right: 0;
+    margin-left: 2rem;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__self .chat-text__body {
+    margin-left: 1.3rem;
+    margin-right: 0;
+    color: #fff;
+    background-color: #022d4d;
+    border-radius: 1.8rem 0 1.8rem 1.8rem;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__self .chat-text__date {
+    font-size: 1.3rem;
+    color: #022d4d;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__pending {
+    margin-top: 2.6rem;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body {
+    align-items: center;
+    padding: 1.6rem 2.6rem;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body i {
+    color: #022d4d;
+    font-size: 1rem;
+    margin-right: 5px;
+}
+
+.tpl-find-work .section__chat .chat__text.chat__text__pending .chat-text__body i:nth-child(1) {
+    font-size: 1.8rem;
+}
+
+.tpl-find-work .section__chat .chat-actions {
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 50px;
+    margin-top: 3.4rem;
+}
+
+.tpl-find-work .section__chat .chat__input {
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 2.4rem;
+    height: 4.8rem;
+    border-radius: 0.9rem;
+    box-shadow: 0 10px 15px -4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.tpl-find-work .section__chat .chat__input .input {
+    flex: 1;
+    border-radius: 0.9rem 0 0 0.9rem;
+    padding: 1.6rem;
+    font-size: 1.4rem;
+    border: 0;
+}
+
+.tpl-find-work .section__chat .chat__avatar {
+    margin-left: 2rem;
+}
+
+.tpl-find-work .section__chat .chat__avatar img {
+    display: block;
+    max-width: 36px;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tpl-find-work .section__chat .chat__search {
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 1.8rem;
+    padding-left: 1.2rem;
+    background-color: rgba(2, 45, 77, 0.1);
+    border-radius: 4px;
+}
+
+.tpl-find-work .section__chat .chat__search input {
+    border: 0;
+    background-color: transparent;
+    font-size: 1.2rem;
+    padding: 1.2rem;
+}
+
+.tpl-find-work .section__chat .chat-person .person__card {
+    padding: 1.6rem 0.9rem 2.5rem;
+    border-bottom: 0.9px solid rgba(2, 45, 77, 0.1);
+}
+
+.tpl-find-work .section__chat .chat-person .person__card:first-child {
+    border-top: 0.9px solid rgba(2, 45, 77, 0.1);
+}
+
+.tpl-find-work .section__chat .chat-person .person__card--active {
+    background-color: #022d4d;
+    border-radius: 9px;
+    position: relative;
+    z-index: 2;
+}
+
+.tpl-find-work .section__chat .chat-person .person__card--active .person__name,
+.tpl-find-work .section__chat .chat-person .person__card--active .person__subtitle,
+.tpl-find-work .section__chat .chat-person .person__card--active .person__date,
+.tpl-find-work .section__chat .chat-person .person__card--active .person__description {
+    color: #fff;
+    opacity: 1;
+}
+
+.tpl-find-work .section__chat .chat-person .person__card--active:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #fff;
+}
+
+.tpl-find-work .section__chat .chat-person .person__body {
+    flex: 1;
+}
+
+.tpl-find-work .section__chat .chat-person .person__avatar {
+    margin-right: 1.1rem;
+}
+
+.tpl-find-work .section__chat .chat-person .person__avatar img {
+    display: block;
+    max-width: 36px;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tpl-find-work .section__chat .chat-person .person__title {
+    justify-content: space-between;
+}
+
+.tpl-find-work .section__chat .chat-person .person__name,
+.tpl-find-work .section__chat .chat-person .person__subtitle,
+.tpl-find-work .section__chat .chat-person .person__date,
+.tpl-find-work .section__chat .chat-person .person__description {
+    font-size: 1.3rem;
+    color: #022d4d;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__chat .chat-person .person__subtitle {
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__chat .chat-person .person__date {
+    font-size: 1.1rem;
+    opacity: 0.4;
+    padding-top: 3px;
+}
+
+.tpl-find-work .section__chat .chat-person .person__description {
+    margin-top: 1rem;
+}
+
+.tpl-find-work .section__chat .chat-person .person__description span {
+    display: block;
+    font-size: 1.1rem;
+    height: 13px;
+    overflow: hidden;
+}
+
+.tpl-find-work .section__chat .chat-calendar {
+    margin: 5rem -1rem 0;
+}
+
+.tpl-find-work .section__member {
+    border-radius: 2rem;
+    padding: 2rem;
+    border: 1px solid rgba(136, 166, 181, 0.4);
+}
+
+.tpl-find-work .section__member .container-master {
+    padding: 0;
+}
+
+.tpl-find-work .section__member .teams__title i {
+    color: #5282F0;
+}
+
+.tpl-find-work .section__member .member__card {
+    border-radius: 1rem;
+    background-color: rgba(0, 128, 221, 0.1);
+    padding: 1.8rem 1.6rem;
+}
+
+.tpl-find-work .section__member .member__header {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tpl-find-work .section__member .member__header h4 {
+    color: #000;
+    font-size: 1.6rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__member .member__status {
+    margin: 1.2rem 0;
+}
+
+.tpl-find-work .section__member .member__status span {
+    margin: 0;
+}
+
+.tpl-find-work .section__member .member-project {
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.tpl-find-work .section__member .member-project:last-child {
+    margin-bottom: 0;
+}
+
+.tpl-find-work .section__member .member-project a {
+    font-size: 1.4rem;
+    color: #000;
+}
+
+.tpl-find-work .section__member .member-project a:hover {
+    color: #cfaa40;
+}
+
+.tpl-find-work .section__member .member-project .member-project__viewall {
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__member .member-project i {
+    margin-left: 8px;
+    color: #cfaa40;
+}
+
+.tpl-find-work .section__member .member-project__name {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+    color: #000;
+    text-transform: uppercase;
+}
+
+.tpl-find-work .section__member .member-project__description {
+    font-size: 1.4rem;
+    color: #022d4d;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__water {
+    padding: 2rem;
+    border: 1px solid #cfaa40;
+    border-radius: 2rem;
+}
+
+.tpl-find-work .section__water .container-master {
+    padding: 0;
+}
+
+.tpl-find-work .section__water .teams__title i {
+    color: #5282F0;
+}
+
+.tpl-find-work .section__water .water__content {
+    flex-wrap: wrap;
+}
+
+.tpl-find-work .section__water .water-project__title {
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2.4rem 2.8rem 3rem;
+    border-bottom: 1px solid rgba(2, 45, 77, 0.1);
+}
+
+.tpl-find-work .section__water .water-project__title h4 {
+    font-size: 1.6rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__water .water__left {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 280px;
+    flex: 0 0 280px;
+    max-width: 280px;
+    margin-right: 4rem;
+}
+
+.tpl-find-work .section__water .water-list__project {
+    margin-bottom: 2.4rem;
+}
+
+.tpl-find-work .section__water .water-list__project ul {
+    padding: 2.3rem 2.4rem 2.4rem 3rem;
+}
+
+.tpl-find-work .section__water .water-list__project ul li {
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.tpl-find-work .section__water .water-list__project ul li:not(:last-child) {
+    margin-bottom: 3rem;
+}
+
+.tpl-find-work .section__water .water-list__project ul span {
+    display: block;
+}
+
+.tpl-find-work .section__water .water-list__project ul .water__character {
+    margin-right: 2.3rem;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    border: 1px solid #cfaa40;
+    background-color: rgba(207, 170, 64, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tpl-find-work .section__water .water-list__project ul .water__character,
+.tpl-find-work .section__water .water-list__project ul .water__name,
+.tpl-find-work .section__water .water-list__project ul .water__count {
+    font-size: 1.3rem;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__water .water-list__project ul .water__count {
+    margin-left: auto;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__water .water__right {
+    flex: 1;
+}
+
+.tpl-find-work .section__water .water-add__status {
+    margin-bottom: 2rem;
+}
+
+.tpl-find-work .section__water .water-add__status .add__actions {
+    padding: 2rem;
+    border-bottom: 1px solid rgba(2, 45, 77, 0.1);
+}
+
+.tpl-find-work .section__water .water-add__status .add__status {
+    margin-bottom: 2rem;
+}
+
+.tpl-find-work .section__water .water-add__status .add__status button {
+    margin-right: 3rem;
+    color: #022d4d;
+    opacity: 0.7;
+    font-size: 1.4rem;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+    display: block;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__status button:hover {
+    color: #cfaa40;
+}
+
+.tpl-find-work .section__water .water-add__status .add__status button.active {
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10rem;
+    background-color: #cfaa40;
+}
+
+.tpl-find-work .section__water .water-add__status .add__form {
+    justify-content: center;
+    align-items: center;
+}
+
+.tpl-find-work .section__water .water-add__status .add__avatar {
+    margin-right: 1.6rem;
+}
+
+.tpl-find-work .section__water .water-add__status .add__avatar img {
+    max-width: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tpl-find-work .section__water .water-add__status .add__input {
+    font-size: 1.4rem;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+    border: 0;
+    padding: 1.2rem 0;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features {
+    padding: 1.2rem 2rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features ul {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features ul li {
+    margin-right: 2.3rem;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features ul li a {
+    align-items: center;
+    justify-content: flex-start;
+    color: #000;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features ul li a:hover span {
+    color: #022d4d;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features ul li img {
+    margin-right: 1rem;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features ul li span {
+    font-size: 1.4rem;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit {
+    cursor: pointer;
+    outline: 0;
+    border: 0;
+    background-color: #022d4d;
+    color: #fff;
+    padding: 1rem 2.7rem;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+
+.tpl-find-work .section__water .water-add__status .add__features .btn-add__submit span {
+    padding: 0;
+}
+
+.tpl-find-work .section__water .water-newfeed__item {
+    padding: 2.4rem 2rem 2rem;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .item-header__avatar img,
+.tpl-find-work .section__water .water-newfeed__item .item-comment__avatar img {
+    max-width: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .item-header__avatar {
+    margin-right: 1.2rem;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .head-info {
+    margin-bottom: 1px;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .head-info .name,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .head-info .act {
+    font-size: 1.4rem;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .head-info .act {
+    opacity: 0.7;
+    color: #022d4d;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .head-time {
+    font-size: 1rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #022d4d;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .btn-head {
+    margin-left: auto;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__content .text,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__content .img {
+    margin: 2rem 0;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__content .text span {
+    font-size: 1.4rem;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__content .img img {
+    border-radius: 8px;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul li {
+    margin-right: 3.2rem;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul a,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul i {
+    color: #022d4d;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__reaction ul span {
+    font-size: 1.4rem;
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+    color: #022d4d;
+    opacity: 0.7;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment {
+    margin-top: 2.4rem;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .item-comment__avatar {
+    margin-right: 20px;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form {
+    background-color: rgba(0, 128, 221, 0.03);
+    border: 1px solid rgba(0, 128, 221, 0.1);
+    border-radius: 8rem;
+    flex: 1;
+    padding: 0 2rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form input {
+    border: 0;
+    outline: 0;
+    color: #000;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    font-size: 1.4rem;
+    padding: 1rem 0;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form input:focus {
+    border: 0;
+    outline: 0;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form input::-webkit-input-placeholder {
+    /* Edge */
+    color: #000;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form input:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #000;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form input::placeholder {
+    color: #000;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul {
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul li {
+    margin-left: 1rem;
+}
+
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul a,
+.tpl-find-work .section__water .water-newfeed__item .newfeed-item__comment .form ul i {
+    color: #022d4d;
+}
+
+@media (max-width: 980px) {
+    .tpl-find-work .section__chat .chat__list {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-left: 0;
+    }
+
+    .tpl-find-work .section__water .water__left {
+        margin-right: 0;
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .tpl-find-work .section__project .col-12,
+    .tpl-find-work .tpl-find-work .section__member .col-12 {
+        margin-bottom: 2rem;
+    }
+
+    .tpl-find-work .section__project .col-12:last-child,
+    .tpl-find-work .tpl-find-work .section__member .col-12:last-child {
+        margin-bottom: 0;
+    }
+
+    .tpl-find-work .section__chat .chat-actions {
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .tpl-find-work .section__layout .teams__title h2 {
+        font-size: 1.8rem;
+    }
+
+    .tpl-find-work .section__chat .chat-actions {
+        padding-left: 0;
+    }
+
+    .tpl-find-work .section__chat .chat__text .chat-text__body {
+        margin-right: 1.4rem;
+        padding: 1.2rem;
+        font-size: 1.4rem;
+    }
+
+    .tpl-find-work .section__water .water-add__status .add__status button {
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .tpl-find-work .section__water .water-add__status .add__features ul {
+        margin-bottom: 1.4rem;
+    }
+
+    .tpl-find-work .section__water .water-add__status .add__features ul li span {
+        font-size: 1.2rem;
+    }
+
+    .tpl-find-work .section__water .section__member,
+    .tpl-find-work .section__water .section__water,
+    .tpl-find-work .section__water .section__project,
+    .tpl-find-work .section__water .section__chat {
+        padding: 2rem 1.2rem;
+    }
+}
+
+.tpl-find-work .header__search .search__list,
+.tpl-find-work .header__search .search__box,
+.tpl-find-work .header__search .search__wrap {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-find-work .header__search .search__list,
+.tpl-find-work .header__search .search__box,
+.tpl-find-work .header__search .search__wrap {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-find-work .header__search {
+    background-color: #022d4d;
+    height: 60px;
+}
+
+.tpl-find-work .header__search>.container-master {
+    height: 100%;
+}
+
+.tpl-find-work .header__search .search__wrap {
+    height: 100%;
+    align-items: center;
+}
+
+.tpl-find-work .header__search .search__box {
+    width: 325px;
+    height: 40px;
+    background-color: #fff;
+    border: 1px solid #88a6b5;
+    border-radius: 3px;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    padding: 0 15px;
+    margin-right: 10px;
+}
+
+.tpl-find-work .header__search .search__box .search__icon {
+    padding-right: 10px;
+    color: #022d4d;
+}
+
+.tpl-find-work .header__search .search__box input {
+    border: none;
+    outline: none;
+    font-size: 1.5rem;
+    color: #022d4d;
+    padding: 0;
+    width: 100%;
+}
+
+.tpl-find-work .header__search .search__box input::-webkit-input-placeholder {
+    font-size: 1.5rem;
+    color: #022d4d;
+    opacity: 0.6;
+    font-family: "Averta-Light", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .header__search .search__box input:-moz-placeholder {
+    /* Firefox 18- */
+    font-size: 1.5rem;
+    color: #022d4d;
+    opacity: 0.6;
+    font-family: "Averta-Light", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .header__search .search__box input::-moz-placeholder {
+    /* Firefox 19+ */
+    font-size: 1.5rem;
+    color: #022d4d;
+    opacity: 0.6;
+    font-family: "Averta-Light", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .header__search .search__box input:-ms-input-placeholder {
+    font-size: 1.5rem;
+    color: #022d4d;
+    opacity: 0.6;
+    font-family: "Averta-Light", Arial, Helvetica, sans-serif;
+}
+
+.tpl-find-work .header__search .search__list {
+    height: 100%;
+}
+
+.tpl-find-work .header__search .search__item {
+    margin-right: 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.tpl-find-work .header__search .search__item:hover .search__submenu {
+    opacity: 1;
+    pointer-events: initial;
+}
+
+.tpl-find-work .header__search .search__link {
+    display: block;
+    border-radius: 3px;
+    padding: 0 15px;
+    line-height: 38px;
+    background-color: #fff;
+    border: 1px solid #88a6b5;
+    font-size: 1.5rem;
+    color: #022d4d;
+    font-family: "Averta-Light", Arial, Helvetica, sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.tpl-find-work .header__search .search__link:hover {
+    color: #cfaa40;
+    border-color: #cfaa40;
+}
+
+.tpl-find-work .header__search .search__submenu {
+    position: absolute;
+    top: 92%;
+    left: 0;
+    background-color: #fff;
+    padding: 4px 0;
+    z-index: 2;
+    border-radius: 2px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    width: 240px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 300ms;
+}
+
+.tpl-find-work .header__search .search__submenu .submenu__link {
+    display: block;
+    color: #022d4d;
+    padding: 8px;
+}
+
+.tpl-find-work .header__search .search__submenu .submenu__link:hover {
+    background-color: rgba(204, 204, 204, 0.514);
+}
+
+.tpl-find-work .hire__banner {
+    width: 100%;
+    height: auto;
+}
+
+.tpl-find-work .hire__banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.tpl-find-work .hire__wrapper {
+    margin: 40px 0;
+    background-color: #fff;
+    height: 100%;
+}
+
+.tpl-find-work .hire-card {
+    overflow: hidden;
+    flex-wrap: wrap;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #fff;
+    border: 2px solid #CFAA40;
+    margin-bottom: 30px;
+}
+
+.tpl-find-work .hire-card .card__header {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tpl-find-work .hire-card .card__title {
+    margin-left: 15px;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    font-size: 2rem;
+    color: #000;
+}
+
+.tpl-find-work .hire-card .card__image {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.tpl-find-work .hire-card .card__image img {
+    display: block;
+}
+
+.tpl-find-work .hire-card .card__copy {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    height: 6rem;
+    overflow: hidden;
+    color: #000;
+}
+
+.tpl-find-work .hire-card .card__body {
+    margin: 20px 0;
+}
+
+.tpl-find-work .hire-card .card__footer a {
+    font-family: "Averta", Arial, Helvetica, sans-serif;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    border-radius: 1rem;
+    height: 4rem;
+    width: 13.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tpl-find-work .hire-card .card__footer a span {
+    font-weight: 300;
+    padding: 0;
+}
+
+.tpl-find-work .hire-card:hover {
+    box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
+}
+
+@media (max-width: 980px) {
+    .tpl-find-work .header__search {
+        height: unset;
+        padding: 1.4rem 0;
+    }
+
+    .tpl-find-work .header__search .search__wrap {
+        flex-wrap: wrap;
+    }
+
+    .tpl-find-work .header__search .search__box {
+        width: 100%;
+        margin-bottom: 1.4rem;
+        margin-right: 0;
+    }
+
+    .tpl-find-work .header__search .search__list {
+        flex-wrap: wrap;
+    }
+
+    .tpl-find-work .header__search .search__item {
+        margin-bottom: 1rem;
+    }
+}
+.tpl-find-work .buttonviewall {
+    top: 0 !important;
+    color: #fff !important;
+    position: absolute;
+    right: 15px;
+    top: 20px;
+    font-size: 15px;
+    font-weight: 600;
+}
+.tpl-find-work .section_pod {
+    margin-top: 4.5rem;
+    padding: 2rem;
+}
+
+.tpl-find-work .section_pod .pods__title {
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    display: inline-flex;
+}
+.tpl-find-work .section_pod .pods__title .buttonViewAll {
+    font-size: 2rem;
+    color: #2200ffee;
+}
+
+.tpl-find-work .section_pod .container-master {
+    padding: 0;
+}
+
+.tpl-find-work .section_pod .pods__title h2 {
+    font-size: 2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+
+.tpl-find-work .section_company {
+    margin-top: 4.5rem;
+    padding: 2rem;
+}
+
+.tpl-find-work .section_company .pods__title {
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.tpl-find-work .section_company .container-master {
+    padding: 0;
+}
+
+.tpl-find-work .section_company .pods__title h2 {
+    font-size: 2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+.section_company .company-box {
+    border: 1px solid #B5C2CB;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.section_company .company-box .title-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.section_company .company-box .title-box img {
+    width: 60px;
+    width: 60px;
+    border-radius: 50px;
+    margin-right: 15px;
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    -ms-border-radius: 50px;
+    -o-border-radius: 50px;
+}
+.section_company .company-box .title-box h4 {
+    color: #18405D;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.section_company .company-box p {
+    color: #18405D !important;
+    font-size: 12px;
+    margin: 10px auto;
+}
+
+.section_company .company-box .learn-more {
+    background: #18405D;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+
+.section_pod .pod-list .pod-list-item {
+    border: 2px solid #CDA73B;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    margin: 10px auto;
+}
+
+.section_pod .pod-list .pod-list-item .pod-title {
+    color: #323232;
+    font-size: 15px;
+    font-weight: 900;
+    text-align: center;
+    margin: 10px auto;
+}
+
+.section_pod .pod-list .pod-list-item .pod-join {
+    background: #022D4D;
+    color: #ffffff;
+    padding: 5px 20px;
+    border-radius: 5px;
+    margin: 10px auto;
+    display: inline-block;
+    transition: all 1s;
+    -webkit-transition: all 1s;
+    -moz-transition: all 1s;
+    -ms-transition: all 1s;
+    -o-transition: all 1s;
+}
+.section_pod .pod-list .pod-list-item .pod-join:hover {
+    background: white;
+    color: #022D4D;
+    border: 1px solid #022D4D;
+}
+
+
+.tpl-pods-list .section_pod {
+    margin-top: 4.5rem;
+    padding: 2rem;
+}
+
+@media (min-width: 992px) {
+    .section_pod .pod-list {
+        -ms-flex-preferred-size: 0;
+        flex-basis: 0;
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        max-width: 100%;
+        min-width: 20%;
+
+    }
+}
+
+@media (max-width: 992px) {}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 576px) {
+    .section_pod .pod-list {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+        min-width: 20%;
+    }
+}
+
+/*# sourceMappingURL=teams.css.map */

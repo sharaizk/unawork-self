@@ -32,6 +32,12 @@ class PodController extends Controller
         return view('pod.edit_form', compact('pod', 'skills'));
     }
 
+    public function list()
+    {
+        $pods = Pod::all();
+        return view('pod.list', compact('pods'));
+    }
+
     public function show(int $podId)
     {
         $user = Auth::user();
