@@ -6,7 +6,7 @@
 @endsection
 
 @section('content')
-<link rel="stylesheet" href="http://unawork.net/styles/scss/outer-pods.css">
+<link rel="stylesheet" href="{{ asset('assets/css/landing/outer-pods.css') }}">
 <section class="section__titlepage">
     <div class="container-master">
         <h1 class="section__titlepage--headertitle"><span>{{ $pod->title }}</span></h1>
