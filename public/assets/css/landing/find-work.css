@@ -2029,6 +2029,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    display: inline-flex;
 }
 
 .tpl-find-work .section_company .container-master {
@@ -2040,6 +2041,12 @@
     font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
     color: #000;
 }
+
+.tpl-find-work .section_company .pods__title .buttonViewAll {
+    font-size: 2rem;
+    color: #2200ffee;
+}
+
 .section_company .company-box {
     border: 1px solid #B5C2CB;
     padding: 12px;
@@ -2124,6 +2131,39 @@
 .tpl-pods-list .section_pod {
     margin-top: 4.5rem;
     padding: 2rem;
+}
+
+.tpl-pods-list .header__search {
+    background-color: #022d4d;
+    height: 60px;
+}
+
+.tpl-pods-list .header__search .search__list,
+.tpl-pods-list .header__search .search__box,
+.tpl-pods-list .header__search .search__wrap {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.tpl-company-list .section_pod {
+    margin-top: 4.5rem;
+    padding: 2rem;
+}
+
+.tpl-company-list .header__search {
+    background-color: #022d4d;
+    height: 60px;
+}
+
+.tpl-company-list .header__search .search__list,
+.tpl-company-list .header__search .search__box,
+.tpl-company-list .header__search .search__wrap {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
 }
 
 @media (min-width: 992px) {

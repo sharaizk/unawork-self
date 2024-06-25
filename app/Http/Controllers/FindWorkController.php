@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pod;
+use App\Models\Profile;
+use App\Models\Skill;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,6 +14,9 @@ class FindWorkController extends Controller
     {   
         $companys = User::role('company')->limit(4)->get();
         $pods = Pod::limit(5)->get();
-        return view('find_work.index', compact('companys', 'pods'));
+        $countries = Profile::distinct()->pluck('country');
+        $skills = Skill::all();
+
+        return view('find_work.index', compact('companys', 'pods', 'countries', 'skills'));
     }
 }

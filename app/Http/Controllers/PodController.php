@@ -32,10 +32,21 @@ class PodController extends Controller
         return view('pod.edit_form', compact('pod', 'skills'));
     }
 
-    public function list()
+    public function list(Request $request)
     {
-        $pods = Pod::all();
-        return view('pod.list', compact('pods'));
+        if ($request->has('skill_ids')) {
+            $skillIds = $request->input('skill_ids');
+
+            $pods = Pod::whereHas('skills', function($query) use ($skillIds) {
+                $query->whereIn('skills.id', $skillIds);
+            })->get();
+        } else {
+            $pods = Pod::all();
+        }   
+
+        $skills = Skill::all();
+
+        return view('pod.list', compact('pods', 'skills'));
     }
 
     public function show(int $podId)

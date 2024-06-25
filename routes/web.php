@@ -60,6 +60,7 @@ use App\Http\Controllers\ReferralProgramController;
 use App\Http\Controllers\PaiementproController;
 use App\Http\Controllers\NepalsteController;
 use App\Http\Controllers\CinetPayController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\FindWorkController;
@@ -101,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
 Route::get('/pods/list', [PodController::class, 'list'])->name('pods.list');
+Route::get('/companys/list', [CompanyController::class, 'list'])->name('companys.list');
 
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
