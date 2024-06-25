@@ -1031,4 +1031,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(Profile::class)->withDefault();
     }
+
+    public function workspaces()
+    {
+        return $this->morphMany(Workspace::class, 'ownerable');
+    }
 }
