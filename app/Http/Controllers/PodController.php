@@ -57,24 +57,9 @@ class PodController extends Controller
         return view('pod.manage.index', compact('currentWorkspace', 'pod'));
     }
 
-    public function showOuter(int $podId)
+    public function showOuter(Pod $pod)
     {
-        $pod = Pod::find($podId);
         $news = $pod->news()->latest('created_at')->get();
         return view('pod.landing.index', compact('pod', 'news'));
-    }
-
-    public function showNews(int $podId)
-    {
-        $pod = Pod::find($podId);
-        $news = $pod->news()->latest('created_at')->get();
-        return view('news.list', compact('pod', 'news'));
-    }
-
-    public function showOnePost(int $podId, int $postId)
-    {
-        $pod = Pod::find($podId);
-        $post = News::find($postId);
-        return view('news.one_post', compact('pod', 'post'));
     }
 }

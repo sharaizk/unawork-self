@@ -68,6 +68,7 @@ use App\Http\Controllers\HirePageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PayHerePaymentController;
 use App\Http\Controllers\PodController;
+use App\Http\Controllers\PodNewsController;
 use App\Http\Controllers\PodUserController;
 
 /*
@@ -106,10 +107,10 @@ Route::get('/companies/list', [CompanyController::class, 'list'])->name('compani
 
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
-Route::get('/pods/{podId}', [PodController::class, 'showOuter'])->name('landing.pods.show');
-Route::get('/pods/{podId}/news', [PodController::class, 'showNews'])->name('landing.pods.news.list');
+Route::get('/pods/{pod}', [PodController::class, 'showOuter'])->name('landing.pods.show');
+Route::get('/pods/{pod}/news', [PodNewsController::class, 'list'])->name('landing.pods.news.list');
 
-Route::get('/pods/{podId}/news/{newsId}', [PodController::class, 'showOnePost'])->name('landing.pods.news.show');
+Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name('landing.pods.news.show');
 
 
 Route::get('/', function () {
