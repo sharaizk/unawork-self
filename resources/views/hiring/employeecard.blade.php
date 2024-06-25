@@ -6,7 +6,7 @@
             <div class="col-12 col-md-6">
                 <div class="card__image" class=">
                     <a href="/commerce-shop.php">
-                        <img src="http://unawork.net/images/thumbnails/card-avatar-1.png" alt="">
+                        <img src="{{ asset('assets/images/landing/card-avatar-1.png') }}" alt="">
                     </a>
                 </div>
             </div>

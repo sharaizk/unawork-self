@@ -2,7 +2,7 @@
 
 @section('content')
 <section class="hire__banner">
-    <img src="http://unawork.net/images/thumbnails/bannerHire.jpg" alt="">
+    <img src="{{ asset('assets/images/landing/bannerHire.jpg') }}" alt="">
   </section>
     <section class="hire__wrapper">
         <div class="container-master">
@@ -59,7 +59,7 @@
                     _token: '{{ csrf_token() }}'
                 };
 
-                fetch('./chatify/api/sendMessage', {
+                fetch('{{ ENV("APP_URL") }}chatify/api/sendMessage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
