@@ -176,11 +176,10 @@ class ProjectController extends Controller
         return view('projects.import', compact("slug"));
     }
 
-    public function store($slug, Request $request)
+    public function store(Workspace $currentWorkspace, Request $request)
     {
         $objUser = Auth::user();
         $plan = Plan::find($objUser->plan);
-        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $user = $currentWorkspace->id;
         //check if user have plan
         if ($plan) {
@@ -280,7 +279,12 @@ class ProjectController extends Controller
                     // }
                 }
 
-                return redirect()->route('projects.index', $currentWorkspace->slug)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+                if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
+                    return redirect()->route('pods.projects', $currentWorkspace->ownerable_id)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+                } else {
+                    return redirect()->route('projects.index', $currentWorkspace->slug)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+                }
+
             } else {
                 return redirect()->back()->with('error', __('Your project limit is over, Please upgrade plan.'));
             }
@@ -556,6 +560,15 @@ class ProjectController extends Controller
         return view('projects.edit', compact('currentWorkspace', 'project'));
     }
 
+    public function editForPod($workspaceId, $projectID)
+    {
+        $objUser = Auth::user();
+        $currentWorkspace = Workspace::find($workspaceId);
+        $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
+
+        return view('projects.edit', compact('currentWorkspace', 'project'));
+    }
+
     public function create($slug)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
@@ -563,6 +576,12 @@ class ProjectController extends Controller
         return view('projects.create', compact('currentWorkspace'));
     }
 
+    public function createForPod($workspaceId)
+    {
+        $currentWorkspace = Workspace::find($workspaceId);
+
+        return view('projects.create', compact('currentWorkspace'));
+    }
 
     public function popup($slug, $projectID)
     {
@@ -701,13 +720,18 @@ class ProjectController extends Controller
     {
         $objUser = Auth::user();
         $project = Project::find($projectID);
+        $workspace = $project->workspaceData;
 
         if ($project->created_by == $objUser->id) {
             UserProject::where('project_id', '=', $projectID)->delete();
             ProjectFile::where('project_id', '=', $projectID)->delete();
             $project->delete();
 
-            return redirect()->route('projects.index', $slug)->with('success', __('Project Deleted Successfully!'));
+            if ($workspace->ownerable_type == "App\Models\Pod") {
+                return redirect()->route('pods.projects', $workspace->ownerable_id)->with('success', __('Project Deleted Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+            } else {
+                return redirect()->route('projects.index', $slug)->with('success', __('Project Deleted Successfully!'));
+            }
         } else {
             return redirect()->route('projects.index', $slug)->with('error', __("You can't Delete Project!"));
         }

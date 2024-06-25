@@ -62,4 +62,14 @@ class PodController extends Controller
         $news = $pod->news()->latest('created_at')->get();
         return view('pod.landing.index', compact('pod', 'news'));
     }
+
+    public function projects(Pod $pod)
+    {
+        $user = Auth::user();
+
+        $projects = $pod->projects()->get();
+        $currentWorkspace = $pod->workspaces->first();
+
+        return view('pod.manage.projects', compact('projects', 'pod', 'currentWorkspace'));
+    }
 }

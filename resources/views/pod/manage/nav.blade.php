@@ -26,6 +26,8 @@
 
         <a href="{{ route('pods.news', $podId=$podId) }}" class="list-group-item list-group-item-action border-0 @if(request()->routeIs('pods.news')) active @endif">News <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
         
+        <a href="{{ route('pods.projects', $pod=$podId) }}" class="list-group-item list-group-item-action border-0 @if(request()->routeIs('pods.projects')) active @endif">Projects <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+        
         
         
     </div>

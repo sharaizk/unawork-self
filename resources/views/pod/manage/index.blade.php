@@ -14,7 +14,7 @@
 @section('content')
 <div class="row">
     <div class="col-xl-2">
-        @include('pod.manage.nav', ['podId' => $pod->id])
+        @include('pod.manage.nav', ['podId' => $pod->id, 'workspace' => $pod->workspaces->first()])
     </div>
     <div class="col-xl-10">
         @yield('content.inside')

@@ -75,6 +75,7 @@ class PodService
     {
         $data = [
             'name' => $pod->title.'-workspace',
+            'slug' => $pod->title.'-workspace',
             'created_by' => $pod->created_by,
             'currency_code' => 'USD',
             'paypal_mode' => 'sandbox',
