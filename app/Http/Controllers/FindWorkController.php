@@ -12,11 +12,11 @@ class FindWorkController extends Controller
 {
     public function index(Request $request)
     {   
-        $companys = User::role('company')->limit(4)->get();
+        $companies = User::role('company')->limit(4)->get();
         $pods = Pod::limit(5)->get();
         $countries = Profile::distinct()->pluck('country');
         $skills = Skill::all();
 
-        return view('find_work.index', compact('companys', 'pods', 'countries', 'skills'));
+        return view('find_work.index', compact('companies', 'pods', 'countries', 'skills'));
     }
 }

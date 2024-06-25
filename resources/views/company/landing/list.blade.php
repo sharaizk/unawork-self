@@ -7,7 +7,7 @@
     <section class="header__search">
         <div class="container-master">
             <div class="search__wrap">
-                <form id="searchForm" class="row g-3 searchForm" method="GET" action="{{ route('companys.list') }}">
+                <form id="searchForm" class="row g-3 searchForm" method="GET" action="{{ route('companies.list') }}">
                     <div id="countryField" class="col-md-8 form-group">
                         <label for="country">Country</label>
                         <select id="country" class="form-control" name="country">
@@ -44,7 +44,7 @@
             </div>
             <div class="container-master">
                 <div class="row-master">
-                    @foreach($companys as $company)
+                    @foreach($companies as $company)
                         @include('company.landing.company_card', ['company' => $company])
                     @endforeach
                 </div>

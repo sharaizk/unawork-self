@@ -93,12 +93,12 @@
     <div class="container-master">
         <section class="section__layout section_company">
             <div class="container-master pods__title">
-                <h2>Company's Hiring</h2>
-                <a href="{{ route('companys.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+                <h2>Companies Hiring</h2>
+                <a href="{{ route('companies.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
                 <div class="row-master">
-                    @foreach($companys as $company)
+                    @foreach($companies as $company)
                         @include('company.landing.company_card', ['company' => $company])
                     @endforeach
                 </div>
@@ -149,7 +149,7 @@
 
         if (type === 'company') {
             var country = document.getElementById('country').value;
-            formAction = '{{ route("companys.list") }}';
+            formAction = '{{ route("companies.list") }}';
             this.action = formAction + '?country=' + country;
         } else if (type === 'pod') {
             var skillIds = [];

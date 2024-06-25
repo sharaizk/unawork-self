@@ -13,17 +13,17 @@ class CompanyController extends Controller
         if ($request->has('country')) {
             $country = $request->input('country');
 
-            $companys = User::role('company')
+            $companies = User::role('company')
             ->whereHas('profile', function($query) use ($country) {
                 $query->where('country', $country);
             })
             ->get();
         } else {
-            $companys = User::role('company')->get();
+            $companies = User::role('company')->get();
         }
 
         $countries = Profile::distinct()->pluck('country');
 
-        return view('company.landing.list', compact('companys', 'countries'));
+        return view('company.landing.list', compact('companies', 'countries'));
     }
 }
