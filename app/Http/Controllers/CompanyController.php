@@ -17,13 +17,9 @@ class CompanyController extends Controller
 
     public function list(Request $request)
     {
-        try {
-            $country = $request->input('country');
-            $companies = $this->companyService->getCompanies($country);
-        } catch (\Exception $e) {
-            return response()->json('Error fetching companies: ' . $e->getMessage());
-        }
-        
+        $country = $request->input('country');
+        $companies = $this->companyService->getCompanies($country);       
+
         $countries = Profile::distinct()->pluck('country');
 
         return view('company.landing.list', compact('companies', 'countries'));

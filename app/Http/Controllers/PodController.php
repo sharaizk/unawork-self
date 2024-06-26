@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\News;
 use App\Models\Pod;
 use App\Models\Skill;
-use App\Models\User;
+use App\Services\PodService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PodController extends Controller
 {
+    protected $podService;
+
+    public function __construct(PodService $podService)
+    {
+        $this->podService = $podService;
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -34,15 +40,8 @@ class PodController extends Controller
 
     public function list(Request $request)
     {
-        if ($request->has('skill_ids')) {
-            $skillIds = $request->input('skill_ids');
-
-            $pods = Pod::whereHas('skills', function($query) use ($skillIds) {
-                $query->whereIn('skills.id', $skillIds);
-            })->get();
-        } else {
-            $pods = Pod::all();
-        }   
+        $skillIds = $request->input('skill_ids');
+        $pods = $this->podService->getPods($skillIds);
 
         $skills = Skill::all();
 

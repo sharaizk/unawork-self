@@ -9,6 +9,19 @@ use Illuminate\Support\Facades\Storage;
 
 class PodService
 {
+    public function getPods(?array $skillIds = null)
+    {
+        if ($skillIds) {
+            $pods = Pod::whereHas('skills', function($query) use ($skillIds) {
+                $query->whereIn('skills.id', $skillIds);
+            })->get();
+        } else {
+            $pods = Pod::all();
+        }
+
+        return $pods;
+    }
+
     public function createPod(array $data): Pod
     {
         if (isset($data['image'])) {
