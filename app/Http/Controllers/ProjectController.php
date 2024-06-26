@@ -708,8 +708,7 @@ class ProjectController extends Controller
             ]
         );
         $objUser = Auth::user();
-        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
+        $project = Project::find($projectID);
         $project->update($request->all());
 
         return redirect()->back()->with('success', __('Project Updated Successfully!'));
