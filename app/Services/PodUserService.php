@@ -127,7 +127,7 @@ class PodUserService
 
         foreach ($workspaces as $workspace) {
             if (!$workspace->users()->where('user_id', $user->id)->exists()) {
-                $workspace->users()->attach($user->id);
+                $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1]);
             }
         }
     }

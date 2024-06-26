@@ -20,7 +20,8 @@ class PodService
         
         if ($pod) {
             $this->attachOwnerToPod($data['created_by'], $pod);
-            $this->createWorkspaceForPod($pod);
+            $workspace = $this->createWorkspaceForPod($pod);
+            $this->attachOwnerToWorkspace($workspace, $data['created_by']);
         }
 
         if (isset($data['skills'])) {
@@ -71,7 +72,7 @@ class PodService
         ]);
     }
 
-    protected function createWorkspaceForPod(Pod $pod): void
+    protected function createWorkspaceForPod(Pod $pod): Workspace
     {
         $data = [
             'name' => $pod->title.'-workspace',
@@ -83,5 +84,11 @@ class PodService
         ];
         $workspace = new Workspace($data);
         $pod->workspaces()->save($workspace);
+        return $workspace;
+    }
+
+    protected function attachOwnerToWorkspace(Workspace $workspace,  int $userId): void
+    {
+        $workspace->users()->attach($userId, ['permission' => 'Owner', 'is_active' => 1]);
     }
 }
