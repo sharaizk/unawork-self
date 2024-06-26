@@ -69,6 +69,19 @@ class ProjectController extends Controller
         return view('projects.index', compact('currentWorkspace', 'projects'));
     }
 
+    public function list(Request $request)
+    {
+        if ($request->has('budget')) {
+            $budget = json_decode($request->input('budget'));
+
+            $projects = Project::whereBetween('budget', $budget)->get();
+        } else {
+            $projects = Project::all();
+        }
+
+        return view('projects.landing.list', compact('projects'));
+    }
+
     public function tracker($slug, $id)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);

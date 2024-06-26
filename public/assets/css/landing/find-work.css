@@ -2166,6 +2166,26 @@
     display: flex;
 }
 
+
+.tpl-project-list .section_pod {
+    margin-top: 4.5rem;
+    padding: 2rem;
+}
+
+.tpl-project-list .header__search {
+    background-color: #022d4d;
+    height: 60px;
+}
+
+.tpl-project-list .header__search .search__list,
+.tpl-project-list .header__search .search__box,
+.tpl-project-list .header__search .search__wrap {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
 @media (min-width: 992px) {
     .section_pod .pod-list {
         -ms-flex-preferred-size: 0;

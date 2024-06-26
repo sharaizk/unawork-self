@@ -44,6 +44,18 @@
                         <option value="" selected>Select Type</option>
                         <option value="pod">Pod</option>
                         <option value="company">Company</option>
+                        <option value="project">Project</option>
+                    </select>
+                </div>
+
+                <div id="budgetField" class="col-md-4 form-group" style="display: none;">
+                    <label for="budget">Budget</label>
+                    <select id="budget" class="form-control" name="budget">
+                        <option value="" selected>Select Budget</option>
+                            <option value="[0,500]">$0 - $500</option>
+                            <option value="[500,1000]">$500 - $1000</option>
+                            <option value="[1000,5000]">$1000 - $5000</option>
+                            <option value="[5000,999999999]">$5000+</option>
                     </select>
                 </div>
 
@@ -105,6 +117,20 @@
             </div>
         </section>
 
+        <section class="section__layout section__project">
+            <div class="container-master teams__title">
+                <h2>Projects Availables</h2>
+                <a href="{{ route('project.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+            </div>
+            <div class="container-master">
+                <div class="row-master">
+                        @foreach($projects as $project)
+                            @include('find_work.project.project_card', ['project' => $project])
+                        @endforeach
+                </div>
+            </div>
+        </section>
+
         <section class="section__layout section_pod">
             <div class="container-master pods__title">
                 <h2>Pods of Interest </h2>
@@ -133,12 +159,19 @@
         if (type === 'company') {
             countryField.style.display = 'block';
             skillsField.style.display = 'none';
+            budgetField.style.display = 'none';
         } else if (type === 'pod') {
             skillsField.style.display = 'block';
             countryField.style.display = 'none';
+            budgetField.style.display = 'none';
+        } else if (type === 'project') {
+            skillsField.style.display = 'none';
+            countryField.style.display = 'none';
+            budgetField.style.display = 'block';
         } else {
             countryField.style.display = 'none';
             skillsField.style.display = 'none';
+            budgetField.style.display = 'none';
         }
     });
 
@@ -158,6 +191,10 @@
             });
             formAction = '{{ route("pods.list") }}';
             this.action = formAction + '?skill_ids=' + JSON.stringify(skillIds);
+        } else if (type === 'project') {
+            var budget = document.getElementById('budget').value;
+            formAction = '{{ route("project.list") }}';
+            this.action = formAction + '?budget=' + encodeURIComponent(budget);
         }
 
         this.submit();

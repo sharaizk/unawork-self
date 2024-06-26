@@ -11,6 +11,8 @@
                $dark_mode = $setting['cust_darklayout'];
                $cust_theme_bg = $setting['cust_theme_bg'];
                $SITE_RTL = $setting['site_rtl'];
+               $adminSetting['enable_chat'] = 'on';
+               
            } else {
                $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
                $color = $setting->theme_color;
