@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Enums\User\UserRole;
 
 class CompanyController extends Controller
 {
@@ -13,13 +14,13 @@ class CompanyController extends Controller
         if ($request->has('country')) {
             $country = $request->input('country');
 
-            $companies = User::role('company')
+            $companies = User::role(UserRole::COMPANY->value)
             ->whereHas('profile', function($query) use ($country) {
                 $query->where('country', $country);
             })
             ->get();
         } else {
-            $companies = User::role('company')->get();
+            $companies = User::role(UserRole::COMPANY->value)->get();
         }
 
         $countries = Profile::distinct()->pluck('country');
