@@ -39,7 +39,7 @@
                                     <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">
                                         <i class="ti ti-user-plus"></i> <span>{{ __('Invite Users') }}</span>
                                     </a>
-                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" data-title="{{ __('Edit Project') }}" data-url="{{route('projects.editForPod',[$currentWorkspace->id,$project->id])}}">
+                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" data-title="{{ __('Edit Project') }}" data-url="{{route('projects.edit',[$currentWorkspace->id,$project->id])}}">
                                     <i class="ti ti-edit"></i> <span>{{ __('Edit') }}</span>
                                     </a>
                                     <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Share to Clients') }}" data-url="{{route('projects.share.popup',[$currentWorkspace->slug,$project->id])}}">

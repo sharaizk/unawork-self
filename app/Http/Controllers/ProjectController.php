@@ -176,10 +176,11 @@ class ProjectController extends Controller
         return view('projects.import', compact("slug"));
     }
 
-    public function store(Workspace $currentWorkspace, Request $request)
+    public function store($slug, Request $request)
     {
         $objUser = Auth::user();
         $plan = Plan::find($objUser->plan);
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $user = $currentWorkspace->id;
         //check if user have plan
         if ($plan) {
@@ -560,15 +561,6 @@ class ProjectController extends Controller
         return view('projects.edit', compact('currentWorkspace', 'project'));
     }
 
-    public function editForPod($workspaceId, $projectID)
-    {
-        $objUser = Auth::user();
-        $currentWorkspace = Workspace::find($workspaceId);
-        $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
-
-        return view('projects.edit', compact('currentWorkspace', 'project'));
-    }
-
     public function create($slug)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
@@ -576,12 +568,6 @@ class ProjectController extends Controller
         return view('projects.create', compact('currentWorkspace'));
     }
 
-    public function createForPod($workspaceId)
-    {
-        $currentWorkspace = Workspace::find($workspaceId);
-
-        return view('projects.create', compact('currentWorkspace'));
-    }
 
     public function popup($slug, $projectID)
     {
@@ -708,7 +694,8 @@ class ProjectController extends Controller
             ]
         );
         $objUser = Auth::user();
-        $project = Project::find($projectID);
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
         $project->update($request->all());
 
         return redirect()->back()->with('success', __('Project Updated Successfully!'));

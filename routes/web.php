@@ -713,11 +713,9 @@ Route::group(['middleware' => ['verified']], function () {
     // project
     Route::get('/{slug}/projects', [ProjectController::class, 'index'])->name('projects.index')->middleware(['auth', 'CheckPlan', 'XSS']);
     Route::get('/{slug}/projects/create', [ProjectController::class, 'create'])->name('projects.create')->middleware(['auth', 'XSS']);
-    Route::get('/{workspaceId}/projects/createForPod', [ProjectController::class, 'createForPod'])->name('projects.create.for.pod')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/projects/{id}', [ProjectController::class, 'show'])->name('projects.show')->middleware(['auth', 'CheckPlan', 'XSS']);
-    Route::post('/{currentWorkspace}/projects', [ProjectController::class, 'store'])->name('projects.store')->middleware(['auth', 'XSS']);
+    Route::post('/{slug}/projects', [ProjectController::class, 'store'])->name('projects.store')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/projects/{id}/edit', [ProjectController::class, 'edit'])->name('projects.edit')->middleware(['auth', 'XSS']);
-    Route::get('/{slug}/projects/{id}/editForPod', [ProjectController::class, 'editForPod'])->name('projects.editForPod')->middleware(['auth', 'XSS']);
     
     Route::post('/{slug}/projects/{id}/update', [ProjectController::class, 'update'])->name('projects.update')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy')->middleware(['auth', 'XSS']);
