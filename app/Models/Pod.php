@@ -40,7 +40,7 @@ class Pod extends Model
     {
         return $this->morphMany(Workspace::class, 'ownerable');
     }
-
+    
     public function projects()
     {
         return $this->hasManyThrough(Project::class, Workspace::class, 'ownerable_id', 'workspace')
