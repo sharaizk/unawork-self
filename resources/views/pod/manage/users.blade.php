@@ -10,8 +10,10 @@
                                 @if ($user->pivot->permission == 'Owner')
                                     <span
                                         class="badge bg-primary">{{ __($user->pivot->permission) }}</span>
-                                @else
+                                @elseif ($user->pivot->status == 'active')
                                     <span class="badge bg-dark">{{ __('Member') }}</span>
+                                @else
+                                    <span class="badge bg-dark">{{ __('pending') }}</span>
                                 @endif
                             @endif
                         <div class="card-header-right">
@@ -21,7 +23,13 @@
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    
+                                @if ($user->pivot->status == 'pending')
+                                    <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
+                                        data-title="{{ __('Remove user from pod') }}">
+                                        <i class="ti ti-pencil"></i> 
+                                        <span>{{ __('Accept user to pod') }}</span>
+                                    </a>
+                                @endif
                                 <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
                                     data-title="{{ __('Remove user from pod') }}">
                                     <i class="ti ti-pencil"></i> 

@@ -95,6 +95,8 @@
             </div>
         </div>
     </section>
+    <div id="message-container"></div>
+
 
     <section class="section__titlepage">
         <div class="container-master">
@@ -150,6 +152,42 @@
 @endsection
 
 @section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.join-form');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const podId = this.getAttribute('data-pod-id');
+
+                fetch(`{{ ENV('APP_URL') }}api/pods/${podId}/requests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const messageContainer = document.getElementById('message-container');
+                    if (data.status === 'success') {
+                        messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        form.style.display = 'none';
+                    } else {
+                        messageContainer.innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    const messageContainer = document.getElementById('message-container');
+                    messageContainer.innerHTML = `<div class="alert alert-danger">An error occurred: ${error.message}</div>`;
+                });
+            });
+        });
+    });
+</script>
 <script>
     document.getElementById('type').addEventListener('change', function () {
         var type = this.value;

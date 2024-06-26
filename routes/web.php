@@ -103,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pods/{podId}/invite', [PodUserController::class, 'create'])->name('pods.invite');
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
+    Route::post('/pods/{pod}/users/{user}', [PodUserController::class, 'accept'])->name('pods.accept');
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

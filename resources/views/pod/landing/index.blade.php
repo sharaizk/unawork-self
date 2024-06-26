@@ -6,11 +6,33 @@
 @endsection
 
 @section('content')
+<style>
+    .pod-join {
+        background: #022D4D;
+        color: #ffffff;
+        padding: 5px 20px;
+        border-radius: 5px;
+        margin: 10px auto;
+        display: inline-block;
+        width: 25rem;
+    }
+    .pod-join :hover {
+        background: white;
+        color: #022D4D;
+        border: 1px solid #022D4D;
+    }
+</style>
 <link rel="stylesheet" href="{{ asset('assets/css/landing/outer-pods.css') }}">
 <section class="section__titlepage">
     <div class="container-master">
-        <h1 class="section__titlepage--headertitle"><span>{{ $pod->title }}</span></h1>
+        <div class="row-master">
+            <h1 class="section__titlepage--headertitle col-9"><span>{{ $pod->title }}</span></h1>
+            <form class="join-form col-3" data-pod-id="{{ $pod->id }}">
+                <button type="submit" class="pod-join btn btn-primary">Join this pod</button>
+            </form>
+        </div>
     </div>
+
 </section>
 <section class="section__tasksmeeting">
     <div class="container-master">
@@ -55,6 +77,42 @@
         $(this).hide();
     });
 });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.join-form');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const podId = this.getAttribute('data-pod-id');
+
+                fetch(`{{ ENV('APP_URL') }}api/pods/${podId}/requests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const messageContainer = document.getElementById('message-container');
+                    if (data.status === 'success') {
+                        messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        form.style.display = 'none';
+                    } else {
+                        messageContainer.innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    const messageContainer = document.getElementById('message-container');
+                    messageContainer.innerHTML = `<div class="alert alert-danger">An error occurred: ${error.message}</div>`;
+                });
+            });
+        });
+    });
 </script>
 @endsection
 
