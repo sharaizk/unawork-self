@@ -3,26 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
-use App\Models\User;
 use Illuminate\Http\Request;
-use App\Enums\User\UserRole;
+use App\Services\CompanyService;
 
 class CompanyController extends Controller
 {
+    protected $companyService;
+
+    public function __construct(CompanyService $companyService)
+    {
+        $this->companyService = $companyService;
+    }
+
     public function list(Request $request)
     {
-        if ($request->has('country')) {
+        try {
             $country = $request->input('country');
-
-            $companies = User::role(UserRole::COMPANY->value)
-            ->whereHas('profile', function($query) use ($country) {
-                $query->where('country', $country);
-            })
-            ->get();
-        } else {
-            $companies = User::role(UserRole::COMPANY->value)->get();
+            $companies = $this->companyService->getCompanies($country);
+        } catch (\Exception $e) {
+            return response()->json('Error fetching companies: ' . $e->getMessage());
         }
-
+        
         $countries = Profile::distinct()->pluck('country');
 
         return view('company.landing.list', compact('companies', 'countries'));
