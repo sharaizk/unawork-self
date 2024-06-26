@@ -180,9 +180,7 @@ class ProjectController extends Controller
     {
         $objUser = Auth::user();
         $plan = Plan::find($objUser->plan);
-        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        return $currentWorkspace;
-        
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);        
         $user = $currentWorkspace->id;
         //check if user have plan
         if ($plan) {
