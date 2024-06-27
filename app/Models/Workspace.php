@@ -104,6 +104,11 @@ class Workspace extends Model
         return $owner;
     }
 
+    public function ownerable()
+    {
+        return $this->morphTo();
+    }
+
     public function is_chagpt_enable()
     {
         $owner1 = UserWorkspace::where('workspace_id', $this->id)->where('permission', 'Owner')->first();

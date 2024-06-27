@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Pod;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -32,6 +33,7 @@ class PodService
         
         if ($pod) {
             $this->attachOwnerToPod($data['created_by'], $pod);
+            $this->createWorkspaceForPod($pod);
         }
 
         if (isset($data['skills'])) {
@@ -80,5 +82,18 @@ class PodService
             'permission' => 'Owner',
             'status' => 'active'
         ]);
+    }
+
+    protected function createWorkspaceForPod(Pod $pod): void
+    {
+        $data = [
+            'name' => $pod->title.'-workspace',
+            'created_by' => $pod->created_by,
+            'currency_code' => 'USD',
+            'paypal_mode' => 'sandbox',
+            'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
+        ];
+        $workspace = new Workspace($data);
+        $pod->workspaces()->save($workspace);
     }
 }
