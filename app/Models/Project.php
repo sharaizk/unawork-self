@@ -16,8 +16,13 @@ class Project extends Model
         'end_date',
         'budget',
         'workspace',
+        'private',
         'created_by',
         'is_active',
+    ];
+
+    protected $casts = [
+        'private',
     ];
 
     public function creater()

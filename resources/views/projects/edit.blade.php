@@ -17,6 +17,15 @@
                 <label for="description" class="form-label">{{ __('Description') }}</label>
                 <textarea rows="3" class="form-control" id="description" name="description" required="" placeholder="{{ __('Add Description') }}">{{$project->description}}</textarea>
             </div>
+            <div class="form-group col-md-12">
+                <label class="form-label">{{ __('Visibility') }}</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="private" name="private" value="1" {{ $project->private ? 'checked' : '' }}>
+                    <label class="form-check-label" for="private">
+                        {{ __('Private Project') }}
+                    </label>
+                </div>
+            </div>
             <div class="form-group col-md-6">
                 <label for="status" class="form-label">{{ __('Status') }}</label>
                 <select id="status" name="status" class="form-control select2">

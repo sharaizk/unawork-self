@@ -17,7 +17,7 @@ class FindWorkController extends Controller
         $pods = Pod::limit(5)->get();
         $countries = Profile::distinct()->pluck('country');
         $skills = Skill::all();
-        $projects = Project::limit(3)->get();
+        $projects = Project::where('private', false)->limit(3)->get();
 
         return view('find_work.index', compact('companies', 'pods', 'countries', 'skills', 'projects'));
     }
