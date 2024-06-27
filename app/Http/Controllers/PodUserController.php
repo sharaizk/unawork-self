@@ -79,4 +79,16 @@ class PodUserController extends Controller
         }
         return response()->json(['error' => 'User not found in pod'], 404);
     }
+
+    public function decline(Pod $pod, User $user)
+    {   
+        $userInPod = $pod->users()->where('user_id', $user->id)->exists();
+
+        if ($userInPod) {
+            $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
+            
+            return response()->json(['message' => 'User status updated to active'], 200);
+        }
+        return response()->json(['error' => 'User not found in pod'], 404);
+    }
 }

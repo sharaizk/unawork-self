@@ -95,6 +95,21 @@
             }
         });
     });
+
+    const declineUserLinks = document.querySelectorAll('.decline-user');
+
+    declineUserLinks.forEach(link => {
+        link.addEventListener('click', async function(event) {
+            event.preventDefault();
+            const url = this.getAttribute('data-url');
+            try {
+                const response = await axios.post(url);
+                location.reload(); 
+            } catch (error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    });
 });
 </script>
 

@@ -27,8 +27,12 @@
                                 @if ($pod->pivot->permission == 'Owner')
                                     <span
                                         class="badge bg-primary">{{ __($pod->pivot->permission) }}</span>
-                                @else
+                                @elseif ($pod->pivot->status == 'active')
                                     <span class="badge bg-dark">{{ __('Member') }}</span>
+                                @elseif ($pod->pivot->status == 'pending')
+                                    <span class="badge bg-dark">{{ __('pending') }}</span>
+                                @else
+                                    <span class="badge bg-dark">{{ __('declined') }}</span>
                                 @endif
                             @endif
                         <div class="card-header-right">

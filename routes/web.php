@@ -104,6 +104,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
     Route::post('/pods/{pod}/users/{user}', [PodUserController::class, 'accept'])->name('pods.accept');
+    Route::post('/pods/{pod}/users/{user}/decline', [PodUserController::class, 'decline'])->name('pods.decline');
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
