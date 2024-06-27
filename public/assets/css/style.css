@@ -16178,7 +16178,7 @@ body.theme-3 {
 }
 
 body.theme-3 .bg-primary {
-    background: linear-gradient(141.55deg, #6fd943 3.46%, #6fd943 99.86%), #6fd943 !important;
+    background: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D !important;
 }
 
 body.theme-3 .dash-header .drp-language .drp-text,
@@ -16198,7 +16198,7 @@ body.theme-3 .dash-sidebar.light-sidebar .dash-navbar > .dash-item.active > .das
   body.theme-3 .dash-sidebar .dash-navbar > .dash-item:hover > .dash-link {
     background: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D;
     color: #fff;
-    box-shadow: 0 5px 7px -1px rgba(111, 217, 67, 0.3);
+    box-shadow: 0 5px 7px -1px rgba(2, 45, 77, 0.3);
 }
 
 body.theme-3 .dash-sidebar.light-sidebar .dash-navbar > .dash-item.active > .dash-link i, body.theme-3 .dash-sidebar.light-sidebar .dash-navbar > .dash-item:active > .dash-link i, body.theme-3 .dash-sidebar.light-sidebar .dash-navbar > .dash-item:focus > .dash-link i, body.theme-3 .dash-sidebar.light-sidebar .dash-navbar > .dash-item:hover > .dash-link i,

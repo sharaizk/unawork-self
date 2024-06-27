@@ -3114,21 +3114,21 @@
                 .btn-outline-primary.active,
                 .btn-outline-primary.dropdown-toggle.show {
                     color: #ffffff;
-                    background-color: #6fd943 !important;
-                    border-color: #6fd943 !important;
+                    background-color: #022D4D !important;
+                    border-color: #022D4D !important;
                 }
 
 
                 .btn-outline-primary:hover {
                     color: #ffffff;
-                    background-color: #6fd943 !important;
-                    border-color: #6fd943 !important;
+                    background-color: #022D4D !important;
+                    border-color: #022D4D !important;
                 }
 
 
                 .btn[class*="btn-outline-"]:hover {
 
-                    border-color: #6fd943 !important;
+                    border-color: #022D4D !important;
                 }
             </style>
         @endif
@@ -3182,15 +3182,15 @@
                 .btn-outline-primary.active,
                 .btn-outline-primary.dropdown-toggle.show {
                     color: #ffffff;
-                    background-color: #6fd943 !important;
-                    border-color: #6fd943 !important;
+                    background-color: #022D4D !important;
+                    border-color: #022D4D !important;
                 }
 
 
                 body.theme-1 .btn-outline-primary:hover {
                     color: #ffffff;
-                    background-color: #6fd943 !important;
-                    border-color: #6fd943 !important;
+                    background-color: #022D4D !important;
+                    border-color: #022D4D !important;
                 }
             </style>
         @endif

@@ -33,7 +33,7 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
             @endif
              @if($color == "theme-3")
             <div class="avatar av-m" style="background-color: #d9efff; text-align: center;">
-                <span class="far fa-bookmark" style="font-size: 22px; color: #6fd943; margin-top: 12px !important;"></span>
+                <span class="far fa-bookmark" style="font-size: 22px; color: #022D4D; margin-top: 12px !important;"></span>
             </div>
             @endif
              @if($color == "theme-4")
