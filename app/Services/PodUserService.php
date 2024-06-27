@@ -123,12 +123,10 @@ class PodUserService
 
     private function attachUserToPodWorkspaces(User $user, Pod $pod): void
     {
-        $workspaces = $pod->workspaces;
+        $workspace = $pod->workspace;
 
-        foreach ($workspaces as $workspace) {
-            if (!$workspace->users()->where('user_id', $user->id)->exists()) {
-                $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1]);
-            }
+        if (!$workspace->users()->where('user_id', $user->id)->exists()) {
+            $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1]);
         }
     }
 

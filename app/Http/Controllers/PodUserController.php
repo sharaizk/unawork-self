@@ -58,9 +58,14 @@ class PodUserController extends Controller
     {
         $pod = Pod::findOrFail($podId);
         $user = User::findOrFail($userId);
+        $workspace = $pod->workspace;
+
 
         if ($pod->users->contains($user)) {
             $pod->users()->detach($user->id);
+            if ($workspace->users()->where('user_id', $user->id)->exists()) {
+                $workspace->users()->detach($user->id);
+            }
             return response()->json(['message' => 'User removed from pod successfully'], 200);
         }
 

@@ -36,9 +36,9 @@ class Pod extends Model
         return $this->morphMany(News::class, 'newsable');
     }
 
-    public function workspaces()
+    public function workspace()
     {
-        return $this->morphMany(Workspace::class, 'ownerable');
+        return $this->morphOne(Workspace::class, 'ownerable');
     }
     
     public function projects()

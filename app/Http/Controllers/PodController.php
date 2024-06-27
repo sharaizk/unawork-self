@@ -68,7 +68,7 @@ class PodController extends Controller
         $user = Auth::user();
 
         $projects = $pod->projects()->get();
-        $currentWorkspace = $pod->workspaces->first();
+        $currentWorkspace = $pod->workspace;
 
         return view('pod.manage.projects', compact('projects', 'pod', 'currentWorkspace'));
     }

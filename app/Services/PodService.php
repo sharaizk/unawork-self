@@ -83,7 +83,7 @@ class PodService
             'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
         ];
         $workspace = new Workspace($data);
-        $pod->workspaces()->save($workspace);
+        $pod->workspace()->save($workspace);
         return $workspace;
     }
 
