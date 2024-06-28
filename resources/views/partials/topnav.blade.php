@@ -284,13 +284,13 @@
                             <span>{{ __('My Profile') }}</span>
                         </a>
                         <!--   @if (env('CHAT_MODULE') == 'on')
-@if (\Auth::user()->type == 'user')
-<a href="{{ url('chats') }}" class="dropdown-item">
-                                    <i class="ti ti-message-circle"></i>
-                                    <span>{{ __('Chats') }}</span>
-                                    </a>
-@endif
-@endif -->
+                            @if (\Auth::user()->type == 'user')
+                                <a href="{{ url('chats') }}" class="dropdown-item">
+                                <i class="ti ti-message-circle"></i>
+                                <span>{{ __('Chats') }}</span>
+                                </a>
+                            @endif
+                        @endif -->
                         <a href="#"
                             class="dropdown-item "onclick="event.preventDefault();document.getElementById('logout-form1').submit();">
                             <i class="ti ti-power"></i>
