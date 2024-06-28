@@ -263,19 +263,19 @@
                                (isset($currentWorkspace) && $currentWorkspace && $currentWorkspace->creater->id == Auth::user()->id)) &&
                                Auth::user()->getGuard() != 'client')
 
-                           <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
+                           <!-- <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
                                <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i
                                            class="ti ti-trophy"></i></span><span
                                        class="dash-mtext">{{ __('Plans') }}</span></a>
-                           </li>
+                           </li> -->
 
 
 
-                           <li class="dash-item {{ Request::route()->getName() == 'order.index' ? ' active' : '' }}">
+                           <!-- <li class="dash-item {{ Request::route()->getName() == 'order.index' ? ' active' : '' }}">
                                <a href="{{ route('order.index') }}" class="dash-link "><span class="dash-micon"><i
                                            data-feather="credit-card"></i></span><span
                                        class="dash-mtext">{{ __('Orders') }}</span></a>
-                           </li>
+                           </li> -->
                            @if (Auth::user()->type == 'admin')
                                <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
                                    <a href="{{ route('plan_request.index') }}" class="dash-link "><span
@@ -321,28 +321,28 @@
                                $currentWorkspace &&
                                $currentWorkspace->creater->id == Auth::user()->id &&
                                Auth::user()->getGuard() != 'client')
-                           <li
+                           <!-- <li
                                class="dash-item {{ Request::route()->getName() == 'referral-programs'}}">
                                <a href="{{ route('referral-program.company',$currentWorkspace->slug) }}" class="dash-link "><span
                                        class="dash-micon">
                                        <i class="ti ti-trophy"></i></span><span
                                        class="dash-mtext">{{ __('Referral Program') }}</span></a>
-                           </li>
-                           <li
+                           </li> -->
+                           <!-- <li
                                class="dash-item {{ Request::route()->getName() == 'notification-templates.index' ? ' active' : '' }}">
                                <a href="{{ route('notification-templates.index', $currentWorkspace->slug) }}"
                                    class="dash-link "><span class="dash-micon"><i
                                            class="ti ti-notification"></i></span><span
                                        class="dash-mtext">{{ __('Notification Template') }}</span></a>
-                           </li>
+                           </li> -->
 
-                           <li
+                           <!-- <li
                                class="dash-item {{ Request::route()->getName() == 'workspace.settings' ? ' active' : '' }}">
                                <a href="{{ route('workspace.settings', $currentWorkspace->slug) }}"
                                    class="dash-link "><span class="dash-micon"><i
                                            data-feather="settings"></i></span><span
                                        class="dash-mtext">{{ __('Settings') }}</span></a>
-                           </li>
+                           </li> -->
                        @endif
 
                        @if (Auth::user()->hasRole('employee'))

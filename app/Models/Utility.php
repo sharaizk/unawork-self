@@ -59,21 +59,9 @@ class Utility
     public static function getWorkspaceBySlug($slug = null)
     {
         $objUser = Auth::user();
-
-        if ($objUser && $objUser->currant_workspace) {
-            if ($objUser->getGuard() == 'client') {
-                $rs = Workspace::select(['workspaces.*'])->join('client_workspaces', 'workspaces.id', '=', 'client_workspaces.workspace_id')->where('workspaces.id', '=', $objUser->currant_workspace)->where('client_id', '=', $objUser->id)->first();
-            } else {
-                $rs = Workspace::select([
-                    'workspaces.*',
-                    'user_workspaces.permission',
-                ])->join('user_workspaces', 'workspaces.id', '=', 'user_workspaces.workspace_id')->where('workspaces.id', '=', $objUser->currant_workspace)->where(
-                    'user_id',
-                    '=',
-                    $objUser->id
-                )->first();
-                // dd($rs);
-            }
+        
+        if (!$objUser) {
+            $rs = Workspace::select(['workspaces.*'])->where('slug', '=', $slug)->limit(1)->first();
         } elseif ($objUser && !empty($slug)) {
             if ($objUser->getGuard() == 'client') {
                 $rs = Workspace::select(['workspaces.*'])->join('client_workspaces', 'workspaces.id', '=', 'client_workspaces.workspace_id')->where('slug', '=', $slug)->where('client_id', '=', $objUser->id)->first();
@@ -95,7 +83,18 @@ class Utility
                 ])->join('user_workspaces', 'workspaces.id', '=', 'user_workspaces.workspace_id')->where('user_id', '=', $objUser->id)->orderBy('workspaces.id', 'desc')->limit(1)->first();
             }
         } else {
-            $rs = Workspace::select(['workspaces.*'])->where('slug', '=', $slug)->limit(1)->first();
+            if ($objUser->getGuard() == 'client') {
+                $rs = Workspace::select(['workspaces.*'])->join('client_workspaces', 'workspaces.id', '=', 'client_workspaces.workspace_id')->where('workspaces.id', '=', $objUser->currant_workspace)->where('client_id', '=', $objUser->id)->first();
+            } else {
+                $rs = Workspace::select([
+                    'workspaces.*',
+                    'user_workspaces.permission',
+                ])->join('user_workspaces', 'workspaces.id', '=', 'user_workspaces.workspace_id')->where('workspaces.id', '=', $objUser->currant_workspace)->where(
+                    'user_id',
+                    '=',
+                    $objUser->id
+                )->first();
+            }
         }
 
         // if(!$rs && $objUser){

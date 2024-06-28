@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\ProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,7 +71,6 @@ Route::get('/profile', [ProfileController::class, 'index']);
 Route::post('/profile', [ProfileController::class, 'update']);
 Route::delete('/profile/{id}', [ProfileController::class, 'destroy']);
 
-});
 
 Route::get('/employees', [EmployeeController::class, 'index']);
 Route::get('/employees/{id}', [EmployeeController::class, 'show']);
@@ -78,3 +78,12 @@ Route::get('/employees/{id}', [EmployeeController::class, 'show']);
 
 Route::resource('news', NewsController::class)->except('update');
 Route::post('/news/{id}', [NewsController::class, 'update']);
+
+
+Route::get('/project', [ProjectController::class, 'index']);
+Route::post('/project', [PodController::class, 'store']);
+Route::get('/project/{id}', [PodController::class, 'show']);
+Route::post('/project/{id}', [PodController::class, 'update']);
+Route::delete('/project/{id}', [PodController::class, 'destroy']);
+
+});

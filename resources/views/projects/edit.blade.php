@@ -2,7 +2,7 @@
     @csrf
     <div class="modal-body">
         <div class="row">
-            @if ($currentWorkspace->is_chagpt_enable())
+            @if ($currentWorkspace->ownerable_type != "App\Models\Pod" && $currentWorkspace->is_chagpt_enable())
             <div class="text-end col-12">
                 <a href="#" data-size="lg" data-ajax-popup-over="true" class="btn btn-sm btn-primary" data-url="{{ route('generate',['project']) }}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Generate with AI') }}" data-title="{{ __('Generate Project Name & Description') }}">
                     <i class="fas fa-robot px-1"></i>{{ __('Generate with AI') }}</a>

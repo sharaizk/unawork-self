@@ -92,6 +92,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/pods/{podId}', [PodController::class, 'show'])->name('pods.show');
     Route::get('/account/pods/{podId}/users', [PodUserController::class, 'index'])->name('pods.users');
 
+
+    Route::get('/account/pods/{pod}/projects', [PodController::class, 'projects'])->name('pods.projects');
+    
+
     Route::get('/account/pods/{podId}/news', [NewsController::class, 'index'])->name('pods.news');
     Route::get('/account/pods/{podId}/news/create', [NewsController::class, 'create'])->name('pods.news.create');
     Route::get('/account/pods/{podId}/news/{NewsId}', [NewsController::class, 'edit'])->name('pods.news.edit');
@@ -712,6 +716,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('/{slug}/projects/{id}', [ProjectController::class, 'show'])->name('projects.show')->middleware(['auth', 'CheckPlan', 'XSS']);
     Route::post('/{slug}/projects', [ProjectController::class, 'store'])->name('projects.store')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/projects/{id}/edit', [ProjectController::class, 'edit'])->name('projects.edit')->middleware(['auth', 'XSS']);
+    
     Route::post('/{slug}/projects/{id}/update', [ProjectController::class, 'update'])->name('projects.update')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy')->middleware(['auth', 'XSS']);
 

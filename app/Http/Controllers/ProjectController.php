@@ -180,7 +180,7 @@ class ProjectController extends Controller
     {
         $objUser = Auth::user();
         $plan = Plan::find($objUser->plan);
-        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);        
         $user = $currentWorkspace->id;
         //check if user have plan
         if ($plan) {
@@ -280,7 +280,12 @@ class ProjectController extends Controller
                     // }
                 }
 
-                return redirect()->route('projects.index', $currentWorkspace->slug)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+                if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
+                    return redirect()->route('pods.projects', $currentWorkspace->ownerable_id)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+                } else {
+                    return redirect()->route('projects.index', $currentWorkspace->slug)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+                }
+
             } else {
                 return redirect()->back()->with('error', __('Your project limit is over, Please upgrade plan.'));
             }
@@ -701,13 +706,18 @@ class ProjectController extends Controller
     {
         $objUser = Auth::user();
         $project = Project::find($projectID);
+        $workspace = $project->workspaceData;
 
         if ($project->created_by == $objUser->id) {
             UserProject::where('project_id', '=', $projectID)->delete();
             ProjectFile::where('project_id', '=', $projectID)->delete();
             $project->delete();
 
-            return redirect()->route('projects.index', $slug)->with('success', __('Project Deleted Successfully!'));
+            if ($workspace->ownerable_type == "App\Models\Pod") {
+                return redirect()->route('pods.projects', $workspace->ownerable_id)->with('success', __('Project Deleted Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+            } else {
+                return redirect()->route('projects.index', $slug)->with('success', __('Project Deleted Successfully!'));
+            }
         } else {
             return redirect()->route('projects.index', $slug)->with('error', __("You can't Delete Project!"));
         }

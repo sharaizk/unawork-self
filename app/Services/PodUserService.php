@@ -15,6 +15,7 @@ class PodUserService
     public function inviteExistedUser(int $userId = null, int $podId): void
     {
         $user = User::find($userId);
+        $pod = Pod::find($podId);
 
         if (is_null($user)) {
             throw new \Exception(__('This User is not connected with our system. Please fill out the below details to invite.'));
@@ -25,9 +26,10 @@ class PodUserService
         }
 
         $this->attachUserToPod($user, $podId);
-
+        $this->attachUserToPodWorkspaces($user, $pod);
+        
         try {
-            $this->sendInvitationEmail($user, $podId);
+            $this->sendInvitationEmail($user, $pod);
         } catch (\Exception $e) {
             throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
         }
@@ -119,9 +121,17 @@ class PodUserService
         ]);
     }
 
-    private function sendInvitationEmail(User $user, int $podId): void
+    private function attachUserToPodWorkspaces(User $user, Pod $pod): void
     {
-        $pod = Pod::find($podId);
+        $workspace = $pod->workspace;
+
+        if (!$workspace->users()->where('user_id', $user->id)->exists()) {
+            $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1]);
+        }
+    }
+
+    private function sendInvitationEmail(User $user, Pod $pod): void
+    {
         $message = "You have been invited to join the pod '{$pod->name}'.";
         Mail::raw($message, function ($m) use ($user) {
             $m->to($user->email)->subject('Pod Invitation');
