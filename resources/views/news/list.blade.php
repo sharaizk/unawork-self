@@ -23,7 +23,7 @@
                             <div class="boxarchives__content__list__item ">
                             
                             <h3 class="boxarchives__content__list__item__title">
-                                <a href="{{ route('landing.pods.news.show', ['podId' => $pod->id, 'newsId' => $post->id]) }}">
+                                <a href="{{ route('landing.pods.news.show', ['pod' => $pod, 'news' => $post]) }}">
                                     <i class="ti ti-pencil"></i> 
                                     <span>{{ $post->title }}</span>
                                 </a>

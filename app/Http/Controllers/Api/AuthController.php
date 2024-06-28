@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\User\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,7 @@ class AuthController extends Controller
             'password'  => Hash::make($request->password),
         ]);
 
-        $user->assignRole('employee');
+        $user->assignRole(UserRole::EMPLOYEE->value);
         
         return $this->success([
             'token' => $user->createToken('API Token')->plainTextToken,

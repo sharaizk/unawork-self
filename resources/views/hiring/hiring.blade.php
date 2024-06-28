@@ -1,5 +1,5 @@
 @extends('layouts.landing')
-
+@section('body-class', 'tpl-outerPods')
 @section('content')
 <style>
     .header__search{

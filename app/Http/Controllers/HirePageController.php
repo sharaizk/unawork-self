@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\User\UserRole;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\Skill;
 use App\Filters\Employee\EmployeeFilter;
 use App\Http\Requests\Employee\FilterRequest;
-use Illuminate\Http\Request;
-use Chatify\Http\Controllers\Api\MessageController;
-use Illuminate\Support\Facades\Auth;
 
 class HirePageController extends Controller
 {
@@ -19,7 +17,7 @@ class HirePageController extends Controller
         $skills = Skill::all();
 
         $data = $request->all();
-        $employees = User::role('employee');
+        $employees = User::role(UserRole::EMPLOYEE->value);
 
         $filter = new EmployeeFilter($data);
         $employees = $filter->apply($employees->with(['profile', 'skills']));

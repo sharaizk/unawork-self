@@ -18,8 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Mail\SendLoginDetail;
 use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
-
-
+use App\Enums\User\UserRole;
 
 
 class RegisteredUserController extends Controller
@@ -219,7 +218,7 @@ class RegisteredUserController extends Controller
             $employeeService = new EmployeeService;
             $employeeService->makeEmployee($user);
         } elseif ($request->role == "company") {
-            $user->assignRole('company');
+            $user->assignRole(UserRole::COMPANY->value);
         }
 
         User::userDefaultDataRegister($user);

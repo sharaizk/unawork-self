@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\News;
 use App\Models\Pod;
 use App\Models\Skill;
-use App\Models\User;
+use App\Services\PodService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PodController extends Controller
 {
+    protected $podService;
+
+    public function __construct(PodService $podService)
+    {
+        $this->podService = $podService;
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -32,6 +38,16 @@ class PodController extends Controller
         return view('pod.edit_form', compact('pod', 'skills'));
     }
 
+    public function list(Request $request)
+    {
+        $skillIds = $request->input('skill_ids');
+        $pods = $this->podService->getPods($skillIds);
+
+        $skills = Skill::all();
+
+        return view('pod.list', compact('pods', 'skills'));
+    }
+
     public function show(int $podId)
     {
         $user = Auth::user();
@@ -40,24 +56,9 @@ class PodController extends Controller
         return view('pod.manage.index', compact('currentWorkspace', 'pod'));
     }
 
-    public function showOuter(int $podId)
+    public function showOuter(Pod $pod)
     {
-        $pod = Pod::find($podId);
         $news = $pod->news()->latest('created_at')->get();
         return view('pod.landing.index', compact('pod', 'news'));
-    }
-
-    public function showNews(int $podId)
-    {
-        $pod = Pod::find($podId);
-        $news = $pod->news()->latest('created_at')->get();
-        return view('news.list', compact('pod', 'news'));
-    }
-
-    public function showOnePost(int $podId, int $postId)
-    {
-        $pod = Pod::find($podId);
-        $post = News::find($postId);
-        return view('news.one_post', compact('pod', 'post'));
     }
 }

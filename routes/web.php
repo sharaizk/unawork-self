@@ -60,12 +60,15 @@ use App\Http\Controllers\ReferralProgramController;
 use App\Http\Controllers\PaiementproController;
 use App\Http\Controllers\NepalsteController;
 use App\Http\Controllers\CinetPayController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
+use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PayHerePaymentController;
 use App\Http\Controllers\PodController;
+use App\Http\Controllers\PodNewsController;
 use App\Http\Controllers\PodUserController;
 
 /*
@@ -98,11 +101,16 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
 });
 
-Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
-Route::get('/pods/{podId}', [PodController::class, 'showOuter'])->name('landing.pods.show');
-Route::get('/pods/{podId}/news', [PodController::class, 'showNews'])->name('landing.pods.news.list');
+Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
+Route::get('/pods/list', [PodController::class, 'list'])->name('pods.list');
+Route::get('/companies/list', [CompanyController::class, 'list'])->name('companies.list');
 
-Route::get('/pods/{podId}/news/{newsId}', [PodController::class, 'showOnePost'])->name('landing.pods.news.show');
+
+Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
+Route::get('/pods/{pod}', [PodController::class, 'showOuter'])->name('landing.pods.show');
+Route::get('/pods/{pod}/news', [PodNewsController::class, 'list'])->name('landing.pods.news.list');
+
+Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name('landing.pods.news.show');
 
 
 Route::get('/', function () {
