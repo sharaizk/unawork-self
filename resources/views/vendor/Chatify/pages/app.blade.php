@@ -284,48 +284,48 @@
         .m-list-active,
         .m-list-active:hover,
         .m-list-active:focus {
-            background: linear-gradient(141.55deg, #6fd943 3.46%, #6fd943 99.86%), #6fd943 !important;
+            background: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D !important;
         }
 
         .mc-sender p {
-            background: linear-gradient(141.55deg, #6fd943 3.46%, #6fd943 99.86%), #6fd943 !important;
+            background: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D !important;
         }
 
         .messenger-favorites div.avatar {
-            box-shadow: 0px 0px 0px 2px #6fd943 !important;
+            box-shadow: 0px 0px 0px 2px #022D4D !important;
         }
 
         .messenger-listView-tabs a,
         .messenger-listView-tabs a:hover,
         .messenger-listView-tabs a:focus {
-            color: linear-gradient(141.55deg, #6fd943 3.46%, #6fd943 99.86%), #6fd943 !important;
+            color: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D !important;
         }
 
         .m-header svg {
-            color: #6fd943 !important;
+            color: #022D4D !important;
         }
 
         .active-tab {
-            border-bottom: 2px solid #6fd943 !important;
+            border-bottom: 2px solid #022D4D !important;
         }
 
         .messenger-infoView nav a {
 
-            color: linear-gradient(141.55deg, #6fd943 3.46%, #6fd943 99.86%), #6fd943 !important;
+            color: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D !important;
         }
 
         .lastMessageIndicator {
-            color: #6fd943 !important;
+            color: #022D4D !important;
         }
 
         .messenger-list-item td span .lastMessageIndicator {
 
-            color: linear-gradient(141.55deg, #6fd943 3.46%, #6fd943 99.86%), #6fd943 !important;
+            color: linear-gradient(141.55deg, #022D4D 3.46%, #022D4D 99.86%), #022D4D !important;
             font-weight: bold;
         }
 
         .messenger-sendCard button svg {
-            color: #6fd943 !important;
+            color: #022D4D !important;
         }
     </style>
 @endif

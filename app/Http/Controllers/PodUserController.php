@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PodUser\Status;
 use App\Models\Pod;
 use App\Models\User;
 use App\Services\PodUserService;
@@ -70,5 +71,17 @@ class PodUserController extends Controller
         }
 
         return response()->json(['error' => 'User not found in pod'], 404);
+    }
+
+    public function accept(Pod $pod, User $user)
+    {   
+        $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
+        return response()->json(['message' => 'User status updated to active'], 200);
+    }
+
+    public function decline(Pod $pod, User $user)
+    {   
+        $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
+        return response()->json(['message' => 'User status updated to active'], 200);
     }
 }

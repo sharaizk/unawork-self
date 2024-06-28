@@ -151,6 +151,7 @@
                                     @php
                                         $user = Auth::user();
                                         $userWorkspace = App\Models\UserWorkspace::where([['user_id', $user->id], ['workspace_id', $workspace->id]])->first();
+                                        $currentWorkspace = App\Models\Utility::getWorkspaceBySlug();
                                     @endphp
                                     @if (isset($userWorkspace))
                                         @if ($userWorkspace->is_active == 1)

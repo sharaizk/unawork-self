@@ -2114,7 +2114,7 @@
     padding: 5px 20px;
     border-radius: 5px;
     margin: 10px auto;
-    display: inline-block;
+    display: block;
     transition: all 1s;
     -webkit-transition: all 1s;
     -moz-transition: all 1s;
@@ -2126,6 +2126,8 @@
     color: #022D4D;
     border: 1px solid #022D4D;
 }
+
+
 
 
 .tpl-pods-list .section_pod {
@@ -2160,6 +2162,26 @@
 .tpl-company-list .header__search .search__list,
 .tpl-company-list .header__search .search__box,
 .tpl-company-list .header__search .search__wrap {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+
+.tpl-project-list .section_pod {
+    margin-top: 4.5rem;
+    padding: 2rem;
+}
+
+.tpl-project-list .header__search {
+    background-color: #022d4d;
+    height: 60px;
+}
+
+.tpl-project-list .header__search .search__list,
+.tpl-project-list .header__search .search__box,
+.tpl-project-list .header__search .search__wrap {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;

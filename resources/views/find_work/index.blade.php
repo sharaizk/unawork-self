@@ -44,6 +44,18 @@
                         <option value="" selected>Select Type</option>
                         <option value="pod">Pod</option>
                         <option value="company">Company</option>
+                        <option value="project">Project</option>
+                    </select>
+                </div>
+
+                <div id="budgetField" class="col-md-4 form-group" style="display: none;">
+                    <label for="budget">Budget</label>
+                    <select id="budget" class="form-control" name="budget">
+                        <option value="" selected>Select Budget</option>
+                            <option value="[0,500]">$0 - $500</option>
+                            <option value="[500,1000]">$500 - $1000</option>
+                            <option value="[1000,5000]">$1000 - $5000</option>
+                            <option value="[5000,999999999]">$5000+</option>
                     </select>
                 </div>
 
@@ -83,6 +95,8 @@
             </div>
         </div>
     </section>
+    <div id="message-container"></div>
+
 
     <section class="section__titlepage">
         <div class="container-master">
@@ -101,6 +115,20 @@
                     @foreach($companies as $company)
                         @include('company.landing.company_card', ['company' => $company])
                     @endforeach
+                </div>
+            </div>
+        </section>
+
+        <section class="section__layout section__project">
+            <div class="container-master teams__title">
+                <h2>Projects Availables</h2>
+                <a href="{{ route('project.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+            </div>
+            <div class="container-master">
+                <div class="row-master">
+                        @foreach($projects as $project)
+                            @include('find_work.project.project_card', ['project' => $project])
+                        @endforeach
                 </div>
             </div>
         </section>
@@ -125,6 +153,42 @@
 
 @section('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.join-form');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const podId = this.getAttribute('data-pod-id');
+
+                fetch(`{{ ENV('APP_URL') }}api/pods/${podId}/requests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const messageContainer = document.getElementById('message-container');
+                    if (data.status === 'success') {
+                        messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        form.style.display = 'none';
+                    } else {
+                        messageContainer.innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    const messageContainer = document.getElementById('message-container');
+                    messageContainer.innerHTML = `<div class="alert alert-danger">An error occurred: ${error.message}</div>`;
+                });
+            });
+        });
+    });
+</script>
+<script>
     document.getElementById('type').addEventListener('change', function () {
         var type = this.value;
         var countryField = document.getElementById('countryField');
@@ -133,12 +197,19 @@
         if (type === 'company') {
             countryField.style.display = 'block';
             skillsField.style.display = 'none';
+            budgetField.style.display = 'none';
         } else if (type === 'pod') {
             skillsField.style.display = 'block';
             countryField.style.display = 'none';
+            budgetField.style.display = 'none';
+        } else if (type === 'project') {
+            skillsField.style.display = 'none';
+            countryField.style.display = 'none';
+            budgetField.style.display = 'block';
         } else {
             countryField.style.display = 'none';
             skillsField.style.display = 'none';
+            budgetField.style.display = 'none';
         }
     });
 
@@ -158,6 +229,10 @@
             });
             formAction = '{{ route("pods.list") }}';
             this.action = formAction + '?skill_ids=' + JSON.stringify(skillIds);
+        } else if (type === 'project') {
+            var budget = document.getElementById('budget').value;
+            formAction = '{{ route("project.list") }}';
+            this.action = formAction + '?budget=' + encodeURIComponent(budget);
         }
 
         this.submit();

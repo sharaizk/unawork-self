@@ -16,9 +16,19 @@ class Project extends Model
         'end_date',
         'budget',
         'workspace',
+        'private',
         'created_by',
         'is_active',
     ];
+
+    protected $casts = [
+        'private',
+    ];
+
+    public function scopePrivate($query, $private = true)
+    {
+        return $query->where('private', $private);
+    }
 
     public function creater()
     {

@@ -69,6 +69,20 @@ class ProjectController extends Controller
         return view('projects.index', compact('currentWorkspace', 'projects'));
     }
 
+    public function list(Request $request)
+    {
+        $q = Project::private(false);
+
+        if ($request->has('budget')) {
+            $budget = json_decode($request->input('budget'));
+            $q = $q->whereBetween('budget', $budget);
+        }
+
+        $projects = $q->get();
+
+        return view('projects.landing.list', compact('projects'));
+    }
+
     public function tracker($slug, $id)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);

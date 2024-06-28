@@ -110,11 +110,11 @@ else{
 @if($color == "theme-3")
 <style type="text/css">
     .selectgroup-input:checked + .selectgroup-button {
-    background-color: #6fd943 !important;
+    background-color: #022D4D !important;
 }
 .selectgroup-button {
     
-    border-color: #6fd943 !important;
+    border-color: #022D4D !important;
     }
 </style>
 @endif
