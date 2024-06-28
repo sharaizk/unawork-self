@@ -25,6 +25,11 @@ class Project extends Model
         'private',
     ];
 
+    public function scopePrivate($query, $private = true)
+    {
+        return $query->where('private', $private);
+    }
+
     public function creater()
     {
         return $this->hasOne('App\Models\User', 'id', 'created_by');

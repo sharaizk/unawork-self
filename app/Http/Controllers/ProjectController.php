@@ -71,13 +71,14 @@ class ProjectController extends Controller
 
     public function list(Request $request)
     {
+        $q = Project::private(false);
+
         if ($request->has('budget')) {
             $budget = json_decode($request->input('budget'));
-
-            $projects = Project::where('private', false)->whereBetween('budget', $budget)->get();
-        } else {
-            $projects = Project::where('private', false)->get();
+            $q = $q->whereBetween('budget', $budget);
         }
+
+        $projects = $q->get();
 
         return view('projects.landing.list', compact('projects'));
     }
