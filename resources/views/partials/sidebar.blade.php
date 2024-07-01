@@ -90,12 +90,12 @@
                                            class="dash-mtext">{{ __('Users') }}</span></a>
                                </li>
                                @if ($currentWorkspace->creater->id == Auth::user()->id)
-                                   <li class="dash-item dash-hasmenu">
+                                   <!-- <li class="dash-item dash-hasmenu">
                                        <a href="{{ route('clients.index', $currentWorkspace->slug) }}"
                                            class="dash-link {{ Request::route()->getName() == 'clients.index' ? ' active' : '' }}"><span
                                                class="dash-micon"> <i class="ti ti-brand-python"></i></span><span
                                                class="dash-mtext"> {{ __('Clients') }}</span></a>
-                                   </li>
+                                   </li> -->
                                @endif
                                <li
                                    class="dash-item {{ Request::route()->getName() == 'projects.index' || Request::segment(2) == 'projects' ? ' active' : '' }}">
@@ -125,17 +125,17 @@
                                    </li>
                                @endif
                                @if ($currentWorkspace->creater->id == Auth::user()->id)
-                                   <li
+                                   <!-- <li
                                        class="dash-item {{ Request::route()->getName() == 'invoices.index' || Request::segment(2) == 'invoices' ? ' active' : '' }}">
                                        <a href="{{ route('invoices.index', $currentWorkspace->slug) }}"
                                            class="dash-link"><span class="dash-micon"><i
                                                    data-feather="printer"></i></span><span
                                                class="dash-mtext">{{ __('Invoices') }} </span></a>
-                                   </li>
+                                   </li> -->
                                @endif
 
                                @if (isset($currentWorkspace) && $currentWorkspace && $currentWorkspace->creater->id == Auth::user()->id)
-                                   <li
+                                   <!-- <li
                                        class="dash-item dash-hasmenu {{ Request::route()->getName() == 'contracts.index' || Request::route()->getName() == 'contracts.show' ? ' active' : '' }}">
                                        <a href="#" class="dash-link"><span class="dash-micon"><i
                                                    class="ti ti-device-floppy"></i></span><span
@@ -155,7 +155,7 @@
                                                    href="{{ route('contract_type.index', $currentWorkspace->slug) }}">{{ __('Contract Type') }}</a>
                                            </li>
                                        </ul>
-                                   </li>
+                                   </li> -->
                                @endif
                                <li
                                    class="dash-item {{ Request::route()->getName() == 'calender.index' ? ' active' : '' }}">
@@ -338,13 +338,13 @@
                                        class="dash-mtext">{{ __('Notification Template') }}</span></a>
                            </li> -->
 
-                           <!-- <li
+                            <li
                                class="dash-item {{ Request::route()->getName() == 'workspace.settings' ? ' active' : '' }}">
                                <a href="{{ route('workspace.settings', $currentWorkspace->slug) }}"
                                    class="dash-link "><span class="dash-micon"><i
                                            data-feather="settings"></i></span><span
                                        class="dash-mtext">{{ __('Settings') }}</span></a>
-                           </li> -->
+                           </li> 
                        @endif
 
                        @if (Auth::user()->hasRole('employee'))

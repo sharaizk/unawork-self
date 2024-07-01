@@ -127,7 +127,7 @@
                                     @endif
                                 </a>
                             @else
-                                <a href="#" class="dropdown-item" title="{{ __('Locked') }}">
+                                <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" class="dropdown-item" title="{{ __('Locked') }}">
                                     <i class="ti ti-lock"></i>
                                     <span>{{ $workspace->name }}</span>
                                     @if (isset($workspace->pivot->permission))
