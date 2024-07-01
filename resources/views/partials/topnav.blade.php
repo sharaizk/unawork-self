@@ -17,6 +17,9 @@
         $cust_theme_bg = $setting['cust_theme_bg'];
         $SITE_RTL = $setting['site_rtl'];
     } else {
+        if (!is_null(Auth::user()->currant_workspace)) {
+                $currentWorkspace = \App\Models\Workspace::find(Auth::user()->currant_workspace);
+               }
         $adminSetting = App\Models\Utility::getAdminPaymentSetting();
         $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
         $color = $setting->theme_color;
@@ -108,76 +111,29 @@
                     <div class="dropdown-menu dash-h-dropdown">
                     
                     <!--all about workspaces, not for employee -->
-                    @if (!Auth::user()->hasRole('employee'))
                         {{-- @foreach (Auth::user()->workspace as $workspace)
-                            @if ($workspace->is_active)
-                                <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
-                                    title="{{ $workspace->name }}" class="dropdown-item">
-                                    @if ($currentWorkspace->id == $workspace->id)
-                                        <i class="ti ti-checks text-success"></i>
-                                    @endif
-                                    <span>{{ $workspace->name }}</span>
-                                    @if (isset($workspace->pivot->permission))
-                                        @if ($workspace->pivot->permission == 'Owner')
-                                            <span
-                                                class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
-                                        @else
-                                            <span class="badge bg-dark">{{ __('Shared') }}</span>
-                                        @endif
-                                    @endif
-                                </a>
-                            @else
-                                <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" class="dropdown-item" title="{{ __('Locked') }}">
-                                    <i class="ti ti-lock"></i>
-                                    <span>{{ $workspace->name }}</span>
-                                    @if (isset($workspace->pivot->permission))
-                                        @if ($workspace->pivot->permission == 'Owner')
-                                            <span
-                                                class="badge badge-success-primary">{{ __($workspace->pivot->permission) }}</span>
-                                        @else
-                                            <span class="badge bg-dark">{{ __('Shared') }}</span>
-                                        @endif
-                                    @endif
-                                </a>
-                            @endif
-                        @endforeach --}}
-                        @if (Auth::user()->getGuard() != 'client')
-                            @php
-                                $login_status = false;
-                            @endphp
-                            @foreach (Auth::user()->workspace as $workspace)
-                                {{-- @dump($workspace) --}}
                                 @if ($workspace->is_active)
-                                    @php
-                                        $user = Auth::user();
-                                        $userWorkspace = App\Models\UserWorkspace::where([['user_id', $user->id], ['workspace_id', $workspace->id]])->first();
-                                        $currentWorkspace = App\Models\Utility::getWorkspaceBySlug();
-                                    @endphp
-                                    @if (isset($userWorkspace))
-                                        @if ($userWorkspace->is_active == 1)
-                                            @php
-                                                $login_status = true;
-                                            @endphp
-                                            <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
-                                                title="{{ $workspace->name }}" class="dropdown-item">
-                                                @if ($currentWorkspace->id == $workspace->id)
-                                                    <i class="ti ti-checks text-success"></i>
-                                                @endif
-                                                <span>{{ $workspace->name }}</span>
-                                                @if (isset($workspace->pivot->permission))
-                                                    @if ($workspace->pivot->permission == 'Owner')
-                                                        <span
-                                                            class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
-                                                    @else
-                                                        <span class="badge bg-dark">{{ __('Shared') }}</span>
-                                                    @endif
-                                                @endif
-                                            </a>
+                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
+                                        title="{{ $workspace->name }}" class="dropdown-item">
+                                        @if (Auth::user()->currant_workspace == $workspace->id)
+                                            <i class="ti ti-checks text-success"></i>
                                         @endif
-                                    @endif
+                                        <span>{{ $workspace->name }}</span>
+                                        @if (isset($workspace->pivot->permission))
+                                            @if ($workspace->pivot->permission == 'Owner')
+                                                <span
+                                                    class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
+                                            @else
+                                                <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                            @endif
+                                        @endif
+                                    </a>
                                 @else
-                                    <a href="#" class="dropdown-item" title="{{ __('Locked') }}">
+                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" class="dropdown-item" title="{{ __('Locked') }}">
                                         <i class="ti ti-lock"></i>
+                                        @if (Auth::user()->currant_workspace == $workspace->id)
+                                            <i class="ti ti-checks text-success"></i>
+                                        @endif
                                         <span>{{ $workspace->name }}</span>
                                         @if (isset($workspace->pivot->permission))
                                             @if ($workspace->pivot->permission == 'Owner')
@@ -188,6 +144,58 @@
                                             @endif
                                         @endif
                                     </a>
+                                @endif
+                            
+                        @endforeach --}}
+                        @if (Auth::user()->getGuard() != 'client')
+                            @php
+                                $login_status = false;
+                            @endphp
+                            @foreach (Auth::user()->workspace as $workspace)
+                                @if ($workspace->ownerable_type != "App\Models\Pod")
+                                    {{-- @dump($workspace) --}}
+                                    @if ($workspace->is_active)
+                                        @php
+                                            $user = Auth::user();
+                                            $userWorkspace = App\Models\UserWorkspace::where([['user_id', $user->id], ['workspace_id', $workspace->id]])->first();
+                                            $currentWorkspace = App\Models\Utility::getWorkspaceBySlug();
+                                        @endphp
+                                        @if (isset($userWorkspace))
+                                            @if ($userWorkspace->is_active == 1)
+                                                @php
+                                                    $login_status = true;
+                                                @endphp
+                                                <a href="@if (Auth::user()->currant_workspace == $workspace->id) #@else {{ route('change-workspace', $workspace->id) }} @endif"
+                                                    title="{{ $workspace->name }}" class="dropdown-item">
+                                                    @if (Auth::user()->currant_workspace == $workspace->id)
+                                                        <i class="ti ti-checks text-success"></i>
+                                                    @endif
+                                                    <span>{{ $workspace->name }}</span>
+                                                    @if (isset($workspace->pivot->permission))
+                                                        @if ($workspace->pivot->permission == 'Owner')
+                                                            <span
+                                                                class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
+                                                        @else
+                                                            <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                                        @endif
+                                                    @endif
+                                                </a>
+                                            @endif
+                                        @endif
+                                    @else
+                                        <a href="#" class="dropdown-item" title="{{ __('Locked') }}">
+                                            <i class="ti ti-lock"></i>
+                                            <span>{{ $workspace->name }}</span>
+                                            @if (isset($workspace->pivot->permission))
+                                                @if ($workspace->pivot->permission == 'Owner')
+                                                    <span
+                                                        class="badge badge-success-primary">{{ __($workspace->pivot->permission) }}</span>
+                                                @else
+                                                    <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                                @endif
+                                            @endif
+                                        </a>
+                                    @endif
                                 @endif
                             @endforeach
                         @endif
@@ -278,7 +286,6 @@
                                 @endif
                             @endauth
                         @endif
-                    @endif
                         <a href="@auth('web'){{ route('users.my.account') }}@elseauth{{ route('client.users.my.account') }}@endauth"
                             class="dropdown-item">
                             <i class="ti ti-user"></i>

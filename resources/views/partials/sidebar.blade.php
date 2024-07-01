@@ -14,6 +14,10 @@
                $adminSetting['enable_chat'] = 'on';
                
            } else {
+               if (!is_null(Auth::user()->currant_workspace)) {
+                $currentWorkspace = \App\Models\Workspace::find(Auth::user()->currant_workspace);
+               }
+                
                $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
                $color = $setting->theme_color;
                $dark_mode = $setting->cust_darklayout;
@@ -81,7 +85,7 @@
                                </a>
                            </li>
                        @endif
-                       @if (isset($currentWorkspace) && $currentWorkspace && !Auth::user()->hasRole('employee'))
+                       @if (isset($currentWorkspace) && $currentWorkspace)
                            @auth('web')
                                <li class="dash-item dash-hasmenu">
                                    <a href="{{ route('users.index', $currentWorkspace->slug) }}"
