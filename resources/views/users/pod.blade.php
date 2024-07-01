@@ -29,8 +29,10 @@
                                         class="badge bg-primary">{{ __($pod->pivot->permission) }}</span>
                                 @elseif ($pod->pivot->status == 'active')
                                     <span class="badge bg-dark">{{ __('Member') }}</span>
-                                @elseif ($pod->pivot->status == 'pending')
-                                    <span class="badge bg-dark">{{ __('pending') }}</span>
+                                @elseif ($user->pivot->status == 'pod_pending')
+                                    <span class="badge bg-dark">{{ __('pending pod') }}</span>
+                                @elseif ($user->pivot->status == 'employee_pending')
+                                    <span class="badge bg-dark">{{ __('pending employee') }}</span>
                                 @else
                                     <span class="badge bg-dark">{{ __('declined') }}</span>
                                 @endif

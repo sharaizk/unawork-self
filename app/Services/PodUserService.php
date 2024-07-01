@@ -7,6 +7,7 @@ use App\Models\PodUser;
 use App\Models\User;
 use App\Enums\PodUser\Permission;
 use App\Enums\PodUser\Status;
+use App\Models\Utility;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -117,7 +118,7 @@ class PodUserService
     {
         $user->pods()->attach($podId, [
             'permission' => Permission::MEMBER->value,
-            'status' => Status::ACTIVE->value
+            'status' => Status::EMPLOYEE_PENDING->value
         ]);
     }
 

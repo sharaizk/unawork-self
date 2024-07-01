@@ -12,8 +12,10 @@
                                         class="badge bg-primary">{{ __($user->pivot->permission) }}</span>
                                 @elseif ($user->pivot->status == 'active')
                                     <span class="badge bg-dark">{{ __('Member') }}</span>
-                                @elseif ($user->pivot->status == 'pending')
-                                    <span class="badge bg-dark">{{ __('pending') }}</span>
+                                @elseif ($user->pivot->status == 'pod_pending')
+                                    <span class="badge bg-dark">{{ __('pending pod') }}</span>
+                                @elseif ($user->pivot->status == 'employee_pending')
+                                    <span class="badge bg-dark">{{ __('pending employee') }}</span>
                                 @else
                                     <span class="badge bg-dark">{{ __('declined') }}</span>
                                 @endif
@@ -25,7 +27,7 @@
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                @if ($user->pivot->status == 'pending')
+                                @if ($user->pivot->status == 'pod_pending')
                                     <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
                                         data-title="{{ __('Accept user') }}">
                                         <i class="ti ti-pencil"></i> 
