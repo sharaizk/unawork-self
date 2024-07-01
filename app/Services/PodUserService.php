@@ -62,21 +62,21 @@ class PodUserService
             'user_id' => $userId,
             'pod_id' => $podId,
             'permission' => Permission::MEMBER->value,
-            'status' => Status::PENDING->value
+            'status' => Status::POD_PENDING->value
         ]);
     }
 
     public function getAllJoinRequests(int $podId)
     {
-        return PodUser::where('pod_id', $podId)->where('status', Status::PENDING->value)->get();
+        return PodUser::where('pod_id', $podId)->where('status', Status::POD_PENDING->value)->get();
     }
 
     public function moderateJoinRequest(int $requestId, string $action, ?string $reason = null): void
     {
         $request = PodUser::findOrFail($requestId);
 
-        if ($request->status != Status::PENDING->value) {
-            throw new \Exception('You can moderate only pending requests');
+        if ($request->status != Status::POD_PENDING->value) {
+            throw new \Exception('You can moderate only pod pending requests');
         }
 
         if ($action === 'accept') {
