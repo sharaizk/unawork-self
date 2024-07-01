@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserWorkspace\Status;
 use App\Models\ActivityLog;
 use App\Models\BugComment;
 use App\Models\BugFile;
@@ -262,7 +263,7 @@ class UserController extends Controller
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         if ($currentWorkspace) {
-            $users = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active')->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id');
+            $users = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active', 'user_workspaces.status')->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id');
             $users->where('user_workspaces.workspace_id', '=', $currentWorkspace->id);
             $users = $users->get();
         } else {
@@ -1282,6 +1283,7 @@ class UserController extends Controller
                     'user_id' => $registerUsers->id,
                     'workspace_id' => $currentWorkspace->id,
                     'permission' => 'Member',
+                    'status' => Status::EMPLOYEE_PENDING->value,
                 ]);
 
                 $workspace_name = Workspace::where('id', $authuser->currant_workspace)->first();

@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
+
 class Workspace extends Model
 {
+    use HasSlug;
+
     protected $fillable = [
         'name',
         'slug',
@@ -185,4 +190,11 @@ class Workspace extends Model
 
     //     return (is_array($key)) ? array_only($settings, $key) : $settings[$key];
     // }
+
+    public function getSlugOptions() : SlugOptions{
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
+    }
 }

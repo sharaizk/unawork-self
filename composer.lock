@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5a1c1cd358f5b721fdd1fb62bddac25e",
+    "content-hash": "8a4ca6b0f9f9f8dc9a38b2bca5730eed",
     "packages": [
         {
             "name": "anandsiddharth/laravel-paytm-wallet",
@@ -453,25 +453,100 @@
             "time": "2022-11-26T18:03:05+00:00"
         },
         {
-            "name": "beste/json",
-            "version": "1.2.1",
+            "name": "beste/in-memory-cache",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/beste/json.git",
-                "reference": "28bb9e0adf03160a124ada37ab4c099598b2de84"
+                "url": "https://github.com/beste/in-memory-cache-php.git",
+                "reference": "f2d504b4f15ac841b1d8b34046619505ba4c9e77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beste/json/zipball/28bb9e0adf03160a124ada37ab4c099598b2de84",
-                "reference": "28bb9e0adf03160a124ada37ab4c099598b2de84",
+                "url": "https://api.github.com/repos/beste/in-memory-cache-php/zipball/f2d504b4f15ac841b1d8b34046619505ba4c9e77",
+                "reference": "f2d504b4f15ac841b1d8b34046619505ba4c9e77",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
+                "psr/cache": "^2.0 || ^3.0",
+                "psr/clock": "^1.0"
+            },
+            "provide": {
+                "psr/cache-implementation": "2.0 || 3.0"
+            },
+            "require-dev": {
+                "beste/clock": "^3.0",
+                "friendsofphp/php-cs-fixer": "^3.41.0",
+                "phpstan/extension-installer": "^1.3.1",
+                "phpstan/phpstan": "^1.10.48",
+                "phpstan/phpstan-deprecation-rules": "^1.1.4",
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpstan/phpstan-strict-rules": "^1.5.2",
+                "phpunit/phpunit": "^10.5.2",
+                "symfony/var-dumper": "^6.4.0"
+            },
+            "suggest": {
+                "psr/clock-implementation": "Allows injecting a Clock, for example a frozen clock for testing"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Beste\\Cache\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jérôme Gamez",
+                    "email": "jerome@gamez.name"
+                }
+            ],
+            "description": "A PSR-6 In-Memory cache that can be used as a fallback implementation and/or in tests.",
+            "keywords": [
+                "beste",
+                "cache",
+                "psr-6"
+            ],
+            "support": {
+                "issues": "https://github.com/beste/in-memory-cache-php/issues",
+                "source": "https://github.com/beste/in-memory-cache-php/tree/1.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeromegamez",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-03-01T23:43:56+00:00"
+        },
+        {
+            "name": "beste/json",
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/beste/json.git",
+                "reference": "2d7aea5a7ceeb428350ba450e4a227ac581359b4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/beste/json/zipball/2d7aea5a7ceeb428350ba450e4a227ac581359b4",
+                "reference": "2d7aea5a7ceeb428350ba450e4a227ac581359b4",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "~8.1.0 || ~8.2.0"
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.5.26"
+                "phpstan/extension-installer": "^1.3",
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-phpunit": "^1.3",
+                "phpstan/phpstan-strict-rules": "^1.5",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.10"
             },
             "type": "library",
             "autoload": {
@@ -496,7 +571,7 @@
             ],
             "support": {
                 "issues": "https://github.com/beste/json/issues",
-                "source": "https://github.com/beste/json/tree/1.2.1"
+                "source": "https://github.com/beste/json/tree/1.4.0"
             },
             "funding": [
                 {
@@ -504,7 +579,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-12-19T10:26:16+00:00"
+            "time": "2023-11-30T22:41:32+00:00"
         },
         {
             "name": "brick/math",
@@ -1812,20 +1887,20 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-            "version": "v4.16.0",
+            "version": "v4.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "523407fb06eb9e5f3d59889b3978d5bfe94299c8"
+                "reference": "bbc513d79acf6691fa9cf10f192c90dd2957f18c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/523407fb06eb9e5f3d59889b3978d5bfe94299c8",
-                "reference": "523407fb06eb9e5f3d59889b3978d5bfe94299c8",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/bbc513d79acf6691fa9cf10f192c90dd2957f18c",
+                "reference": "bbc513d79acf6691fa9cf10f192c90dd2957f18c",
                 "shasum": ""
             },
             "require": {
-                "php": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0"
+                "php": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
             },
             "require-dev": {
                 "cerdic/css-tidy": "^1.7 || ^2.0",
@@ -1867,9 +1942,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ezyang/htmlpurifier/issues",
-                "source": "https://github.com/ezyang/htmlpurifier/tree/v4.16.0"
+                "source": "https://github.com/ezyang/htmlpurifier/tree/v4.17.0"
             },
-            "time": "2022-09-18T07:06:19+00:00"
+            "time": "2023-11-17T15:01:25+00:00"
         },
         {
             "name": "fedapay/fedapay-php",
@@ -2287,16 +2362,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.52.7",
+            "version": "v1.52.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "f79480d1e2b31a695ae98b42ca10b67b41da9fb1"
+                "reference": "5e34556498ecadee2161402fd1024bec7ce33186"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/f79480d1e2b31a695ae98b42ca10b67b41da9fb1",
-                "reference": "f79480d1e2b31a695ae98b42ca10b67b41da9fb1",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/5e34556498ecadee2161402fd1024bec7ce33186",
+                "reference": "5e34556498ecadee2161402fd1024bec7ce33186",
                 "shasum": ""
             },
             "require": {
@@ -2346,22 +2421,22 @@
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.7"
+                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.10"
             },
-            "time": "2023-10-16T22:54:31+00:00"
+            "time": "2023-12-08T22:36:35+00:00"
         },
         {
             "name": "google/cloud-storage",
-            "version": "v1.33.4",
+            "version": "v1.36.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-storage.git",
-                "reference": "02f53c6cbbc18c4ee8f5d12cbd7887ceec575724"
+                "reference": "6b65c334b8b887cd771bb745ba0a5513ff9191b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/02f53c6cbbc18c4ee8f5d12cbd7887ceec575724",
-                "reference": "02f53c6cbbc18c4ee8f5d12cbd7887ceec575724",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/6b65c334b8b887cd771bb745ba0a5513ff9191b7",
+                "reference": "6b65c334b8b887cd771bb745ba0a5513ff9191b7",
                 "shasum": ""
             },
             "require": {
@@ -2402,9 +2477,9 @@
             ],
             "description": "Cloud Storage Client for PHP",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-storage/tree/v1.33.4"
+                "source": "https://github.com/googleapis/google-cloud-php-storage/tree/v1.36.1"
             },
-            "time": "2023-10-16T22:54:31+00:00"
+            "time": "2024-01-05T17:34:35+00:00"
         },
         {
             "name": "graham-campbell/result-type",
@@ -3280,49 +3355,56 @@
         },
         {
             "name": "kreait/firebase-php",
-            "version": "7.6.0",
+            "version": "7.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kreait/firebase-php.git",
-                "reference": "c4b4032b76839578d044f653d6c24aa51baa3026"
+                "reference": "94f394b67990daad1d9e16e683300fc276cf26d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kreait/firebase-php/zipball/c4b4032b76839578d044f653d6c24aa51baa3026",
-                "reference": "c4b4032b76839578d044f653d6c24aa51baa3026",
+                "url": "https://api.github.com/repos/kreait/firebase-php/zipball/94f394b67990daad1d9e16e683300fc276cf26d8",
+                "reference": "94f394b67990daad1d9e16e683300fc276cf26d8",
                 "shasum": ""
             },
             "require": {
                 "beste/clock": "^3.0",
+                "beste/in-memory-cache": "^1.0",
                 "beste/json": "^1.2.1",
                 "ext-ctype": "*",
+                "ext-filter": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
                 "ext-openssl": "*",
                 "fig/http-message-util": "^1.1.5",
                 "firebase/php-jwt": "^6.3.2",
                 "google/auth": "^1.24",
-                "google/cloud-core": "^1.48.1",
                 "google/cloud-storage": "^1.30.1",
                 "guzzlehttp/guzzle": "^7.5",
-                "kreait/firebase-tokens": "^4.2",
+                "guzzlehttp/promises": "^2.0",
+                "guzzlehttp/psr7": "^2.6",
+                "kreait/firebase-tokens": "^5.1",
                 "lcobucci/jwt": "^4.3.0|^5.0",
                 "mtdowling/jmespath.php": "^2.6.1",
-                "php": "~8.1.0|~8.2.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
                 "psr/cache": "^1.0.1|^2.0|^3.0",
+                "psr/clock": "^1.0",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.1 || ^2.0",
                 "psr/log": "^1.1|^2.0|^3.0"
             },
             "require-dev": {
-                "beste/php-cs-fixer-config": "^2.3",
-                "friendsofphp/php-cs-fixer": "^3.25.1",
-                "google/cloud-firestore": "^1.37.0",
+                "friendsofphp/php-cs-fixer": "^3.57.1",
+                "google/cloud-firestore": "^1.43.2",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.33",
-                "phpstan/phpstan-phpunit": "^1.3.14",
-                "phpunit/phpunit": "^10.3.3",
-                "rector/rector": "~0.17.13",
-                "roave/backward-compatibility-check": "^8.3",
-                "symfony/var-dumper": "^6.3.4"
+                "phpstan/phpstan": "^1.11.1",
+                "phpstan/phpstan-phpunit": "^1.4.0",
+                "phpunit/phpunit": "^10.5.20",
+                "rector/rector": "^1.0.5",
+                "shipmonk/composer-dependency-analyser": "^1.5.3",
+                "symfony/var-dumper": "^6.3.5 || ^7.0.7",
+                "vlucas/phpdotenv": "^5.6"
             },
             "suggest": {
                 "google/cloud-firestore": "^1.0 to use the Firestore component"
@@ -3330,10 +3412,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-7.x": "7.x-dev",
-                    "dev-6.x": "6.x-dev",
-                    "dev-5.x": "5.x-dev",
-                    "dev-4.x": "4.x-dev"
+                    "dev-7.x": "7.x-dev"
                 }
             },
             "autoload": {
@@ -3371,20 +3450,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-06T23:22:36+00:00"
+            "time": "2024-06-23T08:41:48+00:00"
         },
         {
             "name": "kreait/firebase-tokens",
-            "version": "4.2.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kreait/firebase-tokens-php.git",
-                "reference": "36987b6bc31f85d927eb888cc3752813d33b581f"
+                "reference": "94a3ab1bff7937adc31b4aa8c5c171a153ffe0a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kreait/firebase-tokens-php/zipball/36987b6bc31f85d927eb888cc3752813d33b581f",
-                "reference": "36987b6bc31f85d927eb888cc3752813d33b581f",
+                "url": "https://api.github.com/repos/kreait/firebase-tokens-php/zipball/94a3ab1bff7937adc31b4aa8c5c171a153ffe0a7",
+                "reference": "94a3ab1bff7937adc31b4aa8c5c171a153ffe0a7",
                 "shasum": ""
             },
             "require": {
@@ -3392,22 +3471,20 @@
                 "ext-json": "*",
                 "ext-openssl": "*",
                 "fig/http-message-util": "^1.1.5",
-                "guzzlehttp/guzzle": "^7.5",
-                "lcobucci/clock": "^3.0",
-                "lcobucci/jwt": "^4.3.0|^5.0",
-                "php": "~8.1.0|~8.2.0",
+                "guzzlehttp/guzzle": "^7.8",
+                "lcobucci/jwt": "^5.2",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
                 "psr/cache": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
-                "beste/php-cs-fixer-config": "^1.2",
-                "phpstan/extension-installer": "^1.2",
-                "phpstan/phpstan": "^1.9.2",
-                "phpstan/phpstan-phpunit": "^1.2.2",
-                "phpunit/phpunit": "^9.5.26",
-                "rector/rector": "^0.12.23",
-                "roave/backward-compatibility-check": "^8.1",
-                "symfony/cache": "^5.4|^6.1.7",
-                "symfony/var-dumper": "^5.3|^6.1.6"
+                "friendsofphp/php-cs-fixer": "^3.56.1",
+                "phpstan/extension-installer": "^1.3.1",
+                "phpstan/phpstan": "^1.10.67",
+                "phpstan/phpstan-phpunit": "^1.3.16",
+                "phpunit/phpunit": "^10.5.20",
+                "rector/rector": "^1.0.5",
+                "symfony/cache": "^6.4.3 || ^7.0.7",
+                "symfony/var-dumper": "^6.4.3 || ^7.0.7"
             },
             "suggest": {
                 "psr/cache-implementation": "to cache fetched remote public keys"
@@ -3439,7 +3516,7 @@
             ],
             "support": {
                 "issues": "https://github.com/kreait/firebase-tokens-php/issues",
-                "source": "https://github.com/kreait/firebase-tokens-php/tree/4.2.0"
+                "source": "https://github.com/kreait/firebase-tokens-php/tree/5.1.0"
             },
             "funding": [
                 {
@@ -3447,33 +3524,33 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-21T22:45:31+00:00"
+            "time": "2024-05-10T21:47:37+00:00"
         },
         {
             "name": "kreait/laravel-firebase",
-            "version": "5.4.0",
+            "version": "5.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kreait/laravel-firebase.git",
-                "reference": "a17491f089cd6f2a628ef0c104e2de077b3c08b2"
+                "reference": "dbaf9dc50161edcc19f4f45e825c8eafc0f7df6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kreait/laravel-firebase/zipball/a17491f089cd6f2a628ef0c104e2de077b3c08b2",
-                "reference": "a17491f089cd6f2a628ef0c104e2de077b3c08b2",
+                "url": "https://api.github.com/repos/kreait/laravel-firebase/zipball/dbaf9dc50161edcc19f4f45e825c8eafc0f7df6c",
+                "reference": "dbaf9dc50161edcc19f4f45e825c8eafc0f7df6c",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^9.0 || ^10.0",
-                "illuminate/support": "^9.0 || ^10.0",
-                "kreait/firebase-php": "^7.0",
-                "php": "~8.1.0 || ~8.2.0",
-                "symfony/cache": "^6.1.2"
+                "illuminate/contracts": "^9.0 || ^10.0 || ^11.0",
+                "illuminate/support": "^9.0 || ^10.0 || ^11.0",
+                "kreait/firebase-php": "^7.13",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
+                "symfony/cache": "^6.1.2 || ^7.0.3"
             },
             "require-dev": {
-                "laravel/pint": "^1.13",
-                "orchestra/testbench": "^7.0 || ^8.0",
-                "phpunit/phpunit": "^9.6"
+                "laravel/pint": "^1.14",
+                "orchestra/testbench": "^7.0 || ^8.0 || ^9.0",
+                "phpunit/phpunit": "^9.6.17 || ^10.5.13"
             },
             "type": "library",
             "extra": {
@@ -3513,7 +3590,7 @@
             ],
             "support": {
                 "issues": "https://github.com/kreait/laravel-firebase/issues",
-                "source": "https://github.com/kreait/laravel-firebase/tree/5.4.0"
+                "source": "https://github.com/kreait/laravel-firebase/tree/5.9.1"
             },
             "funding": [
                 {
@@ -3521,7 +3598,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-05T21:49:15+00:00"
+            "time": "2024-06-23T20:49:35+00:00"
         },
         {
             "name": "lab404/laravel-impersonate",
@@ -4388,102 +4465,36 @@
             "time": "2023-04-25T02:46:11+00:00"
         },
         {
-            "name": "lcobucci/clock",
-            "version": "3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/lcobucci/clock.git",
-                "reference": "039ef98c6b57b101d10bd11d8fdfda12cbd996dc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/lcobucci/clock/zipball/039ef98c6b57b101d10bd11d8fdfda12cbd996dc",
-                "reference": "039ef98c6b57b101d10bd11d8fdfda12cbd996dc",
-                "shasum": ""
-            },
-            "require": {
-                "php": "~8.1.0 || ~8.2.0",
-                "psr/clock": "^1.0"
-            },
-            "provide": {
-                "psr/clock-implementation": "1.0"
-            },
-            "require-dev": {
-                "infection/infection": "^0.26",
-                "lcobucci/coding-standard": "^9.0",
-                "phpstan/extension-installer": "^1.2",
-                "phpstan/phpstan": "^1.9.4",
-                "phpstan/phpstan-deprecation-rules": "^1.1.1",
-                "phpstan/phpstan-phpunit": "^1.3.2",
-                "phpstan/phpstan-strict-rules": "^1.4.4",
-                "phpunit/phpunit": "^9.5.27"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Lcobucci\\Clock\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luís Cobucci",
-                    "email": "lcobucci@gmail.com"
-                }
-            ],
-            "description": "Yet another clock abstraction",
-            "support": {
-                "issues": "https://github.com/lcobucci/clock/issues",
-                "source": "https://github.com/lcobucci/clock/tree/3.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/lcobucci",
-                    "type": "github"
-                },
-                {
-                    "url": "https://www.patreon.com/lcobucci",
-                    "type": "patreon"
-                }
-            ],
-            "time": "2022-12-19T15:00:24+00:00"
-        },
-        {
             "name": "lcobucci/jwt",
-            "version": "5.0.0",
+            "version": "5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lcobucci/jwt.git",
-                "reference": "47bdb0e0b5d00c2f89ebe33e7e384c77e84e7c34"
+                "reference": "08071d8d2c7f4b00222cc4b1fb6aa46990a80f83"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lcobucci/jwt/zipball/47bdb0e0b5d00c2f89ebe33e7e384c77e84e7c34",
-                "reference": "47bdb0e0b5d00c2f89ebe33e7e384c77e84e7c34",
+                "url": "https://api.github.com/repos/lcobucci/jwt/zipball/08071d8d2c7f4b00222cc4b1fb6aa46990a80f83",
+                "reference": "08071d8d2c7f4b00222cc4b1fb6aa46990a80f83",
                 "shasum": ""
             },
             "require": {
-                "ext-hash": "*",
-                "ext-json": "*",
                 "ext-openssl": "*",
                 "ext-sodium": "*",
-                "php": "~8.1.0 || ~8.2.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
                 "psr/clock": "^1.0"
             },
             "require-dev": {
-                "infection/infection": "^0.26.19",
+                "infection/infection": "^0.27.0",
                 "lcobucci/clock": "^3.0",
-                "lcobucci/coding-standard": "^9.0",
-                "phpbench/phpbench": "^1.2.8",
+                "lcobucci/coding-standard": "^11.0",
+                "phpbench/phpbench": "^1.2.9",
                 "phpstan/extension-installer": "^1.2",
-                "phpstan/phpstan": "^1.10.3",
-                "phpstan/phpstan-deprecation-rules": "^1.1.2",
-                "phpstan/phpstan-phpunit": "^1.3.8",
+                "phpstan/phpstan": "^1.10.7",
+                "phpstan/phpstan-deprecation-rules": "^1.1.3",
+                "phpstan/phpstan-phpunit": "^1.3.10",
                 "phpstan/phpstan-strict-rules": "^1.5.0",
-                "phpunit/phpunit": "^10.0.12"
+                "phpunit/phpunit": "^10.2.6"
             },
             "suggest": {
                 "lcobucci/clock": ">= 3.0"
@@ -4512,7 +4523,7 @@
             ],
             "support": {
                 "issues": "https://github.com/lcobucci/jwt/issues",
-                "source": "https://github.com/lcobucci/jwt/tree/5.0.0"
+                "source": "https://github.com/lcobucci/jwt/tree/5.3.0"
             },
             "funding": [
                 {
@@ -4524,7 +4535,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-02-25T21:35:16+00:00"
+            "time": "2024-04-11T23:07:54+00:00"
         },
         {
             "name": "league/commonmark",
@@ -5061,28 +5072,29 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "3.1.49",
+            "version": "3.1.55",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "769209f49ebe3419017114f98bd61e2a7d9af259"
+                "reference": "6d9d791dcdb01a9b6fd6f48d46f0d5fff86e6260"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/769209f49ebe3419017114f98bd61e2a7d9af259",
-                "reference": "769209f49ebe3419017114f98bd61e2a7d9af259",
+                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/6d9d791dcdb01a9b6fd6f48d46f0d5fff86e6260",
+                "reference": "6d9d791dcdb01a9b6fd6f48d46f0d5fff86e6260",
                 "shasum": ""
             },
             "require": {
                 "composer/semver": "^3.3",
                 "ext-json": "*",
-                "illuminate/support": "5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0",
-                "php": "^7.0|^8.0",
+                "illuminate/support": "5.8.*||^6.0||^7.0||^8.0||^9.0||^10.0||^11.0",
+                "php": "^7.0||^8.0",
                 "phpoffice/phpspreadsheet": "^1.18",
-                "psr/simple-cache": "^1.0|^2.0|^3.0"
+                "psr/simple-cache": "^1.0||^2.0||^3.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^6.0|^7.0|^8.0",
+                "laravel/scout": "^7.0||^8.0||^9.0||^10.0",
+                "orchestra/testbench": "^6.0||^7.0||^8.0||^9.0",
                 "predis/predis": "^1.1"
             },
             "type": "library",
@@ -5125,7 +5137,7 @@
             ],
             "support": {
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.49"
+                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.55"
             },
             "funding": [
                 {
@@ -5137,7 +5149,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-26T09:01:33+00:00"
+            "time": "2024-02-20T08:27:10+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -8114,16 +8126,16 @@
         },
         {
             "name": "rize/uri-template",
-            "version": "0.3.5",
+            "version": "0.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rize/UriTemplate.git",
-                "reference": "5ed4ba8ea34af84485dea815d4b6b620794d1168"
+                "reference": "34efe65c79710eed0883884f2285ae6d4a0aad19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rize/UriTemplate/zipball/5ed4ba8ea34af84485dea815d4b6b620794d1168",
-                "reference": "5ed4ba8ea34af84485dea815d4b6b620794d1168",
+                "url": "https://api.github.com/repos/rize/UriTemplate/zipball/34efe65c79710eed0883884f2285ae6d4a0aad19",
+                "reference": "34efe65c79710eed0883884f2285ae6d4a0aad19",
                 "shasum": ""
             },
             "require": {
@@ -8156,7 +8168,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rize/UriTemplate/issues",
-                "source": "https://github.com/rize/UriTemplate/tree/0.3.5"
+                "source": "https://github.com/rize/UriTemplate/tree/0.3.6"
             },
             "funding": [
                 {
@@ -8172,7 +8184,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2022-10-12T17:22:51+00:00"
+            "time": "2024-03-10T08:07:49+00:00"
         },
         {
             "name": "spatie/laravel-google-calendar",
@@ -8391,6 +8403,65 @@
             "time": "2023-10-25T05:12:01+00:00"
         },
         {
+            "name": "spatie/laravel-sluggable",
+            "version": "3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-sluggable.git",
+                "reference": "a44afe6f317959bcfdadcec3148486859fd5c1f5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-sluggable/zipball/a44afe6f317959bcfdadcec3148486859fd5c1f5",
+                "reference": "a44afe6f317959bcfdadcec3148486859fd5c1f5",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
+                "pestphp/pest": "^1.20|^2.0",
+                "spatie/laravel-translatable": "^5.0|^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Sluggable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Generate slugs when saving Eloquent models",
+            "homepage": "https://github.com/spatie/laravel-sluggable",
+            "keywords": [
+                "laravel-sluggable",
+                "spatie"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/laravel-sluggable/tree/3.6.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-02-26T08:33:29+00:00"
+        },
+        {
             "name": "srmklive/paypal",
             "version": "3.0.26",
             "source": {
@@ -8518,16 +8589,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v6.3.6",
+            "version": "v6.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "84aff8d948d6292d2b5a01ac622760be44dddc72"
+                "reference": "287142df5579ce223c485b3872df3efae8390984"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/84aff8d948d6292d2b5a01ac622760be44dddc72",
-                "reference": "84aff8d948d6292d2b5a01ac622760be44dddc72",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/287142df5579ce223c485b3872df3efae8390984",
+                "reference": "287142df5579ce223c485b3872df3efae8390984",
                 "shasum": ""
             },
             "require": {
@@ -8536,7 +8607,7 @@
                 "psr/log": "^1.1|^2|^3",
                 "symfony/cache-contracts": "^2.5|^3",
                 "symfony/service-contracts": "^2.5|^3",
-                "symfony/var-exporter": "^6.3.6"
+                "symfony/var-exporter": "^6.3.6|^7.0"
             },
             "conflict": {
                 "doctrine/dbal": "<2.13.1",
@@ -8554,12 +8625,12 @@
                 "doctrine/dbal": "^2.13.1|^3|^4",
                 "predis/predis": "^1.1|^2.0",
                 "psr/simple-cache": "^1.0|^2.0|^3.0",
-                "symfony/config": "^5.4|^6.0",
-                "symfony/dependency-injection": "^5.4|^6.0",
-                "symfony/filesystem": "^5.4|^6.0",
-                "symfony/http-kernel": "^5.4|^6.0",
-                "symfony/messenger": "^5.4|^6.0",
-                "symfony/var-dumper": "^5.4|^6.0"
+                "symfony/config": "^5.4|^6.0|^7.0",
+                "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+                "symfony/filesystem": "^5.4|^6.0|^7.0",
+                "symfony/http-kernel": "^5.4|^6.0|^7.0",
+                "symfony/messenger": "^5.4|^6.0|^7.0",
+                "symfony/var-dumper": "^5.4|^6.0|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -8594,7 +8665,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/v6.3.6"
+                "source": "https://github.com/symfony/cache/tree/v6.4.8"
             },
             "funding": [
                 {
@@ -8610,20 +8681,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-10-17T14:44:58+00:00"
+            "time": "2024-05-31T14:49:08+00:00"
         },
         {
             "name": "symfony/cache-contracts",
-            "version": "v3.3.0",
+            "version": "v3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache-contracts.git",
-                "reference": "ad945640ccc0ae6e208bcea7d7de4b39b569896b"
+                "reference": "df6a1a44c890faded49a5fca33c2d5c5fd3c2197"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/ad945640ccc0ae6e208bcea7d7de4b39b569896b",
-                "reference": "ad945640ccc0ae6e208bcea7d7de4b39b569896b",
+                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/df6a1a44c890faded49a5fca33c2d5c5fd3c2197",
+                "reference": "df6a1a44c890faded49a5fca33c2d5c5fd3c2197",
                 "shasum": ""
             },
             "require": {
@@ -8633,7 +8704,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "3.4-dev"
+                    "dev-main": "3.5-dev"
                 },
                 "thanks": {
                     "name": "symfony/contracts",
@@ -8670,7 +8741,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache-contracts/tree/v3.3.0"
+                "source": "https://github.com/symfony/cache-contracts/tree/v3.5.0"
             },
             "funding": [
                 {
@@ -8686,7 +8757,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-23T14:45:45+00:00"
+            "time": "2024-04-18T09:32:20+00:00"
         },
         {
             "name": "symfony/console",
@@ -10941,23 +11012,25 @@
         },
         {
             "name": "symfony/var-exporter",
-            "version": "v6.3.6",
+            "version": "v7.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-exporter.git",
-                "reference": "374d289c13cb989027274c86206ddc63b16a2441"
+                "reference": "b80a669a2264609f07f1667f891dbfca25eba44c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-exporter/zipball/374d289c13cb989027274c86206ddc63b16a2441",
-                "reference": "374d289c13cb989027274c86206ddc63b16a2441",
+                "url": "https://api.github.com/repos/symfony/var-exporter/zipball/b80a669a2264609f07f1667f891dbfca25eba44c",
+                "reference": "b80a669a2264609f07f1667f891dbfca25eba44c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1"
+                "php": ">=8.2"
             },
             "require-dev": {
-                "symfony/var-dumper": "^5.4|^6.0"
+                "symfony/property-access": "^6.4|^7.0",
+                "symfony/serializer": "^6.4|^7.0",
+                "symfony/var-dumper": "^6.4|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -10995,7 +11068,7 @@
                 "serialize"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-exporter/tree/v6.3.6"
+                "source": "https://github.com/symfony/var-exporter/tree/v7.1.2"
             },
             "funding": [
                 {
@@ -11011,7 +11084,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-10-13T09:16:49+00:00"
+            "time": "2024-06-28T08:00:31+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -14136,5 +14209,5 @@
         "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

@@ -71,8 +71,12 @@
                                      @else
                                          @if ($user->permission == 'Owner')
                                              <div class="badge p-2 px-3 rounded bg-success">{{ __('Owner') }}</div>
-                                         @else
+                                         @elseif ($user->status == 'active')
                                              <div class="badge p-2 px-3 rounded bg-warning">{{ __('Member') }}</div>
+                                         @elseif ($user->status == 'employee_pending')
+                                             <div class="badge p-2 px-3 rounded bg-warning">{{ __('employee_pending') }}</div>
+                                         @elseif ($user->status == 'workspace_pending')
+                                             <div class="badge p-2 px-3 rounded bg-warning">{{ __('workspace_pending') }}</div>
                                          @endif
                                      @endif
                                  </h6>
