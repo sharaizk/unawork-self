@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\PodUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
 
 class PodUserController extends Controller
 {
@@ -76,6 +77,7 @@ class PodUserController extends Controller
     public function accept(Pod $pod, User $user)
     {   
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
+        $pod->workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 

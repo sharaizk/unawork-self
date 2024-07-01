@@ -7,6 +7,7 @@ use App\Models\PodUser;
 use App\Models\User;
 use App\Enums\PodUser\Permission;
 use App\Enums\PodUser\Status;
+use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
 use App\Models\Utility;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -82,6 +83,8 @@ class PodUserService
 
         if ($action === 'accept') {
             $request->status = Status::ACTIVE->value;
+            $this->attachUserToPodWorkspaces($request->user, $request->pod);
+            $request->pod->workspace->status = UserWorkspaceStatus::ACTIVE->value;
         } elseif ($action === 'decline') {
             if (is_null($reason)) {
                 throw new \Exception('Reason is required for declining a request');
@@ -127,7 +130,7 @@ class PodUserService
         $workspace = $pod->workspace;
 
         if (!$workspace->users()->where('user_id', $user->id)->exists()) {
-            $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1]);
+            $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::EMPLOYEE_PENDING->value]);
         }
     }
 
