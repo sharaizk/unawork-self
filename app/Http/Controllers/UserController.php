@@ -1288,6 +1288,8 @@ class UserController extends Controller
 
                 $workspace_name = Workspace::where('id', $authuser->currant_workspace)->first();
 
+                Utility::sendNotification('workspace_invite', null, $registerUsers->id, $workspace_name);
+
                 try {
                     $uArr = [
                         'user_name' => $registerUsers->name,
@@ -1322,7 +1324,19 @@ class UserController extends Controller
         return json_encode($response);
     }
 
+    public function acceptInvite(Request $request, Workspace $workspace)
+    {
+        $user = Auth::user();
+        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
 
+        if ($isUserInWorkspace) {
+            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
+
+            return redirect()->back()->with('success', __('User status updated to active'));
+        } else {
+            return response()->json(['error' => 'User not found in workspace'], 404);
+        }
+    }
 
     public function manuallyActivatePlan(Request $request, $user_id, $plan_id, $duration)
     {

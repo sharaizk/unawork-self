@@ -312,7 +312,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function notifications($workspace_id)
     {
-        return Notification::select('notifications.*')
+        $query = Notification::select('notifications.*')
             ->with(['user', 'project', 'task', 'bugReport'])
             ->leftJoin('projects', function ($join) {
                 $join->on('notifications.related_id', '=', 'projects.id')
@@ -327,12 +327,14 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->where('notifications.type', 'bug_assign');
             })
             ->where('user_id', $this->id)
-            ->where('workspace_id', $workspace_id)
             ->where('is_read', 0)
-            ->orderBy('notifications.id', 'desc')
-            ->get();
-
-        // dd($notifications->toArray());
+            ->orderBy('notifications.id', 'desc');
+    
+        if (!is_null($workspace_id)) {
+            $query->where('workspace_id', $workspace_id);
+        }
+    
+        return $query->get();
     }
 
 

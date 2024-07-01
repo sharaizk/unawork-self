@@ -356,7 +356,7 @@
                         @if (isset($currentWorkspace) && $currentWorkspace)
                             @auth('web')
                                 @php
-                                    $notifications = Auth::user()->notifications($currentWorkspace->id);
+                                    $notifications = Auth::user()->notifications(null);
                                     // $all_notifications = Auth::user()->all_notifications($currentWorkspace->id);
                                 @endphp
 
@@ -430,6 +430,21 @@
                                                         $text = __('New project assign') . ' <b>' . $data->title . '</b>';
                                                         $icon = 'fa fa-suitcase';
                                                     @endphp
+                                                @elseif($notification->type == 'pod_invite')
+                                                    @php
+                                                        $link = route('pods.index');
+                                                        $text = __('New pod invite into pod: ') . ' <b>' . $data->title . '</b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'workspace_invite')
+                                                    @php
+                                                        $link = route('users.index', ['slug' => $data->slug]);
+                                                        $text = __('New workspace invite into: ') . ' <b>' . $data->name . '</b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'WP';
+                                                        $workspaceId = $data->id;
+                                                    @endphp
                                                 @elseif($notification->type == 'bug_assign')
                                                     @php
                                                         if ($project) {
@@ -462,6 +477,11 @@
                                                                 {!! $text !!}
                                                             </p>
                                                         </div>
+                                                        @if($notification->type == 'workspace_invite')
+                                                            <div class="row-master">
+                                                                <a href="{{ route('users.accept', ['workspace' => $workspaceId]) }}">ACCEPT</a>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </a>
                                             @endforeach

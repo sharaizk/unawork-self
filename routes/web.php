@@ -655,6 +655,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::get('/{slug}/users', [UserController::class, 'index'])->name('users.index')->middleware(['auth', 'CheckPlan', 'XSS']);
     Route::get('/{slug}/users/invite', [UserController::class, 'invite'])->name('users.invite')->middleware(['auth', 'XSS']);
+    Route::get('/{workspace}/users/accept', [UserController::class, 'acceptInvite'])->name('users.accept')->middleware(['auth', 'XSS']);
     Route::post('/{slug}/users/invite', [UserController::class, 'inviteUser'])->name('users.invite.update')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/users/edit/{id}', [UserController::class, 'edit'])->name('users.edit')->middleware(['auth', 'XSS']);
     Route::post('/{slug}/users/update/{id}', [UserController::class, 'update'])->name('users.update')->middleware(['auth', 'XSS']);

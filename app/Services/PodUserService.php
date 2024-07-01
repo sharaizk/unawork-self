@@ -28,6 +28,7 @@ class PodUserService
         }
 
         $this->attachUserToPod($user, $podId);
+        $this->sendInvitationalNotify($userId, $pod);
         $this->attachUserToPodWorkspaces($user, $pod);
         
         try {
@@ -150,4 +151,8 @@ class PodUserService
         });
     }
 
+    private function sendInvitationalNotify(int $userId, Pod $pod): void
+    {
+        Utility::sendNotification('pod_invite', null, $userId, $pod);
+    }
 }

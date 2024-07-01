@@ -346,12 +346,12 @@ class Utility
             }
         } else {
             $notification = Notification::create([
-                'workspace_id' => $currentWorkspace->id,
+                'workspace_id' => $currentWorkspace->id ?? null,
                 'user_id' => $user_id,
-                'project_id' => $obj->project_id,
-                'related_id' => $obj->id,
+                'project_id' => $obj->project_id ?? null,
+                'related_id' => $obj->id ?? null,
                 'type' => $type,
-                'data' => json_encode($obj),
+                'data' => json_encode($obj ?? []),
                 'is_read' => 0,
             ]);
 
@@ -372,7 +372,7 @@ class Utility
             // if (!empty(env('PUSHER_APP_KEY')) && !empty(env('PUSHER_APP_SECRET')) && !empty(env('PUSHER_APP_ID'))) {
             //     $pusher->trigger($currentWorkspace->slug, 'notification', $data);
             // }
-            if (!empty($setting['pusher_app_key']) && !empty($setting['pusher_app_secret']) && !empty($setting['pusher_app_id'])) {
+            if (!is_null($currentWorkspace) && !empty($setting['pusher_app_key']) && !empty($setting['pusher_app_secret']) && !empty($setting['pusher_app_id'])) {
                 $pusher->trigger($currentWorkspace->slug, 'notification', $data);
             }
 
