@@ -1642,6 +1642,11 @@ class Utility
         // $setting = Utility::settings();
         // $path = storage_path('storage/googlecalender/' . $currentWorkspace['google_calender_json_file']);
         $path = storage_path() . '/' . $currentWorkspace['google_calender_json_file'];
+
+        if (!file_exists($path)) {
+            return false; // Повертаємо false, якщо файл не знайдено
+        }
+
         config([
             'google-calendar.default_auth_profile' => 'service_account',
             'google-calendar.auth_profiles.service_account.credentials_json' => $path,
@@ -1651,7 +1656,7 @@ class Utility
             'google-calendar.user_to_impersonate' => '',
 
         ]);
-        // return $arrayJson;
+        return true;
     }
 
 
@@ -1688,7 +1693,7 @@ class Utility
     {
 
         $a = self::googleCalendarConfig($slug);
-        dd($a);
+        //dd($a);
         if ($a) {
 
             $event = new Event();
