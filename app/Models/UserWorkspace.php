@@ -10,5 +10,8 @@ class UserWorkspace extends Model
         'user_id','workspace_id','permission','is_active','status','is_enable_login'
     ];
 
-
+    public function workspace()
+    {
+        return $this->belongsTo(Workspace::class);
+    }
 }

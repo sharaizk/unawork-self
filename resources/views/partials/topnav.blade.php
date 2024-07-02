@@ -152,7 +152,6 @@
                                 $login_status = false;
                             @endphp
                             @foreach (Auth::user()->workspace as $workspace)
-                                @if ($workspace->ownerable_type != "App\Models\Pod")
                                     {{-- @dump($workspace) --}}
                                     @if ($workspace->is_active)
                                         @php
@@ -171,6 +170,15 @@
                                                         <i class="ti ti-checks text-success"></i>
                                                     @endif
                                                     <span>{{ $workspace->name }}</span>
+
+                                                    @if ($workspace->ownerable_type == "App\Models\Pod")
+                                                        <span class="badge bg-primary">{{ __('POD') }}</span>
+                                                    @elseif ($workspace->creater->hasRole('company'))
+                                                        <span class="badge bg-primary">{{ __('Company') }}</span>
+                                                    @elseif ($workspace->creater->hasRole('employee'))
+                                                        <span class="badge bg-primary">{{ __('Own') }}</span>
+                                                    @endif
+
                                                     @if (isset($workspace->pivot->permission))
                                                         @if ($workspace->pivot->permission == 'Owner')
                                                             <span
@@ -196,7 +204,6 @@
                                             @endif
                                         </a>
                                     @endif
-                                @endif
                             @endforeach
                         @endif
                         {{-- For Client  --}}
@@ -432,7 +439,7 @@
                                                     @endphp
                                                 @elseif($notification->type == 'pod_invite')
                                                     @php
-                                                        $link = route('pods.index');
+                                                        $link = route('pods.users', ['podId' => $data->id]);
                                                         $text = __('New pod invite into pod: ') . ' <b>' . $data->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
@@ -446,8 +453,17 @@
                                                     @endphp
                                                 @elseif($notification->type == 'workspace_invite')
                                                     @php
-                                                        $link = route('users.index', ['slug' => $data->slug]);
-                                                        $text = __('New workspace invite into: ') . ' <b>' . $data->name . '</b>';
+                                                        $data = \App\Models\UserWorkspace::findOrFail($data->id);
+                                                        $acceptLink = route('users.accept', ['workspace' => $data->workspace->id]);
+                                                        $declineLink = route('users.decline', ['workspace' => $data->workspace->id]);
+                                                        $text = __('New invite into: ') . ' <b>' . $data->workspace->name . '</b>
+                                                            <br>
+                                                            <br>
+                                                                <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
+                                                                    onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
+                                                                <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                                                                    onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
+                                                        ';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'WP';
                                                         $workspaceId = $data->id;
@@ -466,31 +482,36 @@
                                                         }
                                                     @endphp
                                                 @endif
-                                                <a href="{{ $link }}"
-                                                    class="list-group-item list-group-item-action">
-                                                    <div class="d-flex align-items-center" data-toggle="tooltip"
-                                                        data-placement="right" data-title="{{ $date }}">
-                                                        <div class="notification_icon_size">
-                                                            <span
-                                                                class="avatar bg-primary text-white rounded-circle px-2 py-1">{{ $name }}</span>
-                                                        </div>
-                                                        <div class="flex-fill ml-3">
-                                                            <div class="h6 text-sm mb-0">
-                                                                {{ $notification->user->name }}
-                                                                <small
-                                                                    class="float-end text-muted">{{ $date }}</small>
+                                                <div class="list-group-item list-group-item-action">
+                                                    @if ($link) 
+                                                    <a href="{{ $link }}">
+                                                    @endif
+                                                        <div class="d-flex align-items-center" data-toggle="tooltip"
+                                                            data-placement="right" data-title="{{ $date }}">
+                                                            <div class="notification_icon_size">
+                                                                <span
+                                                                    class="avatar bg-primary text-white rounded-circle px-2 py-1">{{ $name }}</span>
                                                             </div>
-                                                            <p class="text-sm lh-140 mb-0">
-                                                                {!! $text !!}
-                                                            </p>
-                                                        </div>
-                                                        @if($notification->type == 'workspace_invite')
-                                                            <div class="row-master">
-                                                                <a href="{{ route('users.accept', ['workspace' => $workspaceId]) }}">ACCEPT</a>
+                                                            <div class="flex-fill ml-3">
+                                                                <div class="h6 text-sm mb-0">
+                                                                    {{ $notification->user->name }}
+                                                                    <small
+                                                                        class="float-end text-muted">{{ $date }} 
+                                                                    </small>
+                                                                </div>
+
+                                                                <div class="text-sm lh-140 mb-0">
+                                                                    <span>
+                                                                        {!! $text !!}
+                                                                    </span>
+                                                                </div>
                                                             </div>
-                                                        @endif
-                                                    </div>
-                                                </a>
+                                                        </div>
+                                                    @if ($link) 
+                                                    </a>
+                                                    @endif
+                                                </div>
+                                                <hr>
                                             @endforeach
                                         </div>
 

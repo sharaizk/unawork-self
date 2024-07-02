@@ -61,15 +61,14 @@ class PodUserService
             throw new \Exception('You have already submitted a join request for this pod.');
         }
 
-        PodUser::create([
+        $podUser = PodUser::create([
             'user_id' => $userId,
             'pod_id' => $podId,
             'permission' => Permission::MEMBER->value,
             'status' => Status::POD_PENDING->value
         ]);
 
-        $pod = Pod::find($podId);
-        $this->sendRequestNotify($pod);
+        $this->sendRequestNotify($podUser);
     }
 
     public function getAllJoinRequests(int $podId)

@@ -167,20 +167,22 @@
                         <span class="navbar-toggler-icon"></span>
                     </button>
                 </div>
-                <div class="ms-auto d-flex justify-content-end gap-2">
-                    <a href="{{ route('login') }}" class="btn btn-outline-dark rounded"><span
-                            class="hide-mob me-2">Login</span> <i data-feather="log-in"></i></a>
-                    @if ($adminSettings['signup_button'] == 'on')
-                        <a href="{{ route('register') }}" class="btn btn-outline-dark rounded"><span
-                                class="hide-mob me-2">Register</span> <i data-feather="user-check"></i></a>
-                    @endif
+                @guest
+                    <div class="ms-auto d-flex justify-content-end gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-outline-dark rounded"><span
+                                class="hide-mob me-2">Login</span> <i data-feather="log-in"></i></a>
+                        @if ($adminSettings['signup_button'] == 'on')
+                            <a href="{{ route('register') }}" class="btn btn-outline-dark rounded"><span
+                                    class="hide-mob me-2">Register</span> <i data-feather="user-check"></i></a>
+                        @endif
 
-                    <button class="navbar-toggler " type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                </div>
+                        <button class="navbar-toggler " type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                @endguest
             </nav>
         </div>
     @endif

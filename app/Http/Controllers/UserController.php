@@ -1279,16 +1279,17 @@ class UserController extends Controller
                 ->exists();
 
             if (!$is_assigned) {
-                UserWorkspace::create([
+                $userWorkspace = UserWorkspace::create([
                     'user_id' => $registerUsers->id,
                     'workspace_id' => $currentWorkspace->id,
                     'permission' => 'Member',
                     'status' => Status::EMPLOYEE_PENDING->value,
                 ]);
+                $userWorkspace->refresh();
 
                 $workspace_name = Workspace::where('id', $authuser->currant_workspace)->first();
 
-                Utility::sendNotification('workspace_invite', null, $registerUsers->id, $workspace_name);
+                Utility::sendNotification('workspace_invite', null, $registerUsers->id, $userWorkspace);
 
                 try {
                     $uArr = [
@@ -1332,7 +1333,47 @@ class UserController extends Controller
         if ($isUserInWorkspace) {
             $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
 
+            $userWorkspace = DB::table('user_workspaces')
+                ->where('workspace_id', $workspace->id)
+                ->where('user_id', $user->id)
+                ->first();
+            $notification = Notification::where('related_id', $userWorkspace->id)
+                ->where('user_id', $user->id)
+                ->where('type', 'workspace_invite')
+                ->first();
+            if ($notification) {
+                $notification->is_read = 1;
+                $notification->update();
+            }
+
             return redirect()->back()->with('success', __('User status updated to active'));
+        } else {
+            return response()->json(['error' => 'User not found in workspace'], 404);
+        }
+    }
+
+    public function declineInvite(Request $request, Workspace $workspace)
+    {
+        $user = Auth::user();
+        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+
+        if ($isUserInWorkspace) {
+
+            $userWorkspace = DB::table('user_workspaces')
+                ->where('workspace_id', $workspace->id)
+                ->where('user_id', $user->id)
+                ->first();
+            $notification = Notification::where('related_id', $userWorkspace->id)
+                ->where('user_id', $user->id)
+                ->where('type', 'workspace_invite')
+                ->first();
+            if ($notification) {
+                $notification->delete();
+            }
+
+            $workspace->users()->detach($user->id);
+
+            return redirect()->back()->with('success', __('You declined workspace invite successfully'));
         } else {
             return response()->json(['error' => 'User not found in workspace'], 404);
         }
