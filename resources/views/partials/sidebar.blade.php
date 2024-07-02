@@ -322,7 +322,13 @@
                        @if (isset($currentWorkspace) &&
                                $currentWorkspace &&
                                $currentWorkspace->creater->id == Auth::user()->id &&
-                               Auth::user()->getGuard() != 'client')
+                               Auth::user()->getGuard() != 'client' && Auth::user()->role('company'))
+                               <li
+                               class="dash-item {{ Request::route()->getName() == 'workspace.settings' ? ' active' : '' }}">
+                               <a href="{{ route('workspace.settings', $currentWorkspace->slug) }}"
+                                   class="dash-link "><span class="dash-micon"><i
+                                           data-feather="settings"></i></span><span
+                                       class="dash-mtext">{{ __('Settings') }}</span></a>
                            <!-- <li
                                class="dash-item {{ Request::route()->getName() == 'referral-programs'}}">
                                <a href="{{ route('referral-program.company',$currentWorkspace->slug) }}" class="dash-link "><span
