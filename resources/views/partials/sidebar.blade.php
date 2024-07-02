@@ -68,6 +68,7 @@
                </div>
                <div class="navbar-content">
                    <ul class="dash-navbar">
+                       
                        @if (\Auth::guard('client')->check())
                            <li class="dash-item dash-hasmenu">
                                <a href="{{ route('client.home') }}"
@@ -85,6 +86,11 @@
                                </a>
                            </li>
                        @endif
+                        <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
+                            <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
+                                class="ti ti-message-circle"></i></span><span
+                                class="dash-mtext">{{ __('PODS') }}</span> </a>
+                        </li>
                        @if (isset($currentWorkspace) && $currentWorkspace)
                            @auth('web')
                                <li class="dash-item dash-hasmenu">
@@ -362,11 +368,7 @@
                             @endif
                             
                        @endif
-                       <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
-                            <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
-                                class="ti ti-message-circle"></i></span><span
-                                class="dash-mtext">{{ __('PODS') }}</span> </a>
-                        </li>
+                       
                </div>
            </div>
        </nav>

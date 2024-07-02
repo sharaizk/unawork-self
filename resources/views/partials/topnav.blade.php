@@ -255,7 +255,7 @@
 
                         @if (isset($currentWorkspace) && $currentWorkspace)
                             @auth('web')
-                                @if (Auth::user()->id == $currentWorkspace->created_by)
+                                @if (Auth::user()->id == Auth::user()->currentWorkspace->created_by)
                                     <a href="#" class="dropdown-item bs-pass-para"
                                         data-confirm="{{ __('Are You Sure?') }}"
                                         data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
@@ -264,7 +264,7 @@
                                         <span>{{ __('Remove Me From This Workspace') }}</span>
                                     </a>
                                     <form id="remove-workspace-form"
-                                        action="{{ route('delete-workspace', ['id' => $currentWorkspace->id]) }}"
+                                        action="{{ route('delete-workspace', ['id' => Auth::user()->currant_workspace]) }}"
                                         method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
@@ -278,7 +278,7 @@
                                         <span>{{ __('Leave Me From This Workspace') }}</span>
                                     </a>
                                     <form id="remove-workspace-form"
-                                        action="{{ route('leave-workspace', ['id' => $currentWorkspace->id]) }}"
+                                        action="{{ route('leave-workspace', ['id' => Auth::user()->currant_workspace]) }}"
                                         method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
@@ -434,6 +434,13 @@
                                                     @php
                                                         $link = route('pods.index');
                                                         $text = __('New pod invite into pod: ') . ' <b>' . $data->title . '</b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'pod_request')
+                                                    @php
+                                                        $link = route('pods.users', ['podId' => $data->id]);
+                                                        $text = __('New request for joining pod: ') . ' <b>' . $data->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
