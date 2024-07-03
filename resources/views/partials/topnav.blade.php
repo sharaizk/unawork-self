@@ -160,7 +160,7 @@
                                             $currentWorkspace = App\Models\Utility::getWorkspaceBySlug();
                                         @endphp
                                         @if (isset($userWorkspace))
-                                            @if ($userWorkspace->is_active == 1)
+                                            @if ($userWorkspace->is_active == 1 && $userWorkspace->status == "active")
                                                 @php
                                                     $login_status = true;
                                                 @endphp
@@ -500,6 +500,29 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'WP';
                                                         $workspaceId = $data->id;
+                                                    @endphp
+                                                @elseif($notification->type == 'workspace_request_accept_owner')
+                                                    @php
+                                                        $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $text = __('User : ') . ' <b>' . $user->name . '</b> joined your workspace:  <b>'. $workspace->name . ' </b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'workspace_request_accept_user')
+                                                    @php
+                                                        $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        $text = __('You joined workspace:  <b>'. $workspace->name . ' </b>');
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'workspace_request_decline_owner')
+                                                    @php
+                                                        $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your workspace:  <b>'. $workspace->name . ' </b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
                                                     @endphp
                                                 @elseif($notification->type == 'bug_assign')
                                                     @php

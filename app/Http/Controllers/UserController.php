@@ -1346,6 +1346,9 @@ class UserController extends Controller
                 $notification->update();
             }
 
+            Utility::sendNotification('workspace_request_accept_owner', null, $workspace->created_by, $userWorkspace);
+            Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
+    
             return redirect()->back()->with('success', __('User status updated to active'));
         } else {
             return response()->json(['error' => 'User not found in workspace'], 404);
@@ -1370,6 +1373,8 @@ class UserController extends Controller
             if ($notification) {
                 $notification->delete();
             }
+            
+            Utility::sendNotification('workspace_request_decline_owner', null, $workspace->created_by, $userWorkspace);
 
             $workspace->users()->detach($user->id);
 
