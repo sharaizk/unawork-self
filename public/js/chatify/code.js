@@ -356,6 +356,8 @@ function IDinfo(id, type) {
         fetchMessages(id, type);
         // focus on messaging input
         messageInput.focus();
+        //put info in select invite
+        insertSelectsForInviteUser(data);
         // update info in view
         $(".messenger-infoView .info-name").html(data.fetch.name);
         $(".m-header-messaging .user-name").html(data.fetch.name);
@@ -380,6 +382,39 @@ function IDinfo(id, type) {
     NProgress.done();
     NProgress.remove();
   }
+}
+
+/**
+ *-------------------------------------------------------------
+ * Invite user function
+ *-------------------------------------------------------------
+ */
+function insertSelectsForInviteUser(data) {
+  let inserthtml = '';
+  if ((data.can_invite.workspaces && data.can_invite.workspaces.length > 0) || 
+  (data.can_invite.pods && data.can_invite.pods.length > 0)) {
+    inserthtml = makeSelectsForInviteUser(data.can_invite, data.basic_url);
+  } else {
+    inserthtml = '<option value="" selected disabled>No Availible items</option>';
+  }
+  document.querySelector(".m-header-invite-user .selectItem").innerHTML = inserthtml;
+}
+function makeSelectsForInviteUser(data, basicUrl) {
+  let htmlOptions = '';
+
+  // Iterate over workspaces
+  data.workspaces.forEach(workspace => {
+      const url = `${basicUrl}${workspace.slug}/checkuserexists`;
+      htmlOptions += `<option value="${url}">Company: ${workspace.name}</option>`;
+  });
+
+  // Iterate over pods
+  data.pods.forEach(pod => {
+      const url = `${basicUrl}pods/${pod.id}/checkUserExists`;
+      htmlOptions += `<option value="${url}">POD: ${pod.title}</option>`;
+  });
+
+  return htmlOptions;
 }
 
 /**

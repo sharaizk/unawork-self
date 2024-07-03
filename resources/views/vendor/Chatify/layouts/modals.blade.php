@@ -80,3 +80,23 @@ $profile_img  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'
           </div>
       </div>
   </div>
+
+  {{-- ---------------------- Invite Modal ---------------------- --}}
+<div class="app-modal m-header-invite-user" data-name="invite">
+    <div class="app-modal-container">
+        <div class="app-modal-card" data-name='invite' data-modal='0'>
+            <div class="app-modal-header">
+                <h5 class="modal-title">Send Invitation</h5>
+            </div>
+            <div class="app-modal-body">
+                <select id="selectItem" class="form-control selectItem">
+                    <option value="" selected disabled>Select Item</option>
+                </select>
+            </div>
+            <div class="app-modal-footer">
+                <a href="javascript:void(0)" class="app-btn cancel">Cancel</a>
+                <button type="button" class="btn btn-primary sendInvite">Send</button>
+            </div>
+        </div>
+    </div>
+</div>

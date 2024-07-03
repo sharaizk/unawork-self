@@ -1045,11 +1045,25 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('ownerable_type', '!=', 'App\Models\Pod');
     }
 
-    public function podsOwner()
+    public function invitableWorkspaces(int $userId = null)
     {
-        return $this->belongsToMany(Pod::class, 'pod_users')
-                    ->withPivot('permission', 'status', 'reason')
-                    ->wherePivot('permission', 'Owner')
-                    ->withTimestamps();
+        return $this->hasMany('App\Models\Workspace', 'created_by', 'id')
+            ->where('ownerable_type', '!=', 'App\Models\Pod')
+            ->whereDoesntHave('users', function($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->get();
+    }
+
+    public function invitablePods(int $userId = null)
+    {
+        return $this->belongsToMany('App\Models\Pod', 'pod_users')
+                ->withPivot('permission', 'status', 'reason')
+                ->wherePivot('permission', 'Owner')
+                ->whereDoesntHave('users', function($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->withTimestamps()
+                ->get();
     }
 }

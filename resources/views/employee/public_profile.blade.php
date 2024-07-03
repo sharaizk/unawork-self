@@ -141,10 +141,10 @@
         <label for="selectItem">Select Workspace or Pod</label>
         <select id="selectItem" class="form-control">
             <option value="" selected disabled>Select Item</option>
-            @foreach (Auth::user()->workspacesOwner as $workspace)
+            @foreach (Auth::user()->invitableWorkspaces($employee->id) as $workspace)
                 <option value="workspace_{{ $workspace->slug }}">Company: {{ $workspace->name }}</option>
             @endforeach
-            @foreach (Auth::user()->pods as $pod)
+            @foreach (Auth::user()->invitablePods($employee->id) as $pod)
                 <option value="pod_{{ $pod->id }}">POD: {{ $pod->title }}</option>
             @endforeach
         </select>

@@ -16,6 +16,7 @@
 </script>
 @if (Auth::user()->type !== 'admin')
 <script src="{{ asset('js/chatify/code.js') }}"></script>
+<script src="{{ asset('js/chatify/invite.js') }}"></script>
 @endif
 <script>
   // Messenger global variable - 0 by default

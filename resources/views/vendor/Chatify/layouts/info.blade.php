@@ -15,6 +15,9 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
 <div class="messenger-infoView-btns">
     {{-- <a href="#" class="default"><i class="fas fa-camera"></i> default</a> --}}
     <a href="#" class="danger delete-conversation"><i class="fas fa-trash-alt"></i> Delete Conversation</a>
+
+    {{-- <a href="#" class="default"><i class="fas fa-camera"></i> default</a> --}}
+    <a href="#" class="default invite-user"><I class="fas fa-user-plus"></I> Invite User</a>
 </div>
 {{-- shared photos --}}
 <div class="messenger-infoView-shared">

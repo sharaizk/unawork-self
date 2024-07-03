@@ -381,6 +381,10 @@ body {
     display: none;
 }
 
+.messenger-infoView-btns .invite-conversation {
+    display: none;
+}
+
 .message-card {
     display: inline-flex;
     margin: 2px 15px;
