@@ -83,21 +83,21 @@
                                 class="list-group-item list-group-item-action border-0">{{ __('Bug Stage Settings') }} <div
                                     class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
-                            <a href="#tax-settings"
+                            <!-- <a href="#tax-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Tax Settings') }} <div
-                                    class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+                                    class="float-end"><i class="ti ti-chevron-right"></i></div></a> -->
 
                             <a href="#company-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Company Settings') }} <div
                                     class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
-                            <a href="#payment-settings"
+                            <!-- <a href="#payment-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Payment Settings') }} <div
                                     class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
                             <a href="#invoice-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Invoice Settings') }} <div
-                                    class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+                                    class="float-end"><i class="ti ti-chevron-right"></i></div></a> -->
 
                             <a href="#email-notification-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Email Notification Settings') }}
@@ -591,7 +591,7 @@
                         </div>
                     </div>
 
-                    <div id="tax-settings" class="">
+                    <!-- <div id="tax-settings" class="">
                         <div class="row justify-content-center">
                             <div class="col-md-12">
                                 <div class="card">
@@ -661,7 +661,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div id="company-settings" class="tab-pane">
                         <div class="row justify-content-center">
@@ -729,7 +729,7 @@
                         </div>
                     </div>
 
-                    <div id="payment-settings" class="faq">
+                    <!-- <div id="payment-settings" class="faq">
                         <div class="row justify-content-center">
                             <div class="col-md-12">
                                 <div class="card">
@@ -774,7 +774,6 @@
                                                     <div class="accordion accordion-flush setting-accordion"
                                                         id="payment-gateways">
 
-                                                        <!-- Bank Transfer -->
                                                         {{-- <div class="accordion-item">
                                                             <h6 class="accordion-header py-3 px-2" id="headingOne">
                                                                 <div class="d-flex justify-content-between">
@@ -806,7 +805,6 @@
                                                             </div>
                                                         </div> --}}
 
-                                                        <!-- Bank Transfer -->
                                                         <div class="accordion-item card">
                                                             <h2 class="accordion-header" id="headingOne">
                                                                 <button class="accordion-button collapsed" type="button"
@@ -847,7 +845,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Stripe -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="stripe">
@@ -897,7 +894,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- paypal -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="paypal">
@@ -994,7 +990,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- paystack -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="paystack">
@@ -1059,7 +1054,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Flutterwave -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="Flutterwave">
@@ -1123,7 +1117,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Razorpay -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="Razorpay">
@@ -1188,7 +1181,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Mercado Pago -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="mercado">
@@ -1289,7 +1281,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Paytm -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="Paytm">
@@ -1409,7 +1400,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Mollie -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="Mollie">
@@ -1481,7 +1471,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Skrill -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="Skrill">
@@ -1530,7 +1519,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- paypal -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="CoinGate">
@@ -1627,7 +1615,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Paymentwall -->
                                                         <div id="" class="accordion-item card">
 
                                                             <h2 class="accordion-header" id="Paymentwall">
@@ -1704,7 +1691,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- toyyibpay -->
                                                         <div id="" class="accordion-item card ">
 
                                                             <h2 class="accordion-header" id="toyyibpay">
@@ -1781,7 +1767,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- payfast -->
                                                         <div id="" class="accordion-item card ">
 
                                                             <h2 class="accordion-header" id="toyyibpay">
@@ -1922,7 +1907,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- IyziPay -->
                                                         <div id="" class="accordion-item card ">
 
                                                             <h2 class="accordion-header" id="iyzipay">
@@ -2019,7 +2003,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- sspay -->
                                                         <div id="" class="accordion-item card ">
 
                                                             <h2 class="accordion-header" id="sspay">
@@ -2095,7 +2078,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- paytab -->
                                                         <div id="" class="accordion-item card ">
                                                             <h2 class="accordion-header" id="paytab">
                                                                 <button class="accordion-button collapsed"
@@ -2188,7 +2170,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- benefit -->
                                                         <div id="" class="accordion-item card ">
                                                             <h2 class="accordion-header" id="benefit">
                                                                 <button class="accordion-button collapsed"
@@ -2264,7 +2245,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- cashfree -->
                                                         <div id="" class="accordion-item card ">
                                                             <h2 class="accordion-header" id="cashfree">
                                                                 <button class="accordion-button collapsed"
@@ -2340,7 +2320,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Aamarpay -->
                                                         <div id="" class="accordion-item card">
                                                             <h2 class="accordion-header" id="headingTwenty-One">
                                                                 <button class="accordion-button collapsed"
@@ -2463,7 +2442,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- PayTr -->
                                                         <div id="" class="accordion-item card">
                                                             <h2 class="accordion-header" id="headingTwentyfour">
                                                                 <button class="accordion-button collapsed"
@@ -2541,7 +2519,6 @@
                                                         </div>
 
 
-                                                        <!-- Midtrans -->
                                                         <div id="" class="accordion-item card">
                                                             <h2 class="accordion-header" id="headingTwentyfour">
                                                                 <button class="accordion-button collapsed"
@@ -2642,7 +2619,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Xendit -->
                                                         <div id="" class="accordion-item card">
                                                             <h2 class="accordion-header" id="headingTwentySix">
                                                                 <button class="accordion-button collapsed"
@@ -2707,7 +2683,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- YooKassa -->
                                                         <div id="" class="accordion-item card">
                                                             <h2 class="accordion-header" id="heading_YooKassa_payment">
                                                                 <button class="accordion-button collapsed"
@@ -3230,12 +3205,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div id="invoice-settings" class="tab-pane">
                         <div class="">
                             <div class="row justify-content-center">
-                                <div class="col-md-12">
+                                <!-- <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-header">
                                             <div class="row">
@@ -3367,7 +3342,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="" id="email-notification-settings">
                                     <div class="card">
