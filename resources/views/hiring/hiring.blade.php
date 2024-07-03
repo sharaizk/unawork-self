@@ -153,22 +153,22 @@
 @endsection
 
 @section('scripts')
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('.search__box');
-    form.addEventListener('submit', function(event) {
-        const name = document.getElementById('name');
-        const country = document.getElementById('country');
-        if (name.value.trim() === '') {
-            name.remove();
-        }
-        if (country.value.trim() === '') {
-            country.remove();
-        }
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.search__box');
+        form.addEventListener('submit', function(event) {
+            const name = document.getElementById('name');
+            const country = document.getElementById('country');
+            if (name.value.trim() === '') {
+                name.remove();
+            }
+            if (country.value.trim() === '') {
+                country.remove();
+            }
+        });
     });
-});
-</script>
-<script type="text/javascript">
+    </script>
+    <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".sendMessageButton").forEach(button => {
                 button.addEventListener("click", function() {

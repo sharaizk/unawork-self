@@ -6,7 +6,7 @@
             </a>
         </div>
         <div class="card__title">
-            <a href="#">{{$employee->name}}</a>
+            <a href="{{ route('employee.show', ['employee' => $employee->id]) }}">{{$employee->name}}</a>
         </div>
     </div>
     <div class="card__body">

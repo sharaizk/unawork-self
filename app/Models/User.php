@@ -1038,4 +1038,18 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->morphMany(Workspace::class, 'ownerable');
     }
+
+    public function workspacesOwner()
+    {
+        return $this->hasMany('App\Models\Workspace', 'created_by', 'id')
+            ->where('ownerable_type', '!=', 'App\Models\Pod');
+    }
+
+    public function podsOwner()
+    {
+        return $this->belongsToMany(Pod::class, 'pod_users')
+                    ->withPivot('permission', 'status', 'reason')
+                    ->wherePivot('permission', 'Owner')
+                    ->withTimestamps();
+    }
 }

@@ -114,6 +114,7 @@ Route::get('/project/list', [ProjectController::class, 'list'])->name('project.l
 
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
+Route::get('/employee/{employee}', [EmployeeController::class, 'show'])->name('employee.show');
 Route::get('/pods/{pod}', [PodController::class, 'showOuter'])->name('landing.pods.show');
 Route::get('/pods/{pod}/news', [PodNewsController::class, 'list'])->name('landing.pods.news.list');
 

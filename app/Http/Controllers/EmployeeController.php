@@ -3,10 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Profile\UpdateRequest;
+use App\Models\User;
 use App\Services\ProfileService;
 
 class EmployeeController extends Controller
 {
+    public function show(User $employee)
+    {
+        return view('employee.public_profile', compact('employee'));
+    }
+
     public function updateProfile(UpdateRequest $request)
     {
         $data = $request->validated();
