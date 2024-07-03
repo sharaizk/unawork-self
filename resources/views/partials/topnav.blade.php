@@ -451,6 +451,39 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
+                                                @elseif($notification->type == 'pod_request_accept_owner')
+                                                    @php
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
+                                                        $pod = \App\Models\Pod::find($data->pod_id);
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $text = __('User : ') . ' <b>' . $user->name . '</b> joiner your pod:  <b>'. $pod->title . ' </b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'pod_request_accept_user')
+                                                    @php
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
+                                                        $pod = \App\Models\Pod::find($data->pod_id);
+                                                        $text = __('You have joined pod : ') . ' <b>' . $pod->title . '</b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'pod_request_decline_owner')
+                                                    @php
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
+                                                        $pod = \App\Models\Pod::find($data->pod_id);
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your pod:  <b>'. $pod->title . ' </b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
+                                                @elseif($notification->type == 'pod_request_decline_user')
+                                                    @php
+                                                        $pod = \App\Models\Pod::find($data->pod_id);
+                                                        $text = __('You have beed declined to join pod (id) : ') . ' <b>' . $pod->title . '</b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
                                                 @elseif($notification->type == 'workspace_invite')
                                                     @php
                                                         $data = \App\Models\UserWorkspace::findOrFail($data->id);

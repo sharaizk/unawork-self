@@ -9,6 +9,8 @@ use App\Services\PodUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
+use App\Models\PodUser;
+use App\Models\Utility;
 
 class PodUserController extends Controller
 {
@@ -78,12 +80,23 @@ class PodUserController extends Controller
     {   
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
         $pod->workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
+        $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
+    
+        Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
+        Utility::sendNotification('pod_request_accept_user', null, $user->id, $podUser);
+        
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 
     public function decline(Pod $pod, User $user)
     {   
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
+        $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
+    
+
+        Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
+        Utility::sendNotification('pod_request_decline_user', null, $user->id, $podUser);
+        
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 }
