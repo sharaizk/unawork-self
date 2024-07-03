@@ -171,7 +171,7 @@ abbr[data-bs-original-title] {
 }
 
 address {
-    margin-bottom: 1rem;
+    margin-bottom: 0rem;
     font-style: normal;
     line-height: inherit;
 }

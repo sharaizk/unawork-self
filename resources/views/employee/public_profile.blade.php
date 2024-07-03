@@ -24,20 +24,10 @@
                 <ul>
                   <li>
                     <i class="fa fa-map-marker"></i>
-                    <address title="Address">{{ $employee->profile->address }}, {{ $employee->profile->city }},
+                    <span title="Address">{{ $employee->profile->address }}, {{ $employee->profile->city }},
                          {{ $employee->profile->state }}, {{ $employee->profile->country }},
                           {{ $employee->profile->zip_code }}
-                    </address>
-                  </li>
-                  <li>
-                    <i class="fa fa-phone"></i> 
-                    <a href="tel:+36 70 676 3185 " title="Phone">
-                        {{ $employee->profile->phone_number}}
-                    </a>
-                  </li>
-                  <li>
-                    <i class="fa fa-envelope"></i> 
-                    <a href="mailto:info@address.com" title="Mail">{{ $employee->email}}</a>
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -58,13 +48,31 @@
                         n/a
                     @endforelse
                 </p>
-            <a href="#" class="section__btnMore hireButton" data-employee-email="{{ $employee->email }}"><span>Hire</span></a>
           </div>
         </section>
       </div>
       <div class="col-12 col-md-12 col-xl-3">
         <aside class="aside__container">
+        
             @auth('web')
+              <div class="aside__card">
+              <div class="aside__card__title">
+                <span>Invite user</span>
+              </div>
+              <div class="aside__card__body">
+                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+              </div>
+              <div class="aside__card__actions">
+                <button class="hireButton" data-employee-email="{{ $employee->email }}">
+                  <span>
+                    <img src="{{ asset('assets/images/landing/icon-fly.png') }}" alt="">
+                    Invite
+                  </span>
+                </button>
+            <!-- <a href="#" class="section__btnMore " data-employee-email="{{ $employee->email }}"><span>Hire</span></a> -->
+
+              </div>
+            </div>
                 <div class="aside__card">
                     <div class="aside__card__title">
                     <span>Set a Meeting</span>
@@ -100,17 +108,7 @@
               </button>
             </div>
           </div>
-          <div class="aside__card">
-            <div class="aside__card__title">
-              <span>Hire / Buy</span>
-            </div>
-            <div class="aside__card__body">
-              <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
-            </div>
-            <div class="aside__card__actions">
-              <button><span>Get Started</span></button>
-            </div>
-          </div>
+          
         </aside>
       </div>
     </div>
@@ -121,6 +119,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Send Message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
@@ -135,14 +134,15 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Send Message</h5>
+        <h5 class="modal-title">Send Invite</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <label for="selectItem">Select Workspace or Pod</label>
         <select id="selectItem" class="form-control">
             <option value="" selected disabled>Select Item</option>
             @foreach (Auth::user()->workspacesOwner as $workspace)
-                <option value="workspace_{{ $workspace->slug }}">WP: {{ $workspace->name }}</option>
+                <option value="workspace_{{ $workspace->slug }}">Company: {{ $workspace->name }}</option>
             @endforeach
             @foreach (Auth::user()->pods as $pod)
                 <option value="pod_{{ $pod->id }}">POD: {{ $pod->title }}</option>
@@ -160,10 +160,12 @@
 @section('scripts')
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
+          const inviteUserModal = new bootstrap.Modal(document.getElementById("inviteUserPopup"));
+
             document.querySelectorAll(".hireButton").forEach(button => {
                 button.addEventListener("click", function() {
                     let employeeEmail = this.dataset.employeeEmail;
-                    document.getElementById("inviteUserPopup").style.display = "block";
+                    inviteUserModal.show();
                     document.getElementById("inviteUser").dataset.employeeEmail = employeeEmail;
                 });
             });
@@ -227,11 +229,12 @@
         });
     </script>
     <script type="text/javascript">
+        const sendMessageModal = new bootstrap.Modal(document.getElementById("sendMessagePopup"));
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".sendMessageButton").forEach(button => {
                 button.addEventListener("click", function() {
                     let employeeId = this.dataset.employeeId;
-                    document.getElementById("sendMessagePopup").style.display = "block";
+                    sendMessageModal.show();
                     document.getElementById("sendMessage").dataset.employeeId = employeeId;
                 });
             });
