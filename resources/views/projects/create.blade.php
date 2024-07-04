@@ -10,6 +10,17 @@
         @endif 
 
         <div class="form-group col-md-12">
+            <label for="project_category" class="col-form-label">{{ __('Category') }}</label>
+            <select id="project_category" name="project_category_id" class="form-control select">
+                <option value="" selected disabled>{{ __('Select Category') }}</option>
+                @foreach(App\Models\ProjectCategory::all() as $category)
+                    <option value="{{ $category->id }}">
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-md-12">
             <label for="projectname" class="col-form-label">{{ __('Name') }}</label>
             <input class="form-control" type="text" id="projectname" name="name" required="" placeholder="{{ __('Project Name') }}">
         </div>

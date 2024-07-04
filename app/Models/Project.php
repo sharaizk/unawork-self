@@ -19,6 +19,7 @@ class Project extends Model
         'private',
         'created_by',
         'is_active',
+        'project_category_id',
     ];
 
     protected $casts = [
