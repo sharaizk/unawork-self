@@ -249,11 +249,13 @@
                             @foreach (Auth::user()->workspace as $workspace)
                                 @if ($currentWorkspace->id == $workspace->id)
                                     @if ($workspace->pivot->permission == 'Owner')
-                                        <a href="#!" class="dropdown-item" data-toggle="modal"
-                                            data-target="#modelCreateWorkspace">
-                                            <i class="ti ti-circle-plus"></i>
-                                            <span>{{ __('Create New Workspace') }}</span>
-                                        </a>
+                                        @if (Auth::user()->hasRole('company'))
+                                            <a href="#!" class="dropdown-item" data-toggle="modal"
+                                                data-target="#modelCreateWorkspace">
+                                                <i class="ti ti-circle-plus"></i>
+                                                <span>{{ __('Create New Workspace') }}</span>
+                                            </a>
+                                        @endif
                                     @endif
                                 @endif
                             @endforeach
