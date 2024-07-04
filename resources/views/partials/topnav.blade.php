@@ -17,6 +17,9 @@
         $cust_theme_bg = $setting['cust_theme_bg'];
         $SITE_RTL = $setting['site_rtl'];
     } else {
+        if (!is_null(Auth::user()->currant_workspace)) {
+                $currentWorkspace = \App\Models\Workspace::find(Auth::user()->currant_workspace);
+               }
         $adminSetting = App\Models\Utility::getAdminPaymentSetting();
         $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
         $color = $setting->theme_color;
