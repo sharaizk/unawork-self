@@ -111,6 +111,10 @@
                     <div class="dropdown-menu dash-h-dropdown">
                     
                     <!--all about workspaces, not for employee -->
+<<<<<<< HEAD
+=======
+                    @if (!Auth::user()->hasRole('employee') && isset($currentWorkspace))
+>>>>>>> fc5cf81d058990f12f9544a22791c548365dfe8c
                         {{-- @foreach (Auth::user()->workspace as $workspace)
                                 @if ($workspace->is_active)
                                     <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
