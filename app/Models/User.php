@@ -16,6 +16,7 @@ use App\Models\PlanRequest;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
+use App\Enums\User\UserRole;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -1047,23 +1048,47 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function invitableWorkspaces(int $userId = null)
     {
-        return $this->hasMany('App\Models\Workspace', 'created_by', 'id')
-            ->where('ownerable_type', '!=', 'App\Models\Pod')
-            ->whereDoesntHave('users', function($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })
-            ->get();
+        if ($userId) {
+            $user = User::find($userId);
+            if ($user && $user->hasRole(UserRole::EMPLOYEE->value)) {
+                return $this->hasMany('App\Models\Workspace', 'created_by', 'id')
+                    ->where('ownerable_type', '!=', 'App\Models\Pod')
+                    ->whereDoesntHave('users', function($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    })
+                    ->get();
+            } else {
+                return null;
+            }
+        } else {
+            return $this->hasMany('App\Models\Workspace', 'created_by', 'id')
+                ->where('ownerable_type', '!=', 'App\Models\Pod')
+                ->get();
+        }
     }
 
     public function invitablePods(int $userId = null)
     {
-        return $this->belongsToMany('App\Models\Pod', 'pod_users')
+        if ($userId) {
+            $user = User::find($userId);
+            if ($user && $user->hasRole(UserRole::EMPLOYEE->value)) {
+                return $this->belongsToMany('App\Models\Pod', 'pod_users')
+                    ->withPivot('permission', 'status', 'reason')
+                    ->wherePivot('permission', 'Owner')
+                    ->whereDoesntHave('users', function($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    })
+                    ->withTimestamps()
+                    ->get();
+            } else {
+                return null;
+            }
+        } else {
+            return $this->belongsToMany('App\Models\Pod', 'pod_users')
                 ->withPivot('permission', 'status', 'reason')
                 ->wherePivot('permission', 'Owner')
-                ->whereDoesntHave('users', function($query) use ($userId) {
-                    $query->where('user_id', $userId);
-                })
                 ->withTimestamps()
                 ->get();
+        }
     }
 }
