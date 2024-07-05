@@ -87,7 +87,7 @@ Route::get('/project/{id}', [PodController::class, 'show']);
 Route::post('/project/{id}', [PodController::class, 'update']);
 Route::delete('/project/{id}', [PodController::class, 'destroy']);
 
-Route::apiResource('project-categories', ProjectCategoryController::class);
+Route::apiResource('project-categories', ProjectCategoryController::class)->except('store');
 
 Route::post('/project-category', [ProjectCategoryController::class, 'store'])->name('api.project-category.store');
 });
