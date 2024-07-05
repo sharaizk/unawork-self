@@ -19,6 +19,11 @@
                     </option>
                 @endforeach
             </select>
+            <button type="button" id="addCategoryButton" class="btn btn-link">{{ __('+ Add New Category') }}</button>
+            <div class="input-group mb-3" id="newCategoryInput" style="display: none;">
+                <input type="text" id="newCategoryName" class="form-control" placeholder="{{ __('Category Name') }}" aria-label="{{ __('Category Name') }}">
+                <button type="button" id="createCategoryButton" class="btn btn-outline-secondary">{{ __('Create') }}</button>
+            </div>  
         </div>
         <div class="form-group col-md-12">
             <label for="projectname" class="col-form-label">{{ __('Name') }}</label>
@@ -50,3 +55,51 @@
         </div>
     
 </form>
+
+<script>
+        let addCategoryButton = document.getElementById('addCategoryButton');
+        addCategoryButton.addEventListener('click', function () {
+            document.getElementById('newCategoryInput').style.display = "flex";
+            document.getElementById('addCategoryButton').style.display = "none";
+            
+        });
+
+        document.getElementById('createCategoryButton').addEventListener('click', function () {
+            const newCategoryName = document.getElementById('newCategoryName').value;
+
+            if (newCategoryName.trim() === '') {
+                alert("Please enter a category name.");
+                return;
+            }
+
+            fetch("{{ route('api.project-category.store') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ name: newCategoryName })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const select = document.getElementById("project_category");
+                const option = document.createElement("option");
+                option.value = data.id;
+                option.text = data.name;
+                select.appendChild(option);
+                select.value = data.id;
+
+                // Сховати поле для введення нової категорії
+                document.getElementById('newCategoryInput').style.display = "none";
+                document.getElementById('newCategoryName').value = '';
+                document.getElementById('addCategoryButton').style.display = "inline-block";
+
+            })
+            .catch(error => console.error('Error:', error));
+        });
+</script>
