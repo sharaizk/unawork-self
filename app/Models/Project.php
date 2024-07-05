@@ -19,6 +19,7 @@ class Project extends Model
         'private',
         'created_by',
         'is_active',
+        'project_category_id',
     ];
 
     protected $casts = [
@@ -28,6 +29,11 @@ class Project extends Model
     public function scopePrivate($query, $private = true)
     {
         return $query->where('private', $private);
+    }
+
+    public function projectCategory()
+    {
+        return $this->belongsTo(ProjectCategory::class);
     }
 
     public function creater()
