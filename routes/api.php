@@ -52,6 +52,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::post('upload-photos', 'apicontroller@uploadImage')
 
 Route::resource('skill', SkillController::class)->middleware(['auth:sanctum']);
+Route::post('/skill', [SkillController::class, 'store'])->name('api.skill.store');
 
 
 Route::get('/pod', [PodController::class, 'index']);

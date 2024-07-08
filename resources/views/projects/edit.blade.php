@@ -150,7 +150,6 @@
                 select.appendChild(option);
                 select.value = data.id;
 
-                // Сховати поле для введення нової категорії
                 document.getElementById('newCategoryInput').style.display = "none";
                 document.getElementById('newCategoryName').value = '';
                 document.getElementById('addCategoryButton').style.display = "inline-block";
