@@ -10,6 +10,7 @@ set('shared_dirs', ['storage']);
 set('writable_dirs', [
     'bootstrap/cache',
     'storage',
+    'storage/uploads',
     'storage/app',
     'storage/app/public',
     'storage/framework',
@@ -43,7 +44,7 @@ task('deploy', [
     'deploy:prepare',
     'deploy:vendors',
     'artisan:storage:link',
-    'artisan:view:cache',
+//    'artisan:view:cache',
     'artisan:config:cache',
 //    'yarn:install',
 //    'yarn:build',

@@ -26,6 +26,7 @@
         "vue": "^3.2.31"
     },
     "dependencies": {
-        "vanilla-cookieconsent": "^2.9.0"
+        "vanilla-cookieconsent": "^2.9.0",
+        "ziggy-js": "^2.2.1"
     }
 }
