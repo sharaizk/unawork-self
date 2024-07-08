@@ -226,6 +226,7 @@ class ProjectController extends Controller
                 $data['password_protected'] = 'off';
                 $objProject->copylinksetting = json_encode($data);
                 $objProject->save();
+                $objProject->refresh();
 
                 foreach ($userList as $email) {
                     $permission = 'Member';
@@ -234,6 +235,7 @@ class ProjectController extends Controller
                         if ($registerUsers->id == $objUser->id) {
                             $permission = 'Owner';
                         }
+                        Utility::sendNotification('project_new', null, $registerUsers->id, $objProject);
                     } else {
                         $arrUser = [];
                         $arrUser['name'] = 'No Name';
