@@ -1,0 +1,10 @@
+image: mlapko/deployer:latest
+
+pipelines:
+  branches:
+    dev:
+      - step:
+          caches:
+            - composer
+          script:
+            - dep deploy dev

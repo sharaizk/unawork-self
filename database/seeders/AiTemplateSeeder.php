@@ -36,7 +36,7 @@ class AiTemplateSeeder extends Seeder
             ],
             [
                 'template_name'=>'name',
-                'prompt'=>"What would be the project name for decription as follows ##description##" ,
+                'prompt'=>"What would be the project name for description as follows ##description##" ,
                 'module'=>'project',
                 'field_json'=>'{"field":[{"label":"Project Description","placeholder":"e.g. Efficiency and Optimization,Business Growth and Expansion","field_type":"textarea","field_name":"description"}]}',
                 'is_tone'=>'0',
@@ -308,7 +308,7 @@ class AiTemplateSeeder extends Seeder
             ],
 
         ];
-        
+
         Template::insert($template);
     }
 }
