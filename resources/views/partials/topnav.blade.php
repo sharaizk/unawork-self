@@ -526,6 +526,14 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
+                                                @elseif($notification->type == 'project_new')
+                                                    @php
+                                                        $workspace = \App\Models\Workspace::find($data->workspace);
+                                                        $link = route('projects.index', ['slug' => $workspace->slug]);
+                                                        $text = __('New project : ') . ' <b>' . $data->name . '</b> in your workspace:  <b>'. $workspace->name . ' </b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'Proj';
+                                                    @endphp
                                                 @elseif($notification->type == 'bug_assign')
                                                     @php
                                                         if ($project) {
