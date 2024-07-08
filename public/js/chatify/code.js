@@ -389,15 +389,20 @@ function IDinfo(id, type) {
  * Invite user function
  *-------------------------------------------------------------
  */
-function insertSelectsForInviteUser(data) {
+ function insertSelectsForInviteUser(data) {
   let inserthtml = '';
+  const inviteUserSelect = document.querySelector(".m-header-invite-user .selectItem");
+  const inviteButton = document.querySelector(".messenger-infoView-btns .invite-user");
+
   if ((data.can_invite.workspaces && data.can_invite.workspaces.length > 0) || 
-  (data.can_invite.pods && data.can_invite.pods.length > 0)) {
+      (data.can_invite.pods && data.can_invite.pods.length > 0)) {
     inserthtml = makeSelectsForInviteUser(data.can_invite, data.basic_url);
+    inviteButton.style.display = 'block';
   } else {
-    inserthtml = '<option value="" selected disabled>No Availible items</option>';
+    inviteButton.style.display = 'none';
   }
-  document.querySelector(".m-header-invite-user .selectItem").innerHTML = inserthtml;
+  
+  inviteUserSelect.innerHTML = inserthtml;
 }
 function makeSelectsForInviteUser(data, basicUrl) {
   let htmlOptions = '';
