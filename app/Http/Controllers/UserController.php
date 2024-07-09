@@ -607,10 +607,11 @@ class UserController extends Controller
             if ($objUser->type != 'admin') {
 
                 $image_size = $request->file('avatar')->getSize();
-                $result = Utility::updateStorageLimit($workspace_owner->id, $image_size);
+                $result = 1;
+                // $result = Utility::updateStorageLimit($workspace_owner->id, $image_size);
                 if ($result == 1) {
-                    Utility::changeStorageLimit($workspace_owner->id, $objUser->avatar);
-                    $logoName = uniqid() . '.png';
+                    // Utility::changeStorageLimit($workspace_owner->id, $objUser->avatar);
+                    $logoName = uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension();
                     $path = Utility::upload_file($request, 'avatar', $logoName, $dir, []);
                     if ($path['flag'] == 1) {
                         $avatar = $path['url'];
@@ -620,7 +621,7 @@ class UserController extends Controller
                 }
             } else {
 
-                $logoName = uniqid() . '.png';
+                $logoName = uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension();
                 $path = Utility::upload_file($request, 'avatar', $logoName, $dir, []);
                 if ($path['flag'] == 1) {
                     $avatar = $path['url'];

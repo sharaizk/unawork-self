@@ -354,13 +354,6 @@
                                        class="dash-mtext">{{ __('Notification Template') }}</span></a>
                            </li> -->
 
-                            <li
-                               class="dash-item {{ Request::route()->getName() == 'workspace.settings' ? ' active' : '' }}">
-                               <a href="{{ route('workspace.settings', $currentWorkspace->slug) }}"
-                                   class="dash-link "><span class="dash-micon"><i
-                                           data-feather="settings"></i></span><span
-                                       class="dash-mtext">{{ __('Settings') }}</span></a>
-                           </li> 
                        @endif
 
                        @if (Auth::user()->hasRole('employee'))

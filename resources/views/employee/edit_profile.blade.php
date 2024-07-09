@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="col-lg-12">
-                <div class="row">
+                <div class="row skillContainer">
                     <h4>Skills:</h4>
                     @foreach($skills as $skill)
                         <label class="form-check-label">
@@ -50,6 +50,11 @@
                         </label>
                     @endforeach
                 </div>
+                <button type="button" id="addSkillButton" class="btn btn-link">{{ __('+ Add New Skill') }}</button>
+                    <div class="input-group mb-3" id="newSkillInput" style="display: none;">
+                        <input type="text" id="newSkillName" class="form-control" placeholder="{{ __('Skill Name') }}" aria-label="{{ __('Skill Name') }}">
+                        <button type="button" id="createSkillButton" class="btn btn-outline-secondary">{{ __('Create') }}</button>
+                    </div> 
             </div>
         </div>
     </div>
@@ -60,3 +65,59 @@
         </div>
     </div>
 </form>
+
+
+<script>
+        let addCategoryButton = document.getElementById('addSkillButton');
+        addCategoryButton.addEventListener('click', function () {
+            document.getElementById('newSkillInput').style.display = "flex";
+            document.getElementById('addSkillButton').style.display = "none";
+            
+        });
+
+        document.getElementById('createSkillButton').addEventListener('click', function () {
+            const newSkillName = document.getElementById('newSkillName').value;
+
+            if (newSkillName.trim() === '') {
+                alert("Please enter a skill name.");
+                return;
+            }
+
+            fetch("{{ route('api.skill.store') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ name: newSkillName })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let newCheckbox = document.createElement('input');
+                newCheckbox.type = 'checkbox';
+                newCheckbox.name = 'skill_ids[]';
+                newCheckbox.value = data.id;
+                newCheckbox.className = 'form-check-input';
+                newCheckbox.checked = true;
+
+                let label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.appendChild(newCheckbox);
+                label.appendChild(document.createTextNode(data.name));
+
+                let skillsContainer = document.querySelector('.skillContainer');
+                skillsContainer.appendChild(label);
+
+                document.getElementById('newSkillInput').style.display = "none";
+                document.getElementById('newSkillName').value = '';
+                document.getElementById('addSkillButton').style.display = "inline-block";
+
+            })
+            .catch(error => console.error('Error:', error));
+        });
+</script>

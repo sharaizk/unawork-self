@@ -20,7 +20,7 @@ class SkillController extends Controller
 
     public function store(Request $request): JsonResponse
     {   
-        $this->authorize('create', Skill::class);
+        // $this->authorize('create', Skill::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
