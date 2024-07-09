@@ -46,6 +46,7 @@
                     @foreach($skills as $skill)
                         <label class="form-check-label">
                             <input class="form-check-input" type="checkbox" name="skill_ids[]" value="{{ $skill->id }}" {{ in_array($skill->id, $user->skills->pluck('id')->toArray()) ? 'checked' : '' }}>
+                            &nbsp;
                             {{ $skill->name }}
                         </label>
                     @endforeach
