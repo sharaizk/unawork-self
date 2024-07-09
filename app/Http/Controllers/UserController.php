@@ -585,7 +585,7 @@ class UserController extends Controller
         $validation['email'] = 'required|email|max:100|unique:users,email,' . $objUser->id . ',id';
 
         if ($request->has('avatar')) {
-            $validation['avatar'] = 'required';
+            $validation['avatar'] = 'required|image|mimes:jpeg,png,jpg,svg|max:2048';
         }
 
         $validator = \Validator::make($request->all(), $validation);
