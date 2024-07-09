@@ -1532,6 +1532,22 @@ class Utility
                     }
 
                     $res = [
+                        'flag' => 0,
+                        'msg' => 'Undefined error with uploading file',
+                    ];
+
+                    if ($settings['storage_setting'] == 'local') {
+                        $fullPath = storage_path($path);
+                        if (!file_exists($fullPath)) {
+                            return $res;
+                        }
+                    } else {
+                        if (!\Storage::disk($settings['storage_setting'])->exists($path)) {
+                            return $res;
+                        }
+                    }
+
+                    $res = [
                         'flag' => 1,
                         'msg' => 'success',
                         'url' => $path,
