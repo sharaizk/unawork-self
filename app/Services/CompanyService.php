@@ -7,7 +7,7 @@ use App\Enums\User\UserRole;
 
 class CompanyService
 {
-    public function getCompanies(?string $country = null)
+    public function getCompanies(?string $country = null, ?int $limit = null)
     {
         $query = User::role(UserRole::COMPANY->value);
 
@@ -17,6 +17,12 @@ class CompanyService
             });
         }
 
-        return $query->get();
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return $query->with(['workspacesOwner' => function ($query) {
+            $query->where('ownerable_type', '!=', 'App\Models\Pod');
+        }])->get()->pluck('workspacesOwner')->flatten();
     }
 }

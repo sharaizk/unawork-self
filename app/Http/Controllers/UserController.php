@@ -1326,6 +1326,95 @@ class UserController extends Controller
         return json_encode($response);
     }
 
+    public function joinRequest(Request $request, Workspace $workspace)
+    {
+        $user = Auth::user();
+
+        // Check if the user is already assigned to the current workspace
+        $is_assigned = UserWorkspace::where('user_id', $user->id)
+            ->where('workspace_id', $workspace->id)
+            ->exists();
+
+        if (!$is_assigned) {
+            $userWorkspace = UserWorkspace::create([
+                'user_id' => $user->id,
+                'workspace_id' => $workspace->id,
+                'permission' => 'Member',
+                'status' => Status::WORKSPACE_PENDING->value,
+            ]);
+            $userWorkspace->refresh();
+
+            $workspace_name = Workspace::where('id', $user->currant_workspace)->first();
+
+            Utility::sendNotification('workspace_join', null, $workspace->created_by, $userWorkspace);
+
+            
+            return redirect()->route('home')->with('success', __('Request Sended Successfully!'));
+        } else {
+            return response()->json(['error' => 'You are already a member of this workspace'], 404);
+        }
+    }
+
+    public function acceptRequest(UserWorkspace $userWorkspace)
+    {
+        $user = $userWorkspace->user;
+        $workspace = $userWorkspace->workspace;
+        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+
+        if ($isUserInWorkspace) {
+            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
+
+            $userWorkspace = DB::table('user_workspaces')
+                ->where('workspace_id', $workspace->id)
+                ->where('user_id', $user->id)
+                ->first();
+            $notification = Notification::where('related_id', $userWorkspace->id)
+                ->where('user_id', $user->id)
+                ->where('type', 'workspace_request')
+                ->first();
+            if ($notification) {
+                $notification->is_read = 1;
+                $notification->update();
+            }
+
+            Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
+    
+            return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to active'));
+        } else {
+            return response()->json(['error' => 'User not found in workspace'], 404);
+        }
+    }
+
+    public function declineRequest(UserWorkspace $userWorkspace)
+    {
+        $user = $userWorkspace->user;
+        $workspace = $userWorkspace->workspace;
+        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+
+        if ($isUserInWorkspace) {
+            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::DECLINED->value]);
+
+            $userWorkspace = DB::table('user_workspaces')
+                ->where('workspace_id', $workspace->id)
+                ->where('user_id', $user->id)
+                ->first();
+            $notification = Notification::where('related_id', $userWorkspace->id)
+                ->where('user_id', $user->id)
+                ->where('type', 'workspace_request')
+                ->first();
+            if ($notification) {
+                $notification->is_read = 1;
+                $notification->update();
+            }
+
+            Utility::sendNotification('workspace_request_decline_user', null, $user->id, $userWorkspace);
+    
+            return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to declined'));
+        } else {
+            return response()->json(['error' => 'User not found in workspace'], 404);
+        }
+    }
+
     public function acceptInvite(Request $request, Workspace $workspace)
     {
         $user = Auth::user();

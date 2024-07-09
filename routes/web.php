@@ -663,6 +663,10 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('/{slug}/users/update/{id}', [UserController::class, 'update'])->name('users.update')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/users/{id}', [UserController::class, 'removeUser'])->name('users.remove')->middleware(['auth', 'XSS']);
 
+    Route::get('/{workspace}/join-request', [UserController::class, 'joinRequest'])->name('company.join')->middleware(['auth', 'XSS']);
+    Route::get('/{userWorkspace}/join-request/accept', [UserController::class, 'acceptRequest'])->name('company.join.accept')->middleware(['auth', 'XSS']);
+    Route::get('/{userWorkspace}/join-request/decline', [UserController::class, 'declineRequest'])->name('company.join.decline')->middleware(['auth', 'XSS']);
+
 
     Route::get('/my-account', [UserController::class, 'account'])->name('users.my.account')->middleware(['auth', 'XSS']);
     Route::post('/{slug}/my-account/{id}/update', [UserController::class, 'update'])->name('update.account')->middleware(['auth', 'XSS']);

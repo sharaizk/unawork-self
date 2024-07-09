@@ -14,4 +14,9 @@ class UserWorkspace extends Model
     {
         return $this->belongsTo(Workspace::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
