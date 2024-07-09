@@ -1369,8 +1369,8 @@ class UserController extends Controller
                 ->where('user_id', $user->id)
                 ->first();
             $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', $user->id)
-                ->where('type', 'workspace_request')
+                ->where('user_id', Auth::user()->id)
+                ->where('type', 'workspace_join')
                 ->first();
             if ($notification) {
                 $notification->is_read = 1;
@@ -1399,8 +1399,8 @@ class UserController extends Controller
                 ->where('user_id', $user->id)
                 ->first();
             $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', $user->id)
-                ->where('type', 'workspace_request')
+                ->where('user_id', Auth::user()->id)
+                ->where('type', 'workspace_join')
                 ->first();
             if ($notification) {
                 $notification->is_read = 1;
