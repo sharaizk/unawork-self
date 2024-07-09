@@ -17,8 +17,8 @@ class FindWorkController extends Controller
     {   
         $companyService = new CompanyService;
         $companies = $companyService->getCompanies(null, 4);
+        $countries = $companyService->getCompanies()->pluck('country')->filter()->unique()->values();
         $pods = Pod::limit(5)->get();
-        $countries = Profile::distinct()->pluck('country');
         $skills = Skill::all();
         $projects = Project::private(false)->limit(3)->get();
 
