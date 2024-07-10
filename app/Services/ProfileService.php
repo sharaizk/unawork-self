@@ -60,7 +60,7 @@ class ProfileService
     {
         $dir = 'profile-files';
         $fileName = uniqid() . '.pdf';
-        $path = $file->storeAs($dir, $fileName);
+        $path = $file->storeAs($dir, $fileName, 'public');
 
         if ($path) {
             return $path;

@@ -103,7 +103,7 @@
                 <li class="dropdown dash-h-item drp-company">
                     <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
-                        <img class="theme-avtar"@if (Auth::user()->avatar) src="{{ asset($logo . Auth::user()->avatar) }}" @else avatar="{{ Auth::user()->name }}" @endif
+                        <img class="theme-avtar"@if (Auth::user()->avatar) src="{{ asset($logo. Auth::user()->avatar) }}" @else avatar="{{ Auth::user()->name }}" @endif
                             alt="{{ Auth::user()->name }}">
                         <span class="hide-mob ms-2">{{ __('Hi') }},{{ Auth::user()->name }} !</span>
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
@@ -486,6 +486,24 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
+                                                @elseif($notification->type == 'workspace_join')
+                                                    @php
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
+                                                        $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
+                                                        $text = __('User : ') . ' 
+                                                            <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
+                                                            sended join request to your workspace:  
+                                                            <b><a href="'. route('users.index', ['slug' => $workspace->slug]) .'">'. $workspace->name . ' </a></b>
+                                                            <br>
+                                                            <br>
+                                                            <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
+                                                                onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
+                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                                                                onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
+                                                        ';
+                                                    @endphp
                                                 @elseif($notification->type == 'workspace_invite')
                                                     @php
                                                         $data = \App\Models\UserWorkspace::findOrFail($data->id);
@@ -509,14 +527,14 @@
                                                         $user = \App\Models\User::find($data->user_id);
                                                         $text = __('User : ') . ' <b>' . $user->name . '</b> joined your workspace:  <b>'. $workspace->name . ' </b>';
                                                         $icon = 'fa fa-bug';
-                                                        $name = 'POD';
+                                                        $name = 'WP';
                                                     @endphp
                                                 @elseif($notification->type == 'workspace_request_accept_user')
                                                     @php
                                                         $workspace = \App\Models\Workspace::find($data->workspace_id);
                                                         $text = __('You joined workspace:  <b>'. $workspace->name . ' </b>');
                                                         $icon = 'fa fa-bug';
-                                                        $name = 'POD';
+                                                        $name = 'WP';
                                                     @endphp
                                                 @elseif($notification->type == 'workspace_request_decline_owner')
                                                     @php
@@ -524,7 +542,15 @@
                                                         $user = \App\Models\User::find($data->user_id);
                                                         $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your workspace:  <b>'. $workspace->name . ' </b>';
                                                         $icon = 'fa fa-bug';
-                                                        $name = 'POD';
+                                                        $name = 'WP';
+                                                    @endphp
+                                                @elseif($notification->type == 'workspace_request_decline_user')
+                                                    @php
+                                                        $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $text = __('Your request to join workspace : ') . ' <b>' . $workspace->name . '</b> were declined';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'WP';
                                                     @endphp
                                                 @elseif($notification->type == 'project_new')
                                                     @php

@@ -147,7 +147,7 @@ class PlanController extends Controller
         $post['status'] = $request->has('status') ? 1 : 0;
         if ($request->image) {
             $avatarName = 'plan_' . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->storeAs('plans', $avatarName);
+            $request->image->storeAs('plans', $avatarName, 'public');
             $post['image'] = $avatarName;
         }
         if (Plan::create($post)) {

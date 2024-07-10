@@ -18,9 +18,9 @@ class CompanyController extends Controller
     public function list(Request $request)
     {
         $country = $request->input('country');
-        $companies = $this->companyService->getCompanies($country);       
+        $companies = $this->companyService->getCompanies($country);     
 
-        $countries = Profile::distinct()->pluck('country');
+        $countries = $this->companyService->getCompanies()->pluck('country')->filter()->unique()->values();
 
         return view('company.landing.list', compact('companies', 'countries'));
     }

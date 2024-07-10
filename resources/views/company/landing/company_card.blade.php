@@ -8,11 +8,18 @@
             <h4>{{$company->name}}</h4>
         </div>
         <p>
-            {{ $company->profile->country ?? '' }} {{ $company->profile->website ?? '' }}
+            {{ $company->country ?? '' }} {{ $company->website ?? '' }}
         </p>
         <p>
-            {{ $company->profile->about ?? 'about company' }}
+            {{ $company->about ?? 'about company' }}
         </p>
-        <a href="#" class="learn-more">Learn more</a>
+        <div class="row">
+            <div class="col lg-6">
+                <a href="#" class="w-100 learn-more">Learn more</a>
+            </div>
+            <div class="col lg-6">
+                <a href="{{ route('company.join', ['workspace' => $company->id]) }}" class="w-100 learn-more">Join</a>
+            </div>
+        </div>
     </div>
 </div>

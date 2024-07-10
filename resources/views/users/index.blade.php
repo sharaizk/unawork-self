@@ -77,6 +77,8 @@
                                              <div class="badge p-2 px-3 rounded bg-warning">{{ __('employee_pending') }}</div>
                                          @elseif ($user->status == 'workspace_pending')
                                              <div class="badge p-2 px-3 rounded bg-warning">{{ __('workspace_pending') }}</div>
+                                        @elseif ($user->status == 'declined')
+                                             <div class="badge p-2 px-3 rounded bg-warning">{{ __('Declined') }}</div>
                                          @endif
                                      @endif
                                  </h6>

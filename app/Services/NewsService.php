@@ -66,7 +66,7 @@ class NewsService
     {
         $dir = 'news-images';
         $imgName = uniqid() . '.png';
-        $path = $image->storeAs($dir, $imgName);
+        $path = $image->storeAs($dir, $imgName, 'public');
 
         if ($path) {
             return $path;
