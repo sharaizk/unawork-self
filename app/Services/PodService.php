@@ -68,7 +68,7 @@ class PodService
     {
         $dir = 'pod-images';
         $imgName = uniqid() . '.png';
-        $path = $image->storeAs($dir, $imgName);
+        $path = $image->storeAs($dir, $imgName, 'public');
 
         if ($path) {
             return $path;

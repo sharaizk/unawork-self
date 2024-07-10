@@ -601,7 +601,7 @@ class Utility
             'color' => 'theme-3',
             "SITE_RTL" => "off",
             'company_email' => 'test@example.com',
-            "storage_setting" => "local",
+            "storage_setting" => "public",
             "local_storage_validation" => "jpg,jpeg,png,xlsx,xls,csv,pdf",
             "local_storage_max_upload_size" => "2048000000",
             "s3_key" => "",
@@ -1498,55 +1498,23 @@ class Utility
                     return $res;
                 } else {
                     $name = $name;
-                    if ($settings['storage_setting'] == 'local') {
-
-                        $request->$key_name->move(storage_path($path), $name);
-                        $path = $path . $name;
-
-                        // \Storage::disk()->putFileAs(
-                        //     $path,
-                        //     $request->file($key_name),
-                        //     $name
-                        // );
-                        //$path = $path.$name;
-
-                    } else if ($settings['storage_setting'] == 'wasabi') {
-
-                        $path = \Storage::disk('wasabi')->putFileAs(
-                            $path,
-                            $file,
-                            $name
-                        );
-
-                        // $path = $path.$name;
-
-                    } else if ($settings['storage_setting'] == 's3') {
-
-                        $path = \Storage::disk('s3')->putFileAs(
-                            $path,
-                            $file,
-                            $name
-                        );
-                        // $path = $path.$name;
-                        // dd($path);
-                    }
+                
+                    $path = \Storage::disk($settings['storage_setting'])->putFileAs(
+                        $path,
+                        $file,
+                        $name
+                    );
+                    
 
                     $res = [
                         'flag' => 0,
                         'msg' => 'Undefined error with uploading file',
                     ];
 
-                    if ($settings['storage_setting'] == 'local') {
-                        $fullPath = storage_path($path);
-                        if (!file_exists($fullPath)) {
-                            return $res;
-                        }
-                    } else {
-                        if (!\Storage::disk($settings['storage_setting'])->exists($path)) {
-                            return $res;
-                        }
+                    if (!\Storage::disk($settings['storage_setting'])->exists($path)) {
+                        return $res;
                     }
-
+                    
                     $res = [
                         'flag' => 1,
                         'msg' => 'success',
@@ -1595,7 +1563,7 @@ class Utility
                         'filesystems.disks.s3.use_path_style_endpoint' => false,
                     ]
                 );
-            }
+            } 
 
             return \Storage::disk($settings['storage_setting'])->url($path);
         } catch (\Throwable $th) {

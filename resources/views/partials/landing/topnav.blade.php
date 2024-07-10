@@ -1,3 +1,6 @@
+@php
+    $logo = \App\Models\Utility::get_file('users-avatar/');
+@endphp
 <header id="header">
         <div class="header__top">
             <div class="container-master">
@@ -45,7 +48,7 @@
                                             <li class="dropdown dash-h-item drp-company">
                                                 <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#"
                                                     role="button" aria-haspopup="false" aria-expanded="false">
-                                                    <img class="theme-avtar"@if (Auth::user()->avatar) src="{{ asset('storage/' . Auth::user()->avatar) }}" @else avatar="{{ Auth::user()->name }}" @endif
+                                                    <img class="theme-avtar"@if (Auth::user()->avatar) src="{{ asset($logo . Auth::user()->avatar) }}" @else avatar="{{ Auth::user()->name }}" @endif
                                                         alt="{{ Auth::user()->name }}">
                                                     <span class="hide-mob ms-2">{{ __('Hi') }},{{ Auth::user()->name }} !</span>
                                                     <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>

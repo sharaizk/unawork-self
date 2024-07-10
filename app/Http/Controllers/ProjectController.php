@@ -2245,7 +2245,7 @@ class ProjectController extends Controller
         $fileSizeInMB = round($uploadedFileSize / 1024 / 1024, 2);
         if ($result == 1) {
 
-            $request->file->storeAs('tasks', $fileName);
+            $request->file->storeAs('tasks', $fileName, 'public');
         }
 
         $post['bug_id'] = $bug_id;

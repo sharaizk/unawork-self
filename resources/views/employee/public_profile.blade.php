@@ -1,6 +1,9 @@
 @extends('layouts.landing')
 @section('body-class', 'tpl-hub-shop')
 @section('content')
+@php
+    $logo = \App\Models\Utility::get_file('users-avatar/');
+@endphp
 <link rel="stylesheet" href="{{ asset('assets/css/landing/hub-shop.css') }}">
 <link rel="stylesheet" href="http://unawork.net/plugins/fancybox/fancybox.min.css">
 <main>
