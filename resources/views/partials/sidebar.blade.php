@@ -86,11 +86,13 @@
                                </a>
                            </li>
                        @endif
-                        <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
-                            <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
-                                class="ti ti-message-circle"></i></span><span
-                                class="dash-mtext">{{ __('PODS') }}</span> </a>
-                        </li>
+                       @if (\Auth::user()->type != "admin")
+                            <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
+                                <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
+                                    class="ti ti-message-circle"></i></span><span
+                                    class="dash-mtext">{{ __('PODS') }}</span> </a>
+                            </li>
+                        @endif
                        @if (isset($currentWorkspace) && $currentWorkspace)
                            @auth('web')
                                <li class="dash-item dash-hasmenu">
