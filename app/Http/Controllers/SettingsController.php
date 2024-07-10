@@ -1138,7 +1138,7 @@ class SettingsController extends Controller
     public function storageSettingStore(Request $request)
     {
 
-        if (isset($request->storage_setting) && $request->storage_setting == 'local') {
+        if (isset($request->storage_setting) && $request->storage_setting == 'public') {
 
             $request->validate(
                 [
