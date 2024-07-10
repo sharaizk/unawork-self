@@ -3304,7 +3304,7 @@
                                     <div class="pe-2 pb-3">
                                         <input type="radio" class="btn-check" name="storage_setting"
                                             id="local-outlined" autocomplete="off"
-                                            {{ $setting['storage_setting'] == 'local' ? 'checked' : '' }} value="local"
+                                            {{ $setting['storage_setting'] == 'public' ? 'checked' : '' }} value="public"
                                             checked>
                                         <label class="btn btn-outline-primary col-12"
                                             for="local-outlined">{{ __('Local') }}</label>
