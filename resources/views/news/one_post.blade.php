@@ -32,7 +32,7 @@
 
                 <div class="card" style="width: 38rem;">
                     @if($post->image)
-                        <img src="{{ asset('storage/' . $post->image) }}" class="card-img-top" alt="...">
+                        <img src="{{ App\Helpers\FileHelper::getUrl($post->image, 'big') }}" class="card-img-top" alt="...">
                     @endif
                     <div class="card-body">
                         <h1 class="section__titlepage--headertitle">

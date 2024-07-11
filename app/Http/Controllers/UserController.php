@@ -613,7 +613,7 @@ class UserController extends Controller
                     // Utility::changeStorageLimit($workspace_owner->id, $objUser->avatar);
                     $logoName = uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension();
                     $path = Utility::upload_file($request, 'avatar', $logoName, $dir, [], 
-                        ['small']
+                        ['small', 'big']
                     );
                     if ($path['flag'] == 1) {
                         $avatar = $path['url'];
@@ -625,7 +625,7 @@ class UserController extends Controller
 
                 $logoName = uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension();
                 $path = Utility::upload_file($request, 'avatar', $logoName, $dir, [], 
-                        ['small']
+                        ['small', 'big']
                     );
                 if ($path['flag'] == 1) {
                     $avatar = $path['url'];

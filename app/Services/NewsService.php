@@ -69,7 +69,7 @@ class NewsService
     {
         $dir = 'news-images';
         $imgName = uniqid() . '.' . $image->getClientOriginalExtension();
-        $resize_options = ['big'];
+        $resize_options = ['small', 'big'];
 
         $path = Utility::store_file($dir, $image, $imgName, $settings['storage_setting'], $resize_options);
 

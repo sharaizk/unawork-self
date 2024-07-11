@@ -59,7 +59,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
 
-                                    <img @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif
+                                    <img @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif
                                         id="myAvatar" alt="user-image" class="rounded-circle img-thumbnail img_hight w-25">
                                     {{-- @if ($user->avatar != '')
                                         <div class=" ">

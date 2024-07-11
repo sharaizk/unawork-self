@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Pod;
 use App\Models\User;
+use App\Models\Utility;
 use App\Models\Workspace;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,8 @@ class PodService
     public function createPod(array $data): Pod
     {
         if (isset($data['image'])) {
-            $data['image'] = $this->uploadImage($data['image']);
+            $settings = Utility::getAdminPaymentSetting();
+            $data['image'] = $this->uploadImage($data['image'], $settings);
         }
     
         $pod = Pod::create($data);
@@ -51,8 +53,8 @@ class PodService
             if ($pod->image) {
                 Storage::delete($pod->image);
             }
-
-            $data['image'] = $this->uploadImage($data['image']);
+            $settings = Utility::getAdminPaymentSetting();
+            $data['image'] = $this->uploadImage($data['image'], $settings);
         }
 
         $pod->update($data);
@@ -64,11 +66,13 @@ class PodService
         return $pod;
     }
 
-    protected function uploadImage(UploadedFile $image): string
+    protected function uploadImage(UploadedFile $image, array $settings): string
     {
         $dir = 'pod-images';
-        $imgName = uniqid() . '.png';
-        $path = $image->storeAs($dir, $imgName, 'public');
+        $imgName = uniqid() . '.' . $image->getClientOriginalExtension();
+        $resize_options = ['small', 'big'];
+
+        $path = Utility::store_file($dir, $image, $imgName, $settings['storage_setting'], $resize_options);
 
         if ($path) {
             return $path;
