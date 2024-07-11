@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\News;
 use App\Models\Pod;
+use App\Models\Utility;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,7 +26,8 @@ class NewsService
         }
 
         if (isset($data['image'])) {
-            $data['image'] = $this->uploadImage($data['image']);
+            $settings = Utility::getAdminPaymentSetting();
+            $data['image'] = $this->uploadImage($data['image'], $settings);
         }
 
         $newsObj = new News($data);
@@ -40,8 +42,9 @@ class NewsService
             if ($news->image) {
                 Storage::delete($news->image);
             }
-            
-            $data['image'] = $this->uploadImage($data['image']);    
+
+            $settings = Utility::getAdminPaymentSetting();
+            $data['image'] = $this->uploadImage($data['image'], $settings);    
         }
 
         if ($news) {
@@ -62,11 +65,13 @@ class NewsService
         }
     }
 
-    protected function uploadImage(UploadedFile $image): string
+    protected function uploadImage(UploadedFile $image, array $settings): string
     {
         $dir = 'news-images';
-        $imgName = uniqid() . '.png';
-        $path = $image->storeAs($dir, $imgName, 'public');
+        $imgName = uniqid() . '.' . $image->getClientOriginalExtension();
+        $resize_options = ['big'];
+
+        $path = Utility::store_file($dir, $image, $imgName, $settings['storage_setting'], $resize_options);
 
         if ($path) {
             return $path;

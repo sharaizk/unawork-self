@@ -1497,59 +1497,20 @@ class Utility
                     ];
                     return $res;
                 } else {
-                    $name = $name;
-                    $smallPath = $path . '/small_' . $name;
-                    $bigPath = $path . '/big_' . $name;
-                
-                    $path = \Storage::disk($settings['storage_setting'])->putFileAs(
-                        $path,
-                        $file,
-                        $name
-                    );
+                    try {
+                        $path = self::store_file($path, $file, $name, $settings['storage_setting'], $resize_options);
                     
-
-                    $res = [
-                        'flag' => 0,
-                        'msg' => 'Undefined error with uploading file',
-                    ];
-
-                    if (!\Storage::disk($settings['storage_setting'])->exists($path)) {
-                        return $res;
+                        return [
+                            'flag' => 1,
+                            'msg' => 'success',
+                            'url' => $path,
+                        ];
+                    } catch (\Exception $e) {
+                        return [
+                            'flag' => 0,
+                            'msg' => 'Undefined error with uploading file',
+                        ];
                     }
-
-                    // Handle image resizing
-                    if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png', 'gif'])) {
-                        $image = \Intervention\Image\Facades\Image::make($file->getRealPath());
-    
-                        if (in_array('small', $resize_options)) {
-                            $smaillFile = $image->resize(640, 640, function ($constraint) {
-                                $constraint->aspectRatio();
-                            })->stream();
-
-                            \Storage::disk($settings['storage_setting'])->put(
-                                $smallPath,
-                                $smaillFile
-                            );
-                        }
-    
-                        if (in_array('big', $resize_options)) {
-                            $bigFile = $image->resize(1920, 1080, function ($constraint) {
-                                $constraint->aspectRatio();
-                            })->stream();
-
-                            \Storage::disk($settings['storage_setting'])->put(
-                                $bigPath,
-                                $bigFile
-                            );
-                        }
-                    }
-                    
-                    $res = [
-                        'flag' => 1,
-                        'msg' => 'success',
-                        'url' => $path,
-                    ];
-                    return $res;
                 }
             } else {
                 $res = [
@@ -1565,6 +1526,52 @@ class Utility
             ];
             return $res;
         }
+    }
+
+    public static function store_file($path, $file, $name, $storageSettings, $resize_options = null)
+    {
+        $name = $name;
+        $smallPath = $path . '/small_' . $name;
+        $bigPath = $path . '/big_' . $name;
+    
+        $path = \Storage::disk($storageSettings)->putFileAs(
+            $path,
+            $file,
+            $name
+        );
+
+        if (!\Storage::disk($storageSettings)->exists($path)) {
+            throw new \Exception('Undefined error with uploading file');
+        }
+
+        // Handle image resizing
+        if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png', 'gif']) && !is_null($resize_options)) {
+            $image = \Intervention\Image\Facades\Image::make($file->getRealPath());
+
+            if (in_array('small', $resize_options)) {
+                $smaillFile = $image->resize(640, 640, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->stream();
+
+                \Storage::disk($storageSettings)->put(
+                    $smallPath,
+                    $smaillFile
+                );
+            }
+
+            if (in_array('big', $resize_options)) {
+                $bigFile = $image->resize(1920, 1080, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->stream();
+
+                \Storage::disk($storageSettings)->put(
+                    $bigPath,
+                    $bigFile
+                );
+            }
+        }
+
+        return $path;
     }
 
     public static function get_file($path)
