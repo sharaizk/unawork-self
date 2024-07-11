@@ -1522,15 +1522,25 @@ class Utility
                         $image = \Intervention\Image\Facades\Image::make($file->getRealPath());
     
                         if (in_array('small', $resize_options)) {
-                            $image->resize(640, 640, function ($constraint) {
+                            $smaillFile = $image->resize(640, 640, function ($constraint) {
                                 $constraint->aspectRatio();
-                            })->save(storage_path('app/public/' . $smallPath));
+                            })->stream();
+
+                            \Storage::disk($settings['storage_setting'])->put(
+                                $smallPath,
+                                $smaillFile
+                            );
                         }
     
                         if (in_array('big', $resize_options)) {
-                            $image->resize(1280, 1280, function ($constraint) {
+                            $bigFile = $image->resize(1920, 1080, function ($constraint) {
                                 $constraint->aspectRatio();
-                            })->save(storage_path('app/public/' . $bigPath));
+                            })->stream();
+
+                            \Storage::disk($settings['storage_setting'])->put(
+                                $bigPath,
+                                $bigFile
+                            );
                         }
                     }
                     

@@ -8,7 +8,7 @@
 @endsection --}}
 
 @php
-    $logo=\App\Models\Utility::get_file('uploads/logo');
+    $logo=\App\Models\Utility::get_file('uploads/logo/');
     $settings = \Modules\LandingPage\Entities\LandingPageSetting::settings();
 @endphp
 
