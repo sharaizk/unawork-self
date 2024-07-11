@@ -204,6 +204,8 @@ return [
         App\Providers\JetstreamServiceProvider::class,
         //spatie permission
         Spatie\Permission\PermissionServiceProvider::class,
+        //ImageIntervention
+        Intervention\Image\ImageServiceProvider::class,
         /* Setup Wizard */
 
         RachidLaasri\LaravelInstaller\Providers\LaravelInstallerServiceProvider::class,
@@ -268,6 +270,7 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'PaytmWallet' => Anand\LaravelPaytmWallet\Facades\PaytmWallet::class,
         'Chatify' => Chatify\Facades\ChatifyMessenger::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ])->toArray(),
 
 ];

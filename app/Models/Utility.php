@@ -1433,7 +1433,7 @@ class Utility
 
     ///========================== for Storage setting ===============================================================////
 
-    public static function upload_file($request, $key_name, $name, $path, $custom_validation = [])
+    public static function upload_file($request, $key_name, $name, $path, $custom_validation = [], $resize_options = [])
     {
         try {
             $settings = Utility::getAdminPaymentSetting();
@@ -1498,6 +1498,8 @@ class Utility
                     return $res;
                 } else {
                     $name = $name;
+                    $smallPath = $path . '/small_' . $name;
+                    $bigPath = $path . '/big_' . $name;
                 
                     $path = \Storage::disk($settings['storage_setting'])->putFileAs(
                         $path,
@@ -1513,6 +1515,23 @@ class Utility
 
                     if (!\Storage::disk($settings['storage_setting'])->exists($path)) {
                         return $res;
+                    }
+
+                    // Handle image resizing
+                    if (in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png', 'gif'])) {
+                        $image = \Intervention\Image\Facades\Image::make($file->getRealPath());
+    
+                        if (in_array('small', $resize_options)) {
+                            $image->resize(640, 640, function ($constraint) {
+                                $constraint->aspectRatio();
+                            })->save(storage_path('app/public/' . $smallPath));
+                        }
+    
+                        if (in_array('big', $resize_options)) {
+                            $image->resize(1280, 1280, function ($constraint) {
+                                $constraint->aspectRatio();
+                            })->save(storage_path('app/public/' . $bigPath));
+                        }
                     }
                     
                     $res = [
