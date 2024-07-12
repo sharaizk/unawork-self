@@ -110,11 +110,11 @@
                             href="{{ route('register', $lang) }}" tabindex="0"> {{ __('Register') }} </a></p>
                 @endif
             </form>
-            <div class="d-grid mt-3">
+            <!-- <div class="d-grid mt-3">
                 <a href="{{ route('client.login', $lang) }}" type="button" class="btn btn-primary btn-block"
                     style="color:#fff">
                     {{ __('Client Login') }}</a>
-            </div>
+            </div> -->
         </div>
     </div>
 @endsection
