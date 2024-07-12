@@ -91,7 +91,7 @@
                         @foreach($project->users as $user)
                             @if($user->pivot->is_active)
                                 <a href="#" class="img_group" data-toggle="tooltip" data-placement="top" title="{{$user->name}}">
-                                    <img alt="{{$user->name}}" @if($user->avatar) src="{{asset('storage/'.$user->avatar)}}" @else avatar="{{ $user->name }}" @endif>
+                                    <img alt="{{$user->name}}" @if($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
                                 </a>
                             @endif
                         @endforeach

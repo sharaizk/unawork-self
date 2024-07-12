@@ -35,7 +35,7 @@
         </div>
         <div class="col-md-12">
             <label for="users_list" class="col-form-label">{{ __('Users') }}</label>
-            <select class=" multi-select" id="users_list" name="users_list[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}" required>
+            <select class=" multi-select" id="users_list" name="users_list[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
             @if ($currentWorkspace->ownerable_type == "App\Models\Pod")
                 @foreach($currentWorkspace->ownerable->users as $user)
                     <option value="{{$user->email}}">{{$user->name}} - {{$user->email}}</option>

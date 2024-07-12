@@ -57,6 +57,7 @@
     </title>
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset($logo . 'favicon.png') }}">
+    <link rel="stylesheet" href="{{ asset('assets/custom/css/custom.css') }}" id="main-style-link">
 
 
     @if ($setting['cust_darklayout'] == 'on')
