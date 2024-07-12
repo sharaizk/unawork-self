@@ -1704,8 +1704,8 @@ body.no-scroll{
     }
 }
 .big-logo{
-    height: 60px;
-    width: 150px;
+    max-height: 60px;
+    max-width: 150px;
 }
 
 .color-wrp .color-picker-wrp input[type="color"] {
