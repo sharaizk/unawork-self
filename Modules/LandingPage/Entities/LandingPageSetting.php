@@ -192,26 +192,20 @@ class LandingPageSetting extends Model
 
                     $name = $name;
 
-                    if ($settings['storage_setting'] == 'local') {
-                        $request->$key_name->move(storage_path($path), $name);
-                        $path = $path . $name;
-                    } else if ($settings['storage_setting'] == 'wasabi') {
+                    $path = \Storage::disk($settings['storage_setting'])->putFileAs(
+                        $path,
+                        $file,
+                        $name
+                    );
 
-                        $path = \Storage::disk('wasabi')->putFileAs(
-                            $path,
-                            $file,
-                            $name
-                        );
-                    } else if ($settings['storage_setting'] == 's3') {
+                    $res = [
+                        'flag' => 0,
+                        'msg' => 'Undefined error with uploading file',
+                    ];
 
-                        $path = \Storage::disk('s3')->putFileAs(
-                            $path,
-                            $file,
-                            $name
-                        );
+                    if (!\Storage::disk($settings['storage_setting'])->exists($path)) {
+                        return $res;
                     }
-
-
 
                     $res = [
                         'flag' => 1,

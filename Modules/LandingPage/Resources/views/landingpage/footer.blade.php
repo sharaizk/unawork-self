@@ -10,7 +10,7 @@
 @php
     $lang = \App\Models\Utility::getValByName('default_language');
     // $logo=asset(Storage::url('uploads/logo/'));
-    $logo = \App\Models\Utility::get_file('uploads/logo');
+    $logo = \App\Models\Utility::get_file('uploads/logo/');
     $logo_light = \App\Models\Utility::getValByName('logo_light');
     $logo_dark = \App\Models\Utility::getValByName('logo_dark');
     $company_favicon = \App\Models\Utility::getValByName('company_favicon');

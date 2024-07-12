@@ -11,7 +11,7 @@
 @php
 
     $settings = \Modules\LandingPage\Entities\LandingPageSetting::settings();
-    $logo=\App\Models\Utility::get_file('uploads/landing_page_image');
+    $logo=\App\Models\Utility::get_file('uploads/landing_page_image/');
 
 
 @endphp
