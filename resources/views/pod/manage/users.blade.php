@@ -62,7 +62,7 @@
                                         <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
                                             data-title="{{ __('Remove user from pod') }}">
                                             <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Remove me from this pod') }}</span>
+                                            <span>{{ __('Remove me from thispod') }}</span>
                                         </a>
                                     @endif
                                 @endif
@@ -72,7 +72,7 @@
                     </div>
                     <div class="card-body">
                         <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
-                            @if ($user->image) src="{{ asset ('storage/'. $user->image) }}" @else avatar="{{ $user->title }}" @endif>
+                            @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->title }}" @endif>
                         <h4 class="mt-2">{{ $user->name }}</h4>
                         <span>{{ $user->email }}</span>
                         <br>

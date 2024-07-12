@@ -3,7 +3,7 @@
         padding: 20px;
     }
 </style>
-<form class="edit-news-form" id="edit-news-form" data-url="{{ env('APP_URL') }}api/news">
+<form class="edit-news-form" id="edit-news-form" data-url="{{ route('api.news.store') }}">
     @csrf
     <div class="col-lg-12">
         <div class="row">

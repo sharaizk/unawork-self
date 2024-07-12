@@ -78,7 +78,8 @@ Route::get('/employees', [EmployeeController::class, 'index']);
 Route::get('/employees/{id}', [EmployeeController::class, 'show']);
 
 
-Route::resource('news', NewsController::class)->except('update');
+Route::resource('news', NewsController::class)->except('update', 'store');
+Route::post('/news', [NewsController::class, 'store'])->name('api.news.store');
 Route::post('/news/{id}', [NewsController::class, 'update']);
 
 
