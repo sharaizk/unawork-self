@@ -31,8 +31,8 @@
                                 <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
                             @endforeach
                         </select>
-                        <div class="input-group-append w-10">
-                            <a href="#" class="btn btn-primary" data-ajax-popup="true"
+                        <div class="input-group-append">
+                            <a href="#" class="btn btn-sm h-100 btn-primary d-flex align-items-center" data-ajax-popup="true"
                             data-title="{{ __('Create Milestone') }}"
                             data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
                             data-toggle="popover" title="{{ __('Create') }}">
