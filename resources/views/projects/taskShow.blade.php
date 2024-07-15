@@ -32,11 +32,16 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-control-label">{{ __('Assigned') }}</div>
-                    @if ($users = $task->users())
+                    @php
+                        $users = $task->users();
+                    @endphp
+                    @if ($users && count($users) > 0)
                         @foreach ($users as $user)
                             <img @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif
                                 class="rounded-circle mt-1 w-20">
                         @endforeach
+                    @else
+                        <p class="mt-1">{{ __('No Assigned Users') }}</p>
                     @endif
                 </div>
                 <div class="col-md-3">

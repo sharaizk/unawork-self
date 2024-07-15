@@ -20903,7 +20903,7 @@ select.form-control[data-multiselectsplitter-firstselect-selector], select.custo
 
 .datepicker {
     width: 265px;
-    padding: 10px;
+    padding: 0px;
 }
 
 .datepicker.dropdown-menu {

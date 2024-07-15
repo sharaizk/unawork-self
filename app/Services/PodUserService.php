@@ -8,12 +8,22 @@ use App\Models\User;
 use App\Enums\PodUser\Permission;
 use App\Enums\PodUser\Status;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
+use App\Models\Project;
 use App\Models\Utility;
+use App\Models\Workspace;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class PodUserService
 {
+    public function remove(int $userId, int $podId): void
+    {
+        $pod = Pod::find($podId);
+        $this->detachUserFromWorkspace($pod, $userId);
+        $pod->users()->detach($userId);
+        Utility::sendNotification('pod_remove', null, $userId, $pod);
+    }
+
     public function inviteExistedUser(int $userId = null, int $podId): void
     {
         $user = User::find($userId);
@@ -99,6 +109,35 @@ class PodUserService
         }
 
         $request->save();
+    }
+
+    private function detachUserFromWorkspace(Pod $pod, int $userId): void
+    {
+        $workspace = $pod->workspace;
+
+        self::detachUserFromWorkspaceProjects($workspace, $userId);
+
+        $workspace->users()->detach($userId);
+    }
+
+    private function detachUserFromWorkspaceProjects(Workspace $workspace, int $userId): void
+    {
+        $projects = $workspace->projects;
+        foreach ($projects as $project) {
+                self::detachUserFromPodWorkspaceTasks($project, $userId);
+                $project->users()->detach($userId);
+        }
+    }
+
+    private function detachUserFromPodWorkspaceTasks(Project $project, int $userId): void
+    {
+        $tasks = $project->user_tasks($userId);
+        foreach ($tasks as $task) {
+            $taskUsers = explode(',', $task->assign_to);
+            $taskUsers = array_diff($taskUsers, [$userId]);
+            $task->assign_to = implode(',', $taskUsers);
+            $task->save();
+        }
     }
 
     private function createNewUser(array $data): User
