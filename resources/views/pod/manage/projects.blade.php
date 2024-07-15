@@ -4,6 +4,9 @@
 <div class="row">
 
     @foreach ($projects as $project)
+        @php 
+            $project = \App\Models\Project::find($project->id);
+        @endphp
         <div class="col-xl-3 col-lg-4 col-sm-6 All {{ $project->status }}" >
             <div class="card" >
                 <div class="card-header border-0 pb-0">
@@ -29,11 +32,13 @@
                     <div class="card-header-right">
                         <div class="btn-group card-option">
                             @auth('web')
-                            <button type="button" class="btn dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="feather icon-more-vertical"></i>
-                            </button>
+                            @if ($project->users->contains(\Auth::user()->id))
+                                <button type="button" class="btn dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    <i class="feather icon-more-vertical"></i>
+                                </button>
+                            @endif
                             <div class="dropdown-menu dropdown-menu-end">
                                 @if($project->is_active)
                                     <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">

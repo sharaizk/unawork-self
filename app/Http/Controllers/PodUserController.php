@@ -58,22 +58,33 @@ class PodUserController extends Controller
         }
     }
 
+    // public function remove($podId, $userId)
+    // {
+    //     $pod = Pod::findOrFail($podId);
+    //     $user = User::findOrFail($userId);
+    //     $workspace = $pod->workspace;
+
+
+    //     if ($pod->users->contains($user)) {
+    //         $pod->users()->detach($user->id);
+    //         if ($workspace->users()->where('user_id', $user->id)->exists()) {
+    //             $workspace->users()->detach($user->id);
+    //         }
+    //         return response()->json(['message' => 'User removed from pod successfully'], 200);
+    //     }
+
+    //     return response()->json(['error' => 'User not found in pod'], 404);
+    // }
+
     public function remove($podId, $userId)
     {
-        $pod = Pod::findOrFail($podId);
-        $user = User::findOrFail($userId);
-        $workspace = $pod->workspace;
-
-
-        if ($pod->users->contains($user)) {
-            $pod->users()->detach($user->id);
-            if ($workspace->users()->where('user_id', $user->id)->exists()) {
-                $workspace->users()->detach($user->id);
-            }
+        $podUserService = new PodUserService;
+        try {
+            $podUserService->remove($userId, $podId);
             return response()->json(['message' => 'User removed from pod successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed:'.$e], 404);
         }
-
-        return response()->json(['error' => 'User not found in pod'], 404);
     }
 
     public function accept(Pod $pod, User $user)
