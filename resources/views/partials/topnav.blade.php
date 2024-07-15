@@ -446,6 +446,12 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
+                                                @elseif($notification->type == 'pod_remove')
+                                                    @php
+                                                        $text = __('You were removed from pod: ') . ' <b>' . $data->title . '</b>';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'POD';
+                                                    @endphp
                                                 @elseif($notification->type == 'pod_request')
                                                     @php
                                                         $link = route('pods.users', ['podId' => $data->id]);

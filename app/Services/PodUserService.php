@@ -21,6 +21,7 @@ class PodUserService
         $pod = Pod::find($podId);
         $this->detachUserFromWorkspace($pod, $userId);
         $pod->users()->detach($userId);
+        Utility::sendNotification('pod_remove', null, $userId, $pod);
     }
 
     public function inviteExistedUser(int $userId = null, int $podId): void
