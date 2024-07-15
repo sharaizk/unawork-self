@@ -24,13 +24,22 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label class="col-form-label">{{ __('Milestone') }}</label>
-                    <select class="form-control form-control-light select2" name="milestone_id" id="task-milestone"
-                        required>
-                        <option value="">{{ __('Select Milestone') }}</option>
-                        @foreach ($project->milestones as $milestone)
-                            <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
-                        @endforeach
-                    </select>
+                    <div class="input-group">
+                        <select class="form-control form-control-light select2" name="milestone_id" id="task-milestone" required>
+                            <option value="">{{ __('Select Milestone') }}</option>
+                            @foreach ($project->milestones as $milestone)
+                                <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
+                            @endforeach
+                        </select>
+                        <div class="input-group-append w-10">
+                            <a href="#" class="btn btn-primary" data-ajax-popup="true"
+                            data-title="{{ __('Create Milestone') }}"
+                            data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
+                            data-toggle="popover" title="{{ __('Create') }}">
+                                <i class="ti ti-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group col-md-8">
                     <label class="col-form-label">{{ __('Title') }}</label>
@@ -49,7 +58,7 @@
                     <label class="col-form-label">{{ __('Assign To') }}</label>
 
                     <select class=" multi-select" id="assign_to" name="assign_to[]" data-toggle="select2"
-                        multiple="multiple" data-placeholder="{{ __('Select Users ...') }}" required>
+                        multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
                         @foreach ($users as $u)
                             <option value="{{ $u->id }}">{{ $u->name }} - {{ $u->email }}</option>
                         @endforeach

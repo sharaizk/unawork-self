@@ -834,7 +834,6 @@ class ProjectController extends Controller
                 'title' => 'required',
                 'priority' => 'required',
                 'milestone_id' => 'required',
-                'assign_to' => 'required',
                 'start_date' => 'required',
                 'due_date' => 'required',
                 'description' => 'required',
@@ -864,7 +863,7 @@ class ProjectController extends Controller
             if ($stage) {
                 $post['milestone_id'] = !empty($request->milestone_id) ? $request->milestone_id : 0;
                 $post['status'] = $stage->id;
-                $post['assign_to'] = implode(",", $request->assign_to);
+                $post['assign_to'] = $request->has('assign_to') ? implode(",", $request->assign_to) : null;
                 $task = Task::create($post);
                 $google_msg = '';
 
@@ -904,7 +903,9 @@ class ProjectController extends Controller
                     Utility::send_telegram_msg('New Task', $uArr, $user);
                 }
 
-                Utility::sendNotification('task_assign', $currentWorkspace, $request->assign_to, $task);
+                if ($request->has('assign_to')) {
+                    Utility::sendNotification('task_assign', $currentWorkspace, $request->assign_to, $task);
+                }
 
 
                 //webhook

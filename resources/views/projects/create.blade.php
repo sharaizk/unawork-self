@@ -33,6 +33,15 @@
             <label for="description" class="col-form-label">{{ __('Description') }}</label>
             <textarea class="form-control" id="description" name="description" required="" placeholder="{{ __('Add Description') }}"></textarea>
         </div>
+        <div class="form-group col-md-12">
+                <label class="form-label">{{ __('Visibility') }}</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="private" name="private" value="1">
+                    <label class="form-check-label" for="private">
+                        {{ __('Private Project') }}
+                    </label>
+                </div>
+            </div>
         <div class="col-md-12">
             <label for="users_list" class="col-form-label">{{ __('Users') }}</label>
             <select class=" multi-select" id="users_list" name="users_list[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
