@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserWorkspace\Status;
 use App\Exports\projectsExport;
 use App\Imports\projectsImport;
 use App\Models\ActivityLog;
@@ -47,6 +48,7 @@ use Spatie\GoogleCalendar\Event;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Expense;
+use App\Models\Notification;
 use Illuminate\Support\Facades\File;
 
 
@@ -308,6 +310,87 @@ class ProjectController extends Controller
         } else {
             return redirect()->back()->with('error', __('Default plan is deleted.'));
         }
+    }
+
+    public function userJoinRequest(Project $project)
+    {
+        $user = Auth::user();
+        $workspace = $project->workspaceData;
+
+        $userInWorkspace = $workspace->users()->wherePivot('status', Status::ACTIVE->value)->where('user_id', $user->id)->exists();
+
+        if ($userInWorkspace) {
+            $userInProject = $project->users()->where('user_projects.user_id', $user->id)->exists();
+            if (!$userInProject) {
+                $userProject = UserProject::create([
+                    'project_id' => $project->id,
+                    'user_id' => $user->id,
+                    'is_active' => 0,
+                    'status' => 'pending'
+                ]);    
+
+                Utility::sendNotification('project_request', null, $workspace->created_by, $userProject);
+                // return response()->json('success', __('You have been successfully sended join request'));
+                return redirect()->back()->with('success', __('You have been successfully sended join request'));
+            } else {
+                return redirect()->back()->with('error', __('You already send Join request!'));
+                // return response()->json('success', __('You already send Join request!'));
+
+            }
+        } else {
+            return redirect()->back()->with('error', __('You should be in accepted to project workspace first!'));
+            // return response()->json('success', __('You should be in accepted to project workspace first!'));
+            
+        }
+    }
+
+    public function acceptUserJoinRequest(UserProject $record)
+    {
+        $user = $record->user;
+        $project = $record->project;
+        $record->update([
+            'is_active' => 1,
+            'status' => 'active',
+            'permission' => json_encode(Utility::getAllPermission())
+        ]);
+
+        $notification = Notification::where('type', 'project_request')
+            ->where('user_id', $project->workspaceData->created_by)
+            ->whereJsonContains('data->id', $record->id)
+            ->first();
+
+        if ($notification) {
+            $notification->update(['is_read' => 1]);
+        }
+
+        Utility::sendNotification('project_accepted', null, $user->id, $project);
+
+
+        return redirect()->back()->with('success', __('You have been successfully accepted join request'));
+    }
+
+    public function declineUserJoinRequest(UserProject $record)
+    {
+        $user = $record->user;
+        $project = $record->project;
+        $record->update([
+            'is_active' => 0,
+            'status' => 'declined'
+        ]);
+
+        $notification = Notification::where('type', 'project_request')
+            ->where('user_id', $project->workspaceData->created_by)
+            ->whereJsonContains('data->id', $record->id)
+            ->first();
+
+        if ($notification) {
+            $notification->update(['is_read' => 1]);
+        }
+
+        Utility::sendNotification('project_decline', null, $user->id, $project);
+
+
+        return redirect()->back()->with('success', __('You have been successfully decline join request'));
     }
 
     public function inviteUser(User $user, Project $project, $permission)

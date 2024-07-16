@@ -94,6 +94,9 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/account/pods/{pod}/projects', [PodController::class, 'projects'])->name('pods.projects');
+    Route::get('/account/pods/projects/{project}/request', [ProjectController::class, 'userJoinRequest'])->name('pods.projects.join');
+    Route::get('/account/pods/projects/{record}/accept', [ProjectController::class, 'acceptUserJoinRequest'])->name('pods.projects.join.accept');
+    Route::get('/account/pods/projects/{record}/decline', [ProjectController::class, 'declineUserJoinRequest'])->name('pods.projects.join.decline');
     
 
     Route::get('/account/pods/{podId}/news', [NewsController::class, 'index'])->name('pods.news');
