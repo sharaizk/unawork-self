@@ -595,6 +595,20 @@ class UserController extends Controller
         }
 
         $objUser->name = $request->name;
+        if ($objUser->hasRole('employee')) {
+            try {
+                $employeeWorkspace = Workspace::where('created_by', $objUser->id)
+                    ->where('ownerable_type', '!=', 'App\Models\Pod')
+                    ->firstOrFail();
+        
+                $employeeWorkspace->name = $request->name;
+                $employeeWorkspace->save();
+            } catch (\Exception $e) {
+                // Обробка будь-яких інших виключень
+                return response()->json(['error' => 'An error occurred while updating the workspace'], 500);
+            }
+        }
+        
         $objUser->email = $request->email;
         $dir = 'users-avatar/';
 

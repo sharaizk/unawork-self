@@ -70,6 +70,7 @@ use App\Http\Controllers\PayHerePaymentController;
 use App\Http\Controllers\PodController;
 use App\Http\Controllers\PodNewsController;
 use App\Http\Controllers\PodUserController;
+use App\Http\Controllers\ProjectUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,9 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/account/pods/{pod}/projects', [PodController::class, 'projects'])->name('pods.projects');
+    Route::get('/account/pods/projects/{project}/request', [ProjectUserController::class, 'store'])->name('pods.projects.join');
+    Route::get('/account/pods/projects/{record}/accept', [ProjectUserController::class, 'accept'])->name('pods.projects.join.accept');
+    Route::get('/account/pods/projects/{record}/decline', [ProjectUserController::class, 'decline'])->name('pods.projects.join.decline');
     
 
     Route::get('/account/pods/{podId}/news', [NewsController::class, 'index'])->name('pods.news');

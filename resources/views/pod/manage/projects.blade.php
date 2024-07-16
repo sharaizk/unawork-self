@@ -32,36 +32,48 @@
                     <div class="card-header-right">
                         <div class="btn-group card-option">
                             @auth('web')
-                            @if ($project->users->contains(\Auth::user()->id))
                                 <button type="button" class="btn dropdown-toggle"
                                     data-bs-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false">
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
-                            @endif
                             <div class="dropdown-menu dropdown-menu-end">
                                 @if($project->is_active)
-                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">
-                                        <i class="ti ti-user-plus"></i> <span>{{ __('Invite Users') }}</span>
-                                    </a>
-                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" data-title="{{ __('Edit Project') }}" data-url="{{route('projects.edit',[$currentWorkspace->slug,$project->id])}}">
-                                    <i class="ti ti-edit"></i> <span>{{ __('Edit') }}</span>
-                                    </a>
-                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Share to Clients') }}" data-url="{{route('projects.share.popup',[$currentWorkspace->slug,$project->id])}}">
-                                    <i class="ti ti-share"></i> <span>{{ __('Share to Clients')}}</span>
-                                    </a>
-                                    <a href="#" class="dropdown-item" data-ajax-popup="true"
-                                        data-size="md" data-title="{{ __('Duplicate Project') }}"
-                                        data-url="{{ route('project.copy', [$currentWorkspace->slug,$project->id]) }}">
-                                        <i class="ti ti-copy"></i> <span>{{ __('Duplicate') }}</span>
-                                    </a>
-                                    <a href="#" class="dropdown-item text-danger delete-popup bs-pass-para" data-confirm="{{__('Are You Sure?')}}" data-text="{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="delete-form-{{$project->id}}" >
-                                    <i class="ti ti-trash"></i>  <span>{{ __('Delete')}}</span>
-                                    </a>
-                                    <form id="delete-form-{{$project->id}}" action="{{ route('projects.destroy',[$currentWorkspace->slug,$project->id]) }}" method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
+                                    @if ($project->users()->where('user_projects.status', 'active')->where('user_projects.user_id', \Auth::user()->id)->exists())
+
+                                        <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">
+                                            <i class="ti ti-user-plus"></i> <span>{{ __('Invite Users') }}</span>
+                                        </a>
+                                        <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" data-title="{{ __('Edit Project') }}" data-url="{{route('projects.edit',[$currentWorkspace->slug,$project->id])}}">
+                                        <i class="ti ti-edit"></i> <span>{{ __('Edit') }}</span>
+                                        </a>
+                                        <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Share to Clients') }}" data-url="{{route('projects.share.popup',[$currentWorkspace->slug,$project->id])}}">
+                                        <i class="ti ti-share"></i> <span>{{ __('Share to Clients')}}</span>
+                                        </a>
+                                        <a href="#" class="dropdown-item" data-ajax-popup="true"
+                                            data-size="md" data-title="{{ __('Duplicate Project') }}"
+                                            data-url="{{ route('project.copy', [$currentWorkspace->slug,$project->id]) }}">
+                                            <i class="ti ti-copy"></i> <span>{{ __('Duplicate') }}</span>
+                                        </a>
+                                        <a href="#" class="dropdown-item text-danger delete-popup bs-pass-para" data-confirm="{{__('Are You Sure?')}}" data-text="{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="delete-form-{{$project->id}}" >
+                                        <i class="ti ti-trash"></i>  <span>{{ __('Delete')}}</span>
+                                        </a>
+                                        <form id="delete-form-{{$project->id}}" action="{{ route('projects.destroy',[$currentWorkspace->slug,$project->id]) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    @else
+                                        @if (!$project->users->contains(\Auth::user()->id))
+                                            <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item">
+                                                <i class="ti ti-user-plus"></i> <span>{{ __('Send Join Request') }}</span>
+                                            </a>
+                                        @else
+                                            <a href="#" class="dropdown-item" title="{{__('You sended join request')}}">
+                                                <i data-feather="lock"></i> <span>{{__('You sended join request')}}</span>
+                                            </a>
+                                        @endif
+                                    @endif
+                                    
 
                                 @else
                                     <a href="#" class="dropdown-item" title="{{__('Locked')}}">

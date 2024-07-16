@@ -492,6 +492,40 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
+                                                @elseif($notification->type == 'project_request')
+                                                    @php
+                                                        $user = \App\Models\User::find($data->user_id);
+                                                        $project = \App\Models\Project::find($data->project_id);
+                                                        $acceptLink = route('pods.projects.join.accept', ['record' => $data->id]);
+                                                        $declineLink = route('pods.projects.join.decline', ['record' => $data->id]);
+                                                        $text = __('User : ') . ' 
+                                                            <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
+                                                            sended join request to your project:  
+                                                            <b><a href="'. route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]) .'">'. $project->name . ' </a></b>
+                                                            <br>
+                                                            <br>
+                                                            <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
+                                                                onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
+                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                                                                onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
+                                                        ';
+                                                    @endphp
+                                                @elseif($notification->type == 'project_accepted')
+                                                    @php
+                                                        $project = \App\Models\Project::find($data->id);
+                                                        $link = route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]);
+                                                        $text = __('Your request to join project : ') . ' <b>' . $project->name . '</b> was accepted';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'Pro';
+                                                    @endphp
+                                                @elseif($notification->type == 'project_decline')
+                                                    @php
+                                                        $project = \App\Models\Project::find($data->id);
+                                                        $link = route('home');
+                                                        $text = __('Your request to join project : ') . ' <b>' . $project->name . '</b> was declined';
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'Pro';
+                                                    @endphp
                                                 @elseif($notification->type == 'workspace_join')
                                                     @php
                                                         $user = \App\Models\User::find($data->user_id);
