@@ -39,7 +39,7 @@
                                 </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 @if($project->is_active)
-                                    @if ($project->users()->where('status', 'active')->where('id', \Auth::user()->id))
+                                    @if ($project->users()->where('user_projects.status', 'active')->where('user_projects.user_id', \Auth::user()->id)->exists())
 
                                         <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">
                                             <i class="ti ti-user-plus"></i> <span>{{ __('Invite Users') }}</span>
