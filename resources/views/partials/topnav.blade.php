@@ -736,6 +736,10 @@
                             <i class="ti ti-user"></i>
                             <span>{{ __('My Profile') }}</span>
                         </a>
+                        <a href="{{ route('pods.index') }}" class="dropdown-item">
+                            <i class="ti ti-message-circle"></i>
+                            <span>{{ __('PODS') }}</span> 
+                        </a>
                         <!--   @if (env('CHAT_MODULE') == 'on')
                             @if (\Auth::user()->type == 'user')
                                 <a href="{{ url('chats') }}" class="dropdown-item">
