@@ -98,6 +98,8 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
     <!-- create pod JS -->
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
@@ -134,6 +136,11 @@
             $(document).on('shown.bs.modal', function (e) {
                 const modal = $(e.target);
                 const form = modal.find('.update-pod-form');
+
+                $(".chosen-select").chosen({
+                    width: "100%",
+                    placeholder_text_multiple: "Select Skills"
+                });
 
                 if (form.length) {
                 form.off('submit').on('submit', async function(event) {
