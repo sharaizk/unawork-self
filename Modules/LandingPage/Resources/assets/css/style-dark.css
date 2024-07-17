@@ -18627,8 +18627,8 @@ body:not(.minimenu) .dash-sidebar .dash-submenu .dash-submenu .dash-submenu > .d
 .dash-header .dash-head-link .theme-avtar {
     border-radius: 12px;
     font-size: 16px;
-    width: 34px;
-    height: 34px;
+    width: 20px;
+    height: 20px;
     background: #dcdaeb;
     color: #51459d;
 }
