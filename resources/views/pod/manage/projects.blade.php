@@ -1,6 +1,6 @@
-@extends('pod.manage.index')
+@extends('layouts.admin')
 
-@section('content.inside')
+@section('content')
 <div class="row">
 
     @foreach ($projects as $project)

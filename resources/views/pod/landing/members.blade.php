@@ -5,7 +5,7 @@
 </style>
 <div class="section__general_info">
     <h3 class="title_box">Members</h3>
-    <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right">&raquo;</i></a>
+    <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
 
     <div class="members__info_list">
 

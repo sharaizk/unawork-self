@@ -1061,7 +1061,6 @@ class ProjectController extends Controller
             'project_id' => 'required',
             'title' => 'required',
             'priority' => 'required',
-            'assign_to' => 'required',
             'start_date' => 'required',
             'due_date' => 'required',
         ];
@@ -1084,7 +1083,11 @@ class ProjectController extends Controller
         }
         if ($project) {
             $post = $request->all();
-            $post['assign_to'] = implode(",", $request->assign_to);
+            if (isset($post['assign_to'])) {
+                $post['assign_to'] = implode(",", $request->assign_to);
+            } else {
+                $post['assign_to'] = null;
+            }
             $task = Task::find($taskID);
             $task->update($post);
 

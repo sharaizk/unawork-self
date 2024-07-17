@@ -59,7 +59,7 @@
            class="dash-sidebar light-sidebar {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
            <div class="navbar-wrapper">
                <div class="m-header main-logo">
-                   <a href="{{ route('home') }}" class="b-brand">
+                   <a href="{{ route('landing') }}" class="b-brand">
                        <!-- ========   change your logo hear   ============ -->
                        {{-- <img src="{{ asset($logo . $company_logo . '?timestamp=' . strtotime(isset($currentWorkspace) ? $currentWorkspace->updated_at : '')) }}" alt="logo" class="sidebar_logo_size " /> --}}
                        <img src="{{ asset($logo . $company_logo . '?v=' . time()) }}" alt="logo"
@@ -87,20 +87,54 @@
                            </li>
                        @endif
                        @if (\Auth::user()->type != "admin")
-                            <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
+                            <!-- <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
                                 <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
                                     class="ti ti-message-circle"></i></span><span
                                     class="dash-mtext">{{ __('PODS') }}</span> </a>
-                            </li>
+                            </li> -->
                         @endif
                        @if (isset($currentWorkspace) && $currentWorkspace)
                            @auth('web')
-                               <li class="dash-item dash-hasmenu">
+                               @if ($currentWorkspace->ownerable_type == "App\Models\Pod")
+                                    <li class="dash-item dash-hasmenu">
+                                        @php
+                                            $currentRoute = Request::route()->getName();
+                                        @endphp
+                                        <a href="{{ route('pods.users', $podId=$currentWorkspace->ownerable_id) }}"
+                                            class="dash-link {{ in_array($currentRoute, ['pods.users']) ? 'active' : '' }}">
+                                                <span class="dash-micon"> 
+                                                    <i data-feather="user"></i>
+                                                </span>
+                                            <span class="dash-mtext">{{ __('Users') }}</span>
+                                        </a>
+                                    </li>
+                                    <li class="dash-item dash-hasmenu">
+                                            @php
+                                                $currentRoute = Request::route()->getName();
+                                            @endphp
+                                        <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
+                                            class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
+                                                    <span class="dash-micon"> 
+                                                        <i data-feather="clipboard"></i>
+                                                    </span>
+                                                <span class="dash-mtext">{{ __('News') }}</span>
+                                            </a>
+                                    </li>
+                                @else
+                                <li class="dash-item dash-hasmenu">
+                                    @php
+                                        $currentRoute = Request::route()->getName();
+                                    @endphp
                                    <a href="{{ route('users.index', $currentWorkspace->slug) }}"
-                                       class="dash-link {{ Request::route()->getName() == 'users.index' ? ' active' : '' }}"><span
-                                           class="dash-micon"> <i data-feather="user"></i></span><span
-                                           class="dash-mtext">{{ __('Users') }}</span></a>
+                                       class="dash-link {{ in_array($currentRoute, ['users.index']) ? 'active' : '' }}">
+                                            <span class="dash-micon"> 
+                                                <i data-feather="user"></i>
+                                            </span>
+                                           <span class="dash-mtext">{{ __('Users') }}</span>
+                                    </a>
                                </li>
+                                @endif
+
                                @if ($currentWorkspace->creater->id == Auth::user()->id)
                                    <!-- <li class="dash-item dash-hasmenu">
                                        <a href="{{ route('clients.index', $currentWorkspace->slug) }}"

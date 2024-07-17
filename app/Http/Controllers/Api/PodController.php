@@ -55,9 +55,10 @@ class PodController extends Controller
         $pod = Pod::findOrFail($id);
         $this->authorize('update', $pod);
         $data = $request->validated();
+        $sata = $request->all();
     
         try {
-            $updatedPod = $this->podService->updatePod($pod, $data);
+            $updatedPod = $this->podService->updatePod($pod, $sata);
             return new PodResource($updatedPod);
         } catch (\Exception $e) {
             return response()->json([

@@ -138,7 +138,7 @@ require __DIR__ . '/auth.php';
 Route::get('/verify-email/{lang?}', [AuthenticatedSessionController::class, 'showVerifcation'])->name('verification.notice');
 Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke',])->name('verification.verify')->middleware('auth');
 Route::get('/email/verification-notification', [EmailVerificationNotificationController::class, 'store',])->name('verification.send');
-Route::get('/', [HomeController::class, 'landingPage'])->middleware(['XSS']);
+Route::get('/', [HomeController::class, 'landingPage'])->middleware(['XSS'])->name('landing');
 
 Route::get('password/resets/{lang?}', [AuthenticatedSessionController::class, 'showLinkRequestForm'])->name('password.request')->middleware(['XSS']);
 

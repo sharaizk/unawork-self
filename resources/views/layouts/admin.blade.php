@@ -133,6 +133,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/custom-color.css') }}">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
 </head>
 
 
@@ -381,7 +382,8 @@
         $currantLang = 'en';
     @endphp
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
     <script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
     <script src="{{ asset('assets/custom/libs/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
@@ -431,6 +433,7 @@
         });
     </script>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script type="text/javascript">
         $(document).on("click", ".view_all_notification", function() {

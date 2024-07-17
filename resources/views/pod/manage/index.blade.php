@@ -26,92 +26,9 @@
 @push('scripts')
 @section('scripts')
 @endsection
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        $(document).on('shown.bs.modal', function (e) {
-            const form = document.querySelector('.invite-user-form');
-            const inviteUserButton = document.getElementById('inviteUserButton');
-            const podId = {{ $pod->id }};
 
-            inviteUserButton.addEventListener('click', async function(event) {
-                event.preventDefault();
 
-                const formData = new FormData(form);
-
-                try {
-                    const response = await axios.post('{{ route('pods.user.exists', ['podId' => $pod->id]) }}', formData);
-                    console.log(response);
-
-                    form.reset();
-                    document.getElementById('success-message').style.display = 'block';
-                    setTimeout(function() {
-                        location.reload(); 
-                    }, 3000);
-                } catch (error) {
-                    console.log(error);
-
-                    form.reset();
-                    document.getElementById('failed-message').style.display = 'block';
-                    
-                    setTimeout(function() {
-                        location.reload(); 
-                    }, 3000);
-                }
-            });
-        });
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const removeUserLinks = document.querySelectorAll('.remove-user');
-
-    removeUserLinks.forEach(link => {
-        link.addEventListener('click', async function(event) {
-            event.preventDefault();
-            const url = this.getAttribute('data-url');
-            try {
-                const response = await axios.delete(url);
-                location.reload(); 
-            } catch (error) {
-                console.error('An error occurred:', error);
-            }
-        });
-    });
-
-    const acceptUserLinks = document.querySelectorAll('.accept-user');
-
-    acceptUserLinks.forEach(link => {
-        link.addEventListener('click', async function(event) {
-            event.preventDefault();
-            const url = this.getAttribute('data-url');
-            try {
-                const response = await axios.post(url);
-                location.reload(); 
-            } catch (error) {
-                console.error('An error occurred:', error);
-            }
-        });
-    });
-
-    const declineUserLinks = document.querySelectorAll('.decline-user');
-
-    declineUserLinks.forEach(link => {
-        link.addEventListener('click', async function(event) {
-            event.preventDefault();
-            const url = this.getAttribute('data-url');
-            try {
-                const response = await axios.post(url);
-                location.reload(); 
-            } catch (error) {
-                console.error('An error occurred:', error);
-            }
-        });
-    });
-});
-</script>
 
 
 @endpush

@@ -8,7 +8,6 @@
 
     <div class="col-lg-12">
         <div class="row">
-            <h4>Profile:</h4>
             <div class="alert alert-success" id="success-message" style="display: none;">
                 Pod created successfully!
             </div>
@@ -33,12 +32,13 @@
             <div class="col-lg-12">
                 <div class="row">
                     <h4>Skills:</h4>
-                    @foreach($skills as $skill)
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="skills[]" value="{{ $skill->id }}">
-                            {{ $skill->name }}
-                        </label>
-                    @endforeach
+                    <select class="form-control chosen-select" name="skills[]" multiple>
+                        @foreach($skills as $skill)
+                            <option value="{{ $skill->id }}">
+                                {{ $skill->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>

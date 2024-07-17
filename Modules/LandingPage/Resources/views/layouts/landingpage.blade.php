@@ -119,7 +119,13 @@
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#home">{{ $settings['home_title'] }}</a>
+                            <a class="nav-link active" href="{{ route('login') }}">{{ $settings['home_title'] }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('landing.find-work') }}">Find Work</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('landing.hiring') }}">Hiring</a>
                         </li>
                         @if ($settings['feature_status'] == 'on')
                             <li class="nav-item">

@@ -3,11 +3,11 @@
         padding: 20px;
     }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
 <form class="update-pod-form" id="edit-pod-form" data-url="./api/pod/{{ $pod->id }}">
     @csrf
     <div class="col-lg-12">
         <div class="row">
-            <h4>Profile:</h4>
             <div class="alert alert-success" id="success-message" style="display: none;">
                 Pod updated successfully!
             </div>
@@ -35,12 +35,13 @@
             <div class="col-lg-12">
                 <div class="row">
                     <h4>Skills:</h4>
-                    @foreach($skills as $skill)
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="skills[]" value="{{ $skill->id }}" {{ $pod->skills->contains($skill->id) ? 'checked' : '' }}>
-                            {{ $skill->name }}
-                        </label>
-                    @endforeach
+                    <select class="form-control chosen-select" name="skills[]" multiple>
+                        @foreach($skills as $skill)
+                            <option value="{{ $skill->id }}" {{ $pod->skills->contains($skill->id) ? 'selected' : '' }}>
+                                {{ $skill->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>
@@ -52,3 +53,13 @@
         </div>
     </div>
 </form>
+<!-- 
+
+    <script>
+        $(document).ready(function() {
+            $(".chosen-select").chosen({
+                width: "100%",
+                placeholder_text_multiple: "Select Skills"
+            });
+        });
+    </script> -->

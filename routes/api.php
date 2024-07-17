@@ -78,9 +78,10 @@ Route::get('/employees', [EmployeeController::class, 'index']);
 Route::get('/employees/{id}', [EmployeeController::class, 'show']);
 
 
-Route::resource('news', NewsController::class)->except('update', 'store');
+Route::resource('news', NewsController::class)->except('update', 'store', 'delete');
 Route::post('/news', [NewsController::class, 'store'])->name('api.news.store');
-Route::post('/news/{id}', [NewsController::class, 'update']);
+Route::post('/news/{id}', [NewsController::class, 'update'])->name('api.news.update');
+Route::delete('/news/{id}', [NewsController::class, 'update'])->name('api.news.delete');
 
 
 Route::get('/project', [ProjectController::class, 'index']);
