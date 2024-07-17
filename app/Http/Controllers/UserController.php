@@ -262,9 +262,6 @@ class UserController extends Controller
     public function index($slug = null)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
-            return redirect()->route('pods.users', ['podId' => $currentWorkspace->ownerable_id]);
-        }
         if ($currentWorkspace) {
             $users = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active', 'user_workspaces.status')->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id');
             $users->where('user_workspaces.workspace_id', '=', $currentWorkspace->id);
