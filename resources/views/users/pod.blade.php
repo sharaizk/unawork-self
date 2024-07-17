@@ -107,6 +107,11 @@
                 const modal = $(e.target);
                 const form = modal.find('.create-pod-form');
 
+                $(".chosen-select").chosen({
+                    width: "100%",
+                    placeholder_text_multiple: "Select Skills"
+                });
+                
                 if (form.length) {
                 form.off('submit').on('submit', async function(event) {
                     event.preventDefault(); 
