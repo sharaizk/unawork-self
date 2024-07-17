@@ -20,7 +20,7 @@
                                 </li>
                                 <li class="">
                                     <!-- is going to turn into the manage plate after they sign in -->
-                                    <a href="#">Home</a>
+                                    <a href="{{ route('login') }}">Home</a>
                                 </li>
                                 <li class="">
                                     <a href="{{ route('landing.find-work') }}">Find Work</a>

@@ -43,13 +43,13 @@
             <div class="col-lg-12">
                 <div class="row skillContainer">
                     <h4>Skills:</h4>
-                    @foreach($skills as $skill)
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="skill_ids[]" value="{{ $skill->id }}" {{ in_array($skill->id, $user->skills->pluck('id')->toArray()) ? 'checked' : '' }}>
-                            &nbsp;
-                            {{ $skill->name }}
-                        </label>
-                    @endforeach
+                    <select class="form-control chosen-select" multiple name="skill_ids[]" id="skillSelect">
+                        @foreach($skills as $skill)
+                            <option value="{{ $skill->id }}" {{ in_array($skill->id, \Auth::user()->skills->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                {{ $skill->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <button type="button" id="addSkillButton" class="btn btn-link">{{ __('+ Add New Skill') }}</button>
                     <div class="input-group mb-3" id="newSkillInput" style="display: none;">
@@ -99,26 +99,23 @@
                 return response.json();
             })
             .then(data => {
-                let newCheckbox = document.createElement('input');
-                newCheckbox.type = 'checkbox';
-                newCheckbox.name = 'skill_ids[]';
-                newCheckbox.value = data.id;
-                newCheckbox.className = 'form-check-input';
-                newCheckbox.checked = true;
-
-                let label = document.createElement('label');
-                label.className = 'form-check-label';
-                label.appendChild(newCheckbox);
-                label.appendChild(document.createTextNode(data.name));
-
-                let skillsContainer = document.querySelector('.skillContainer');
-                skillsContainer.appendChild(label);
+                let newOption = new Option(data.name, data.id, true, true);
+                let skillSelect = document.getElementById('skillSelect');
+                skillSelect.add(newOption);
+                $(skillSelect).trigger("chosen:updated");
 
                 document.getElementById('newSkillInput').style.display = "none";
                 document.getElementById('newSkillName').value = '';
                 document.getElementById('addSkillButton').style.display = "inline-block";
-
             })
             .catch(error => console.error('Error:', error));
+        });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+<script>
+        $(".chosen-select").chosen({
+            width: "100%",
+            placeholder_text_multiple: "Select Skills"
         });
 </script>

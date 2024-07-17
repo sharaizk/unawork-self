@@ -17,8 +17,8 @@
         </div>
         <div class="card__skills">
             <p><strong>Skills:</strong> 
-                @forelse ($employee->skills as $skill) 
-                    {{$skill->name}},
+                @forelse ($employee->skills as $index => $skill)
+                    {{ $skill->name }}{{ $index < $employee->skills->count() - 1 ? ',' : '' }}
                 @empty
                     n/a
                 @endforelse

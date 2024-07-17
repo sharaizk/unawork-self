@@ -27,9 +27,18 @@
                 <ul>
                   <li>
                     <i class="fa fa-map-marker"></i>
-                    <span title="Address">{{ $employee->profile->address }}, {{ $employee->profile->city }},
-                         {{ $employee->profile->state }}, {{ $employee->profile->country }},
-                          {{ $employee->profile->zip_code }}
+                    @php
+                        $addressParts = array_filter([
+                            $employee->profile->address,
+                            $employee->profile->city,
+                            $employee->profile->state,
+                            $employee->profile->country,
+                            $employee->profile->zip_code
+                        ]);
+                        $address = implode(', ', array_filter($addressParts));
+                    @endphp
+                    <span title="Address">
+                      {{ $address ?: 'n/a' }}
                     </span>
                   </li>
                 </ul>
