@@ -3,12 +3,15 @@
         padding: 20px;
     }
 </style>
-<form class="edit-news-form" id="edit-news-form" data-url="{{ env('APP_URL') }}api/news/{{ $post->id }}">
+<form class="edit-news-form" id="edit-news-form" data-url="{{ route('api.news.update', ['id' => $post->id]) }}">
     @csrf
     <div class="col-lg-12">
         <div class="row">
             <div class="alert alert-success" id="success-message" style="display: none;">
                 Post updated successfully!
+            </div>
+            <div class="alert alert-success" id="failed-message" style="display: none;">
+                Post update failed!
             </div>
             <div class="col-lg-12">
                 <div class="form-group">

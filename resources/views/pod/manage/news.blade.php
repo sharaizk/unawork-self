@@ -1,6 +1,6 @@
-@extends('pod.manage.index')
+@extends('layouts.admin')
 
-@section('content.inside')
+@section('content')
 <div class="row">
     @foreach ($news as $new)
         <div class="col-xl-3 col-lg-4 col-sm-6">
@@ -74,6 +74,9 @@
 
             const form = document.querySelector('.edit-news-form');
             if (form) {console.log (1);}
+            const succesDiv = document.getElementById('success-message');
+            if (succesDiv) {console.log (23);}
+
 
             form.addEventListener('submit', async function(event) {
                 event.preventDefault();
@@ -86,9 +89,9 @@
                 try {
                     const response = await axios.post(dataUrl, formData);
                     console.log(response);
+                    succesDiv.style.display = 'block';
 
                     form.reset();
-                    document.getElementById('success-message').style.display = 'block';
                     setTimeout(function() {
                         location.reload(); 
                     }, 3000);
@@ -98,9 +101,7 @@
                     form.reset();
                     document.getElementById('failed-message').style.display = 'block';
                     
-                    setTimeout(function() {
-                        location.reload(); 
-                    }, 3000);
+                    
                 }
             });
         });
@@ -115,7 +116,7 @@
             button.addEventListener('click', function(event) {
                 event.preventDefault();
                 const postId = button.getAttribute('data-post-id');
-                const url = `{{ env('APP_URL') }}api/news/${postId}`;
+                const url = `{{ route('api.news.update', ['id' => ':postId']) }}`.replace(':postId', postId);
 
                 if (confirm('Are you sure you want to delete this post?')) {
                     fetch(url, {

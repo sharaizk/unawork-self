@@ -433,6 +433,7 @@
         });
     </script>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script type="text/javascript">
         $(document).on("click", ".view_all_notification", function() {

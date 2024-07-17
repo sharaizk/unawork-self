@@ -95,12 +95,46 @@
                         @endif
                        @if (isset($currentWorkspace) && $currentWorkspace)
                            @auth('web')
-                               <li class="dash-item dash-hasmenu">
+                               @if ($currentWorkspace->ownerable_type == "App\Models\Pod")
+                                    <li class="dash-item dash-hasmenu">
+                                        @php
+                                            $currentRoute = Request::route()->getName();
+                                        @endphp
+                                        <a href="{{ route('pods.users', $podId=$currentWorkspace->ownerable_id) }}"
+                                            class="dash-link {{ in_array($currentRoute, ['pods.users']) ? 'active' : '' }}">
+                                                <span class="dash-micon"> 
+                                                    <i data-feather="user"></i>
+                                                </span>
+                                            <span class="dash-mtext">{{ __('Users') }}</span>
+                                        </a>
+                                    </li>
+                                    <li class="dash-item dash-hasmenu">
+                                            @php
+                                                $currentRoute = Request::route()->getName();
+                                            @endphp
+                                        <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
+                                            class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
+                                                    <span class="dash-micon"> 
+                                                        <i data-feather="clipboard"></i>
+                                                    </span>
+                                                <span class="dash-mtext">{{ __('News') }}</span>
+                                            </a>
+                                    </li>
+                                @else
+                                <li class="dash-item dash-hasmenu">
+                                    @php
+                                        $currentRoute = Request::route()->getName();
+                                    @endphp
                                    <a href="{{ route('users.index', $currentWorkspace->slug) }}"
-                                       class="dash-link {{ Request::route()->getName() == 'users.index' ? ' active' : '' }}"><span
-                                           class="dash-micon"> <i data-feather="user"></i></span><span
-                                           class="dash-mtext">{{ __('Users') }}</span></a>
+                                       class="dash-link {{ in_array($currentRoute, ['users.index']) ? 'active' : '' }}">
+                                            <span class="dash-micon"> 
+                                                <i data-feather="user"></i>
+                                            </span>
+                                           <span class="dash-mtext">{{ __('Users') }}</span>
+                                    </a>
                                </li>
+                                @endif
+
                                @if ($currentWorkspace->creater->id == Auth::user()->id)
                                    <!-- <li class="dash-item dash-hasmenu">
                                        <a href="{{ route('clients.index', $currentWorkspace->slug) }}"
