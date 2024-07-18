@@ -173,7 +173,7 @@
             document.querySelectorAll(".sendMessageButton").forEach(button => {
                 button.addEventListener("click", function() {
                     let employeeId = this.dataset.employeeId;
-                    document.getElementById("sendMessagePopup").style.display = "block";
+                    $("#sendMessagePopup").modal('show');
                     document.getElementById("sendMessage").dataset.employeeId = employeeId;
                 });
             });
@@ -199,7 +199,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
-                    document.getElementById("sendMessagePopup").style.display = "none";
+                    $("#sendMessagePopup").modal('hide');
                 })
                 .catch((error) => {
                     console.error('Error:', error);
