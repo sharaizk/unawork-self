@@ -87,7 +87,7 @@
             </div>
                 <div class="aside__card">
                     <div class="aside__card__title">
-                    <span>Set a Meeting</span>
+                    <span>Send a message</span>
                     </div>
                     <div class="aside__card__body">
                     <span>Integer scelerisque leo a maximus volutpat. Cras commodo est sed lectus elementum
