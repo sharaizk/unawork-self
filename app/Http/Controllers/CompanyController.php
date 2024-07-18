@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Models\Workspace;
 use Illuminate\Http\Request;
 use App\Services\CompanyService;
 
@@ -14,6 +15,12 @@ class CompanyController extends Controller
     {
         $this->companyService = $companyService;
     }
+
+    public function show(Workspace $company)
+    {
+        return view('company.landing.index', compact('company'));
+    }
+
 
     public function list(Request $request)
     {

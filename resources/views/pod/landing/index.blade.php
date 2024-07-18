@@ -27,9 +27,13 @@
     <div class="container-master">
         <div class="row-master">
             <h1 class="section__titlepage--headertitle col-9"><span>{{ $pod->title }}</span></h1>
-            <form class="join-form col-3" data-pod-id="{{ $pod->id }}">
-                <button type="submit" class="pod-join btn btn-primary">Join this pod</button>
-            </form>
+            @if (Auth::user())
+                @if (!in_array($pod->id, Auth::user()->pods()->pluck('pods.id')->toArray())  )
+                    <form class="join-form col-3" data-pod-id="{{ $pod->id }}">
+                        <button type="submit" class="pod-join btn btn-primary">Join this pod</button>
+                    </form>
+                @endif
+            @endif
         </div>
     </div>
 
