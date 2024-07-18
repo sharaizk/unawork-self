@@ -100,9 +100,11 @@
                         </div>
                     </li>
                 @endif
-                <li class="dropdown dash-h-item drp-company">
+                <li class="dropdown dash-h-item">
                     <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
+                        <i class="ti ti-folder"></i>
+                        
                         <span class="hide-mob ms-2">{{ __('') }}{{ $currentWorkspace->name }} !</span>
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
@@ -127,7 +129,8 @@
                                         @endif
                                     </a>
                                 @else
-                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" class="dropdown-item" title="{{ __('Locked') }}">
+                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" 
+                                        class="dropdown-item" title="{{ __('Locked') }}">
                                         <i class="ti ti-lock"></i>
                                         @if (Auth::user()->currant_workspace == $workspace->id)
                                             <i class="ti ti-checks text-success"></i>
@@ -662,7 +665,7 @@
                     </li>
                 @endif
 
-                <li class="dropdown dash-h-item drp-language">
+                <li class="dropdown dash-h-item">
                     <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown"
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti ti-world nocolor"></i>
