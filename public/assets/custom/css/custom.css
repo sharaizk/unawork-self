@@ -1303,7 +1303,7 @@ span.currency-icon {
     width: auto ;
     height: auto;
     max-width: -webkit-fill-available !important;
-    max-height: -webkit-fill-available !important;
+    max-height: 70px;
     max-width: -moz-available;
     max-height: -moz-available;
     margin: 0 auto;
