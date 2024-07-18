@@ -87,7 +87,7 @@
             </div>
                 <div class="aside__card">
                     <div class="aside__card__title">
-                    <span>Set a Meeting</span>
+                    <span>Send a message</span>
                     </div>
                     <div class="aside__card__body">
                     <span>Integer scelerisque leo a maximus volutpat. Cras commodo est sed lectus elementum
@@ -137,6 +137,7 @@
         <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
       </div>
       <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
       </div>
     </div>

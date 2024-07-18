@@ -17,9 +17,15 @@
                         
             <div class="right">
                 <h3 class="member_name"><a href="#">{{ $user->name }}</a></h3>
-                <button class="sendMessageButton" data-employee-id="{{ $user->id }}">
-                    <span> Message </span> 
-                </button>
+                @if (Auth::user())
+                    @if (Auth::user()->id != $user->id)
+                        <button class="btn btn-secondary sendMessageButton" data-employee-id="{{ $user->id }}">
+                            <span> Message </span> 
+                        </button>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}"><span>Message</span></a>
+                @endif
                 
                 <p class="content">
                     <strong>Country:</strong> {{$user->profile->country ?? 'n/a'}}
@@ -47,11 +53,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Send Message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
       </div>
     </div>
@@ -63,7 +71,7 @@
         document.querySelectorAll(".sendMessageButton").forEach(button => {
             button.addEventListener("click", function() {
                 let employeeId = this.dataset.employeeId;
-                document.getElementById("sendMessagePopup").style.display = "block";
+                $("#sendMessagePopup").modal('show');
                 document.getElementById("sendMessage").dataset.employeeId = employeeId;
             });
         });
@@ -89,7 +97,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                document.getElementById("sendMessagePopup").style.display = "none";
+                    $("#sendMessagePopup").modal('hide');
             })
             .catch((error) => {
                 console.error('Error:', error);
