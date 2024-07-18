@@ -272,7 +272,8 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
-                    document.getElementById("sendMessagePopup").style.display = "none";
+                    sendMessageModal.hide();
+
                 })
                 .catch((error) => {
                     console.error('Error:', error);
