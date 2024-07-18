@@ -2,7 +2,7 @@
     <div class="card__header">
         <div class="card__image" class=">
             <a href="/commerce-shop.php">
-                <img src="{{ asset('assets/images/landing/card-avatar-1.png') }}" alt="">
+                <img @if ($employee->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $employee->avatar, 'small') }}" @else avatar="{{ $employee->name }}" @endif alt="">
             </a>
         </div>
         <div class="card__title">
@@ -30,9 +30,17 @@
 
                 <a href="#"><span>View HubShop</span></a>
                 <a href="#"><span>Interview</span></a>
-                <button class="sendMessageButton" data-employee-id="{{ $employee->id }}">
-                    <span> Message </span> 
-                </button>
+                
+                @if (Auth::user())
+                    @if (Auth::user()->id != $employee->id)
+                        <button class="sendMessageButton" data-employee-id="{{ $employee->id }}">
+                            <span> Message </span> 
+                        </button>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}"><span>Message</span></a>
+                @endif
+
                 <a href="#"><span>Video</span></a>
         </div>
     </div>

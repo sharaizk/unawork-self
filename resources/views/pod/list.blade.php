@@ -84,7 +84,10 @@
                 <div class="container-master">
                     <div class="row-master">
                         @foreach($pods as $pod)
-                            @include('pod.landing.pod_card', ['pod' => $pod])
+                            @php
+                                $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
+                            @endphp
+                            @include('pod.landing.pod_card', ['pod' => $pod, 'joinable' => $joinable])
                         @endforeach
                     </div>
                 </div>

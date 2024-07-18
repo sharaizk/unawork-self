@@ -2005,8 +2005,15 @@
     display: inline-flex;
 }
 .tpl-find-work .section_pod .pods__title .buttonViewAll {
-    font-size: 2rem;
-    color: #2200ffee;
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+.tpl-find-work .section_pod .pods__title  i {
+    color: #cfaa40;
+    margin-left: 8px;
 }
 
 .tpl-find-work .section_pod .container-master {
@@ -2043,8 +2050,15 @@
 }
 
 .tpl-find-work .section_company .pods__title .buttonViewAll {
-    font-size: 2rem;
-    color: #2200ffee;
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+.tpl-find-work .section_company .pods__title  i {
+    color: #cfaa40;
+    margin-left: 8px;
 }
 
 .section_company .company-box {
@@ -2061,7 +2075,7 @@
 
 .section_company .company-box .title-box img {
     width: 60px;
-    width: 60px;
+    height: 60px;
     border-radius: 50px;
     margin-right: 15px;
     -webkit-border-radius: 50px;

@@ -124,6 +124,8 @@ Route::get('/pods/{pod}/news', [PodNewsController::class, 'list'])->name('landin
 
 Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name('landing.pods.news.show');
 
+Route::get('/company/{company}', [CompanyController::class, 'show'])->name('landing.company.show');
+
 
 Route::get('/', function () {
     return view('welcome');

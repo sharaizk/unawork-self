@@ -22,6 +22,13 @@ class FindWorkController extends Controller
         $skills = Skill::all();
         $projects = Project::private(false)->limit(3)->get();
 
-        return view('find_work.index', compact('companies', 'pods', 'countries', 'skills', 'projects'));
+        $user = auth()->user();
+        $joinedPods = [];
+    
+        if ($user) {
+            $joinedPods = $user->pods()->pluck('pod_id')->toArray();
+        }
+
+        return view('find_work.index', compact('companies', 'pods', 'countries', 'skills', 'projects', 'joinedPods', 'user'));
     }
 }
