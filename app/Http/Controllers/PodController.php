@@ -45,7 +45,15 @@ class PodController extends Controller
 
         $skills = Skill::all();
 
-        return view('pod.list', compact('pods', 'skills'));
+        $user = auth()->user();
+        $joinedPods = [];
+    
+        if ($user) {
+            $joinedPods = $user->pods()->pluck('pod_id')->toArray();
+        }
+    
+
+        return view('pod.list', compact('pods', 'skills', 'joinedPods', 'user'));
     }
 
     public function show(int $podId)

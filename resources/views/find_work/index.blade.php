@@ -108,7 +108,7 @@
         <section class="section__layout section_company">
             <div class="container-master pods__title">
                 <h2>Companies Hiring</h2>
-                <a href="{{ route('companies.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ route('companies.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
                 <div class="row-master">
@@ -122,7 +122,7 @@
         <section class="section__layout section__project">
             <div class="container-master teams__title">
                 <h2>Projects Availables</h2>
-                <a href="{{ route('project.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ route('project.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
                 <div class="row-master">
@@ -136,12 +136,15 @@
         <section class="section__layout section_pod">
             <div class="container-master pods__title">
                 <h2>Pods of Interest </h2>
-                <a href="{{ route('pods.list') }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ route('pods.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
                 <div class="row-master">
                     @foreach($pods as $pod)
-                        @include('pod.landing.pod_card', ['pod' => $pod])
+                            @php
+                                $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
+                            @endphp
+                        @include('pod.landing.pod_card', ['pod' => $pod, 'joinable' => $joinable])
                     @endforeach
                 </div>
             </div>

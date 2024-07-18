@@ -2,7 +2,7 @@
     <div class="card__header">
         <div class="card__image" class=">
             <a href="/commerce-shop.php">
-                <img src="{{ asset('assets/images/landing/card-avatar-1.png') }}" alt="">
+                <img @if ($employee->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $employee->avatar, 'small') }}" @else avatar="{{ $employee->name }}" @endif alt="">
             </a>
         </div>
         <div class="card__title">

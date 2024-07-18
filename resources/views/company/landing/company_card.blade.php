@@ -18,7 +18,11 @@
                 <a href="#" class="w-100 learn-more">Learn more</a>
             </div>
             <div class="col lg-6">
-                <a href="{{ route('company.join', ['workspace' => $company->id]) }}" class="w-100 learn-more">Join</a>
+                @if (Auth::user())
+                    @if (!in_array($company->id, Auth::user()->workspace()->pluck('workspaces.id')->toArray())  )
+                        <a href="{{ route('company.join', ['workspace' => $company->id]) }}" class="w-100 learn-more">Join</a>
+                    @endif
+                @endif
             </div>
         </div>
     </div>
