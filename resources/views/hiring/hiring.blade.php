@@ -146,7 +146,8 @@
         <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" id="sendMessage">Send</button>
       </div>
     </div>
   </div>
