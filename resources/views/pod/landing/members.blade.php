@@ -5,7 +5,7 @@
 </style>
 <div class="section__general_info">
     <h3 class="title_box">Members</h3>
-    <a href="#" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+    <a href="#" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
 
     <div class="members__info_list">
 
@@ -13,7 +13,7 @@
                     
         <div class="members__info_list--item" {!! $index > 2 ? 'style="display: none;"' : '' !!}>
             <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
-                            @if ($user->image) src="{{ asset ('storage/'. $user->avatar) }}" @else avatar="{{ $user->name }}" @endif>
+                @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
                         
             <div class="right">
                 <h3 class="member_name"><a href="#">{{ $user->name }}</a></h3>
@@ -87,19 +87,29 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            fetch('{{ ENV("APP_URL") }}chatify/api/sendMessage', {
+            fetch('/chatify/api/sendMessage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw new Error(error.message || 'Something went wrong');
+                        showNotification('Message sending failed:'.error.message, 'danger');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Success:', data);
+                showNotification('Message successfully sended', 'success');
                     $("#sendMessagePopup").modal('hide');
             })
             .catch((error) => {
+                showNotification('Message sending failed:'.error, 'danger');
                 console.error('Error:', error);
             });
         });

@@ -66,6 +66,7 @@ use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PayHerePaymentController;
 use App\Http\Controllers\PodController;
 use App\Http\Controllers\PodNewsController;
@@ -126,6 +127,8 @@ Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name(
 
 Route::get('/company/{company}', [CompanyController::class, 'show'])->name('landing.company.show');
 
+Route::get('/account/notifications', [NotificationController::class, 'list',])->name('view_all.notifications');
+Route::post('/account/notifications/{notification}', [NotificationController::class, 'read',])->name('mark_as_read.notifications');
 
 Route::get('/', function () {
     return view('welcome');

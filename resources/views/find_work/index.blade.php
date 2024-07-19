@@ -95,7 +95,6 @@
             </div>
         </div>
     </section>
-    <div id="message-container"></div>
 
 
     <section class="section__titlepage">
@@ -165,7 +164,7 @@
 
                 const podId = this.getAttribute('data-pod-id');
 
-                fetch(`{{ ENV('APP_URL') }}api/pods/${podId}/requests`, {
+                fetch(`/api/pods/${podId}/requests`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -175,17 +174,15 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    const messageContainer = document.getElementById('message-container');
                     if (data.status === 'success') {
-                        messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        showNotification('Request sended successfully', 'success');
                         form.style.display = 'none';
                     } else {
-                        messageContainer.innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
+                        showNotification('Request sending error:', 'danger');
                     }
                 })
                 .catch(error => {
-                    const messageContainer = document.getElementById('message-container');
-                    messageContainer.innerHTML = `<div class="alert alert-danger">An error occurred: ${error.message}</div>`;
+                        showNotification('Request sending error', 'danger');
                 });
             });
         });

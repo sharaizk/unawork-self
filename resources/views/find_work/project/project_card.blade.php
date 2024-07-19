@@ -28,7 +28,7 @@
                         @if($displayedUsers < 3)
                             <li>
                                 <a href="#section__water" class="project-person__link" data-toggle="tooltip" data-placement="top" title="{{$user->name}}">
-                                    <img alt="{{$user->name}}" @if($user->avatar) src="{{asset($logo.$user->avatar)}}" @else avatar="{{ $user->name }}" @endif>
+                                    <img alt="{{$user->name}}" @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
                                 </a>
                             </li>
                             @php $displayedUsers++; @endphp

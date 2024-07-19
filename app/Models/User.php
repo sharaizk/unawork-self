@@ -73,7 +73,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public function workspace()
     {
-        return $this->belongsToMany('App\Models\Workspace', 'user_workspaces', 'user_id', 'workspace_id')->withPivot('permission');
+        return $this->belongsToMany('App\Models\Workspace', 'user_workspaces', 'user_id', 'workspace_id')->withPivot('permission', 'status');
     }
 
     public function currentWorkspace()

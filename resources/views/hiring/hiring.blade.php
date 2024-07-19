@@ -46,11 +46,6 @@
         font-size: 1.8rem;
     }
 
-    .btn-primary {
-        padding: 10px 20px;
-        font-size: 1.8rem;
-    }
-
     .dropdown-menu-xl {
         min-width: 200px; 
         width: 300px; 
@@ -113,7 +108,7 @@
                         </ul>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Filter</button>
+                <button type="submit" class="btn btn-xl btn-primary">Filter</button>
             </form>
         </div>
     </div>
@@ -147,7 +142,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success" id="sendMessage">Send</button>
+        <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
       </div>
     </div>
   </div>
@@ -191,7 +186,7 @@
                     _token: '{{ csrf_token() }}'
                 };
 
-                fetch('{{ ENV("APP_URL") }}chatify/api/sendMessage', {
+                fetch('/chatify/api/sendMessage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -201,9 +196,11 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
+                    showNotification('Message successfully sended', 'success');
                     $("#sendMessagePopup").modal('hide');
                 })
                 .catch((error) => {
+                    showNotification('Message sending failed:'.error, 'danger');
                     console.error('Error:', error);
                 });
             });

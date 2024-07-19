@@ -2,6 +2,9 @@
     $unseenCounter = App\Models\ChMessage::where('to_id', Auth::user()->id)
         ->where('seen', 0)
         ->count();
+    $notificationCounter = App\Models\Notification::where('user_id', Auth::user()->id)
+        ->where('is_read', 0)
+        ->count();
     $logo = \App\Models\Utility::get_file('users-avatar/');
 @endphp
 @php
@@ -364,16 +367,17 @@
 
                                     <i class="ti ti-bell"></i>
                                     <span
-                                        class="@if (count($notifications) > 0) bg-danger dash-h-badge dots @endif"><span
-                                            class="sr-only"></span></span>
+                                    class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $notificationCounter }}<span
+                                        class="sr-only"></span>
                                 </a>
                                 <div class="dropdown-menu dash-h-dropdown dropdown-menu-end notification_menu_all">
-                                    <div class="noti-header">
-                                        <h5 class="m-0">Notification</h5>
-                                        <a href="#"
-                                            data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}"
-                                            class="dash-head-link clear_all_notifications">Clear All</a>
+                                <div class="noti-header d-flex align-items-center justify-content-between">
+                                    <h5 class="m-0">Notification</h5>
+                                    <div class="d-flex">
+                                        <a href="{{ route('view_all.notifications') }}" class="dash-head-link me-2">View All</a>
+                                        <a href="#" data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}" class="dash-head-link clear_all_notifications">Clear All</a>
                                     </div>
+                                </div>
                                     {{-- <div class="parent-div overflow-auto"> --}}
                                     <div class="noti-body">
                                         <div class="limited">
@@ -444,8 +448,9 @@
                                                     @endphp
                                                 @elseif($notification->type == 'pod_request')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->id]);
-                                                        $text = __('New request for joining pod: ') . ' <b>' . $data->title . '</b>';
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
+                                                        $pod = \App\Models\Pod::find($data->pod_id);
+                                                        $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp

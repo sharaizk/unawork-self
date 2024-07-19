@@ -263,7 +263,7 @@
                     _token: '{{ csrf_token() }}'
                 };
 
-                fetch('{{ ENV("APP_URL") }}chatify/api/sendMessage', {
+                fetch('/chatify/api/sendMessage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -272,11 +272,13 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    showNotification('Message successfully sended', 'success');
                     console.log('Success:', data);
                     sendMessageModal.hide();
 
                 })
                 .catch((error) => {
+                    showNotification('Message sending failed:'.error, 'danger');
                     console.error('Error:', error);
                 });
             });
