@@ -2,6 +2,9 @@
     $unseenCounter = App\Models\ChMessage::where('to_id', Auth::user()->id)
         ->where('seen', 0)
         ->count();
+    $notificationCounter = App\Models\Notification::where('user_id', Auth::user()->id)
+        ->where('is_read', 0)
+        ->count();
     $logo = \App\Models\Utility::get_file('users-avatar/');
 @endphp
 @php
@@ -364,12 +367,15 @@
 
                                     <i class="ti ti-bell"></i>
                                     <span
-                                        class="@if (count($notifications) > 0) bg-danger dash-h-badge dots @endif"><span
-                                            class="sr-only"></span></span>
+                                    class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $notificationCounter }}<span
+                                        class="sr-only"></span>
                                 </a>
                                 <div class="dropdown-menu dash-h-dropdown dropdown-menu-end notification_menu_all">
                                     <div class="noti-header">
                                         <h5 class="m-0">Notification</h5>
+                                        <a href="#"
+                                            data-url="{{ route('view_all.notifications', $currentWorkspace->slug) }}"
+                                            class="dash-head-link clear_all_notifications">View All</a>
                                         <a href="#"
                                             data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}"
                                             class="dash-head-link clear_all_notifications">Clear All</a>

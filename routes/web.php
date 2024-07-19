@@ -126,6 +126,7 @@ Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name(
 
 Route::get('/company/{company}', [CompanyController::class, 'show'])->name('landing.company.show');
 
+Route::get('/account/notifications', [NotificationController::class, 'list',])->name('view_all.notifications');
 
 Route::get('/', function () {
     return view('welcome');

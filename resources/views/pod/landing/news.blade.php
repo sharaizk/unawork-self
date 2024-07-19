@@ -1,6 +1,6 @@
 <div class="boxarchives__content">
     <h3 class="title_box">Industry based info</h3>
-    <a href="{{ route('landing.pods.news.list', $pod = $pod ) }}" class="buttonViewAll">ViewAll <i class="fa fa-chevron-right"></i></a>
+    <a href="{{ route('landing.pods.news.list', $pod = $pod ) }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
     <div class="boxarchives__content__list">
         @forelse($news as $index => $post)
             <div class="boxarchives__content__list__item {{ $index < 3 ? 'visible' : 'hidden' }}">
