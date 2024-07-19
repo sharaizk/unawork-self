@@ -19,6 +19,6 @@ class NotificationController extends Controller
     public function read(Notification $notification)
     {
         $notification->update(["is_read" => 1]);
-        return response()->json("succsess");
+        return response()->json("success");
     }
 }
