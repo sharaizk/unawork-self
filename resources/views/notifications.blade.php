@@ -45,6 +45,15 @@
 <div class="limited">
     @foreach ($notifications as $notification)
         @php
+            $project = $notification->project;
+            $task = $notification->task;
+            $notifyingUser = $notification->user;
+
+            // Define variables for the notification data
+            $projectTitle = $project ? $project->title : '';
+            $taskTitle = $task ? $task->title : '';
+            $notifyingUserName = $notifyingUser->name;
+
             // Define other variables you need for HTML
             $link = ''; // Replace with the actual link
             $name = ''; // Replace with the notification icon or name
@@ -68,7 +77,8 @@
         @if ($notification->type == 'task_assign')
             @php
                 if ($project) {
-                    $link = route('projects.task.board', [$notification->workspace_id, $notification->project_id]);
+                    $workspace = \App\Models\Workspace::find($notification->workspace_id);
+                    $link = route('projects.task.board', [$workspace->slug, $notification->project_id]);
                     $text = __('New task assign') . ' <b>' . $data->title . '</b> ' . __('in project') . ' <b>' . $project->name . '</b>';
                     $icon = 'fa fa-clock-o';
                     if ($data->priority == 'Low') {
