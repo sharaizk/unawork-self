@@ -164,7 +164,7 @@
 
                 const podId = this.getAttribute('data-pod-id');
 
-                fetch('/api/pods/${podId}/requests', {
+                fetch(`/api/pods/${podId}/requests`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

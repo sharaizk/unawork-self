@@ -2,7 +2,7 @@
     <div class="company-box">
         <div class="title-box">
             <!-- <img src="http://unawork.net/images/thumbnails/card-avatar.png" alt=""> -->
-            <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
+            <img alt="user-image" class="img-fluid img_users_fix_size"
             @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
                         
             <h4>{{$company->name}}</h4>
