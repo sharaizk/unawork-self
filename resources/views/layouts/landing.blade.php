@@ -22,6 +22,15 @@
     <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}">
 
+    <style>
+        #notification-container {
+            position: fixed;
+            top: 5%;
+            right: 2%;
+            z-index: 1050;
+            max-width: 300px;
+        }
+    </style>
 </head>
 
 <body class="@yield('body-class')">
@@ -36,6 +45,9 @@
 </main>
 
 
+<div class="container mt-3">
+    <div id="notification-container" class="alert" style="display: none;"></div>
+</div>
 <div class="modal fade" id="commonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -96,7 +108,25 @@
         });
     </script>
 
+    <script>
+        // Функція для відображення сповіщення
+        function showNotification(message, type = 'info') {
+            const notificationContainer = document.getElementById('notification-container');
+            notificationContainer.className = `alert alert-${type} alert-dismissible fade show`;
+            notificationContainer.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            notificationContainer.style.display = 'block';
 
+            setTimeout(() => {
+                notificationContainer.style.display = 'none';
+            }, 3000);
+        }
+
+        // Виклик функції для тесту
+        // showNotification('This is a test message', 'danger');
+    </script>
 
 @yield('scripts')
 

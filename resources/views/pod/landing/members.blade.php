@@ -87,19 +87,29 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            fetch('{{ ENV("APP_URL") }}chatify/api/sendMessage', {
+            fetch('/chatify/api/sendMessage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw new Error(error.message || 'Something went wrong');
+                        showNotification('Message sending failed:'.error.message, 'danger');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Success:', data);
+                showNotification('Message successfully sended', 'success');
                     $("#sendMessagePopup").modal('hide');
             })
             .catch((error) => {
+                showNotification('Message sending failed:'.error, 'danger');
                 console.error('Error:', error);
             });
         });

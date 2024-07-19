@@ -77,8 +77,10 @@ class PodUserService
             'permission' => Permission::MEMBER->value,
             'status' => Status::POD_PENDING->value
         ]);
+        
+        $pod = Pod::find($podId);
 
-        $this->sendRequestNotify($podUser);
+        $this->sendRequestNotify($podUser, $pod->created_by);
     }
 
     public function getAllJoinRequests(int $podId)
@@ -197,9 +199,8 @@ class PodUserService
         Utility::sendNotification('pod_invite', null, $userId, $pod);
     }
 
-    private function sendRequestNotify(Pod $pod): void
+    private function sendRequestNotify(PodUser $podUser, int $podCreator): void
     {
-        $userId = $pod->created_by;
-        Utility::sendNotification('pod_request', null, $userId, $pod);
+        Utility::sendNotification('pod_request', null, $podCreator, $podUser);
     }
 }
