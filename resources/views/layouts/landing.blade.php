@@ -109,7 +109,6 @@
     </script>
 
     <script>
-        // Функція для відображення сповіщення
         function showNotification(message, type = 'info') {
             const notificationContainer = document.getElementById('notification-container');
             notificationContainer.className = `alert alert-${type} alert-dismissible fade show`;
@@ -123,9 +122,6 @@
                 notificationContainer.style.display = 'none';
             }, 3000);
         }
-
-        // Виклик функції для тесту
-        // showNotification('This is a test message', 'danger');
     </script>
 
 @yield('scripts')

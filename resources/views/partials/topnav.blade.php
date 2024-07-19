@@ -373,9 +373,8 @@
                                 <div class="dropdown-menu dash-h-dropdown dropdown-menu-end notification_menu_all">
                                     <div class="noti-header">
                                         <h5 class="m-0">Notification</h5>
-                                        <a href="#"
-                                            data-url="{{ route('view_all.notifications', $currentWorkspace->slug) }}"
-                                            class="dash-head-link clear_all_notifications">View All</a>
+                                        <a href="{{ route('view_all.notifications') }}"
+                                            class="dash-head-link">View All</a>
                                         <a href="#"
                                             data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}"
                                             class="dash-head-link clear_all_notifications">Clear All</a>

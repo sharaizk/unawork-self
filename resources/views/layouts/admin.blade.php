@@ -195,6 +195,15 @@
         float: left !important;
     }
 </style>
+<style>
+        #notification-container {
+            position: fixed;
+            top: 5%;
+            right: 2%;
+            z-index: 1050;
+            max-width: 300px;
+        }
+    </style>
 @php
     if (Auth::user()->type == 'admin') {
         $color = !empty($setting['color']) ? $setting['color'] : 'theme-3';
@@ -217,6 +226,9 @@
 @endphp
 
 <body class="{{ $color }} ">
+<div class="container mt-3">
+    <div id="notification-container" class="alert" style="display: none;"></div>
+</div>
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
         <div class="loader-track">
@@ -457,6 +469,21 @@
         });
     </script>
 
+    <script>
+        function showNotification(message, type = 'info') {
+            const notificationContainer = document.getElementById('notification-container');
+            notificationContainer.className = `alert alert-${type} alert-dismissible fade show`;
+            notificationContainer.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            notificationContainer.style.display = 'block';
+
+            setTimeout(() => {
+                notificationContainer.style.display = 'none';
+            }, 3000);
+        }
+    </script>
 
     <script>
         $(document).on("click", ".clear_all_notifications", function() {

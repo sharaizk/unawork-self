@@ -1543,14 +1543,14 @@ class UserController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
         $user = Auth::user();
-        $get_notification = Notification::where('user_id', $user->id)->delete();
+        $get_notification = Notification::where('user_id', $user->id)->update(['is_read' => 1]);
 
         // $get_notification->delete();
 
         return response()->json(
             [
                 'is_success' => true,
-                'success' => __('Notifications successfully deleted!'),
+                'success' => __('Notifications successfully marked as read!'),
             ],
             200
         );
