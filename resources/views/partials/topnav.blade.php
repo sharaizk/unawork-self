@@ -444,8 +444,9 @@
                                                     @endphp
                                                 @elseif($notification->type == 'pod_request')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->id]);
-                                                        $text = __('New request for joining pod: ') . ' <b>' . $data->title . '</b>';
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
+                                                        $pod = \App\Models\Pod::find($data->pod_id);
+                                                        $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
