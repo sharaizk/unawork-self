@@ -371,14 +371,13 @@
                                         class="sr-only"></span>
                                 </a>
                                 <div class="dropdown-menu dash-h-dropdown dropdown-menu-end notification_menu_all">
-                                    <div class="noti-header">
-                                        <h5 class="m-0">Notification</h5>
-                                        <a href="{{ route('view_all.notifications') }}"
-                                            class="dash-head-link">View All</a>
-                                        <a href="#"
-                                            data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}"
-                                            class="dash-head-link clear_all_notifications">Clear All</a>
+                                <div class="noti-header d-flex align-items-center justify-content-between">
+                                    <h5 class="m-0">Notification</h5>
+                                    <div class="d-flex">
+                                        <a href="{{ route('view_all.notifications') }}" class="dash-head-link me-2">View All</a>
+                                        <a href="#" data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}" class="dash-head-link clear_all_notifications">Clear All</a>
                                     </div>
+                                </div>
                                     {{-- <div class="parent-div overflow-auto"> --}}
                                     <div class="noti-body">
                                         <div class="limited">
