@@ -564,8 +564,8 @@
                                                                 class="badge bg-warning p-2 px-3 rounded">{{ __('Incomplete') }}</label>
                                                         @endif
                                                     </td>
-                                                    <td>{{ $milestone->start_date }}</td>
-                                                    <td>{{ $milestone->end_date }}</td>
+                                                    <td>{{ isset($milestone->start_date) ? App\Models\Utility::dateFormat($milestone->start_date) : '' }}</td>
+                                                    <td>{{ isset($milestone->end_date) ? App\Models\Utility::dateFormat($milestone->end_date) : '' }}</td>
                                                     <td>{{ !empty($currentWorkspace->currency) ? $currentWorkspace->currency : '$' }}{{ $milestone->cost }}
                                                     </td>
                                                     <td>
