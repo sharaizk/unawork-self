@@ -748,6 +748,14 @@ class ProjectController extends Controller
         $userProject = Project::find($projectID);
         UserProject::where('project_id', '=', $userProject->id)->where('user_id', '=', $objUser->id)->delete();
 
+        $tasks = $userProject->user_tasks($userId);
+        foreach ($tasks as $task) {
+            $taskUsers = explode(',', $task->assign_to);
+            $taskUsers = array_diff($taskUsers, [$userId]);
+            $task->assign_to = implode(',', $taskUsers);
+            $task->save();
+        }
+
         return redirect()->route('projects.index', $slug)->with('success', __('Project Leave Successfully!'));
     }
 
