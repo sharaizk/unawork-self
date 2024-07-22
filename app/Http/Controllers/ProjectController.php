@@ -2425,7 +2425,7 @@ class ProjectController extends Controller
             $tmp['project_name'] = $task->project->name;
             $tmp['milestone'] = ($milestone = $task->milestone()) ? $milestone->title : '';
 
-            $due_date = '<span class="text-' . ($task->due_date < date('Y-m-d') ? 'danger' : 'success') . '">' . date('Y-m-d', strtotime($task->due_date)) . '</span> ';
+            $due_date = '<span class="text-' . ($task->due_date < date('Y-m-d') ? 'danger' : 'success') . '">' . date('M-d-y', strtotime($task->due_date)) . '</span> ';
             $tmp['due_date'] = $due_date;
 
             if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client') {

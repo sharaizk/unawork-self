@@ -199,7 +199,7 @@
                                                             href="{{ route($client_keyword . 'projects.task.board', [$currentWorkspace->slug, $task->project_id]) }}"
                                                             class="text-body">{{ $task->title }}</a></div>
 
-                                                    @php($due_date = '<span class="text-' . ($task->due_date < date('Y-m-d') ? 'danger' : 'success') . '">' . date('Y-m-d', strtotime($task->due_date)) . '</span> ')
+                                                    @php($due_date = '<span class="text-' . ($task->due_date < date('Y-m-d') ? 'danger' : 'success') . '">' . date('M-d-y', strtotime($task->due_date)) . '</span> ')
 
                                                     <span class="text-muted font-13">{{ __('Due Date') }} :
                                                         {!! $due_date !!}</span>
@@ -310,7 +310,7 @@
 
 
                     @if (Auth::user()->getGuard() != 'client')
-                        <div class="card ">
+                        <!-- <div class="card ">
                             <div class="card-header">
                                 <h5>{{ __('Storage Status') }} <small>({{ $users->storage_limit . 'MB' }} /
                                         {{ $plan->storage_limit . 'MB' }})</small></h5>
@@ -318,7 +318,7 @@
                             <div class="card-body">
                                 <div id="storage-limit-chart"></div>
                             </div>
-                        </div>
+                        </div> -->
                     @endif
 
                     @if (Auth::user()->getGuard() == 'client')
