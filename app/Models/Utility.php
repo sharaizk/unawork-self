@@ -302,7 +302,7 @@ class Utility
     {
         $lang = \App::getLocale();
         \App::setLocale(basename($lang));
-        $date = Date::parse($date)->format('d M Y');
+        $date = Date::parse($date)->format('M d Y');
 
         return $date;
     }

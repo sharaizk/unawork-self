@@ -748,13 +748,22 @@ class ProjectController extends Controller
         $userProject = Project::find($projectID);
         UserProject::where('project_id', '=', $userProject->id)->where('user_id', '=', $objUser->id)->delete();
 
+        $tasks = $userProject->user_tasks($objUser->id);
+        foreach ($tasks as $task) {
+            $taskUsers = explode(',', $task->assign_to);
+            $taskUsers = array_diff($taskUsers, [$objUser->id]);
+            $task->assign_to = implode(',', $taskUsers);
+            $task->save();
+        }
+
         return redirect()->route('projects.index', $slug)->with('success', __('Project Leave Successfully!'));
     }
 
 
-    public function taskBoard($slug, $projectID)
+    public function taskBoard($slug, $projectID, Request $request)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $showOnlyMyTasks = $request->query('show_only_my_tasks', false);
 
         $objUser = Auth::user();
         if ($objUser->getGuard() == 'client') {
@@ -780,17 +789,21 @@ class ProjectController extends Controller
                     $statusClass[] = 'task-list-' . str_replace(' ', '_', $status->id);
                     $task = Task::where('project_id', '=', $projectID);
 
-                    if ($currentWorkspace->permission != 'Owner' && $objUser->getGuard() != 'client') {
-                        if (isset($objUser) && $objUser) {
-                            $task->whereRaw("find_in_set('" . $objUser->id . "',assign_to)");
-                        }
+                    // if ($currentWorkspace->permission != 'Owner' && $objUser->getGuard() != 'client') {
+                    //     if (isset($objUser) && $objUser) {
+                    //         $task->whereRaw("find_in_set('" . $objUser->id . "',assign_to)");
+                    //     }
+                    // }
+                    if ($showOnlyMyTasks) {
+                        $task->whereRaw("find_in_set('" . $objUser->id . "',assign_to)");
                     }
+
                     $task->orderBy('order');
                     $status['tasks'] = $task->where('status', '=', $status->id)->get();
                 }
             }
 
-            return view('projects.taskboard', compact('currentWorkspace', 'project', 'stages', 'statusClass'));
+            return view('projects.taskboard', compact('currentWorkspace', 'project', 'stages', 'statusClass', 'showOnlyMyTasks'));
         } else {
             return redirect()->back()->with('error', __('Task Not Found.'));
         }
@@ -2412,7 +2425,7 @@ class ProjectController extends Controller
             $tmp['project_name'] = $task->project->name;
             $tmp['milestone'] = ($milestone = $task->milestone()) ? $milestone->title : '';
 
-            $due_date = '<span class="text-' . ($task->due_date < date('Y-m-d') ? 'danger' : 'success') . '">' . date('Y-m-d', strtotime($task->due_date)) . '</span> ';
+            $due_date = '<span class="text-' . ($task->due_date < date('Y-m-d') ? 'danger' : 'success') . '">' . date('M-d-y', strtotime($task->due_date)) . '</span> ';
             $tmp['due_date'] = $due_date;
 
             if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client') {

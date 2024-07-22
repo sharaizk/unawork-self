@@ -342,7 +342,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card" >
+                            <!-- <div class="card" >
 
                                 <div class="card-header">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -416,7 +416,7 @@
                                     </div>
 
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
@@ -564,8 +564,8 @@
                                                                 class="badge bg-warning p-2 px-3 rounded">{{ __('Incomplete') }}</label>
                                                         @endif
                                                     </td>
-                                                    <td>{{ $milestone->start_date }}</td>
-                                                    <td>{{ $milestone->end_date }}</td>
+                                                    <td>{{ isset($milestone->start_date) ? App\Models\Utility::dateFormat($milestone->start_date) : '' }}</td>
+                                                    <td>{{ isset($milestone->end_date) ? App\Models\Utility::dateFormat($milestone->end_date) : '' }}</td>
                                                     <td>{{ !empty($currentWorkspace->currency) ? $currentWorkspace->currency : '$' }}{{ $milestone->cost }}
                                                     </td>
                                                     <td>
