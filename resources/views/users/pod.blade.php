@@ -65,7 +65,7 @@
                         <h4 class="mt-2">   
                             <a href="{{ route('change-workspace', $pod->workspace->id) }}">
                                 {{ $pod->title }}
-                                <i class="ti ti-eye"></i>
+                                <!-- <i class="ti ti-eye"></i> -->
                             </a>    
                         </h4>
                         <span>{{ $pod->description }}</span>

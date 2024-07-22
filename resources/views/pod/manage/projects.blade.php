@@ -23,7 +23,9 @@
 
                         <h5 class="mb-0">
                         @if($project->is_active)
-                        <a href="@auth('web'){{route('projects.show',[$currentWorkspace->slug,$project->id])}}@elseauth{{route('client.projects.show',[$currentWorkspace->slug,$project->id])}}@endauth" title="{{ $project->name }}" class="">{{ $project->name }}<i class="ti ti-eye"></i></a>
+                        <a href="@auth('web'){{route('projects.show',[$currentWorkspace->slug,$project->id])}}@elseauth{{route('client.projects.show',[$currentWorkspace->slug,$project->id])}}@endauth" title="{{ $project->name }}" class="">{{ $project->name }}
+                            <!-- <i class="ti ti-eye"></i> -->
+                        </a>
                         @else
                         <a href="#" title="{{ __('Locked') }}" class="">{{ $project->name }}</a>
                     @endif
