@@ -748,10 +748,10 @@ class ProjectController extends Controller
         $userProject = Project::find($projectID);
         UserProject::where('project_id', '=', $userProject->id)->where('user_id', '=', $objUser->id)->delete();
 
-        $tasks = $userProject->user_tasks($userId);
+        $tasks = $userProject->user_tasks($objUser->id);
         foreach ($tasks as $task) {
             $taskUsers = explode(',', $task->assign_to);
-            $taskUsers = array_diff($taskUsers, [$userId]);
+            $taskUsers = array_diff($taskUsers, [$objUser->id]);
             $task->assign_to = implode(',', $taskUsers);
             $task->save();
         }
