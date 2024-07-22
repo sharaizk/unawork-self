@@ -122,7 +122,7 @@
                     $link = route('pods.users', ['podId' => $data->pod_id]);
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
-                    $text = __('User : ') . ' <b>' . $user->name . '</b> joiner your pod:  <b>'. $pod->title . ' </b>';
+                    $text = __('User : ') . ' <b>' . $user->name . '</b> joined your pod:  <b>'. $pod->title . ' </b>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
                 @endphp
@@ -301,6 +301,9 @@
         </div>
         <hr>
     @endforeach
+    <div class="d-flex justify-content-center">
+        {{ $notifications->onEachSide(1)->links('pagination::bootstrap-4') }}
+    </div>
 </div>
 </main>
 @endsection
@@ -323,7 +326,7 @@
             return response.json();
         })
         .then(data => {
-            if (data === 'succsess') {
+            if (data === 'success') {
                 showNotification('Notification marked as read!', 'success');
                 document.getElementById(`isReadStatus-${notificationId}`).style.display = 'none';
             } else {

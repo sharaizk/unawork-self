@@ -121,7 +121,8 @@ class HomeController extends Controller
         
         $userObj = Auth::user();
         
-        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        // $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $currentWorkspace = Workspace::find($userObj->currant_workspace);
         
         if ($userObj->type == 'admin') {
             $totalUsers = User::where('type', '!=', 'admin')->count();

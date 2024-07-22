@@ -108,7 +108,7 @@
                         role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti ti-folder"></i>
                         
-                        <span class="hide-mob ms-2">{{ __('') }}{{ $currentWorkspace->name }} !</span>
+                        <span class="hide-mob ms-2">{{ __('') }}{{ $currentWorkspace->name }}</span>
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
@@ -459,7 +459,7 @@
                                                         $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $pod = \App\Models\Pod::find($data->pod_id);
                                                         $user = \App\Models\User::find($data->user_id);
-                                                        $text = __('User : ') . ' <b>' . $user->name . '</b> joiner your pod:  <b>'. $pod->title . ' </b>';
+                                                        $text = __('User : ') . ' <b>' . $user->name . '</b> joined your pod:  <b>'. $pod->title . ' </b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
@@ -735,7 +735,7 @@
                         role="button" aria-haspopup="false" aria-expanded="false">
                         <img class="theme-avtar"@if (Auth::user()->avatar) src="{{ asset($logo. Auth::user()->avatar) }}" @else avatar="{{ Auth::user()->name }}" @endif
                             alt="{{ Auth::user()->name }}">
-                        <span class="hide-mob ms-2">{{ __('Hi') }},{{ Auth::user()->name }} !</span>
+                        <span class="hide-mob ms-2">{{ __('Hi') }}, {{ Auth::user()->name }} </span>
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
