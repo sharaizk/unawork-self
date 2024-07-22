@@ -21,6 +21,7 @@
         <li class="breadcrumb-item"><a href="{{ route('projects.index', $currentWorkspace->slug) }}">{{ __('Project') }}</a>
         </li>
     @endif
+    <li class="breadcrumb-item">{{ $project->name }}</li>
     <li class="breadcrumb-item"><a
             href="{{ route($client_keyword . 'projects.show', [$currentWorkspace->slug, $project->id]) }}">{{ __('Project Details') }}</a>
     </li>
@@ -29,6 +30,19 @@
 
 
 @section('action-button')
+    <div class="dropdown d-inline mx-1">
+        <button class="btn btn-sm btn-primary" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="ti ti-filter"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="filterDropdown">
+            <div class="form-check">
+                <input class="form-check-input mx-1" type="checkbox" value="" id="showOnlyMyTasksCheckbox">
+                <label class="form-check-label" for="showOnlyMyTasksCheckbox">
+                    {{ __('Show Only My Tasks') }}
+                </label>
+            </div>
+        </div>
+    </div>
     @if (
         (isset($permissions) && in_array('create task', $permissions)) ||
             ($currentWorkspace && $currentWorkspace->permission == 'Owner'))
@@ -245,6 +259,27 @@
 @endsection
 @if ($project && $currentWorkspace)
     @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const checkbox = document.getElementById('showOnlyMyTasksCheckbox');
+                const urlParams = new URLSearchParams(window.location.search);
+                const showOnlyMyTasks = urlParams.has('show_only_my_tasks');
+
+                if (showOnlyMyTasks) {
+                    checkbox.checked = true;
+                }
+
+                checkbox.addEventListener('change', function () {
+                    const url = new URL(window.location.href);
+                    if (this.checked) {
+                        url.searchParams.set('show_only_my_tasks', '1');
+                    } else {
+                        url.searchParams.delete('show_only_my_tasks');
+                    }
+                    window.location.href = url.toString();
+                });
+            });
+        </script>
         <!-- third party js -->
         <script src="{{ asset('assets/custom/js/dragula.min.js') }}"></script>
         <script>

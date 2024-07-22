@@ -752,9 +752,10 @@ class ProjectController extends Controller
     }
 
 
-    public function taskBoard($slug, $projectID)
+    public function taskBoard($slug, $projectID, Request $request)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $showOnlyMyTasks = $request->query('show_only_my_tasks', false);
 
         $objUser = Auth::user();
         if ($objUser->getGuard() == 'client') {
@@ -780,17 +781,21 @@ class ProjectController extends Controller
                     $statusClass[] = 'task-list-' . str_replace(' ', '_', $status->id);
                     $task = Task::where('project_id', '=', $projectID);
 
-                    if ($currentWorkspace->permission != 'Owner' && $objUser->getGuard() != 'client') {
-                        if (isset($objUser) && $objUser) {
-                            $task->whereRaw("find_in_set('" . $objUser->id . "',assign_to)");
-                        }
+                    // if ($currentWorkspace->permission != 'Owner' && $objUser->getGuard() != 'client') {
+                    //     if (isset($objUser) && $objUser) {
+                    //         $task->whereRaw("find_in_set('" . $objUser->id . "',assign_to)");
+                    //     }
+                    // }
+                    if ($showOnlyMyTasks) {
+                        $task->whereRaw("find_in_set('" . $objUser->id . "',assign_to)");
                     }
+
                     $task->orderBy('order');
                     $status['tasks'] = $task->where('status', '=', $status->id)->get();
                 }
             }
 
-            return view('projects.taskboard', compact('currentWorkspace', 'project', 'stages', 'statusClass'));
+            return view('projects.taskboard', compact('currentWorkspace', 'project', 'stages', 'statusClass', 'showOnlyMyTasks'));
         } else {
             return redirect()->back()->with('error', __('Task Not Found.'));
         }
