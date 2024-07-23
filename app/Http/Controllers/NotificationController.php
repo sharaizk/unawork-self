@@ -23,4 +23,11 @@ class NotificationController extends Controller
         $notification->update(["is_read" => 1]);
         return response()->json("success");
     }
+
+    public function delete(Notification $notification)
+    {
+        $this->authorize('delete', $notification);
+        $notification->delete();
+        return redirect()->back()->with('success', __('Notification Deleted Successfully!'));
+    }
 }

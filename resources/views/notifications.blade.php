@@ -316,6 +316,13 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @if ($link) 
                 </a>
                 @endif
+                <form method="POST" action="{{ route('notification.delete', ['notification' => $notification->id]) }}" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-link text-danger p-1">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
             </div>
         </div>
         <hr>
