@@ -76,17 +76,20 @@
                                         <div class="card-header-right">
                                             <div class="btn-group card-option">
                                                 @auth('web')
-                                                <button type="button" class="btn dropdown-toggle"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true"
-                                                    aria-expanded="false">
-                                                    <i class="feather icon-more-vertical"></i>
-                                                </button>
+                                                    @if (in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
+
+                                                        <button type="button" class="btn dropdown-toggle"
+                                                            data-bs-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                            <i class="feather icon-more-vertical"></i>
+                                                        </button>
+                                                    @endif
                                                 <div class="dropdown-menu dropdown-menu-end">
 
 
                                         @if($project->is_active)
 
-                                                @if($currentWorkspace->permission == 'Owner')
+                                                @if ($currentWorkspace->permission == 'Owner')
                                                     <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">
                                                         <i class="ti ti-user-plus"></i> <span>{{ __('Invite Users') }}</span>
                                                     </a>

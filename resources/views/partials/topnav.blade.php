@@ -366,9 +366,11 @@
                                     href="#" role="button" aria-haspopup="false" aria-expanded="false">
 
                                     <i class="ti ti-bell"></i>
-                                    <span
-                                    class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $notificationCounter }}<span
-                                        class="sr-only"></span>
+                                    @if ($notificationCounter > 1)
+                                        <span
+                                        class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $notificationCounter }}<span
+                                            class="sr-only"></span>
+                                    @endif
                                 </a>
                                 <div class="dropdown-menu dash-h-dropdown dropdown-menu-end notification_menu_all">
                                 <div class="noti-header d-flex align-items-center justify-content-between">
@@ -424,7 +426,7 @@
                                                                 $icon_color = 'bg-danger';
                                                             }
                                                         } else {
-                                                            return '';
+                                                            continue;
                                                         }
                                                     @endphp
                                                 @elseif($notification->type == 'project_assign')

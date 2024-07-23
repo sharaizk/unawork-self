@@ -255,10 +255,10 @@ class WorkspaceController extends Controller
 
             if (Auth::user()->getGuard() == 'client') {
 
-                return redirect()->route('client.home')->with('success', __('Workspace Change Successfully!'));
+                return redirect()->route('client.home')->with('success', __('Workspace Changed Successfully!'));
             } else {
 
-                return redirect()->route('home')->with('success', __('Workspace Change Successfully!'));
+                return redirect()->route('home')->with('success', __('Workspace Changed Successfully!'));
             }
         } else {
             return redirect()->back()->with('error', __('Workspace is locked'));

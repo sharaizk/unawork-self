@@ -51,7 +51,7 @@
                                                 class="ti ti-pencil"></i> <span>{{ __('Edit') }}</span>
                                         </a>
                                     @endif
-                                    <a href="{{ route('change-workspace', $pod->workspace->id) }}" class="dropdown-item" data-size="md"
+                                    <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Go to Pod') }}"><i 
                                             class="ti ti-pencil"></i> <span>{{ __('Go to Pod') }}</span></a> 
                                 </div>
@@ -63,7 +63,7 @@
                             @if ($pod->image) src="{{ asset ('storage/'. $pod->image) }}" @else avatar="{{ $pod->title }}" @endif>
                         
                         <h4 class="mt-2">   
-                            <a href="{{ route('change-workspace', $pod->workspace->id) }}">
+                            <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
                                 {{ $pod->title }}
                                 <!-- <i class="ti ti-eye"></i> -->
                             </a>    

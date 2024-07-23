@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "¡Puta!  Algo salió mal. ",
   "workspace" : "espacio de trabajo ",
   "Workspace" : "Workspace ",
-  "Workspace Change Successfully!" : "Cambio de espacio de trabajo satisfactoriamente ",
+  "Workspace Changed Successfully!" : "Cambio de espacio de trabajo satisfactoriamente ",
   "Workspace Created Successfully!" : "Espacio de trabajo creado correctamente. ",
   "Workspace Deleted Successfully!" : "Espacio de trabajo suprimido correctamente. ",
   "Workspace is locked" : "Espacio de trabajo bloqueado ",

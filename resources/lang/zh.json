@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "哇哦 ! 出什么事了",
   "workspace" : "工作空间",
   "Workspace" : "工作空间",
-  "Workspace Change Successfully!" : "工作空间更改成功!",
+  "Workspace Changed Successfully!" : "工作空间更改成功!",
   "Workspace Created Successfully!" : "已成功创建工作空间 !",
   "Workspace Deleted Successfully!" : "已成功删除工作空间 !",
   "Workspace is locked" : "工作空间已锁定",

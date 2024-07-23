@@ -496,13 +496,9 @@
                 },
                 type: 'POST',
                 success: function(response) {
+                    location.reload();
                     if (response.is_success) {
                         show_toastr('success', response.success, 'success');
-
-
-                        $('.noti-body').hide();
-                        $('.dots').hide();
-
                     } else {
                         show_toastr('error', response.error, 'error');
                     }

@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "Упс!  Что-то не так. ",
   "workspace" : "рабочая область ",
   "Workspace" : "Рабочее пространство ",
-  "Workspace Change Successfully!" : "Изменение рабочей области выполнено успешно! ",
+  "Workspace Changed Successfully!" : "Изменение рабочей области выполнено успешно! ",
   "Workspace Created Successfully!" : "Рабочая Область Успешно Создана! ",
   "Workspace Deleted Successfully!" : "Рабочая Область Удалена! ",
   "Workspace is locked" : "Рабочая область заблокирована ",
