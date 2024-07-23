@@ -377,7 +377,7 @@
                                     <h5 class="m-0">Notification</h5>
                                     <div class="d-flex">
                                         <a href="{{ route('view_all.notifications') }}" class="dash-head-link me-2">View All</a>
-                                        <a href="#" data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}" class="dash-head-link clear_all_notifications">Clear All</a>
+                                        <!-- <a href="#" data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}" class="dash-head-link clear_all_notifications">Clear All</a> -->
                                     </div>
                                 </div>
                                     {{-- <div class="parent-div overflow-auto"> --}}
@@ -431,8 +431,10 @@
                                                     @endphp
                                                 @elseif($notification->type == 'project_assign')
                                                     @php
-                                                        $link = route('projects.show', [$notification->workspace_id, $notification->data->id]);
-                                                        $text = __('New project assign') . ' <b>' . $data->title . '</b>';
+                                                        $project = \App\Models\Project::find($data->id);
+                                                        $workspace = \App\Models\Workspace::find($notification->workspace_id);
+                                                        $link = route('projects.show', [$workspace->slug, $project->id]);
+                                                        $text = __('You were assigned to new project: ') . ' <b>' . $project->name . '</b>';
                                                         $icon = 'fa fa-suitcase';
                                                     @endphp
                                                 @elseif($notification->type == 'pod_invite')

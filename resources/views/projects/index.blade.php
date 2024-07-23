@@ -76,14 +76,13 @@
                                         <div class="card-header-right">
                                             <div class="btn-group card-option">
                                                 @auth('web')
-                                                    @if (in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
 
                                                         <button type="button" class="btn dropdown-toggle"
                                                             data-bs-toggle="dropdown" aria-haspopup="true"
                                                             aria-expanded="false">
                                                             <i class="feather icon-more-vertical"></i>
                                                         </button>
-                                                    @endif
+                                                
                                                 <div class="dropdown-menu dropdown-menu-end">
 
 
@@ -111,7 +110,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>
-                                                @else
+                                                @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'active')->pluck('id')->toArray()))
                                                     <a href="#" class="dropdown-item text-danger bs-pass-para" data-confirm="{{__('Are You Sure?')}}" data-text="{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="leave-form-{{$project->id}}">
                                                          <i class="ti ti-trash"></i>  <span>{{ __('Delete')}}</span>
                                                     </a>
@@ -119,6 +118,12 @@
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>
+                                                @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'pending')->pluck('id')->toArray()))
+                                                    <span class="dropdown-item">Join Request Sended</span>
+                                                @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
+                                                    <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item"> 
+                                                        <span><i class="fa fa-pen-to-square"></i> Join This Project </span>
+                                                    </a>
                                                 @endif
 
                                         @else
