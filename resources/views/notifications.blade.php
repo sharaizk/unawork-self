@@ -116,9 +116,24 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $icon = 'fa fa-suitcase';
                 @endphp
             @elseif($notification->type == 'pod_invite')
-                @php
-                    $link = route('pods.users', ['podId' => $data->id]);
-                    $text = __('New pod invite into pod: ') . ' <b>' . $data->title . '</b>';
+            @php
+                    $pod = \App\Models\Pod::find($data->id);
+                    $user = \Auth::user();
+                    $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
+                    $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
+                    $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>
+                        <br>
+                        <form id="acceptForm-' . $user->id . '" 
+                            action="' . $acceptLink . '" 
+                            method="POST" 
+                            style="display: none;">
+                            ' . csrf_field() . '
+                        </form>
+                        <button class="btn btn-success btn-sm p-1 align-baseline accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
+                            ACCEPT
+                        </button>
+                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn" 
+                            data-url="' . $declineLink . '">DECLINE</button>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
                 @endphp
@@ -130,9 +145,23 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @endphp
             @elseif($notification->type == 'pod_request')
                 @php
-                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $pod = \App\Models\Pod::find($data->pod_id);
-                    $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>';
+                    $user = \App\Models\User::find($data->user_id);
+                    $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
+                    $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
+                    $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>
+                        <br>
+                        <form id="acceptForm-' . $user->id . '" 
+                            action="' . $acceptLink . '" 
+                            method="POST" 
+                            style="display: none;">
+                            ' . csrf_field() . '
+                        </form>
+                        <button class="btn btn-success btn-sm p-1 align-baseline accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
+                            ACCEPT
+                        </button>
+                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn" 
+                            data-url="' . $declineLink . '">DECLINE</button>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
                 @endphp
@@ -317,12 +346,12 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 </a>
                 @endif
                 <form method="POST" action="{{ route('notification.delete', ['notification' => $notification->id]) }}" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger p-1">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </form>
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-link text-danger p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
             </div>
         </div>
         <hr>
@@ -331,6 +360,73 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
         {{ $notifications->onEachSide(1)->links('pagination::bootstrap-4') }}
     </div>
 </div>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".accept-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                let userId = this.dataset.userId;
+                let form = document.getElementById(`acceptForm-${userId}`);
+                let formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    showNotification('Request accepted successfully', 'success');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                })
+                .catch(error => {
+                    showNotification('Request failed: ' + error.message, 'danger');
+                    console.error('Error:', error);
+                });
+            });
+        });
+
+        document.querySelectorAll(".decline-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                let url = this.dataset.url;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    showNotification('Request declined successfully', 'success');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                })
+                .catch(error => {
+                    showNotification('Request failed: ' + error.message, 'danger');
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+</script>
 </main>
 @endsection
 
