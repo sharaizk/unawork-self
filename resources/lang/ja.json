@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "おっと ! 何かがおかしい",
   "workspace" : "ワークスペース",
   "Workspace" : "ワークスペース",
-  "Workspace Change Successfully!" : "ワークスペースの変更は正常に完了",
+  "Workspace Changed Successfully!" : "ワークスペースの変更は正常に完了",
   "Workspace Created Successfully!" : "ワークスペースを正常に作成しました",
   "Workspace Deleted Successfully!" : "ワークスペースを正常に削除しました",
   "Workspace is locked" : "ワークスペースはロック済み",

@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "Whoops!  Bir şeyler ters gitti. ",
   "workspace" : "çalışma alanı ",
   "Workspace" : "Çalışma Alanı ",
-  "Workspace Change Successfully!" : "Çalışma Alanı Başarıyla Değişti! ",
+  "Workspace Changed Successfully!" : "Çalışma Alanı Başarıyla Değişti! ",
   "Workspace Created Successfully!" : "Çalışma Alanı Başarıyla Yaratıldı! ",
   "Workspace Deleted Successfully!" : "Çalışma Alanı Başarıyla Silindi! ",
   "Workspace is locked" : "Çalışma alanı kilitli ",

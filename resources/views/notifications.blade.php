@@ -12,7 +12,11 @@
     <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
     <li class="breadcrumb-item"> {{ __('Notifications') }}</li>
 @endsection
-
+@php
+$unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::user()->id)
+        ->where('is_read', 0)
+        ->count();
+@endphp
 @section('content')
 <style>
     .unread-dot {
@@ -40,8 +44,21 @@
     .justify-content-between {
         justify-content: space-between;
     }
+    .action-button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
 </style>
 <main>
+    <div class="action-button-container">
+        <span></span>
+        @if ($unreadNotificationCounter > 0)
+        <a href="#" data-url="{{ route('delete_all.notifications', $currentWorkspace->slug) }}" class="btn btn-sm btn-secondary clear_all_notifications">Read All</a>
+        @endif
+    </div>
+
 <div class="limited">
     @foreach ($notifications as $notification)
         @php
@@ -92,8 +109,10 @@
             @endphp
             @elseif($notification->type == 'project_assign')
                 @php
-                    $link = route('projects.show', [$notification->workspace_id, $notification->data->id]);
-                    $text = __('New project assign') . ' <b>' . $data->title . '</b>';
+                    $project = \App\Models\Project::find($data->id);
+                    $workspace = \App\Models\Workspace::find($notification->workspace_id);
+                    $link = route('projects.show', [$workspace->slug, $project->id]);
+                    $text = __('You were assigned to new project: ') . ' <b>' . $project->name . '</b>';
                     $icon = 'fa fa-suitcase';
                 @endphp
             @elseif($notification->type == 'pod_invite')

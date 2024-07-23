@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "Ups!  Noget gik galt. ",
   "workspace" : "arbejdsområde ",
   "Workspace" : "Arbejdsområde ",
-  "Workspace Change Successfully!" : "Arbejdsområde-change er udført! ",
+  "Workspace Changed Successfully!" : "Arbejdsområde-change er udført! ",
   "Workspace Created Successfully!" : "Arbejdsområdet er oprettet. ",
   "Workspace Deleted Successfully!" : "Arbejdsområdet er slettet! ",
   "Workspace is locked" : "Arbejdsområdet er låst ",

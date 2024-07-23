@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Spatie\Sluggable\HasSlug;
+use Illuminate\Support\Str;
 use Spatie\Sluggable\SlugOptions;
 
 class Workspace extends Model
@@ -190,6 +191,11 @@ class Workspace extends Model
 
     //     return (is_array($key)) ? array_only($settings, $key) : $settings[$key];
     // }
+    
+    public function setSlugAttribute($value)
+    {
+        $this->attributes['slug'] = Str::slug(Str::lower($value));
+    }
 
     public function getSlugOptions() : SlugOptions{
         return SlugOptions::create()

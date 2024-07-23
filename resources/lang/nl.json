@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "Oeps!  Er is iets misgegaan. ",
   "workspace" : "werkgebied ",
   "Workspace" : "Werkgebied ",
-  "Workspace Change Successfully!" : "Wijziging van werkgebied is gelukt! ",
+  "Workspace Changed Successfully!" : "Wijziging van werkgebied is gelukt! ",
   "Workspace Created Successfully!" : "Het Werkgebied Is Gemaakt! ",
   "Workspace Deleted Successfully!" : "Het Werkgebied Is Gewist! ",
   "Workspace is locked" : "Werkgebied is vergrendeld ",

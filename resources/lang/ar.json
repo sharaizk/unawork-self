@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "الووبس !  حدث شيء خاطئ. ",
   "workspace" : "مساحة العمل ",
   "Workspace" : "مساحة العمل ",
-  "Workspace Change Successfully!" : "تم تغيير مساحة العمل بنجاح ! ",
+  "Workspace Changed Successfully!" : "تم تغيير مساحة العمل بنجاح ! ",
   "Workspace Created Successfully!" : "تم تكوين مساحة العمل بنجاح ! ",
   "Workspace Deleted Successfully!" : "تم حذف مساحة العمل بنجاح ! ",
   "Workspace is locked" : "تم اقفال مساحة العمل ",

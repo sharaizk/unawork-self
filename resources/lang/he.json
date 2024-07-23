@@ -1407,7 +1407,7 @@
   "Whoops! Something went wrong." : "אופס!  משהו השתבש. ",
   "workspace" : "סביבת עבודה ",
   "Workspace" : "סביבת עבודה ",
-  "Workspace Change Successfully!" : "שינוי מרחב העבודה בוצע בהצלחה! ",
+  "Workspace Changed Successfully!" : "שינוי מרחב העבודה בוצע בהצלחה! ",
   "Workspace Created Successfully!" : "מרחב העבודה נוצר בהצלחה! ",
   "Workspace Deleted Successfully!" : "מרחב העבודה נמחק בהצלחה! ",
   "Workspace is locked" : "מרחב העבודה נעול ",

@@ -17,9 +17,9 @@
      @if (\Auth::user()->type == 'admin')
          <li class="breadcrumb-item"> {{ __('company') }}</li>
      @else
-         <li class="breadcrumb-item"> {{ __('users') }}</li>
+         <li class="breadcrumb-item"> {{ __('Users') }}</li>
      @endif
-     {{-- <li class="breadcrumb-item"> {{ __('users') }}</li> --}}
+     {{-- <li class="breadcrumb-item"> {{ __('Users') }}</li> --}}
  @endsection
  @php
      $logo = \App\Models\Utility::get_file('users-avatar/');

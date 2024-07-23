@@ -392,7 +392,7 @@
 
                        @endif
 
-                       @if (Auth::user()->hasRole('employee'))
+                       <!-- @if (Auth::user()->hasRole('employee'))
                             @if ($adminSetting['enable_chat'] == 'on')
                                 <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
                                     <a href="{{ route('chats') }}" class="dash-link"><span class="dash-micon"><i
@@ -402,7 +402,7 @@
                                 
                             @endif
                             
-                       @endif
+                       @endif -->
                        
                </div>
            </div>
