@@ -56,7 +56,7 @@ class ProjectUserController extends Controller
             ->first();
 
         if ($notification) {
-            $notification->update(['is_read' => 1]);
+            $notification->delete();
         }
 
         Utility::sendNotification('project_accepted', null, $user->id, $project);
@@ -80,7 +80,7 @@ class ProjectUserController extends Controller
             ->first();
 
         if ($notification) {
-            $notification->update(['is_read' => 1]);
+            $notification->delete();
         }
 
         Utility::sendNotification('project_decline', null, $user->id, $project);

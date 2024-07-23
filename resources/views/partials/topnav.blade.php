@@ -644,6 +644,9 @@
                                                 </div>
                                                 <hr>
                                             @endforeach
+                                            @if ($notificationCounter === 0)
+                                                <span>There is no unread notifications</span>
+                                            @endif
                                         </div>
 
                                         <div class="all_notification">
