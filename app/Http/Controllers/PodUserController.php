@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
 use App\Models\Notification;
 use App\Models\PodUser;
+use App\Models\UserWorkspace;
 use App\Models\Utility;
+use App\Models\Workspace;
+use Spatie\Permission\Models\Permission;
 
 class PodUserController extends Controller
 {
@@ -130,5 +133,31 @@ class PodUserController extends Controller
         }
         
         return response()->json(['message' => 'User status updated to active'], 200);
+    }
+
+    public function editPermissions(Pod $pod, User $user)
+    {   
+        $workspace = $pod->workspace;
+        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        $permissions = Permission::all();
+
+        return view('pod.manage.edit_permissions', compact('permissions', 'user', 'pod', 'userWorkspace'));
+    }
+
+    public function updatePermissions(Request $request, Pod $pod, User $user)
+    {
+        $workspace = $pod->workspace;
+
+        // policies 
+        $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
+        if (!$userWorkspaceEditor->hasPermissionTo('users_edit')) {
+            return 'error';
+        }
+
+        $permissions = $request->input('permissions', []);
+        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        $userWorkspace->syncPermissions($permissions);
+
+        return redirect()->back()->with('success', 'Permissions updated successfully.');
     }
 }

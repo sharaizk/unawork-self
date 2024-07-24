@@ -110,6 +110,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');
     Route::post('/pods/{pod}/users/{user}', [PodUserController::class, 'accept'])->name('pods.accept');
     Route::post('/pods/{pod}/users/{user}/decline', [PodUserController::class, 'decline'])->name('pods.decline');
+
+    Route::get('/pod/{pod}/users/{user}/edit-permissions', [PodUserController::class, 'editPermissions'])->name('pod.users.editPermissions');
+    Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

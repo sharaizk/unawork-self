@@ -41,11 +41,21 @@
                                             <span>{{ __('Decline user') }}</span>
                                         </a>
                                     @else
-                                        <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
-                                            data-title="{{ __('Remove user from pod') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Remove user from pod') }}</span>
-                                        </a>
+                                        <!-- if ($user->id != Auth::id()) -->
+                                            <a href="#" class="dropdown-item" 
+                                                    data-ajax-popup="true" 
+                                                    data-size="lg" 
+                                                    data-title="Edit Permissions"
+                                                    data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
+                                                <i class="ti ti-flag"></i> 
+                                                Edit Permissions
+                                            </a>
+                                            <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
+                                                data-title="{{ __('Remove user from pod') }}">
+                                                <i class="ti ti-pencil"></i> 
+                                                <span>{{ __('Remove user from pod') }}</span>
+                                            </a>
+                                        <!-- endif -->
                                     @endif
                                 @elseif ($user->id == Auth::user()->id )
                                     @if ($user->pivot->status == 'employee_pending')
