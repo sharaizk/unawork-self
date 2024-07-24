@@ -21,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
         Skills::class => SkillsPolicy::class,
         Pod::class => PodPolicy::class,
         News::class => NewsPolicy::class,
+        Notification::class => NotificationPolicy::class,
     ];
 
     /**

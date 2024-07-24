@@ -1173,6 +1173,7 @@ Route::group(['middleware' => ['verified']], function () {
         '/{slug}/Notification/Delete',
         [UserController::class, 'delete_all_notification',]
     )->name('delete_all.notifications');
+    Route::delete('/account/Notification/{notification}/Delete', [NotificationController::class, 'delete',])->name('notification.delete');
 
 
     //=============================================Webhook===================================================

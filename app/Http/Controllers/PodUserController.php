@@ -9,6 +9,7 @@ use App\Services\PodUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
+use App\Models\Notification;
 use App\Models\PodUser;
 use App\Models\Utility;
 
@@ -89,12 +90,22 @@ class PodUserController extends Controller
 
     public function accept(Pod $pod, User $user)
     {   
+        $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
         $pod->workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
     
         Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_accept_user', null, $user->id, $podUser);
+
+        $notification = Notification::where('type', 'pod_request')
+            ->where('user_id', $ownId)
+            ->whereJsonContains('data->id', $podUser->id)
+            ->first();
+
+        if ($notification) {
+            $notification->delete();
+        }
         
         return response()->json(['message' => 'User status updated to active'], 200);
     }
@@ -107,6 +118,15 @@ class PodUserController extends Controller
 
         Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_decline_user', null, $user->id, $podUser);
+
+        $notification = Notification::where('type', 'pod_request')
+            ->where('user_id', $ownId)
+            ->whereJsonContains('data->id', $podUser->id)
+            ->first();
+
+        if ($notification) {
+            $notification->delete();
+        }
         
         return response()->json(['message' => 'User status updated to active'], 200);
     }

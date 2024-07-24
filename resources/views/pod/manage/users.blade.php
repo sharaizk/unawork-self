@@ -94,7 +94,7 @@
                 </div>
             </div>
         @endforeach
-        @if ($pod->created_by == Auth::user()->id ))
+        @if ($pod->created_by == Auth::user()->id )
         <div class="col-xl-3 col-lg-4 col-sm-6">
             <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
                 data-title="{{ __('Invite New User') }}" data-url="{{ route('pods.invite', $podId=$pod->id) }}"

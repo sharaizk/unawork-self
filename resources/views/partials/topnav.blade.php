@@ -366,7 +366,7 @@
                                     href="#" role="button" aria-haspopup="false" aria-expanded="false">
 
                                     <i class="ti ti-bell"></i>
-                                    @if ($notificationCounter > 1)
+                                    @if ($notificationCounter > 0)
                                         <span
                                         class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $notificationCounter }}<span
                                             class="sr-only"></span>
@@ -644,6 +644,9 @@
                                                 </div>
                                                 <hr>
                                             @endforeach
+                                            @if ($notificationCounter === 0)
+                                                <span>There is no unread notifications</span>
+                                            @endif
                                         </div>
 
                                         <div class="all_notification">
