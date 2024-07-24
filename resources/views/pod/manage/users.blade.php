@@ -2,6 +2,7 @@
  
 @section('content')
 <div class="row">
+    
         @foreach ($users as $user)
             <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="card   text-center">
@@ -94,6 +95,7 @@
                 </div>
             </div>
         @endforeach
+
         @if ($pod->created_by == Auth::user()->id )
         <div class="col-xl-3 col-lg-4 col-sm-6">
             <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
