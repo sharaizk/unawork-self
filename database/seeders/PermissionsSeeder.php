@@ -13,13 +13,13 @@ class PermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        Permission::create(['name' => 'users_index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'users_edit', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'users_index', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'users_edit', 'guard_name' => 'web']);
 
-        Permission::create(['name' => 'news_index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'news_edit', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'news_index', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'news_edit', 'guard_name' => 'web']);
 
-        Permission::create(['name' => 'projects_index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'projects_edit', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'projects_index', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'projects_edit', 'guard_name' => 'web']);
     }
 }
