@@ -156,6 +156,7 @@
                                 $login_status = false;
                             @endphp
                             @foreach (Auth::user()->workspace as $workspace)
+                                {{$workspace->name}}
                                     {{-- @dump($workspace) --}}
                                     @if ($workspace->is_active)
                                         @php

@@ -92,7 +92,7 @@ class PodUserController extends Controller
     {   
         $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
-        $pod->workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
+        $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
     
         Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
@@ -113,6 +113,7 @@ class PodUserController extends Controller
     public function decline(Pod $pod, User $user)
     {   
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
+        $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
     
 
