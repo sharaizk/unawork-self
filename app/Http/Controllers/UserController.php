@@ -497,6 +497,7 @@ class UserController extends Controller
 
 
             $objUser->currant_workspace = $objWorkspace->id;
+            $objWorkspace->ownerable()->associate($objUser);
             $objUser->save();
 
             UserWorkspace::create(
