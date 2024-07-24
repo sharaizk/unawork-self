@@ -80,6 +80,8 @@ class PodUserService
         ]);
         
         $pod = Pod::find($podId);
+        $user = User::find($userId);
+        $this->attachUserToPodWorkspaces($user, $pod);
 
         $this->sendRequestNotify($podUser, $pod->created_by);
     }
