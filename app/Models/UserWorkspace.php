@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 class UserWorkspace extends Model
@@ -23,5 +24,11 @@ class UserWorkspace extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assignAllPermissionsToCreator()
+    {
+        $allPermissions = Permission::all();
+        $this->givePermissionTo($allPermissions);
     }
 }

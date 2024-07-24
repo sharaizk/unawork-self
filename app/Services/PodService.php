@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\Pod;
 use App\Models\User;
+use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 
 class PodService
 {
@@ -107,5 +109,8 @@ class PodService
     protected function attachOwnerToWorkspace(Workspace $workspace,  int $userId): void
     {
         $workspace->users()->attach($userId, ['permission' => 'Owner', 'is_active' => 1]);
+
+        $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $userId)->first();
+        $userWorkspace->assignAllPermissionsToCreator();
     }
 }
