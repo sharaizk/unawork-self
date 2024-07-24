@@ -12,7 +12,7 @@
 
 @php
     $logo=\App\Models\Utility::get_file('users-avatar/');
-
+    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
 @endphp
 @section('action-button')
     @auth('web')
@@ -20,7 +20,7 @@
         <a href="{{ route('project.export') }}"  class="btn btn-sm btn-primary "  data-toggle="tooltip" title="{{ __('Export Project') }}" > <i class="ti ti-file-x"></i></a>
         <a href="#"  class="btn btn-sm btn-primary mx-1" data-ajax-popup="true" data-title="{{__('Import Project')}}" data-url="{{ route('project.file.import' ,$currentWorkspace->slug) }}"  data-toggle="tooltip" title="{{ __('Import Project') }}"><i class="ti ti-file-import"></i> </a>
 
-        @if(isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id())
+        @if(isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id() || $userWorkspace->hasPermissionTo('projects_edit'))
             <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="md" data-title="{{ __('Create New Project') }}" data-url="{{route('projects.create',$currentWorkspace->slug)}}" data-toggle="tooltip" title="{{ __('Add Project') }}">
                 <i class="ti ti-plus"></i>
             </a>
@@ -185,7 +185,7 @@
                     @endforeach
 
                           @auth('web')
-                            @if(isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id())
+                            @if(isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id() || $userWorkspace->hasPermissionTo('projects_edit'))
                              <div class="col-xl-3 col-lg-4 col-sm-6 All add_projects">
                                 <a href="#" class="btn-addnew-project " style="padding: 90px 10px;" data-ajax-popup="true" data-size="md" data-title="{{ __('Create New Project') }}" data-url="{{route('projects.create',$currentWorkspace->slug)}}">
                                 <div class="bg-primary proj-add-icon">

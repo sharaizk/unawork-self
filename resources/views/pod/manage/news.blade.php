@@ -1,32 +1,37 @@
 @extends('layouts.admin')
 
 @section('content')
+@php
+    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+@endphp
 <div class="row">
     @foreach ($news as $new)
         <div class="col-xl-3 col-lg-4 col-sm-6">
             <div class="card   text-center">
                 <div class="card-header border-0 pb-0">
                     <div class="card-header-right">
-                        <div class="btn-group card-option">
-                            <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="feather icon-more-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" 
-                                    data-title="{{ __('Edit') }}" 
-                                    data-url="{{ route('pods.news.edit', ['podId' => $pod->id, 'NewsId' => $new->id]) }}""
-                                    data-title="{{ __('Edit this post') }}">
-                                    <i class="ti ti-pencil"></i> 
-                                    <span>{{ __('Edit this post') }}</span>
-                                </a>
-                                <a href="#" class="dropdown-item delete-post"
-                                    data-post-id="{{ $new->id }}">
-                                    <i class="ti ti-trash"></i> 
-                                    <span>{{ __('Delete this post') }}</span>
-                                </a>
+                        @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('news_edit'))
+                            <div class="btn-group card-option">
+                                <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    <i class="feather icon-more-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="lg" 
+                                        data-title="{{ __('Edit') }}" 
+                                        data-url="{{ route('pods.news.edit', ['podId' => $pod->id, 'NewsId' => $new->id]) }}""
+                                        data-title="{{ __('Edit this post') }}">
+                                        <i class="ti ti-pencil"></i> 
+                                        <span>{{ __('Edit this post') }}</span>
+                                    </a>
+                                    <a href="#" class="dropdown-item delete-post"
+                                        data-post-id="{{ $new->id }}">
+                                        <i class="ti ti-trash"></i> 
+                                        <span>{{ __('Delete this post') }}</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -43,17 +48,19 @@
             </div>
         </div>
     @endforeach
-    <div class="col-xl-3 col-lg-4 col-sm-6">
-        <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
-            data-title="{{ __('Create new Post') }}" data-url="{{ route('pods.news.create', $podId=$pod->id) }}"
-            data-toggle="tooltip" title="{{ __('Create new Post') }}">
-            <div class="bg-primary proj-add-icon">
-                <i class="ti ti-plus"></i>
-            </div>
-            <h6 class="mt-4 mb-2">{{__('Create New Post')}}</h6>
-            <p class="text-muted text-center">{{__('Click here to create New Post')}}</p>
-        </a>
-    </div>
+    @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('news_edit'))
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+            <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
+                data-title="{{ __('Create new Post') }}" data-url="{{ route('pods.news.create', $podId=$pod->id) }}"
+                data-toggle="tooltip" title="{{ __('Create new Post') }}">
+                <div class="bg-primary proj-add-icon">
+                    <i class="ti ti-plus"></i>
+                </div>
+                <h6 class="mt-4 mb-2">{{__('Create New Post')}}</h6>
+                <p class="text-muted text-center">{{__('Click here to create New Post')}}</p>
+            </a>
+        </div>
+    @endif
 </div>
 
 <script src="{{ asset('assets/js/plugins/tinymce/tinymce.min.js') }}"></script>

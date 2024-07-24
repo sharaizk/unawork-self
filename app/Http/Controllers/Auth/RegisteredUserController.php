@@ -196,6 +196,9 @@ class RegisteredUserController extends Controller
         ]);
 
         $objWorkspace = Workspace::create(['lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 'created_by' => $user->id, 'name' => $request->name, 'currency_code' => 'USD', 'paypal_mode' => 'sandbox']);
+        
+        $objWorkspace->ownerable()->associate($user);
+        $objWorkspace->save();
 
         $setting = Utility::getAdminPaymentSetting();
 
@@ -209,6 +212,8 @@ class RegisteredUserController extends Controller
         } else {
             $userWorkspace->save();
         }
+
+        $userWorkspace->assignAllPermissionsToCreator();
 
 
         $user->currant_workspace = $objWorkspace->id;

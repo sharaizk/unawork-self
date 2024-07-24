@@ -1,7 +1,11 @@
 @extends('layouts.admin')
  
 @section('content')
+@php
+    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+@endphp
 <div class="row">
+        
         @foreach ($users as $user)
             <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="card   text-center">
@@ -27,7 +31,7 @@
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                @if ($pod->created_by == Auth::user()->id )
+                                @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
                                     @if ($user->pivot->status == 'pod_pending')
                                         <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
                                             data-title="{{ __('Accept user') }}">
@@ -40,11 +44,21 @@
                                             <span>{{ __('Decline user') }}</span>
                                         </a>
                                     @else
-                                        <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
-                                            data-title="{{ __('Remove user from pod') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Remove user from pod') }}</span>
-                                        </a>
+                                        <!-- if ($user->id != Auth::id()) -->
+                                            <a href="#" class="dropdown-item" 
+                                                    data-ajax-popup="true" 
+                                                    data-size="lg" 
+                                                    data-title="Edit Permissions"
+                                                    data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
+                                                <i class="ti ti-flag"></i> 
+                                                Edit Permissions
+                                            </a>
+                                            <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
+                                                data-title="{{ __('Remove user from pod') }}">
+                                                <i class="ti ti-pencil"></i> 
+                                                <span>{{ __('Remove user from pod') }}</span>
+                                            </a>
+                                        <!-- endif -->
                                     @endif
                                 @elseif ($user->id == Auth::user()->id )
                                     @if ($user->pivot->status == 'employee_pending')
@@ -94,7 +108,8 @@
                 </div>
             </div>
         @endforeach
-        @if ($pod->created_by == Auth::user()->id )
+
+        @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
         <div class="col-xl-3 col-lg-4 col-sm-6">
             <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
                 data-title="{{ __('Invite New User') }}" data-url="{{ route('pods.invite', $podId=$pod->id) }}"

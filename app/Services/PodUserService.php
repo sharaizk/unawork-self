@@ -9,6 +9,7 @@ use App\Enums\PodUser\Permission;
 use App\Enums\PodUser\Status;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
 use App\Models\Project;
+use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
 use Illuminate\Support\Facades\Hash;
@@ -79,6 +80,8 @@ class PodUserService
         ]);
         
         $pod = Pod::find($podId);
+        $user = User::find($userId);
+        $this->attachUserToPodWorkspaces($user, $pod);
 
         $this->sendRequestNotify($podUser, $pod->created_by);
     }
@@ -176,6 +179,9 @@ class PodUserService
         if (!$workspace->users()->where('user_id', $user->id)->exists()) {
             $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::EMPLOYEE_PENDING->value]);
         }
+
+        $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $user->id)->first();
+        $userWorkspace->givePermissionTo('users_index');
     }
 
     private function sendInvitationEmail(User $user, Pod $pod): void

@@ -25,6 +25,7 @@
     $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
+    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
 @endphp
 
 @section('multiple-action-button')
@@ -307,7 +308,7 @@
                                                     </div>
                                                     <div class="col-sm-auto text-sm-end d-flex align-items-center">
                                                         @auth('web')
-                                                            @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id())
+                                                            @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
                                                                 <a href="#"
                                                                     class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center"
                                                                     data-ajax-popup="true" data-size="lg"

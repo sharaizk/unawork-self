@@ -367,7 +367,7 @@ class ProjectController extends Controller
                         'app_url' => env('APP_URL'),
                     ];
                     //send notification
-                    Utility::sendNotification('project_assign', $project->workspace, $user->id, $project);
+                    Utility::sendNotification('project_assign', $project->workspaceData, $user->id, $project);
                     // Send Email
                     $resp = Utility::sendEmailTemplate('Project Assigned', $user->id, $uArr);
                     // Mail::to($user->email)->send(new SendInvication($user, $project));

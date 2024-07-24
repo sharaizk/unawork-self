@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\News;
 use App\Models\Pod;
+use App\Models\UserWorkspace;
 use App\Models\Utility;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,13 @@ class NewsService
 
         if ($newsableType == 'pod') {
             $newsable = Pod::find($newsableId);
+
+            // policies 
+            $workspace = $newsable->workspace;
+            $userWorkspaceEditor = UserWorkspace::where('user_id', $data['created_by'])->where('workspace_id', $workspace->id)->first();
+            if (!$userWorkspaceEditor->hasPermissionTo('news_edit')) {
+                throw new \Exception('You do not have permission!');
+            }
         } else {
             throw new \Exception('Invalid newsable type');
         }
