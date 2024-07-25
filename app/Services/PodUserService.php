@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Enums\PodUser\Permission;
 use App\Enums\PodUser\Status;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
+use App\Jobs\SendEmail;
 use App\Models\Project;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
@@ -25,7 +26,7 @@ class PodUserService
         Utility::sendNotification('pod_remove', null, $userId, $pod);
     }
 
-    public function inviteExistedUser(int $userId = null, int $podId): void
+    public function inviteExistedUser(int $userId = null, int $podId, array $settings): void
     {
         $user = User::find($userId);
         $pod = Pod::find($podId);
@@ -41,22 +42,23 @@ class PodUserService
         $this->attachUserToPod($user, $podId);
         $this->sendInvitationalNotify($userId, $pod);
         $this->attachUserToPodWorkspaces($user, $pod);
-        
-        // try {
-        //     $this->sendInvitationEmail($user, $pod);
-        // } catch (\Exception $e) {
-        //     throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
-        // }
+    
+        try {
+            $this->sendInvitationEmail($user, $pod, $settings);
+        } catch (\Exception $e) {
+            throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'.$e));
+        }
     }
 
-    public function inviteNewUser(array $data, int $podId): void
+    public function inviteNewUser(array $data, int $podId, array $settings): void
     {
         $user = $this->createNewUser($data);
         $this->attachUserToPod($user, $podId);
-
+        $pod = Pod::find($podId);
+        
         try {
-            $this->sendInvitationEmail($user, $podId);
-            $this->sendRegistrationEmail($user);
+            $this->sendInvitationEmail($user, $pod, $settings);
+            $this->sendRegistrationEmail($user, $settings);
         } catch (\Exception $e) {
             throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
         }
@@ -184,20 +186,18 @@ class PodUserService
         $userWorkspace->givePermissionTo('users_index');
     }
 
-    private function sendInvitationEmail(User $user, Pod $pod): void
+    private function sendInvitationEmail(User $user, Pod $pod, array $settings): void
     {
-        $message = "You have been invited to join the pod '{$pod->name}'.";
-        Mail::raw($message, function ($m) use ($user) {
-            $m->to($user->email)->subject('Pod Invitation');
-        });
+        $message = "You have been invited to join the pod: ".$pod->title." !";
+        $subject = 'Pod Invitation';
+        SendEmail::dispatch($user->email, $message, $subject, $settings);
     }
 
-    private function sendRegistrationEmail(User $user): void
+    private function sendRegistrationEmail(User $user, array $settings): void
     {
         $message = "You have been succesfully registered!";
-        Mail::raw($message, function ($m) use ($user) {
-            $m->to($user->email)->subject('Pod Invitation');
-        });
+        $subject = 'Pod Invitation';
+        SendEmail::dispatch($user->email, $message, $subject, $settings);
     }
 
     private function sendInvitationalNotify(int $userId, Pod $pod): void
