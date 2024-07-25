@@ -93,15 +93,14 @@ class PodService
 
     protected function createWorkspaceForPod(Pod $pod): Workspace
     {
-        $data = [
-            'name' => $pod->title.'-workspace',
-            'slug' => $pod->title.'-workspace',
-            'created_by' => $pod->created_by,
-            'currency_code' => 'USD',
+        $workspace = Workspace::create([
+            'name' => $pod->title.'-workspace', 
+            'created_by' => $pod->created_by, 
+            'currency_code' => 'USD', 
             'paypal_mode' => 'sandbox',
             'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
-        ];
-        $workspace = new Workspace($data);
+        ]);
+
         $pod->workspace()->save($workspace);
         return $workspace;
     }
