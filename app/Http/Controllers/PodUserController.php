@@ -37,11 +37,12 @@ class PodUserController extends Controller
     {
         $email = $request->email;
         $registerUsers = User::where('email', '=', $email)->first(); 
-
+        $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
+        
         if ($registerUsers) {
             $podUserService = new PodUserService;
             try {
-                $podUserService->inviteExistedUser($registerUsers->id, $podId);
+                $podUserService->inviteExistedUser($registerUsers->id, $podId, $settings);
                 return response()->json([
                     'code' => 200,
                     'status' => 'Success',

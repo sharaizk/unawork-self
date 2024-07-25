@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PodUser\InviteNewUserRequest;
 use App\Http\Requests\PodUser\UpdateRequest;
+use App\Models\Utility;
 use App\Services\PodUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,9 +24,10 @@ class PodUserController extends Controller
         $data = $request->validate([
             'user_id' => 'required|integer|exists:users,id'
         ]);
-    
+        $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
+        
         try {
-            $this->podUserService->inviteExistedUser($data['user_id'], $podId);
+            $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings);
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -43,9 +45,10 @@ class PodUserController extends Controller
     public function inviteNewUser(InviteNewUserRequest $request, $podId): JsonResponse
     {   
         $data = $request->validated();
+        $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
 
         try {
-            $this->podUserService->inviteNewUser($data, $podId);
+            $this->podUserService->inviteNewUser($data, $podId, $settings);
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
