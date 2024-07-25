@@ -24,7 +24,7 @@ class PodUserController extends Controller
         $data = $request->validate([
             'user_id' => 'required|integer|exists:users,id'
         ]);
-        $settings = Utility::fetchAdminPaymentSetting();
+        $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
         
         try {
             $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings);
@@ -45,7 +45,7 @@ class PodUserController extends Controller
     public function inviteNewUser(InviteNewUserRequest $request, $podId): JsonResponse
     {   
         $data = $request->validated();
-        $settings = Utility::fetchAdminPaymentSetting();
+        $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
 
         try {
             $this->podUserService->inviteNewUser($data, $podId, $settings);
