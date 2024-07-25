@@ -37,7 +37,8 @@ class PodUserController extends Controller
     {
         $email = $request->email;
         $registerUsers = User::where('email', '=', $email)->first(); 
-        $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
+        //$settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
+        $settings = Utility::getAdminPaymentSetting();
         
         if ($registerUsers) {
             $podUserService = new PodUserService;
