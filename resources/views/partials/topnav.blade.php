@@ -102,7 +102,6 @@
                             </form>
                         </div>
                     </li>
-                @endif
                 <li class="dropdown dash-h-item">
                     <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
@@ -112,6 +111,7 @@
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
+                @endif
                     
                     <!--all about workspaces, not for employee -->
                         {{-- @foreach (Auth::user()->workspace as $workspace)

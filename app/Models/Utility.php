@@ -1148,7 +1148,8 @@ class Utility
                                 'mail_from_name'    => $settings['mail_from_name'],
                             ];
                     } else {
-                        $settings = self::getPaymentSetting($usr->currant_workspace);
+                        // $settings = self::getPaymentSetting($usr->currant_workspace);
+                        $settings = self::fetchAdminPaymentSetting();
 
 
                         if (($settings['mail_host'] == null) || ($settings['mail_port'] == null) || ($settings['mail_username'] == null) || ($settings['mail_password'] == null) || ($settings['mail_encryption'] == null) || ($settings['mail_from_address'] == null) || ($settings['mail_from_name'] == null)) {
