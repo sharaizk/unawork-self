@@ -55,7 +55,7 @@ class Workspace extends Model
         $defaultStages = [
             '#77b6ea' => __('Todo'),
             '#545454' => __('In Progress'),
-            '#3cb8d9' => __('Review'),
+            '#3cb8d9' => __('To Test'),
             '#37b37e' => __('Done'),
         ];
         
