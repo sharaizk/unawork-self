@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PodUser\Permission as PodUserPermission;
 use App\Enums\PodUser\Status;
 use App\Models\Pod;
 use App\Models\User;
@@ -150,7 +151,8 @@ class PodUserController extends Controller
 
         // policies 
         $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
-        if (!$userWorkspaceEditor->hasPermissionTo('users_edit')) {
+        $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
+        if (!$userWorkspaceEditor->hasPermissionTo('users_edit') && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value ) {
             return 'error';
         }
 
