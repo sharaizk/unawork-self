@@ -20,7 +20,7 @@
             <div class="col lg-6">
                     @php
                         $user = Auth::user();
-                        $workspace = $user->workspace()->where('workspace_id', $company->id)->first();
+                        $workspace = !is_null($user) ? $user->workspace()->where('workspace_id', $company->id)->first() : null;
                         $status = $workspace ? $workspace->pivot->status : null;
                     @endphp
                 @if ($user)

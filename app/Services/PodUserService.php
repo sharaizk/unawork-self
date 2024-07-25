@@ -42,11 +42,11 @@ class PodUserService
         $this->sendInvitationalNotify($userId, $pod);
         $this->attachUserToPodWorkspaces($user, $pod);
         
-        try {
-            $this->sendInvitationEmail($user, $pod);
-        } catch (\Exception $e) {
-            throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
-        }
+        // try {
+        //     $this->sendInvitationEmail($user, $pod);
+        // } catch (\Exception $e) {
+        //     throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
+        // }
     }
 
     public function inviteNewUser(array $data, int $podId): void
