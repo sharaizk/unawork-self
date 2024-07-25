@@ -243,7 +243,7 @@
                 const url = this.getAttribute('data-url');
                 try {
                     const response = await axios.delete(url);
-                    location.reload(); 
+                    window.location.href = '{{ route('pods.index') }}'; 
                 } catch (error) {
                     console.error('An error occurred:', error);
                 }
