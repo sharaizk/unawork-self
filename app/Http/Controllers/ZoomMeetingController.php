@@ -129,7 +129,7 @@ class ZoomMeetingController extends Controller
                 return redirect()->back()->with('error', __('Meeting not created.'));
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', __("invalid token."));
+            return redirect()->back()->with('error', __("Invalid Zoom Api Token!"));
         }
     }
 
