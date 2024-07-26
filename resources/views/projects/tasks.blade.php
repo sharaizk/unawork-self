@@ -15,6 +15,15 @@
     <a href="#" class="btn btn-sm btn-primary filter" data-toggle="tooltip" title="{{ __('Filter') }}">
         <i class="ti ti-filter"></i>
     </a>
+    @php
+        $userWorkspace = App\Models\UserWorkspace::where([['user_id', \Auth::id()], ['workspace_id', $currentWorkspace->id]])->first();
+    @endphp
+    @if ($currentWorkspace->permission == 'Owner' || $userWorkspace->hasPermissionTo('projects_edit'))
+        <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
+            data-title="{{ __('Create New Task') }}"
+            data-url="{{ route('tasks.create_without_id', ['slug' => $currentWorkspace->slug]) }}"
+            data-toggle="tooltip" title="{{ __('Add Task') }}"><i class="ti ti-plus"></i></a>
+    @endif
 @endsection
 @push('css-page')
     <style>

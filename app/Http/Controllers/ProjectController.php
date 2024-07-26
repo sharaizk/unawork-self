@@ -815,21 +815,38 @@ class ProjectController extends Controller
     }
 
 
-    public function taskCreate($slug, $projectID)
-    {
+    public function taskCreate(Request $request, $slug, $projectID = null)
+    {   
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         if ($objUser->getGuard() == 'client') {
             $project = Project::select('projects.*')->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
             $projects = Project::select('projects.*')->join('client_projects', 'client_projects.project_id', '=', 'projects.id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
         } else {
-            $project = Project::select('projects.*')->join('user_projects', 'user_projects.project_id', '=', 'projects.id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
-            $projects = Project::select('projects.*')->join('user_projects', 'user_projects.project_id', '=', 'projects.id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
+            $projects = Project::select('projects.*')
+                ->join('user_projects', 'user_projects.project_id', '=', 'projects.id')
+                ->where('user_projects.user_id', $objUser->id)
+                ->where('projects.workspace', $currentWorkspace->id)
+                ->get();
+
+                if (is_null($projectID)) {
+                    $project = $projects->first();
+                } else {
+                    $project = $projects->firstWhere('id', $projectID);
+                }
         }
 
-        $users = User::select('users.*')->join('user_projects', 'user_projects.user_id', '=', 'users.id')->where('project_id', '=', $projectID)->get();
+        $users = $project ? $project->users : collect();
+        $milestones = $project ? $project->milestones : collect();
 
-        return view('projects.taskCreate', compact('currentWorkspace', 'project', 'projects', 'users'));
+        if (isset($request->json)) {
+            return response()->json([
+                'users' => $users,
+                'milestones' => $milestones
+            ]);
+        }
+
+        return view('projects.taskCreate', compact('currentWorkspace', 'project', 'projects', 'users', 'projectID'));
     }
 
     public function taskStore(Request $request, $slug, $projectID)
@@ -957,13 +974,7 @@ class ProjectController extends Controller
                         ]
                     )->with('success', __('Task Create Successfully!') . $google_msg . '');
                 } else {
-                    return redirect()->route(
-                        'projects.task.board',
-                        [
-                            $currentWorkspace->slug,
-                            $request->project_id,
-                        ]
-                    )->with('success', __('Task Create Successfully!') . '</br><span class="text-danger">' . $google_msg . '</span>');
+                    return redirect()->back()->with('success', __('Task Create Successfully!') . '</br><span class="text-danger">' . $google_msg . '</span>');
                 }
             } else {
                 return redirect()->back()->with('error', __('Please add stages first.'));
