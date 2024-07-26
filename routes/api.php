@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PodUserController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ProjectCategoryController;

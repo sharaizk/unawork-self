@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\JobVacancy\StoreJobVacancyRequest;
 use App\Http\Requests\JobVacancy\UpdateJobVacancyRequest;
 use App\Models\JobVacancy;
 use App\Services\JobVacancyService;
-use Illuminate\Support\Facades\Auth;
 
 class JobVacancyController extends Controller
 {
