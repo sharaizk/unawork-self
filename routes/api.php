@@ -93,4 +93,6 @@ Route::delete('/project/{id}', [PodController::class, 'destroy']);
 Route::apiResource('project-categories', ProjectCategoryController::class)->except('store');
 
 Route::post('/project-category', [ProjectCategoryController::class, 'store'])->name('api.project-category.store');
+
+Route::apiResource('job-vacancies', JobVacancyController::class);
 });
