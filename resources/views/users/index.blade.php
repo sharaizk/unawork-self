@@ -239,7 +239,16 @@
                                      @else 
                                        avatar="{{ $user->name }}" @endif>
                              </div>
-                             <h4 class="mt-2">{{ $user->name }}</h4>
+                             <h4 class="mt-2">
+                                @if ($user->hasRole('employee'))
+                                    <a href="{{ route('employee.show', ['employee' => $user]) }}">
+                                        {{ $user->name }}
+                                        <i class="ti ti-eye"></i>
+                                    </a>
+                                @else
+                                    {{ $user->name }}
+                                @endif
+                            </h4>
                              <small>{{ $user->email }}</small>
 
                              <div class=" mb-0 mt-3">
