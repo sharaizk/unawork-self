@@ -221,14 +221,13 @@
                     })
                     .then(response => {
                         if (response.status === 200) {
-                            document.getElementById("inviteUserPopup").style.display = "none";
-                            document.getElementById("successMessage").innerText = 'User invited successfully!';
-                            document.getElementById("successMessage").style.display = "block";
+                            inviteUserModal.hide();
+                            showNotification('User successfully invited', 'success');
+                            
                         } else {
                             return response.json().then(data => {
                                 console.error('Error:', data.message);
-                                document.getElementById("successMessage").innerText = `Error: ${data.message}`;
-                                document.getElementById("successMessage").style.display = "block";
+                                showNotification(`Error: ${data.message}`, 'danger');
                             });
                         }
                     })
