@@ -403,7 +403,7 @@ Route::group(['middleware' => ['verified']], function () {
 
         // Task Board
         Route::get('/{slug}/projects/{id}/task-board', [ProjectController::class, 'taskBoard'])->name('projects.task.board')->middleware(['auth:client', 'XSS']);
-        Route::get('/{slug}/projects/{id}/task-board/create', [ProjectController::class, 'taskCreate'])->name('tasks.create')->middleware(['auth:client', 'XSS']);
+        Route::get('/{slug}/projects/{id}/task-board/create', [ProjectController::class, 'taskCreate'])->name('client.tasks.create')->middleware(['auth:client', 'XSS']);
         Route::post('/{slug}/projects/{id}/task-board', [ProjectController::class, 'taskStore'])->name('tasks.store')->middleware(['auth:client', 'XSS']);
         Route::post('/{slug}/projects/{id}/task-board/order-update', [ProjectController::class, 'taskOrderUpdate'])->name('tasks.update.order')->middleware(['auth:client', 'XSS']);
         Route::get('/{slug}/projects/{id}/task-board/edit/{tid}', [ProjectController::class, 'taskEdit'])->name('tasks.edit')->middleware(['auth:client', 'XSS']);
@@ -769,6 +769,7 @@ Route::group(['middleware' => ['verified']], function () {
     // Task Board
     Route::get('/{slug}/projects/client/task-board/{code}', [ProjectController::class, 'taskBoard'])->name('projects.client.task.board');
     Route::get('/{slug}/projects/{id}/task-board/create', [ProjectController::class, 'taskCreate'])->name('tasks.create')->middleware(['auth', 'XSS']);
+    Route::get('/{slug}/task-board/create', [ProjectController::class, 'taskCreate'])->name('tasks.create_without_id')->middleware(['auth', 'XSS']);
     Route::post('/{slug}/projects/{id}/task-board', [ProjectController::class, 'taskStore'])->name('tasks.store')->middleware(['auth', 'XSS']);
     Route::post('/{slug}/projects/{id}/task-board/order-update', [ProjectController::class, 'taskOrderUpdate'])->name('tasks.update.order');
     Route::get('/{slug}/projects/{id}/task-board/edit/{tid}', [ProjectController::class, 'taskEdit'])->name('tasks.edit')->middleware(['auth', 'XSS']);

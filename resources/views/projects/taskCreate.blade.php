@@ -18,7 +18,13 @@
                     <label class="col-form-label">{{ __('Project') }}</label>
                     <select class="form-control form-control-light select2" name="project_id" required>
 
+                        @if ($projectID != null) 
                         <option value="{{ $project->id }}">{{ $project->name }}</option>
+                        @else
+                            @foreach($projects as $proj)
+                                <option value="{{ $proj->id }}" {{ $project && $project->id == $proj->id ? 'selected' : '' }}>{{ $proj->name }}</option>
+                            @endforeach
+                        @endif
 
                     </select>
                 </div>
@@ -57,9 +63,9 @@
                 <div class="form-group col-md-12">
                     <label class="col-form-label">{{ __('Assign To') }}</label>
 
-                    <select class=" multi-select" id="assign_to" name="assign_to[]" data-toggle="select2"
+                    <select class="assign_to multi-select" id="assign_to" name="assign_to[]" data-toggle="select2"
                         multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
-                        @foreach ($users as $u)
+                        @foreach ($project->users as $u)
                             <option value="{{ $u->id }}">{{ $u->name }} - {{ $u->email }}</option>
                         @endforeach
                     </select>
@@ -100,6 +106,56 @@
     </form>
     <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
     <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    <script>
+        $(document).on('change', "select[name=project_id]", function() {
+            let projectId = $(this).val();
+            let url = '{{ route('tasks.create', [$currentWorkspace->slug, 'projectIdPlace']) }}';
+            url = url.replace('projectIdPlace', projectId); 
+
+            $.ajax({
+                url: url + '?json=true',
+                type: 'GET',
+                success: function(response) {
+                    let assignToContainer = $('#assign_to').closest('.form-group');
+                    $('#assign_to').closest('.form-group').html(''); 
+
+                    let label = $('<label>', {
+                        class: 'col-form-label',
+                        text: '{{ __('Assign To') }}'
+                    });
+                    assignToContainer.append(label);
+
+                    let newSelect = $('<select>', {
+                        id: 'assign_to',
+                        name: 'assign_to[]',
+                        class: 'multi-select form-control',
+                        multiple: 'multiple',
+                        'data-toggle': 'select2',
+                        'data-placeholder': '{{ __("Select Users ...") }}'
+                    });
+
+                    if (response.users && response.users.length > 0) {
+                        response.users.forEach(function(user) {
+                            newSelect.append('<option value="' + user.id + '">' + user.name + ' - ' + user.email + '</option>');
+                        });
+                    } 
+
+                    assignToContainer.append(newSelect); // Додаємо новий селект
+                    choicesInstance = new Choices('#assign_to', { removeItemButton: true });
+
+                    $('#task-milestone').html('<option value="">{{ __('Select Milestone') }}</option>');
+                    if (response.milestones.length > 0) {
+                        response.milestones.forEach(function(milestone) {
+                            $('#task-milestone').append('<option value="' + milestone.id + '">' + milestone.title + '</option>');
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    </script>
     <script>
         if ($(".multi-select").length > 0) {
             $($(".multi-select")).each(function(index, element) {
@@ -170,29 +226,29 @@
 
             cb(start, end);
         });
-        $(document).on('change', "select[name=project_id]", function() {
-            $.get('@auth('web'){{ route('home') }}@elseauth{{ route('client.home') }}@endauth' +
-                '/userProjectJson/' + $(this).val(),
-                function(data) {
-                    $('select[name=assign_to]').html('');
-                    data = JSON.parse(data);
-                    $(data).each(function(i, d) {
-                        $('select[name=assign_to]').append('<option value="' + d.id + '">' + d.name +
-                            ' - ' + d.email + '</option>');
-                    });
-                });
-            $.get('@auth('web'){{ route('home') }}@elseauth{{ route('client.home') }}@endauth' +
-                '/projectMilestoneJson/' + $(this).val(),
-                function(data) {
-                    $('select[name=milestone_id]').html(
-                        '<option value="">{{ __('Select Milestone') }}</option>');
-                    data = JSON.parse(data);
-                    $(data).each(function(i, d) {
-                        $('select[name=milestone_id]').append('<option value="' + d.id + '">' + d
-                            .title + '</option>');
-                    });
-                })
-        })
+        // $(document).on('change', "select[name=project_id]", function() {
+        //     $.get('@auth('web'){{ route('home') }}@elseauth{{ route('client.home') }}@endauth' +
+        //         '/userProjectJson/' + $(this).val(),
+        //         function(data) {
+        //             $('select[name=assign_to]').html('');
+        //             data = JSON.parse(data);
+        //             $(data).each(function(i, d) {
+        //                 $('select[name=assign_to]').append('<option value="' + d.id + '">' + d.name +
+        //                     ' - ' + d.email + '</option>');
+        //             });
+        //         });
+        //     $.get('@auth('web'){{ route('home') }}@elseauth{{ route('client.home') }}@endauth' +
+        //         '/projectMilestoneJson/' + $(this).val(),
+        //         function(data) {
+        //             $('select[name=milestone_id]').html(
+        //                 '<option value="">{{ __('Select Milestone') }}</option>');
+        //             data = JSON.parse(data);
+        //             $(data).each(function(i, d) {
+        //                 $('select[name=milestone_id]').append('<option value="' + d.id + '">' + d
+        //                     .title + '</option>');
+        //             });
+        //         })
+        // })
     </script>
 @else
     <div class="container mt-5">
@@ -202,7 +258,7 @@
                     <div class="page-inner">
                         <h1>404</h1>
                         <div class="page-description">
-                            {{ __('Page Not Found') }}
+                            {{ __('Page Not Found. No Projects For this user!') }}
                         </div>
                         <div class="page-search">
                             <p class="text-muted mt-3">

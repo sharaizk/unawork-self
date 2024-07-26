@@ -1,4 +1,6 @@
 @extends('layouts.landing')
+@section('title', 'Hire')
+
 @section('body-class', 'tpl-outerPods')
 @section('content')
 <style>

@@ -252,7 +252,10 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @endphp
             @elseif($notification->type == 'workspace_invite')
                 @php
-                    $data = \App\Models\UserWorkspace::findOrFail($data->id);
+                    $data = \App\Models\UserWorkspace::find($data->id);
+                    if (!$data) {
+                        continue;
+                    }
                     $acceptLink = route('users.accept', ['workspace' => $data->workspace->id]);
                     $declineLink = route('users.decline', ['workspace' => $data->workspace->id]);
                     $text = __('New invite into: ') . ' <b>' . $data->workspace->name . '</b>
