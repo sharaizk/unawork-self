@@ -1,4 +1,5 @@
 @extends('layouts.landing')
+@section('title', 'Public Profile')
 @section('body-class', 'tpl-hub-shop')
 @section('content')
 @php

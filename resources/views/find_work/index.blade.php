@@ -1,6 +1,7 @@
 @extends('layouts.landing')
 
 @section('body-class', 'tpl-find-work')
+@section('title', 'Find Work')
 
 @section('content')
 <style>

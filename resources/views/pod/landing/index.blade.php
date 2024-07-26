@@ -1,8 +1,8 @@
 @extends('layouts.landing')
 
 
-@section('page-title')
-    {{ __('POD') }}
+@section('title')
+    {{ __('Pod') }}
 @endsection
 
 @section('content')
