@@ -21,11 +21,18 @@ class PodUserController extends Controller
 {
     public function index(int $podId)
     {
-        $pod = Pod::find($podId);
-        $currentWorkspace = $pod->workspace;
+        try {
+            $pod = Pod::findOrFail($podId);
+            $currentWorkspace = $pod->workspace;
 
-        $users = $pod->users;
-        return view('pod.manage.users', compact('currentWorkspace', 'pod', 'users'));
+            $podUserService = new PodUserService;
+
+            $users = $podUserService->list($pod, Auth::id(), $currentWorkspace->id);
+
+            return view('pod.manage.users', compact('currentWorkspace', 'pod', 'users'));
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Permission denied']);
+        }
     }
 
     public function create(int $podId)

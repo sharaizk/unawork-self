@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -219,5 +220,18 @@ class PodUserService
             $location = route('change-workspace', ['id' => $workspace->id]);
         }
         return $location;
+    }
+
+    public function list(Pod $pod, int $ownId, $workspaceId): Collection
+    {
+        $userWorkspace = UserWorkspace::where('user_id', $ownId)->where('workspace_id', $workspaceId)->firstOrFail();
+        
+        if ($userWorkspace->hasPermissionTo('users_index') || $pod->created_by == $ownId) {
+            $users = $pod->users;
+        } else {
+            $users = $pod->users->where('id', $ownId);
+        }
+
+        return $users;
     }
 }
