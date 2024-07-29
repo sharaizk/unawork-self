@@ -119,13 +119,13 @@
                     const formData = new FormData(this); 
                     try {
                         const response = await axios.post('./api/pod', formData); 
-                        console.log(response.data); 
 
+                        $("#commonModal").modal('hide');
+                        showNotification('Pod successfully created', 'success');
                         this.reset();
                         document.getElementById('success-message').style.display = 'block';
                         setTimeout(function() {
-                            // document.getElementById('success-message').style.display = 'none';
-                            location.reload(); // Перезавантаження сторінки після 5 секунд
+                            location.reload();
                         }, 3000);
                     } catch (error) {
                         console.error(error); 
@@ -155,12 +155,10 @@
                     const url = this.getAttribute('data-url');
                     try {
                         const response = await axios.post(url, formData); 
-                        console.log(response.data); 
-
+                        $("#commonModal").modal('hide');
+                        showNotification('Pod successfully updated', 'success');
                         this.reset();
-                        document.getElementById('success-message').style.display = 'block';
                         setTimeout(function() {
-                            // document.getElementById('success-message').style.display = 'none';
                             location.reload(); 
                         }, 3000);
                     } catch (error) {

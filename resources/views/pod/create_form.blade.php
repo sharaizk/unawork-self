@@ -2,8 +2,11 @@
     .create-pod-form {
         padding: 20px;
     }
+    .chosen-drop {
+        width: 10px;
+    }
 </style>
-<form class="create-pod-form">
+<form class="create-pod-form position-relative">
         @csrf
 
     <div class="col-lg-12">
@@ -25,13 +28,7 @@
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
-                    <label for="description" class="form-label">Description:</label>
-                    <textarea class="form-control" name="description" id="description" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="row">
-                    <h4>Skills:</h4>
+                    <label for="skills[]" class="form-label">Skills:</label>
                     <select class="form-control chosen-select" name="skills[]" multiple>
                         @foreach($skills as $skill)
                             <option value="{{ $skill->id }}">
@@ -41,9 +38,16 @@
                     </select>
                 </div>
             </div>
+
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+                </div>
+            </div>
         </div>
     </div>
-    
+    <br>
     <div class="row">
         <div class="text-end">
             <button type="submit" class="btn-submit btn btn-primary ">Create POD</button>
