@@ -439,7 +439,7 @@
                                                     @endphp
                                                 @elseif($notification->type == 'pod_invite')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->id]);
+                                                        $link = route('view_all.notifications');
                                                         $text = __('New pod invite into pod: ') . ' <b>' . $data->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
