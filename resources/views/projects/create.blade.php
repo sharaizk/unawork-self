@@ -12,7 +12,7 @@
         <div class="form-group col-md-12">
             <label for="project_category" class="col-form-label">{{ __('Category') }}</label>
             <select id="project_category" name="project_category_id" class="form-control select">
-                <option value="" selected disabled>{{ __('Select Category') }}</option>
+                <option value="" selected>{{ __('Select Category') }}</option>
                 @foreach(App\Models\ProjectCategory::all() as $category)
                     <option value="{{ $category->id }}">
                         {{ $category->name }}
