@@ -210,7 +210,7 @@ class PodUserService
         Utility::sendNotification('pod_request', null, $podCreator, $podUser);
     }
 
-    public function removeRedirectToLocation($ownId, $userId, $podId): string
+    public function getBackUrl($ownId, $userId, $podId): string
     {
         if ($ownId != $userId) {
             $location = route('pods.users', ['podId' => $podId]);

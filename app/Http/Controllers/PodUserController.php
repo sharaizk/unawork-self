@@ -89,7 +89,7 @@ class PodUserController extends Controller
         $podUserService = new PodUserService;
         try {
             $podUserService->remove($userId, $podId);
-            $location = $podUserService->removeRedirectToLocation(Auth::id(), $userId, $podId);
+            $location = $podUserService->getBackUrl(Auth::id(), $userId, $podId);
             return response()->json([
                 'message' => 'User removed from pod successfully',
                 'location' => $location
