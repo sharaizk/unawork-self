@@ -52,8 +52,8 @@
                                         </a>
                                     @endif
                                     <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
-                                         data-title="{{ __('Go to Pod') }}"><i 
-                                            class="ti ti-pencil"></i> <span>{{ __('Go to Pod') }}</span></a> 
+                                         data-title="{{ __('Go to Pod') }}">
+                                         <i class="ti ti-align-right"></i> <span>{{ __('Go to Pod') }}</span></a> 
                                 </div>
                             </div>
                         </div>
