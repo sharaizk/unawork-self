@@ -21,8 +21,9 @@ class PodUserController extends Controller
 {
     public function index(int $podId)
     {
-        $currentWorkspace = Auth::user()->currentWorkspace;
         $pod = Pod::find($podId);
+        $currentWorkspace = $pod->workspace;
+
         $users = $pod->users;
         return view('pod.manage.users', compact('currentWorkspace', 'pod', 'users'));
     }
@@ -88,7 +89,11 @@ class PodUserController extends Controller
         $podUserService = new PodUserService;
         try {
             $podUserService->remove($userId, $podId);
-            return response()->json(['message' => 'User removed from pod successfully'], 200);
+            $location = $podUserService->removeRedirectToLocation(Auth::id(), $userId, $podId);
+            return response()->json([
+                'message' => 'User removed from pod successfully',
+                'location' => $location
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed:'.$e], 404);
         }
@@ -142,8 +147,9 @@ class PodUserController extends Controller
         // policies 
         $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
         $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
+
         if (!$userWorkspaceEditor->hasPermissionTo('users_edit') && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value ) {
-            return 'error';
+            return redirect()->back()->with('error', __('Error: you do not have permission for this!'));
         }
 
         $permissions = $request->input('permissions', []);

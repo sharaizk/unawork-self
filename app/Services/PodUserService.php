@@ -209,4 +209,15 @@ class PodUserService
     {
         Utility::sendNotification('pod_request', null, $podCreator, $podUser);
     }
+
+    public function removeRedirectToLocation($ownId, $userId, $podId): string
+    {
+        if ($ownId != $userId) {
+            $location = route('pods.users', ['podId' => $podId]);
+        } else {
+            $workspace = Workspace::where('created_by', $userId)->first();
+            $location = route('change-workspace', ['id' => $workspace->id]);
+        }
+        return $location;
+    }
 }
