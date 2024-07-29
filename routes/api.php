@@ -95,5 +95,7 @@ Route::apiResource('project-categories', ProjectCategoryController::class)->exce
 
 Route::post('/project-category', [ProjectCategoryController::class, 'store'])->name('api.project-category.store');
 
-Route::apiResource('job-vacancies', JobVacancyController::class);
+Route::apiResource('job-vacancies', JobVacancyController::class)->except('show');
+Route::get('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'show'])->name('api.job_vacancies.show');
+
 });

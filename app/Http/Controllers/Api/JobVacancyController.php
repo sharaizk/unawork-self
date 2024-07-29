@@ -8,6 +8,7 @@ use App\Http\Requests\JobVacancy\StoreJobVacancyRequest;
 use App\Http\Requests\JobVacancy\UpdateJobVacancyRequest;
 use App\Models\JobVacancy;
 use App\Services\JobVacancyService;
+use Illuminate\Http\Request;
 
 class JobVacancyController extends Controller
 {
@@ -18,15 +19,16 @@ class JobVacancyController extends Controller
         $this->jobVacancyService = $jobVacancyService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $jobVacancies = JobVacancy::all();
+        $perPage = $request->get('per_page', 10);
+        $jobVacancies = $this->jobVacancyService->list($perPage);
+        
         return response()->json($jobVacancies);
     }
 
-    public function show($id)
+    public function show(JobVacancy $jobVacancy)
     {
-        $jobVacancy = JobVacancy::findOrFail($id);
         return response()->json($jobVacancy);
     }
 
@@ -35,7 +37,7 @@ class JobVacancyController extends Controller
         $data = $request->validated();
         $data['user_id'] = Auth::id();
 
-        $jobVacancy = $this->jobVacancyService->createJobVacancy($data);
+        $jobVacancy = $this->jobVacancyService->create($data);
 
         return response()->json($jobVacancy, 201);
     }
@@ -44,7 +46,7 @@ class JobVacancyController extends Controller
     {
         $this->authorize('update', $jobVacancy);
         $data = $request->validated();
-        $jobVacancy = $this->jobVacancyService->updateJobVacancy($jobVacancy, $data);
+        $jobVacancy = $this->jobVacancyService->update($jobVacancy, $data);
 
         return response()->json($jobVacancy);
     }
@@ -52,7 +54,7 @@ class JobVacancyController extends Controller
     public function destroy(JobVacancy $jobVacancy)
     {
         $this->authorize('delete', $jobVacancy);
-        $this->jobVacancyService->deleteJobVacancy($jobVacancy);
+        $this->jobVacancyService->delete($jobVacancy);
 
         return response()->json(null, 204);
     }

@@ -6,18 +6,23 @@ use App\Models\JobVacancy;
 
 class JobVacancyService
 {
-    public function createJobVacancy(array $data): JobVacancy
+    public function list(int $perPage = 10)
+    {
+        return JobVacancy::paginate($perPage);
+    }
+
+    public function create(array $data): JobVacancy
     {
         return JobVacancy::create($data);
     }
 
-    public function updateJobVacancy(JobVacancy $jobVacancy, array $data): JobVacancy
+    public function update(JobVacancy $jobVacancy, array $data): JobVacancy
     {
         $jobVacancy->update($data);
         return $jobVacancy;
     }
 
-    public function deleteJobVacancy(JobVacancy $jobVacancy): void
+    public function delete(JobVacancy $jobVacancy): void
     {
         $jobVacancy->delete();
     }
