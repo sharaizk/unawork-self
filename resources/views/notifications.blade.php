@@ -121,7 +121,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $user = \Auth::user();
                     $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
                     $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
-                    $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>
+                    $text = __('New invite for joining pod: ') . ' <b>' . $pod->title . '</b>
                         <br>
                         <form id="acceptForm-' . $user->id . '" 
                             action="' . $acceptLink . '" 
@@ -194,7 +194,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @elseif($notification->type == 'pod_request_decline_user')
                 @php
                     $pod = \App\Models\Pod::find($data->pod_id);
-                    $text = __('You have beed declined to join pod (id) : ') . ' <b>' . $pod->title . '</b>';
+                    $text = __('You have beed declined to join pod : ') . ' <b>' . $pod->title . '</b>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
                 @endphp

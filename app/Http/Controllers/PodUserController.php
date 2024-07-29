@@ -104,36 +104,24 @@ class PodUserController extends Controller
         Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_accept_user', null, $user->id, $podUser);
 
-        $notification = Notification::where('type', 'pod_request')
-            ->where('user_id', $ownId)
-            ->whereJsonContains('data->id', $podUser->id)
-            ->first();
-
-        if ($notification) {
-            $notification->delete();
-        }
+        $this->deleteNotification('pod_request', $ownId, $podUser->id);
+        $this->deleteNotification('pod_invite', $user->id, $pod->id);
         
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 
     public function decline(Pod $pod, User $user)
     {   
+        $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
         $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
     
-
         Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_decline_user', null, $user->id, $podUser);
 
-        $notification = Notification::where('type', 'pod_request')
-            ->where('user_id', $ownId)
-            ->whereJsonContains('data->id', $podUser->id)
-            ->first();
-
-        if ($notification) {
-            $notification->delete();
-        }
+        $this->deleteNotification('pod_request', $ownId, $podUser->id);
+        $this->deleteNotification('pod_invite', $user->id, $pod->id);
         
         return response()->json(['message' => 'User status updated to active'], 200);
     }
@@ -163,5 +151,13 @@ class PodUserController extends Controller
         $userWorkspace->syncPermissions($permissions);
 
         return redirect()->back()->with('success', 'Permissions updated successfully.');
+    }
+
+    private function deleteNotification($type, $userId, $podUserId)
+    {
+        Notification::where('type', $type)
+            ->where('user_id', $userId)
+            ->whereJsonContains('data->id', $podUserId)
+            ->delete();
     }
 }
