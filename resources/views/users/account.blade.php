@@ -19,22 +19,22 @@
         <div class="col-xl-3">
             <div class="card sticky-top" style="top:30px">
                 <div class="list-group list-group-flush" id="useradd-sidenav">
-                    <a href="#v-pills-home" class="list-group-item list-group-item-action border-0">{{ __('Account') }} <div
+                    <a href="#v-pills-home" class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Account') }} <div
                             class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
                     <a href="#v-pills-profile"
-                        class="list-group-item list-group-item-action border-0">{{ __('Change Password') }} <div
+                        class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Change Password') }} <div
                             class="float-end"><i class="ti ti-chevron-right"></i></div></a>
                     
                     @if ($user->hasRole('employee'))
                         <a href="#v-pills-profiler"
-                            class="list-group-item list-group-item-action border-0">{{ __('Employee Profile') }} <div
+                            class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Employee Profile') }} <div
                                 class="float-end"><i class="ti ti-chevron-right"></i></div></a>
                     @endif
 
                     @auth('client')
                         <a href="#v-pills-billing"
-                            class="list-group-item list-group-item-action border-0">{{ __('Billing Details') }} <div
+                            class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Billing Details') }} <div
                                 class="float-end"><i class="ti ti-chevron-right"></i></div></a>
                     @endauth
 
@@ -299,21 +299,21 @@
         });
     </script>
     <script>
-        $(document).on('click', '.list-group-item', function() {
-            $('.list-group-item').removeClass('active');
-            $('.list-group-item').removeClass('text-primary');
+        $(document).on('click', '.list-group-item-special', function() {
+            $('.list-group-item-special').removeClass('active');
+            $('.list-group-item-special').removeClass('text-primary');
             setTimeout(() => {
                 $(this).addClass('active').removeClass('text-primary');
             }, 10);
         });
 
         var type = window.location.hash.substr(1);
-        $('.list-group-item').removeClass('active');
-        $('.list-group-item').removeClass('text-primary');
+        $('.list-group-item-special').removeClass('active');
+        $('.list-group-item-special').removeClass('text-primary');
         if (type != '') {
             $('a[href="#' + type + '"]').addClass('active').removeClass('text-primary');
         } else {
-            $('.list-group-item:eq(0)').addClass('active').removeClass('text-primary');
+            $('.list-group-item-special:eq(0)').addClass('active').removeClass('text-primary');
         }
 
         var scrollSpy = new bootstrap.ScrollSpy(document.body, {

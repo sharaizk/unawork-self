@@ -59,6 +59,10 @@ class PodService
             $data['image'] = $this->uploadImage($data['image'], $settings);
         }
 
+        if (isset($data['title'])) {
+            $this->updateWorkspaceName($data['title'], $pod);
+        }
+
         $pod->update($data);
 
         if (isset($data['skills'])) {
@@ -111,5 +115,13 @@ class PodService
 
         $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $userId)->first();
         $userWorkspace->assignAllPermissionsToCreator();
+    }
+
+    protected function updateWorkspaceName(string $title, Pod $pod): void
+    {
+        $worskpace = $pod->workspace;
+        $worskpace->update([
+            'name' => $title.'-workspace', 
+        ]);
     }
 }

@@ -112,7 +112,7 @@
                                                     </form>
                                                 @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'active')->pluck('id')->toArray()))
                                                     <a href="#" class="dropdown-item text-danger bs-pass-para" data-confirm="{{__('Are You Sure?')}}" data-text="{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="leave-form-{{$project->id}}">
-                                                         <i class="ti ti-trash"></i>  <span>{{ __('Delete')}}</span>
+                                                         <i class="ti ti-trash"></i>  <span>{{ __('Leave the Project')}}</span>
                                                     </a>
                                                     <form id="leave-form-{{$project->id}}" action="{{ route('projects.leave',[$currentWorkspace->slug,$project->id]) }}" method="POST" style="display: none;">
                                                         @csrf

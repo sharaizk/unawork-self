@@ -21,8 +21,9 @@ class PodUserController extends Controller
 {
     public function index(int $podId)
     {
-        $currentWorkspace = Auth::user()->currentWorkspace;
         $pod = Pod::find($podId);
+        $currentWorkspace = $pod->workspace;
+
         $users = $pod->users;
         return view('pod.manage.users', compact('currentWorkspace', 'pod', 'users'));
     }
@@ -88,7 +89,11 @@ class PodUserController extends Controller
         $podUserService = new PodUserService;
         try {
             $podUserService->remove($userId, $podId);
-            return response()->json(['message' => 'User removed from pod successfully'], 200);
+            $location = $podUserService->getBackUrl(Auth::id(), $userId, $podId);
+            return response()->json([
+                'message' => 'User removed from pod successfully',
+                'location' => $location
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed:'.$e], 404);
         }
@@ -104,36 +109,24 @@ class PodUserController extends Controller
         Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_accept_user', null, $user->id, $podUser);
 
-        $notification = Notification::where('type', 'pod_request')
-            ->where('user_id', $ownId)
-            ->whereJsonContains('data->id', $podUser->id)
-            ->first();
-
-        if ($notification) {
-            $notification->delete();
-        }
+        $this->deleteNotification('pod_request', $ownId, $podUser->id);
+        $this->deleteNotification('pod_invite', $user->id, $pod->id);
         
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 
     public function decline(Pod $pod, User $user)
     {   
+        $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
         $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
     
-
         Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_decline_user', null, $user->id, $podUser);
 
-        $notification = Notification::where('type', 'pod_request')
-            ->where('user_id', $ownId)
-            ->whereJsonContains('data->id', $podUser->id)
-            ->first();
-
-        if ($notification) {
-            $notification->delete();
-        }
+        $this->deleteNotification('pod_request', $ownId, $podUser->id);
+        $this->deleteNotification('pod_invite', $user->id, $pod->id);
         
         return response()->json(['message' => 'User status updated to active'], 200);
     }
@@ -154,8 +147,9 @@ class PodUserController extends Controller
         // policies 
         $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
         $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
+
         if (!$userWorkspaceEditor->hasPermissionTo('users_edit') && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value ) {
-            return 'error';
+            return redirect()->back()->with('error', __('Error: you do not have permission for this!'));
         }
 
         $permissions = $request->input('permissions', []);
@@ -163,5 +157,13 @@ class PodUserController extends Controller
         $userWorkspace->syncPermissions($permissions);
 
         return redirect()->back()->with('success', 'Permissions updated successfully.');
+    }
+
+    private function deleteNotification($type, $userId, $podUserId)
+    {
+        Notification::where('type', $type)
+            ->where('user_id', $userId)
+            ->whereJsonContains('data->id', $podUserId)
+            ->delete();
     }
 }

@@ -28,20 +28,20 @@
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
-                    <label for="description" class="form-label">Description:</label>
-                    <textarea class="form-control" name="description" id="description" rows="3">{{ $pod->description }}</textarea>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="row">
-                    <h4>Skills:</h4>
-                    <select class="form-control chosen-select" name="skills[]" multiple>
+                    <label for="skills[]" class="form-label">Skills:</label>
+                    <select class="form-group chosen-select" name="skills[]" multiple>
                         @foreach($skills as $skill)
                             <option value="{{ $skill->id }}" {{ $pod->skills->contains($skill->id) ? 'selected' : '' }}>
                                 {{ $skill->name }}
                             </option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea class="form-control" name="description" id="description" rows="3">{{ $pod->description }}</textarea>
                 </div>
             </div>
         </div>

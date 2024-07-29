@@ -3,6 +3,9 @@
 @section('content')
 @php
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+    if (!$userWorkspace) {
+        return redirect()->back()->with('error', 'permission denied!');
+    }
 @endphp
 <div class="row">
         
@@ -252,7 +255,7 @@
                 const url = this.getAttribute('data-url');
                 try {
                     const response = await axios.delete(url);
-                    window.location.href = '{{ route('pods.index') }}'; 
+                    window.location.href = response.data.location; 
                 } catch (error) {
                     console.error('An error occurred:', error);
                 }

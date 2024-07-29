@@ -1,4 +1,4 @@
-<form class="" method="post" action="{{ route('projects.update',[$currentWorkspace->slug,$project->id]) }}">
+<form id="editProjectForm" class="" method="post" action="{{ route('projects.update',[$currentWorkspace->slug,$project->id]) }}">
     @csrf
     <div class="modal-body">
         <div class="row">
@@ -29,7 +29,7 @@
             <div class="form-group col-md-12">
                     <label for="project_category" class="form-label">{{ __('Project Category') }}</label>
                     <select id="project_category" name="project_category_id" class="form-control select2">
-                        <option value="" {{ $project->project_category_id == null ? 'selected' : '' }} disabled>{{ __('Select Category') }}</option>
+                        <option value="" {{ $project->project_category_id == null ? 'selected' : '' }}>{{ __('Select Category') }}</option>
                         @foreach(App\Models\ProjectCategory::all() as $category)
                             <option value="{{ $category->id }}" {{ $project->project_category_id == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
@@ -113,48 +113,42 @@
 </script>
 
 <script>
-        let addCategoryButton = document.getElementById('addCategoryButton');
-        addCategoryButton.addEventListener('click', function () {
-            document.getElementById('newCategoryInput').style.display = "flex";
-            document.getElementById('addCategoryButton').style.display = "none";
-            
-        });
+    $(document).on('shown.bs.modal', function () {
+        // Перевіряємо наявність форми перед прив'язкою обробників
+        if ($('#createProjectForm, #editProjectForm').length) {
+            $('#addCategoryButton').off('click').on('click', function() {
+                $('#newCategoryInput').show();
+                $('#addCategoryButton').hide();
+            });
 
-        document.getElementById('createCategoryButton').addEventListener('click', function () {
-            const newCategoryName = document.getElementById('newCategoryName').value;
+            $('#createCategoryButton').off('click').on('click', function() {
+                const newCategoryName = $('#newCategoryName').val().trim();
 
-            if (newCategoryName.trim() === '') {
-                alert("Please enter a category name.");
-                return;
-            }
-
-            fetch("{{ route('api.project-category.store') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({ name: newCategoryName })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                if (newCategoryName === '') {
+                    alert("Please enter a category name.");
+                    return;
                 }
-                return response.json();
-            })
-            .then(data => {
-                const select = document.getElementById("project_category");
-                const option = document.createElement("option");
-                option.value = data.id;
-                option.text = data.name;
-                select.appendChild(option);
-                select.value = data.id;
 
-                document.getElementById('newCategoryInput').style.display = "none";
-                document.getElementById('newCategoryName').value = '';
-                document.getElementById('addCategoryButton').style.display = "inline-block";
+                fetch("{{ route('api.project-category.store') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({ name: newCategoryName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const select = $("#project_category");
+                    const option = $('<option></option>').val(data.id).text(data.name);
+                    select.append(option).val(data.id);
 
-            })
-            .catch(error => console.error('Error:', error));
-        });
+                    $('#newCategoryInput').hide();
+                    $('#newCategoryName').val('');
+                    $('#addCategoryButton').show();
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+    });
 </script>
