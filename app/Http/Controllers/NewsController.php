@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\News;
 use App\Models\Pod;
+use App\Models\UserWorkspace;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,14 @@ class NewsController extends Controller
     {
         $currentWorkspace = Auth::user()->currentWorkspace;
         $pod = Pod::find($podId);
-        $news = $pod->news;
+
+        $userWorkspace = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $pod->workspace->id)->firstOrFail();
+        if ($userWorkspace->hasPermissionTo('news_index') || $pod->created_by == Auth::id()) {
+            $news = $pod->news;
+        } else {
+            $news = [];
+        }
+
         return view('pod.manage.news', compact('currentWorkspace', 'pod', 'news'));
     }
 
