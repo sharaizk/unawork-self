@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PodUserController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ProjectCategoryController;
@@ -93,4 +94,8 @@ Route::delete('/project/{id}', [PodController::class, 'destroy']);
 Route::apiResource('project-categories', ProjectCategoryController::class)->except('store');
 
 Route::post('/project-category', [ProjectCategoryController::class, 'store'])->name('api.project-category.store');
+
+Route::apiResource('job-vacancies', JobVacancyController::class)->except('show');
+Route::get('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'show'])->name('api.job_vacancies.show');
+
 });
