@@ -6,8 +6,8 @@
             <thead>
                 <tr>
                     <th>Permission Type</th>
-                    <th>View</th>
-                    <th>Edit</th>
+                    <th>View All</th>
+                    <th>Management</th>
                 </tr>
             </thead>
             <tbody>
