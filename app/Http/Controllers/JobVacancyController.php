@@ -33,4 +33,10 @@ class JobVacancyController extends Controller
     {
         return view('job_vacancies.landing.page', compact('vacancy'));
     }
+
+    public function list()
+    {
+        $vacancies = JobVacancy::paginate(12);
+        return view('job_vacancies.landing.list', compact('vacancies'));
+    }
 }

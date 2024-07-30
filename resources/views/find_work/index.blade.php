@@ -108,7 +108,7 @@
         <section class="section__layout section_company">
             <div class="container-master pods__title">
                 <h2>Companies Hiring</h2>
-                <a href="{{ route('companies.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ route('job-vacancies.landing.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
                 <div class="row-master">

@@ -2,7 +2,7 @@
     $company = $vacancy->company;
     $vacancy_page = route('job-vacancies.landing.show', ['vacancy' => $vacancy->id]);
 @endphp
-<div class="col-md-3">
+<div class="col-md-3 p-3">
     <div class="company-box">
         <div class="title-box">
                 <img alt="user-image" class="img-fluid img_users_fix_size"
