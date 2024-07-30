@@ -10,6 +10,15 @@
 
     @php
         $company = $vacancy->company;
+        if (Auth::user()) {
+            if (Auth::user()->hasRole('employee')) {
+                $sendRequestUrl = route('login');
+            } else {
+                $sendRequestUrl = "#";
+            }
+        } else {
+            $sendRequestUrl = route('login');
+        }
     @endphp
     <main>
         <div class="container-master">
@@ -83,7 +92,12 @@
                                 <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
                             </div>
                             <div class="aside__card__actions">
-                                <a href="/hub-shop.php"><span>Send request</span></a>
+                                @guest
+                                    <a href="{{ route('login') }}"><span>Send Application</span></a>
+                                @endguest
+                                @if (Auth::check() && Auth::user()->hasRole('employee'))
+                                <a href="#" id="sendApplButton"><span>Send Application</span></a>
+                                @endif
                             </div>
                         </div>
                         <!-- <div class="aside__card">
@@ -118,10 +132,63 @@
             </div>
         </div>
     </main>
-
+    <!-- Application Modal -->
+    <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Send Application</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="applicationForm" method="POST" action="{{ route('api.job-applications.store') }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+                        <input type="hidden" name="job_vacancy_id" value="{{ $vacancy->id }}">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">Submit Application</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 @section('scripts')
+<script>
+    $(document).ready(function() {
+        $('#sendApplButton').on('click', function(event) {
+            $('#applicationModal').modal('show')
+        });
+
+        $('#applicationForm').on('submit', function(event) {
+            event.preventDefault();
+            var form = $(this);
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    $('#applicationModal').modal('hide');
+                    showNotification('Application submitted successfully!', 'success');
+                },
+                error: function(xhr) {
+                    $('#applicationModal').modal('hide');
+
+                    var errorMessage = 'An error occurred while submitting your application.';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    showNotification(errorMessage, 'danger');
+                }
+            });
+        });
+    });
+</script>
 @endsection
 @endpush
