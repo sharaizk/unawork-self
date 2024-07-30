@@ -6,7 +6,7 @@
     <div class="company-box">
         <div class="title-box">
                 <img alt="user-image" class="img-fluid img_users_fix_size"
-                @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
+                @if ($company->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $company->avatar) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
                         
                 <a href="{{ $vacancy_page }}">
                     <h4>{{$vacancy->title}}</h4>
