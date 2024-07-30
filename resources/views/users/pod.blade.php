@@ -126,8 +126,10 @@
                         document.getElementById('success-message').style.display = 'block';
                         setTimeout(function() {
                             location.reload();
-                        }, 3000);
+                        }, 1000);
                     } catch (error) {
+                        $("#commonModal").modal('hide');
+                        showNotification('Pod creation failed.', 'danger');
                         console.error(error); 
                     }
                 });

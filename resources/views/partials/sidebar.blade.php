@@ -17,6 +17,8 @@
                if (!is_null(Auth::user()->currant_workspace)) {
                 $currentWorkspace = \App\Models\Workspace::find(Auth::user()->currant_workspace);
                }
+
+                $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
                 
                $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
                $color = $setting->theme_color;
@@ -108,6 +110,7 @@
                                             <span class="dash-mtext">{{ __('Users') }}</span>
                                         </a>
                                     </li>
+                                    @if ($currentWorkspace->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('news_index'))
                                     <li class="dash-item dash-hasmenu">
                                             @php
                                                 $currentRoute = Request::route()->getName();
@@ -120,6 +123,7 @@
                                                 <span class="dash-mtext">{{ __('News') }}</span>
                                             </a>
                                     </li>
+                                    @endif
                                 @else
                                 <li class="dash-item dash-hasmenu">
                                     @php

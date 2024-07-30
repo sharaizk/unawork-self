@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ProjectCategoryController;
+use App\Http\Controllers\Api\JobApplicationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -97,5 +98,13 @@ Route::post('/project-category', [ProjectCategoryController::class, 'store'])->n
 
 Route::apiResource('job-vacancies', JobVacancyController::class)->except('show');
 Route::get('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'show'])->name('api.job_vacancies.show');
+
+
+Route::prefix('job-applications')->middleware(['auth:sanctum'])->group(function () {
+    Route::get('/', [JobApplicationController::class, 'index'])->name('job-applications.index');
+    Route::post('/', [JobApplicationController::class, 'store'])->name('job-applications.store');
+    Route::patch('/{jobApplication}/accept', [JobApplicationController::class, 'accept'])->name('job-applications.accept');
+    Route::patch('/{jobApplication}/reject', [JobApplicationController::class, 'reject'])->name('job-applications.reject');
+});
 
 });

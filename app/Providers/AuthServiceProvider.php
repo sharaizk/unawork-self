@@ -23,6 +23,7 @@ class AuthServiceProvider extends ServiceProvider
         News::class => NewsPolicy::class,
         Notification::class => NotificationPolicy::class,
         JobVacancy::class => JobVacancyPolicy::class,
+        JobApplication::class => JobApplicationPolicy::class,
     ];
 
     /**

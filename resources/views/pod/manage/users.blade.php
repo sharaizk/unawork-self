@@ -6,6 +6,7 @@
     if (!$userWorkspace) {
         return redirect()->back()->with('error', 'permission denied!');
     }
+    $adminSetting = App\Models\Utility::getAdminPaymentSetting();
 @endphp
 <div class="row">
         
@@ -84,10 +85,12 @@
                                     @endif
                                 @endif
                                 @if ($user->id != Auth::user()->id )
-                                    <a href="#" class="dropdown-item sendMessageUser" data-employee-id="{{ $user->id }}">
-                                        <i class="ti ti-pencil"></i> 
-                                        <span> Message </span> 
-                                    </a>
+                                    @if ($adminSetting['enable_chat'] == 'on')
+                                        <a href="#" class="dropdown-item sendMessageUser" data-employee-id="{{ $user->id }}">
+                                            <i class="ti ti-pencil"></i> 
+                                            <span> Message </span> 
+                                        </a>
+                                    @endif
                                 @endif
                                 </div>
                             </div>
