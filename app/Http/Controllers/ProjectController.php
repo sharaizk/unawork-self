@@ -62,12 +62,12 @@ class ProjectController extends Controller
     {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        $userWorkspace = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->firstOrFail();
+        $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->firstOrFail();
 
         if ($objUser->getGuard() == 'client') {
             $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
         } else {
-            if ($userWorkspace->hasPermissionTo('projects_index') || $currentWorkspace->created_by == Auth::id()) {
+            if ($userWorkspace->hasPermissionTo('projects_index') || $currentWorkspace->created_by == $objUser->id) {
                 $projects = Project::select('projects.*')
                 ->where('projects.workspace', '=', $currentWorkspace->id)->get();
             } else {

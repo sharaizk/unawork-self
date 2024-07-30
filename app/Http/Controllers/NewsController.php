@@ -15,12 +15,12 @@ class NewsController extends Controller
         $currentWorkspace = Auth::user()->currentWorkspace;
         $pod = Pod::find($podId);
 
-        $userWorkspace = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $pod->workspace->id)->firstOrFail();
-        if ($userWorkspace->hasPermissionTo('news_index') || $pod->created_by == Auth::id()) {
+        // $userWorkspace = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $pod->workspace->id)->firstOrFail();
+        // if ($userWorkspace->hasPermissionTo('news_index') || $pod->created_by == Auth::id()) {
             $news = $pod->news;
-        } else {
-            $news = [];
-        }
+        // } else {
+        //     $news = [];
+        // }
 
         return view('pod.manage.news', compact('currentWorkspace', 'pod', 'news'));
     }
