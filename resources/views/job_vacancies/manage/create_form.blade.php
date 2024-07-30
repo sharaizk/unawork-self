@@ -20,14 +20,14 @@
             <div class="col-lg-12">
                 <div class="form-group">
                     <label for="salary" class="form-label">Salary:</label>
-                    <input type="number" class="form-control" name="salary" id="salary" min="0" placeholder="Enter Salary (e.g., 1000)">
+                    <input type="number" class="form-control" name="salary" id="salary" min="0" placeholder="Enter Salary (e.g., 1000)" required>
                 </div>
             </div>
 
             <div class="col-lg-12">
                 <div class="form-group">
                     <label for="description" class="form-label">Description:</label>
-                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="Enter Description"></textarea>
+                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="Enter Description" required></textarea>
                 </div>
             </div>
         </div>

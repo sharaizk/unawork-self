@@ -9,6 +9,7 @@ use App\Models\Skill;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Enums\User\UserRole;
+use App\Models\JobVacancy;
 use App\Services\CompanyService;
 
 class FindWorkController extends Controller
@@ -29,6 +30,8 @@ class FindWorkController extends Controller
             $joinedPods = $user->pods()->pluck('pod_id')->toArray();
         }
 
-        return view('find_work.index', compact('companies', 'pods', 'countries', 'skills', 'projects', 'joinedPods', 'user'));
+        $vacancies = JobVacancy::limit(4)->get();
+
+        return view('find_work.index', compact('vacancies', 'companies', 'pods', 'countries', 'skills', 'projects', 'joinedPods', 'user'));
     }
 }

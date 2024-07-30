@@ -24,7 +24,12 @@
                     <div class="card   text-center">
                         <div class="card-header border-0 pb-0">
                             <span class="badge bg-primary"></span>
-                                
+                            <h4 class="mt-2">   
+                                <a href="#">
+                                    {{$vacancy->title}}
+                                    <!-- <i class="ti ti-eye"></i> -->
+                                </a>    
+                            </h4>
                             <div class="card-header-right">
                                 <div class="btn-group card-option">
                                     <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
@@ -50,12 +55,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <h4 class="mt-2">   
-                                <a href="#">
-                                    {{$vacancy->title}}
-                                    <!-- <i class="ti ti-eye"></i> -->
-                                </a>    
-                            </h4>
+                            
                             <span>Salary : {{ $vacancy->salary }}</span>
                             <br>
                             <small>

@@ -28,4 +28,9 @@ class JobVacancyController extends Controller
     {
         return view('job_vacancies.manage.edit_form', compact('vacancy'));
     }
+
+    public function show(JobVacancy $vacancy)
+    {
+        return view('job_vacancies.landing.page', compact('vacancy'));
+    }
 }

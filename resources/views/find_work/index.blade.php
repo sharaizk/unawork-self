@@ -112,6 +112,20 @@
             </div>
             <div class="container-master">
                 <div class="row-master">
+                    @foreach($vacancies as $vacancy)
+                        @include('job_vacancies.landing.card', ['vacancy' => $vacancy])
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <section class="section__layout section_company">
+            <div class="container-master pods__title">
+                <h2>Companies</h2>
+                <a href="{{ route('companies.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
+            </div>
+            <div class="container-master">
+                <div class="row-master">
                     @foreach($companies as $company)
                         @include('company.landing.company_card', ['company' => $company])
                     @endforeach
