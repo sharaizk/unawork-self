@@ -96,8 +96,11 @@ Route::apiResource('project-categories', ProjectCategoryController::class)->exce
 
 Route::post('/project-category', [ProjectCategoryController::class, 'store'])->name('api.project-category.store');
 
-Route::apiResource('job-vacancies', JobVacancyController::class)->except('show');
+Route::apiResource('job-vacancies', JobVacancyController::class)->except('store','show', 'update', 'delete');
+Route::post('job-vacancies', [JobVacancyController::class, 'store'])->name('api.job_vacancies.store');
+Route::post('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'update'])->name('api.job_vacancies.update');
 Route::get('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'show'])->name('api.job_vacancies.show');
+Route::delete('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'destroy'])->name('api.job_vacancies.destroy');
 
 
 Route::prefix('job-applications')->middleware(['auth:sanctum'])->group(function () {

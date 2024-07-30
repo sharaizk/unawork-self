@@ -72,6 +72,7 @@ use App\Http\Controllers\PodController;
 use App\Http\Controllers\PodNewsController;
 use App\Http\Controllers\PodUserController;
 use App\Http\Controllers\ProjectUserController;
+use App\Http\Controllers\JobVacancyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +114,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pod/{pod}/users/{user}/edit-permissions', [PodUserController::class, 'editPermissions'])->name('pod.users.editPermissions');
     Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
+
+    Route::get('/account/job-vacancies', [JobVacancyController::class, 'index'])->name('job-vacancies.index');
+    Route::get('/account/job-vacancies/create', [JobVacancyController::class, 'create'])->name('job-vacancies.create');
+    Route::get('/account/job-vacancies/{vacancy}/edit', [JobVacancyController::class, 'edit'])->name('job-vacancies.edit');
+
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
