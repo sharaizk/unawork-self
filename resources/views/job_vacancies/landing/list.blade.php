@@ -31,6 +31,15 @@
             color: #0056b3;
         }
     </style>
+    <section class="section__titlepage">
+        <div class="container-master">
+            <h1 class="section__titlepage--headertitle"><span>Companies hiring</span></h1>
+            <ul class="breadcrumb mt-1">
+                <li class="breadcrumb-item"><a href="{{ route('landing.find-work') }}">Find Work</a></li>
+                <li class="breadcrumb-item"> {{ __('Vacancies') }}</li>
+            </ul>
+        </div>
+    </section>
     <section class="section__layout section_company">
         <div class="container-master">
             <div class="row-master">
