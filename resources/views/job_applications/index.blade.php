@@ -6,7 +6,7 @@
 
 @section('links')
     <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
-    <li class="breadcrumb-item"> <a href="{{ route('home') }}">{{ __('Job Vacancies') }}</a></li>
+    <li class="breadcrumb-item"> <a href="{{ route('job-vacancies.index') }}">{{ __('Job Vacancies') }}</a></li>
     <li class="breadcrumb-item"> {{ $vacancy->title }}</li>
     <li class="breadcrumb-item"> {{ __('Job Applications') }}</li>
 @endsection
