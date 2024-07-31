@@ -20,6 +20,7 @@
             <div class="form-group col-md-12">
                 <label class="form-label">{{ __('Visibility') }}</label>
                 <div class="form-check">
+                    <input type="hidden" name="private" value="0">
                     <input class="form-check-input" type="checkbox" id="private" name="private" value="1" {{ $project->private ? 'checked' : '' }}>
                     <label class="form-check-label" for="private">
                         {{ __('Private Project') }}
