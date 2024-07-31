@@ -64,7 +64,7 @@
                     <label class="col-form-label">{{ __('Assign To') }}</label>
 
                     <select class="assign_to multi-select" id="assign_to" name="assign_to[]" data-toggle="select2"
-                        multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
+                         data-placeholder="{{ __('Select User ...') }}">
                         @foreach ($project->users as $u)
                             <option value="{{ $u->id }}">{{ $u->name }} - {{ $u->email }}</option>
                         @endforeach
