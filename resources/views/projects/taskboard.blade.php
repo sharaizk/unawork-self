@@ -201,11 +201,11 @@
                                                                 {{-- @dump($users->name) --}}
                                                                 @foreach ($users as $key => $user)
                                                                     @if ($key < 3)
-                                                                        <a href="#" class="img_group">
-                                                                            <img alt="image" data-toggle="tooltip"
-                                                                                data-original-title="{{ $user->name }}"
-                                                                                @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif>
-                                                                        </a>
+                                                                    <a href="#" class="img_group" data-toggle="tooltip" data-placement="bottom" title="{{$user->name}}">
+                                                                        <img alt="{{$user->name}}"
+                                                                            @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif
+                                                                            style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                                                                    </a>
                                                                     @endif
                                                                 @endforeach
                                                                 @if (count($users) > 2)
