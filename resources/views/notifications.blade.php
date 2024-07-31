@@ -322,6 +322,14 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                         }
                     }
                 @endphp
+            @elseif($notification->type == 'job_application_new')
+                @php
+                    $link = route('job-applications.index', ['vacancy' => $data->job_vacancy_id]);
+                    $vacancy = \App\Models\JobVacancy::find($data->job_vacancy_id);
+                    $text = __('You have new application for your vacancy : ') . ' <b>' . $vacancy->title . '</b>';
+                    $icon = 'fa fa-bug';
+                    $name = 'JOB';
+                @endphp
         @endif
         <div class="list-group-item list-group-item-action">
             <div class="d-flex align-items-center">
