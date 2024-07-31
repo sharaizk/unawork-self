@@ -131,7 +131,7 @@
                         class: 'multi-select form-control',
                         multiple: 'multiple',
                         'data-toggle': 'select2',
-                        'data-placeholder': '{{ __("Select Users ...") }}'
+                        'data-placeholder': '{{ __("Select User ...") }}'
                     });
 
                     if (response.users && response.users.length > 0) {
