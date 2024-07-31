@@ -37,6 +37,9 @@
                                         <i class="feather icon-more-vertical"></i>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="{{ route('job-applications.index', ['vacancy' => $vacancy->id]) }}" class="dropdown-item">
+                                            <i class="ti ti-book"></i> <span>{{ __('View Applications') }}</span>
+                                        </a>
                                         <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" 
                                             data-title="{{ __('Edit') }}"
                                             data-url="{{ route('job-vacancies.edit', $vacancy=$vacancy) }}"><i 

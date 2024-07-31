@@ -65,6 +65,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PayHerePaymentController;
@@ -118,6 +119,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/job-vacancies', [JobVacancyController::class, 'index'])->name('job-vacancies.index');
     Route::get('/account/job-vacancies/create', [JobVacancyController::class, 'create'])->name('job-vacancies.create');
     Route::get('/account/job-vacancies/{vacancy}/edit', [JobVacancyController::class, 'edit'])->name('job-vacancies.edit');
+
+    Route::get('/account/job-vacancies/{vacancy}/applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
 
 });
 

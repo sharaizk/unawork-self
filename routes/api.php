@@ -106,8 +106,8 @@ Route::delete('job-vacancies/{job_vacancy}', [JobVacancyController::class, 'dest
 Route::prefix('job-applications')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/', [JobApplicationController::class, 'index'])->name('job-applications.index');
     Route::post('/', [JobApplicationController::class, 'store'])->name('api.job-applications.store');
-    Route::patch('/{jobApplication}/accept', [JobApplicationController::class, 'accept'])->name('job-applications.accept');
-    Route::patch('/{jobApplication}/reject', [JobApplicationController::class, 'reject'])->name('job-applications.reject');
+    Route::patch('/{jobApplication}/accept', [JobApplicationController::class, 'accept'])->name('api.job-applications.accept');
+    Route::patch('/{jobApplication}/reject', [JobApplicationController::class, 'reject'])->name('api.job-applications.reject');
 });
 
 });
