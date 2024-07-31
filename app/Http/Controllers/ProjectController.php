@@ -737,8 +737,9 @@ class ProjectController extends Controller
         $objUser = Auth::user();
         $project = Project::find($projectID);
         $workspace = $project->workspaceData;
+        $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $workspace->id)->first();
 
-        if ($project->created_by == $objUser->id) {
+        if ($project->created_by == $objUser->id || $userWorkspace->hasPermissionTo('projects_edit')) {
             UserProject::where('project_id', '=', $projectID)->delete();
             ProjectFile::where('project_id', '=', $projectID)->delete();
             $project->delete();
