@@ -28,73 +28,97 @@
                                     <span class="badge bg-dark">{{ __('declined') }}</span>
                                 @endif
                             @endif
-                        <div class="card-header-right">
-                            <div class="btn-group card-option">
-                                <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                    <i class="feather icon-more-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
-                                    @if ($user->pivot->status == 'pod_pending')
-                                        <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
-                                            data-title="{{ __('Accept user') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Accept user') }}</span>
-                                        </a>
-                                        <a href="#" class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}""
-                                            data-title="{{ __('Decline user') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Decline user') }}</span>
-                                        </a>
-                                    @else
-                                        <!-- if ($user->id != Auth::id()) -->
-                                            <a href="#" class="dropdown-item" 
-                                                    data-ajax-popup="true" 
-                                                    data-size="lg" 
-                                                    data-title="Edit Permissions"
-                                                    data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
-                                                <i class="ti ti-flag"></i> 
-                                                Edit Permissions
-                                            </a>
-                                            <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
-                                                data-title="{{ __('Remove user from pod') }}">
-                                                <i class="ti ti-pencil"></i> 
-                                                <span>{{ __('Remove user from pod') }}</span>
-                                            </a>
-                                        <!-- endif -->
-                                    @endif
-                                @elseif ($user->id == Auth::user()->id )
-                                    @if ($user->pivot->status == 'employee_pending')
-                                        <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
-                                            data-title="{{ __('Accept user') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Accept invite') }}</span>
-                                        </a>
-                                        <a href="#" class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}""
-                                            data-title="{{ __('Decline user') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Decline invite') }}</span>
-                                        </a>
-                                    @else
-                                        <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
-                                            data-title="{{ __('Remove user from pod') }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span>{{ __('Remove me from this pod') }}</span>
-                                        </a>
-                                    @endif
+                            
+                            @php
+                                $hasOptions = false;
+                                $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
+                                $isPendingUser = $user->pivot->status == 'pod_pending';
+                                $isCurrentUser = $user->id == Auth::user()->id;
+                                $isChatEnabled = $adminSetting['enable_chat'] == 'on';
+
+                                // Check if there are any options to show
+                                if ($isCreatorOrHasPermission) {
+                                    if ($isPendingUser || $user->pivot->status != 'pod_pending') {
+                                        $hasOptions = true;
+                                    }
+                                } elseif ($isCurrentUser) {
+                                    if ($isPendingUser || $user->pivot->status != 'employee_pending') {
+                                        $hasOptions = true;
+                                    }
+                                }
+
+                                if (!$isCurrentUser && $isChatEnabled) {
+                                    $hasOptions = true;
+                                }
+                            @endphp
+
+                            <div class="card-header-right">
+                                @if($hasOptions)
+                                    <div class="btn-group card-option">
+                                        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                            <i class="feather icon-more-vertical"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            @if ($isCreatorOrHasPermission)
+                                                @if ($isPendingUser)
+                                                    <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
+                                                        data-title="{{ __('Accept user') }}">
+                                                        <i class="ti ti-pencil"></i> 
+                                                        <span>{{ __('Accept user') }}</span>
+                                                    </a>
+                                                    <a href="#" class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}""
+                                                        data-title="{{ __('Decline user') }}">
+                                                        <i class="ti ti-pencil"></i> 
+                                                        <span>{{ __('Decline user') }}</span>
+                                                    </a>
+                                                @else
+                                                    <!-- if ($user->id != Auth::id()) -->
+                                                        <a href="#" class="dropdown-item" 
+                                                                data-ajax-popup="true" 
+                                                                data-size="lg" 
+                                                                data-title="Edit Permissions"
+                                                                data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
+                                                            <i class="ti ti-flag"></i> 
+                                                            Edit Permissions
+                                                        </a>
+                                                        <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
+                                                            data-title="{{ __('Remove user from pod') }}">
+                                                            <i class="ti ti-pencil"></i> 
+                                                            <span>{{ __('Remove user from pod') }}</span>
+                                                        </a>
+                                                    <!-- endif -->
+                                                @endif
+                                            @elseif ($isCurrentUser)
+                                                @if ($isPendingUser)
+                                                    <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
+                                                        data-title="{{ __('Accept user') }}">
+                                                        <i class="ti ti-pencil"></i> 
+                                                        <span>{{ __('Accept invite') }}</span>
+                                                    </a>
+                                                    <a href="#" class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}""
+                                                        data-title="{{ __('Decline user') }}">
+                                                        <i class="ti ti-pencil"></i> 
+                                                        <span>{{ __('Decline invite') }}</span>
+                                                    </a>
+                                                @else
+                                                    <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
+                                                        data-title="{{ __('Remove user from pod') }}">
+                                                        <i class="ti ti-pencil"></i> 
+                                                        <span>{{ __('Remove me from this pod') }}</span>
+                                                    </a>
+                                                @endif
+                                            @endif
+                                            @if (!$isCurrentUser && $isChatEnabled)
+                                                <a href="#" class="dropdown-item sendMessageUser" data-employee-id="{{ $user->id }}">
+                                                    <i class="ti ti-pencil"></i> 
+                                                    <span> Message </span> 
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
                                 @endif
-                                @if ($user->id != Auth::user()->id )
-                                    @if ($adminSetting['enable_chat'] == 'on')
-                                        <a href="#" class="dropdown-item sendMessageUser" data-employee-id="{{ $user->id }}">
-                                            <i class="ti ti-pencil"></i> 
-                                            <span> Message </span> 
-                                        </a>
-                                    @endif
-                                @endif
-                                </div>
                             </div>
-                        </div>
                     </div>
                     <div class="card-body">
                         <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
