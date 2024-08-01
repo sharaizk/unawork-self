@@ -433,6 +433,9 @@
                                                     @php
                                                         $project = \App\Models\Project::find($data->id);
                                                         $workspace = \App\Models\Workspace::find($notification->workspace_id);
+                                                        if (!$project || !$workspace) {
+                                                            continue;
+                                                        }
                                                         $link = route('projects.show', [$workspace->slug, $project->id]);
                                                         $text = __('You were assigned to new project: ') . ' <b>' . $project->name . '</b>';
                                                         $icon = 'fa fa-suitcase';
@@ -452,34 +455,46 @@
                                                     @endphp
                                                 @elseif($notification->type == 'pod_request')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $pod = \App\Models\Pod::find($data->pod_id);
+                                                        if (!$pod) {
+                                                            continue;
+                                                        }
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
                                                 @elseif($notification->type == 'pod_request_accept_owner')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $pod = \App\Models\Pod::find($data->pod_id);
                                                         $user = \App\Models\User::find($data->user_id);
+                                                        if (!$pod || !$user) {
+                                                            continue;
+                                                        }
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $text = __('User : ') . ' <b>' . $user->name . '</b> joined your pod:  <b>'. $pod->title . ' </b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
                                                 @elseif($notification->type == 'pod_request_accept_user')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $pod = \App\Models\Pod::find($data->pod_id);
+                                                        if (!$pod) {
+                                                            continue;
+                                                        }
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $text = __('You have joined pod : ') . ' <b>' . $pod->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
                                                 @elseif($notification->type == 'pod_request_decline_owner')
                                                     @php
-                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $pod = \App\Models\Pod::find($data->pod_id);
                                                         $user = \App\Models\User::find($data->user_id);
+                                                        if (!$pod || !$user) {
+                                                            continue;
+                                                        }
+                                                        $link = route('pods.users', ['podId' => $data->pod_id]);
                                                         $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your pod:  <b>'. $pod->title . ' </b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
@@ -487,6 +502,9 @@
                                                 @elseif($notification->type == 'pod_request_decline_user')
                                                     @php
                                                         $pod = \App\Models\Pod::find($data->pod_id);
+                                                        if (!$pod) {
+                                                            continue;
+                                                        }
                                                         $text = __('You have beed declined to join pod (id) : ') . ' <b>' . $pod->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
@@ -495,6 +513,9 @@
                                                     @php
                                                         $user = \App\Models\User::find($data->user_id);
                                                         $project = \App\Models\Project::find($data->project_id);
+                                                        if (!$project) {
+                                                            continue;
+                                                        }
                                                         $acceptLink = route('pods.projects.join.accept', ['record' => $data->id]);
                                                         $declineLink = route('pods.projects.join.decline', ['record' => $data->id]);
                                                         $text = __('User : ') . ' 
@@ -512,6 +533,9 @@
                                                 @elseif($notification->type == 'project_accepted')
                                                     @php
                                                         $project = \App\Models\Project::find($data->id);
+                                                        if (!$project) {
+                                                            continue;
+                                                        }
                                                         $link = route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]);
                                                         $text = __('Your request to join project : ') . ' <b>' . $project->name . '</b> was accepted';
                                                         $icon = 'fa fa-bug';
@@ -520,6 +544,9 @@
                                                 @elseif($notification->type == 'project_decline')
                                                     @php
                                                         $project = \App\Models\Project::find($data->id);
+                                                        if (!$project) {
+                                                            continue;
+                                                        }
                                                         $link = route('home');
                                                         $text = __('Your request to join project : ') . ' <b>' . $project->name . '</b> was declined';
                                                         $icon = 'fa fa-bug';
@@ -529,6 +556,9 @@
                                                     @php
                                                         $user = \App\Models\User::find($data->user_id);
                                                         $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        if (!$workspace || !$user) {
+                                                            continue;
+                                                        }
                                                         $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
                                                         $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
                                                         $text = __('User : ') . ' 
@@ -546,6 +576,9 @@
                                                 @elseif($notification->type == 'workspace_invite')
                                                     @php
                                                         $data = \App\Models\UserWorkspace::findOrFail($data->id);
+                                                        if (!$data) {
+                                                            continue;
+                                                        }
                                                         $acceptLink = route('users.accept', ['workspace' => $data->workspace->id]);
                                                         $declineLink = route('users.decline', ['workspace' => $data->workspace->id]);
                                                         $text = __('New invite into: ') . ' <b>' . $data->workspace->name . '</b>
@@ -564,6 +597,9 @@
                                                     @php
                                                         $workspace = \App\Models\Workspace::find($data->workspace_id);
                                                         $user = \App\Models\User::find($data->user_id);
+                                                        if (!$workspace || !$user) {
+                                                            continue;
+                                                        }
                                                         $text = __('User : ') . ' <b>' . $user->name . '</b> joined your workspace:  <b>'. $workspace->name . ' </b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'WP';
@@ -571,6 +607,9 @@
                                                 @elseif($notification->type == 'workspace_request_accept_user')
                                                     @php
                                                         $workspace = \App\Models\Workspace::find($data->workspace_id);
+                                                        if (!$workspace) {
+                                                            continue;
+                                                        }
                                                         $text = __('You joined workspace:  <b>'. $workspace->name . ' </b>');
                                                         $icon = 'fa fa-bug';
                                                         $name = 'WP';
@@ -579,6 +618,9 @@
                                                     @php
                                                         $workspace = \App\Models\Workspace::find($data->workspace_id);
                                                         $user = \App\Models\User::find($data->user_id);
+                                                        if (!$workspace || !$user) {
+                                                            continue;
+                                                        }
                                                         $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your workspace:  <b>'. $workspace->name . ' </b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'WP';
@@ -587,6 +629,9 @@
                                                     @php
                                                         $workspace = \App\Models\Workspace::find($data->workspace_id);
                                                         $user = \App\Models\User::find($data->user_id);
+                                                        if (!$workspace || !$user) {
+                                                            continue;
+                                                        }
                                                         $text = __('Your request to join workspace : ') . ' <b>' . $workspace->name . '</b> were declined';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'WP';
@@ -594,6 +639,9 @@
                                                 @elseif($notification->type == 'project_new')
                                                     @php
                                                         $workspace = \App\Models\Workspace::find($data->workspace);
+                                                        if (!$workspace) {
+                                                            continue;
+                                                        }
                                                         $link = route('projects.index', ['slug' => $workspace->slug]);
                                                         $text = __('New project : ') . ' <b>' . $data->name . '</b> in your workspace:  <b>'. $workspace->name . ' </b>';
                                                         $icon = 'fa fa-bug';
@@ -614,8 +662,11 @@
                                                     @endphp
                                                 @elseif($notification->type == 'job_application_new')
                                                     @php
-                                                        $link = route('job-applications.index', ['vacancy' => $data->job_vacancy_id]);
                                                         $vacancy = \App\Models\JobVacancy::find($data->job_vacancy_id);
+                                                        if (!$vacancy) {
+                                                            continue;
+                                                        }
+                                                        $link = route('job-applications.index', ['vacancy' => $data->job_vacancy_id]);
                                                         $text = __('You have new application for your vacancy : ') . ' <b>' . $vacancy->title . '</b>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'JOB';
@@ -623,6 +674,9 @@
                                                 @elseif($notification->type == 'job_application_accepted')
                                                     @php
                                                         $vacancy = \App\Models\JobVacancy::find($data->job_vacancy_id);
+                                                        if (!$vacancy) {
+                                                            continue;
+                                                        }
                                                         $text = __('Your application for vacancy : ') . ' <b>' . $vacancy->title . '</b> was accepted';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'JOB';
@@ -630,6 +684,9 @@
                                                 @elseif($notification->type == 'job_application_rejected')
                                                     @php
                                                         $vacancy = \App\Models\JobVacancy::find($data->job_vacancy_id);
+                                                        if (!$vacancy) {
+                                                            continue;
+                                                        }
                                                         $text = __('Your application for vacancy : ') . ' <b>' . $vacancy->title . '</b> was rejected';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'JOB';

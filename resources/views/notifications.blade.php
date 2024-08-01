@@ -95,6 +95,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @php
                 if ($project) {
                     $workspace = \App\Models\Workspace::find($notification->workspace_id);
+                    if (!$workspace) {
+                        continue;
+                    }
                     $link = route('projects.task.board', [$workspace->slug, $notification->project_id]);
                     $text = __('New task assign') . ' <b>' . $data->title . '</b> ' . __('in project') . ' <b>' . $project->name . '</b>';
                     $icon = 'fa fa-clock-o';
@@ -111,6 +114,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $project = \App\Models\Project::find($data->id);
                     $workspace = \App\Models\Workspace::find($notification->workspace_id);
+                    if (!$project || !$workspace) {
+                        continue;
+                    }
                     $link = route('projects.show', [$workspace->slug, $project->id]);
                     $text = __('You were assigned to new project: ') . ' <b>' . $project->name . '</b>';
                     $icon = 'fa fa-suitcase';
@@ -119,6 +125,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @php
                     $pod = \App\Models\Pod::find($data->id);
                     $user = \Auth::user();
+                    if (!$pod || !$user) {
+                        continue;
+                    }
                     $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
                     $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
                     $text = __('New invite for joining pod: ') . ' <b>' . $pod->title . '</b>
@@ -147,6 +156,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
+                    if (!$pod || !$user) {
+                        continue;
+                    }
                     $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
                     $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
                     $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>
@@ -167,26 +179,35 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @endphp
             @elseif($notification->type == 'pod_request_accept_owner')
                 @php
-                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
+                    if (!$pod || !$user) {
+                        continue;
+                    }
+                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $text = __('User : ') . ' <b>' . $user->name . '</b> joined your pod:  <b>'. $pod->title . ' </b>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
                 @endphp
             @elseif($notification->type == 'pod_request_accept_user')
                 @php
-                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $pod = \App\Models\Pod::find($data->pod_id);
+                    if (!$pod) {
+                        continue;
+                    }
+                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $text = __('You have joined pod : ') . ' <b>' . $pod->title . '</b>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
                 @endphp
             @elseif($notification->type == 'pod_request_decline_owner')
                 @php
-                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
+                    if (!$pod || !$user) {
+                        continue;
+                    }
+                    $link = route('pods.users', ['podId' => $data->pod_id]);
                     $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your pod:  <b>'. $pod->title . ' </b>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
@@ -194,6 +215,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @elseif($notification->type == 'pod_request_decline_user')
                 @php
                     $pod = \App\Models\Pod::find($data->pod_id);
+                    if (!$pod) {
+                        continue;
+                    }
                     $text = __('You have beed declined to join pod : ') . ' <b>' . $pod->title . '</b>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
@@ -202,6 +226,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $user = \App\Models\User::find($data->user_id);
                     $project = \App\Models\Project::find($data->project_id);
+                    if (!$project || !$user) {
+                        continue;
+                    }
                     $acceptLink = route('pods.projects.join.accept', ['record' => $data->id]);
                     $declineLink = route('pods.projects.join.decline', ['record' => $data->id]);
                     $text = __('User : ') . ' 
@@ -219,6 +246,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @elseif($notification->type == 'project_accepted')
                 @php
                     $project = \App\Models\Project::find($data->id);
+                    if (!$project) {
+                        continue;
+                    }
                     $link = route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]);
                     $text = __('Your request to join project : ') . ' <b>' . $project->name . '</b> was accepted';
                     $icon = 'fa fa-bug';
@@ -227,6 +257,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @elseif($notification->type == 'project_decline')
                 @php
                     $project = \App\Models\Project::find($data->id);
+                    if (!$project) {
+                        continue;
+                    }
                     $link = route('home');
                     $text = __('Your request to join project : ') . ' <b>' . $project->name . '</b> was declined';
                     $icon = 'fa fa-bug';
@@ -236,6 +269,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $user = \App\Models\User::find($data->user_id);
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
+                    if (!$workspace || !$user) {
+                        continue;
+                    }
                     $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
                     $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
                     $text = __('User : ') . ' 
@@ -274,6 +310,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     $user = \App\Models\User::find($data->user_id);
+                    if (!$workspace || !$user) {
+                        continue;
+                    }
                     $text = __('User : ') . ' <b>' . $user->name . '</b> joined your workspace:  <b>'. $workspace->name . ' </b>';
                     $icon = 'fa fa-bug';
                     $name = 'WP';
@@ -281,6 +320,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @elseif($notification->type == 'workspace_request_accept_user')
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
+                    if (!$workspace) {
+                        continue;
+                    }
                     $text = __('You joined workspace:  <b>'. $workspace->name . ' </b>');
                     $icon = 'fa fa-bug';
                     $name = 'WP';
@@ -289,6 +331,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     $user = \App\Models\User::find($data->user_id);
+                    if (!$workspace || !$user) {
+                        continue;
+                    }
                     $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your workspace:  <b>'. $workspace->name . ' </b>';
                     $icon = 'fa fa-bug';
                     $name = 'WP';
@@ -297,6 +342,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     $user = \App\Models\User::find($data->user_id);
+                    if (!$workspace || !$user) {
+                        continue;
+                    }
                     $text = __('Your request to join workspace : ') . ' <b>' . $workspace->name . '</b> were declined';
                     $icon = 'fa fa-bug';
                     $name = 'WP';
@@ -304,6 +352,9 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             @elseif($notification->type == 'project_new')
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace);
+                    if (!$workspace) {
+                        continue;
+                    }
                     $link = route('projects.index', ['slug' => $workspace->slug]);
                     $text = __('New project : ') . ' <b>' . $data->name . '</b> in your workspace:  <b>'. $workspace->name . ' </b>';
                     $icon = 'fa fa-bug';
@@ -324,8 +375,11 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @endphp
             @elseif($notification->type == 'job_application_new')
                 @php
-                    $link = route('job-applications.index', ['vacancy' => $data->job_vacancy_id]);
                     $vacancy = \App\Models\JobVacancy::find($data->job_vacancy_id);
+                    if (!$vacancy) {
+                        continue;
+                    }
+                    $link = route('job-applications.index', ['vacancy' => $data->job_vacancy_id]);
                     $text = __('You have new application for your vacancy : ') . ' <b>' . $vacancy->title . '</b>';
                     $icon = 'fa fa-bug';
                     $name = 'JOB';
