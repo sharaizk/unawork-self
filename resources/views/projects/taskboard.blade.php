@@ -504,7 +504,8 @@
                     }
                 });
             });
-            $(document).on("click", ".delete-subtask", function() {
+            $(document).on("click", ".delete-subtask", function(e) {
+                e.preventDefault();
                 // if (confirm('{{ __('Are you sure ?') }}')) {
                 var btn = $(this);
                 $.ajax({
