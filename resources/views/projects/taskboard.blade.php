@@ -429,7 +429,7 @@
                     });
                 }
             });
-            $(document).on('click', '#form-subtask button', function(e) {
+            $(document).on('click', '#form-subtask button.create-subtask', function(e) {
                 e.preventDefault();
 
                 var name = $.trim($("#form-subtask input[name=name]").val());
