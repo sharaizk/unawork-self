@@ -2988,6 +2988,7 @@ class ProjectController extends Controller
         $duplicate['workspace'] = $currentWorkspace->id;
         $duplicate['created_by'] = $project->created_by;
         $duplicate['is_active'] = $project->is_active;
+        $duplicate['project_category_id'] = $project->project_category_id;
         $duplicate->save();
 
 
