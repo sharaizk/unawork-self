@@ -183,7 +183,7 @@
                                                 </span>
                                             @else
                                                 <span class="avatar-title rounded">
-                                                    <img src="{{ asset($logo_tasks . 'sample-file.png') }}"
+                                                    <img src="{{ asset($logo_tasks . 'sample.jpg') }}"
                                                         class="preview_img_size" id="" />
                                                 </span>
                                             @endif
@@ -359,7 +359,7 @@ reader.readAsDataURL(this.files[0]);
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 // If it's not an image, show the default image
-                $('#task_file').attr('src', '{{ asset($logo_tasks . 'sample-file.png') }}');
+                $('#task_file').attr('src', '{{ asset($logo_tasks . 'sample.jpg') }}');
             }
         }
     });

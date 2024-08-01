@@ -86,7 +86,7 @@
                                                 <div class="dropdown-menu dropdown-menu-end">
 
 
-                                        @if($project->is_active)
+                                            @if($project->is_active)
 
                                                 @if ($currentWorkspace->permission == 'Owner')
                                                     <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" data-title="{{ __('Invite Users') }}" data-url="{{route('projects.invite.popup',[$currentWorkspace->slug,$project->id])}}">
@@ -120,17 +120,19 @@
                                                     </form>
                                                 @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'pending')->pluck('id')->toArray()))
                                                     <span class="dropdown-item">Join Request Sended</span>
+                                                @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'declined')->pluck('id')->toArray()))
+                                                    <span class="dropdown-item">Join Request Was Declined</span>
                                                 @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
                                                     <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item"> 
                                                         <span><i class="fa fa-pen-to-square"></i> Join This Project </span>
                                                     </a>
                                                 @endif
 
-                                        @else
-                                            <a href="#" class="dropdown-item" title="{{__('Locked')}}">
-                                                <i data-feather="lock"></i> <span>{{__('Locked')}}</span>
-                                            </a>
-                                        @endif
+                                            @else
+                                                <a href="#" class="dropdown-item" title="{{__('Locked')}}">
+                                                    <i data-feather="lock"></i> <span>{{__('Locked')}}</span>
+                                                </a>
+                                            @endif
 
                                                 </div>
                                                  @endauth
