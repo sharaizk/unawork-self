@@ -75,9 +75,7 @@
 
         function getMembers(project_id) {
 
-            $("#members-div").html('');
-            $('#members-div').append(
-                '<select class="form-control" id="members" name="members[]" multiple></select>');
+            
 
             $.get("{{ route('projects.members', ['workspace_id ', 'project_id']) }}".replace('workspace_id',
                 workspace_id).replace('project_id', project_id), function(data) {
@@ -89,10 +87,14 @@
                     list += "<option value=''> {{ __('No Projects') }} </option>";
                 }
 
+                $("#members-div").html('');
+                $('#members-div').append('<select class="form-control" id="members" name="members[]" multiple></select>');
+
                 $.each(data, function(i, item) {
                     list += "<option value='" + item.id + "'>" + item.name + "</option>"
                 });
                 $('#members').html(list);
+                
                 var multipleCancelButton = new Choices(
                     '#members', {
                         removeItemButton: true,
