@@ -38,7 +38,7 @@
                             @endforeach
                         </select>
                         <div class="input-group-append">
-                            <a href="#" class="btn btn-sm h-100 btn-primary d-flex align-items-center" data-ajax-popup="true"
+                            <a href="#" id="createMilestoneButton" class="btn btn-sm h-100 btn-primary d-flex align-items-center" data-ajax-popup="true"
                             data-title="{{ __('Create Milestone') }}"
                             data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
                             data-toggle="popover" title="{{ __('Create') }}">
@@ -111,6 +111,14 @@
             let projectId = $(this).val();
             let url = '{{ route('tasks.create', [$currentWorkspace->slug, 'projectIdPlace']) }}';
             url = url.replace('projectIdPlace', projectId); 
+
+            // Update milestone creation URL and title
+            let milestoneButton = $('#createMilestoneButton');
+            if (milestoneButton) {console.log(123);}
+            let milestoneUrl = '{{ route('projects.milestone', [$currentWorkspace->slug, 'projectIdPlace']) }}';
+            milestoneUrl = milestoneUrl.replace('projectIdPlace', projectId);
+            milestoneButton.attr('data-url', milestoneUrl);
+            milestoneButton.attr('data-title', '{{ __('Create Milestone') }}: ' + projectId);
 
             $.ajax({
                 url: url + '?json=true',
