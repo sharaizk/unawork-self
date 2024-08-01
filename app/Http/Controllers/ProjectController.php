@@ -1788,49 +1788,30 @@ class ProjectController extends Controller
 
     public function fileDownload($slug, $id, $file_id)
     {
-
-        $project = Project::find($id);
-
-        $project = Project::find($id);
-
-        // $file = ProjectFile::find($file_id);
-        // if ($file) {
-        //     $file_path = storage_path('project_files/' . $file->file_path);
-        //     $filename = $file->file_name;
-
-        //     return \Response::download(
-        //         $file_path, $filename, [
-        //             'Content-Length: ' . filesize($file_path),
-        //         ]
-        //     );
-        // } else {
-        //     return redirect()->back()->with('error', __('File is not exist.'));
-        // }
-
         $file = ProjectFile::find($file_id);
         if ($file) {
-            $logo = Utility::get_file('project_files/');
-
-            $settings = Utility::getAdminPaymentSetting();
             try {
-                if ($settings['storage_setting'] == 'local') {
-
-                    $file_path = storage_path('project_files/' . $file->file_path);
-                } else {
-                    $file_path = $logo . $file->file_path;
+                $storageSetting = Utility::getAdminPaymentSetting()['storage_setting'];
+                
+                $filePath = \Storage::disk($storageSetting)->path('project_files/' . $file->file_path);
+                
+                if (!file_exists($filePath)) {
+                    return redirect()->back()->with('error', __('File does not exist.'));
                 }
+
 
                 $filename = $file->file_name;
 
-                return \Response::download(
-                    $file_path,
+                return response()->download(
+                    $filePath, 
                     $filename,
                     [
-                        'Content-Length: ' . filesize($file_path),
+                        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                        'Content-Length' => filesize($filePath),
                     ]
                 );
             } catch (\Exception $e) {
-                return redirect()->back()->with('error', __("File Not Exists."));
+                return redirect()->back()->with('error', __("File Not Exists".$e->getMessage()));
             }
         } else {
             return redirect()->back()->with('error', __('File is not exist.'));
