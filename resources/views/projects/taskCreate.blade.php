@@ -38,11 +38,12 @@
                             @endforeach
                         </select>
                         <div class="input-group-append">
-                            <button id="createMilestoneButton" class="btn-primary btn" 
+                            
+                            <a href="#" id="createMilestoneButton" class="btn btn-sm h-100 btn-primary d-flex align-items-center" " 
                                         data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}">
                                 <i class="ti ti-plus"></i>
                                 
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -103,15 +104,17 @@
         </div>
 
     </form>
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1040;"></div>
     <script>
         $(document).ready(function(){
             $('#createMilestoneButton').click(function(e){
                 e.preventDefault();
-                var url = $(this).data('url');
+                var url = $('#createMilestoneButton').attr('data-url');
                 var title = "Create New Milestone";
                 $("#commonModalOver .modal-title").html(title);
                 
                 $('#commonModalOver .modal-body').load(url, function() {
+                    $('#overlay').show();
                     $('#commonModalOver').modal('show');
                     
                     $('#commonModalOver').find('form').off('submit').on('submit', function(e) {
@@ -126,7 +129,8 @@
                             data: formData,
                             success: function(response) {
                                 $('#commonModalOver').modal('hide');
-                                updateProjectMilestones(); // Виклик оновлення списку майлстоунів
+                                $('#overlay').hide(); 
+                                updateProjectMilestones();
                             },
                             error: function(response) {
                                 console.log('Error creating milestone.', response);
@@ -135,9 +139,11 @@
                     });
                 });
             });
+            $('#commonModalOver').on('hidden.bs.modal', function () {
+                $('#overlay').hide();
+            });
 
             function updateProjectMilestones() {
-                // Отримуємо поточний вибраний проект
                 let projectId = $("select[name=project_id]").val();
                 let url = '{{ route('tasks.create', [$currentWorkspace->slug, 'projectIdPlace']) }}';
                 url = url.replace('projectIdPlace', projectId); 
@@ -147,7 +153,6 @@
                 let milestoneUrl = '{{ route('projects.milestone', [$currentWorkspace->slug, 'projectIdPlace']) }}';
                 milestoneUrl = milestoneUrl.replace('projectIdPlace', projectId);
                 milestoneButton.attr('data-url', milestoneUrl);
-                milestoneButton.attr('data-title', '{{ __('Create Milestone') }}: ' + projectId);
 
                 $.ajax({
                     url: url + '?json=true',
