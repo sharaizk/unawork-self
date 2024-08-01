@@ -42,6 +42,12 @@ class ActivityLog extends Model
                 return $user_name . " " . __('Move Task') . " <b>" . $remark['title'] . "</b> " . __('from') . " " . __(ucwords($remark['old_status'])) . " " . __('to') . " " . __(ucwords($remark['new_status']));
             } elseif ($this->log_type == 'Create Milestone') {
                 return $user_name . " " . __('Create new Milestone') . " <b>" . $remark['title'] . "</b>";
+            } elseif ($this->log_type == 'Commented') {
+                return $user_name . " " . __('left comment for task') . " <b>" . $remark['title'] . "</b>";
+            } elseif ($this->log_type == 'Upload Task File') {
+                return $user_name . " " . __('uploaded file for task') . " <b>" . $remark['title'] . "</b>";
+            } elseif ($this->log_type == 'Create Subtask') {
+                return $user_name . " " . __('created subtask for task') . " <b>" . $remark['title'] . "</b>";
             }
         } else {
             return $this->remark;
@@ -71,6 +77,12 @@ class ActivityLog extends Model
             return __('Move Task');
         } elseif ($logtype == 'Create Milestone') {
             return __('Create new Milestone');
+        } elseif ($logtype == 'Commented') {
+            return __('Commented');
+        } elseif ($logtype == 'Upload Task File') {
+            return __('Upload Task File');
+        } elseif ($logtype == 'Create Subtask') {
+            return __('Create Subtask');
         }
 
     }

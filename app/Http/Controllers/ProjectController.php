@@ -1214,6 +1214,17 @@ class ProjectController extends Controller
             'task_title' => $task->title,
 
         ];
+
+        ActivityLog::create(
+            [
+                'user_id' => \Auth::user()->id,
+                'user_type' => get_class(\Auth::user()),
+                'project_id' => $projectID,
+                'log_type' => 'Commented',
+                'remark' => json_encode(['title' => $task->title]),
+            ]
+        );
+
         if (isset($settings['taskcom_notificaation']) && $settings['taskcom_notificaation'] == 1) {
 
             Utility::send_slack_msg('New Task Comment', $user1, $uArr);
@@ -1326,6 +1337,17 @@ class ProjectController extends Controller
             $TaskFile->delete();
         } else {
             $TaskFile->result = 1;
+            $project = Project::find($projectID);
+            $task = Task::find($taskID);
+            ActivityLog::create(
+                [
+                    'user_id' => \Auth::user()->id,
+                    'user_type' => get_class(\Auth::user()),
+                    'project_id' => $project->id,
+                    'log_type' => 'Upload Task File',
+                    'remark' => json_encode(['title' => $task->title]),
+                ]
+            );
         }
 
         return $TaskFile->toJson();
@@ -1663,6 +1685,17 @@ class ProjectController extends Controller
                 $slug,
                 $projectID,
                 $subtask->id,
+            ]
+        );
+
+        $task = Task::find($taskID);
+        ActivityLog::create(
+            [
+                'user_id' => \Auth::user()->id,
+                'user_type' => get_class(\Auth::user()),
+                'project_id' => $projectID,
+                'log_type' => 'Create Subtask',
+                'remark' => json_encode(['title' => $task->title]),
             ]
         );
 

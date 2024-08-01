@@ -494,6 +494,18 @@
                                                 <span
                                                     class="timeline-step timeline-step-sm border border-success text-white">
                                                     <i class="fas fa-clock-o"></i></span>
+                                            @elseif($activity->log_type == 'Commented')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-tasks"></i></span>
+                                            @elseif($activity->log_type == 'Create Subtask')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-tasks"></i></span>
+                                            @elseif($activity->log_type == 'Upload Task File')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-tasks"></i></span>
                                             @endif
 
                                             <div class="last_notification_text">
