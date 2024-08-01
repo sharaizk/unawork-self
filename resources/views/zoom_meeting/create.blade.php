@@ -15,8 +15,12 @@
             
             <div class="form-group col-md-6">
                 {{ Form::label('projects', __('Projects'), ['class' => 'col-form-label']) }}
-                {{ Form::select('project_id', $projects, null, array('placeholder' => 'Select Project', 'id' => 'project_id',  'data-toggle' => 'select', 'class' => 'form-control', 'tabindex' => '2', )) }}
-                {{-- {{ Form::select('project_id', $projects, null, ['class' => 'form-control ', 'id' => 'project_id', 'data-toggle' => 'select']) }} --}}
+                <select name="project_id" id="project_id" class="form-control" data-toggle="select" tabindex="2" required>
+                    <option value="" disabled selected>{{ __('Select Project') }}</option>
+                    @foreach($projects as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="form-group col-md-6">
@@ -80,7 +84,7 @@
                 var list = '';
                 $('.js-data-example-ajax').empty();
                 if (data.length > 0) {
-                    list += "<option value=''> {{ __('Select Project') }}</option>";
+                    list += "<option value=''> {{ __('Select Members') }}</option>";
                 } else {
                     list += "<option value=''> {{ __('No Projects') }} </option>";
                 }
