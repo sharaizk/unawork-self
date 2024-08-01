@@ -65,6 +65,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PayHerePaymentController;
@@ -72,6 +73,7 @@ use App\Http\Controllers\PodController;
 use App\Http\Controllers\PodNewsController;
 use App\Http\Controllers\PodUserController;
 use App\Http\Controllers\ProjectUserController;
+use App\Http\Controllers\JobVacancyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,12 +115,22 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pod/{pod}/users/{user}/edit-permissions', [PodUserController::class, 'editPermissions'])->name('pod.users.editPermissions');
     Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
+
+    Route::get('/account/job-vacancies', [JobVacancyController::class, 'index'])->name('job-vacancies.index');
+    Route::get('/account/job-vacancies/create', [JobVacancyController::class, 'create'])->name('job-vacancies.create');
+    Route::get('/account/job-vacancies/{vacancy}/edit', [JobVacancyController::class, 'edit'])->name('job-vacancies.edit');
+
+    Route::get('/account/job-vacancies/{vacancy}/applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
+
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
 Route::get('/pods/list', [PodController::class, 'list'])->name('pods.list');
 Route::get('/companies/list', [CompanyController::class, 'list'])->name('companies.list');
 Route::get('/project/list', [ProjectController::class, 'list'])->name('project.list');
+Route::get('/job-vacancies/list', [JobVacancyController::class, 'list'])->name('job-vacancies.landing.list');
+
+Route::get('/job-vacancies/{vacancy}', [JobVacancyController::class, 'show'])->name('job-vacancies.landing.show');
 
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');

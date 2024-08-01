@@ -38,7 +38,7 @@
                             @endforeach
                         </select>
                         <div class="input-group-append">
-                            <a href="#" class="btn btn-sm h-100 btn-primary d-flex align-items-center" data-ajax-popup="true"
+                            <a href="#" id="createMilestoneButton" class="btn btn-sm h-100 btn-primary d-flex align-items-center" data-ajax-popup="true"
                             data-title="{{ __('Create Milestone') }}"
                             data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
                             data-toggle="popover" title="{{ __('Create') }}">
@@ -64,7 +64,7 @@
                     <label class="col-form-label">{{ __('Assign To') }}</label>
 
                     <select class="assign_to multi-select" id="assign_to" name="assign_to[]" data-toggle="select2"
-                        multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
+                         data-placeholder="{{ __('Select User ...') }}">
                         @foreach ($project->users as $u)
                             <option value="{{ $u->id }}">{{ $u->name }} - {{ $u->email }}</option>
                         @endforeach
@@ -112,6 +112,14 @@
             let url = '{{ route('tasks.create', [$currentWorkspace->slug, 'projectIdPlace']) }}';
             url = url.replace('projectIdPlace', projectId); 
 
+            // Update milestone creation URL and title
+            let milestoneButton = $('#createMilestoneButton');
+            if (milestoneButton) {console.log(123);}
+            let milestoneUrl = '{{ route('projects.milestone', [$currentWorkspace->slug, 'projectIdPlace']) }}';
+            milestoneUrl = milestoneUrl.replace('projectIdPlace', projectId);
+            milestoneButton.attr('data-url', milestoneUrl);
+            milestoneButton.attr('data-title', '{{ __('Create Milestone') }}: ' + projectId);
+
             $.ajax({
                 url: url + '?json=true',
                 type: 'GET',
@@ -131,7 +139,7 @@
                         class: 'multi-select form-control',
                         multiple: 'multiple',
                         'data-toggle': 'select2',
-                        'data-placeholder': '{{ __("Select Users ...") }}'
+                        'data-placeholder': '{{ __("Select User ...") }}'
                     });
 
                     if (response.users && response.users.length > 0) {

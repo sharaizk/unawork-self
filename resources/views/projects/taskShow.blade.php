@@ -318,6 +318,13 @@
             clearBtn: true,
             format: 'yyyy-mm-dd',
         });
+
+        document.querySelectorAll('.datepicker2').forEach(datepicker => {
+            datepicker.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent the event from propagating to parent elements
+                event.preventDefault(); // Prevent the default behavior, if any
+            });
+        });
     })();
 </script>
 

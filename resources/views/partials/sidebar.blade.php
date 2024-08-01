@@ -88,6 +88,15 @@
                                </a>
                            </li>
                        @endif
+                       @if (\Auth::user()->hasRole('company'))
+                                <li class="dash-item dash-hasmenu">
+                                    <a href="{{ route('job-vacancies.index') }}"
+                                        class="dash-link  {{ Request::route()->getName() == 'job-vacancies.index' ? ' active' : '' }}">
+                                        <span class="dash-micon"><i class="ti ti-accessible"></i></span>
+                                        <span class="dash-mtext">{{ __('Job Vacancies') }}</span>
+                                    </a>
+                                </li>
+                        @endif
                        @if (\Auth::user()->type != "admin")
                             <!-- <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
                                 <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
