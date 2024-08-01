@@ -678,6 +678,25 @@
                 }
             });
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // get all elements 'card-list' class
+                var columns = document.querySelectorAll('.card-list');
+                var maxHeight = 0;
+
+                // get max height
+                columns.forEach(function(column) {
+                    if (column.clientHeight > maxHeight) {
+                        maxHeight = column.clientHeight;
+                    }
+                });
+
+                // set height to all columns
+                columns.forEach(function(column) {
+                    column.style.height = maxHeight + 'px';
+                });
+            });
+        </script>
     @endpush
 @endif
 <style type="text/css">
