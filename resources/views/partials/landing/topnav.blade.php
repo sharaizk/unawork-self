@@ -12,12 +12,7 @@
                     </div>
                     <div class="header__main">
                         <nav class="col nav__left">
-                            <ul class="nav__list">
-                                <li class="logoHeaderMenu">
-                                    <a href="/">
-                                        <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork">
-                                    </a>
-                                </li>
+                            <ul class="nav__list m-0">
                                 <li class="">
                                     <!-- is going to turn into the manage plate after they sign in -->
                                     <a href="{{ route('login') }}">Home</a>
@@ -26,12 +21,12 @@
                                     <a href="{{ route('landing.find-work') }}">Find Work</a>
                                 </li>
                                 <li class="">
-                                    <a href="{{ route('landing.hiring') }}">Hire</a>
+                                    <a href="{{ route('landing.hiring') }}">Hiring</a>
                                 </li>
                             </ul>
                         </nav>
                         <nav class="col nav__right">
-                            <ul class="nav__list">
+                            <ul class="nav__list m-0">
                                 
                                 @guest
                                     <li class="">
