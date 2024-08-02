@@ -17,11 +17,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
 use App\Enums\User\UserRole;
+use Cmgmyr\Messenger\Traits\Messagable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
 
-    use Notifiable, HasApiTokens, HasRoles;
+    use Notifiable, HasApiTokens, HasRoles, Messagable;
     use HasApiTokens, HasFactory, Notifiable, Impersonate;
 
 

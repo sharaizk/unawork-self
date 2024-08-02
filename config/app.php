@@ -191,6 +191,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Cmgmyr\Messenger\MessengerServiceProvider::class,
         \Chatify\ChatifyServiceProvider::class,
         /*
          * Application Service Providers...
