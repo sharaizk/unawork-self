@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
+use App\Models\CustomMessage;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 use App\Models\User;
 use App\Models\Utility;
@@ -141,30 +142,16 @@ class MessagesController extends Controller
         $recipientId = $request['id'];
         $thread = $this->findOrCreateThread($userId, $recipientId);
     
-        $message = LaravelMessage::create([
+        $message = CustomMessage::create([
             'thread_id' => $thread->id,
             'user_id' => $userId,
             'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
-            'attachment' => ($attachmentData['attachment']) ? json_encode((object)[
-                'new_name' => $attachmentData['attachment'],
-                'old_name' => htmlentities(trim($attachmentData['attachment_title']), ENT_QUOTES, 'UTF-8'),
-            ]) : null,
+            'attachment' => $this->formatAttachment($attachmentData),
         ]);
     
         $thread->touch();
     
-        $message = LaravelMessage::find($message->id);
-        $messageData = [
-            'id' => $message->id,
-            'from_id' => $message->user_id,
-            'to_id' => $message->thread->participants->where('user_id', '!=', $message->user_id)->first()->user_id ?? $message->user_id,
-            'message' => $message->body,
-            'attachment' => $message->attachment,
-            'time' => $message->created_at->diffForHumans(),
-            'fullTime' => $message->created_at->format('Y-m-d H:i:s'),
-            'viewType' => 'sender',
-            'seen' => false,
-        ];
+        $messageData = $this->formatMessageData($message->id);
     
         return Response::json([
             'status' => '200',
@@ -173,34 +160,22 @@ class MessagesController extends Controller
             'tempID' => $request['temporaryMsgId'],
         ]);
     }
-
+    
     public function fetch(Request $request)
     {
         $allMessages = null;
+    
         $userId = Auth::user()->id;
         $recipientId = $request['id'];
         $thread = $this->findOrCreateThread($userId, $recipientId);
     
         if ($thread) {
             $messages = $thread->messages()->orderBy('created_at', 'asc')->get();
-    
             if ($messages->count() > 0) {
                 foreach ($messages as $message) {
-                    $messageData = [
-                        'id' => $message->id,
-                        'from_id' => $message->user_id,
-                        'to_id' => $message->thread->participants->where('user_id', '!=', $message->user_id)->first()->user_id ?? $message->user_id,
-                        'message' => $message->body,
-                        'attachment' => $message->attachment,
-                        'time' => $message->created_at->diffForHumans(),
-                        'fullTime' => $message->created_at->format('Y-m-d H:i:s'),
-                        'viewType' => ($message->user_id == Auth::user()->id) ? 'sender' : 'default',
-                        'seen' => false,
-                    ];
-    
+                    $messageData = $this->formatMessageData($message->id);
                     $allMessages .= Chatify::messageCard($messageData);
                 }
-    
                 return Response::json([
                     'count' => $messages->count(),
                     'messages' => $allMessages,
@@ -664,5 +639,46 @@ class MessagesController extends Controller
         }
 
         return $thread;
+    }
+
+    private function formatAttachment($attachmentData)
+    {
+        if ($attachmentData['attachment']) {
+            return json_encode((object)[
+                'new_name' => $attachmentData['attachment'],
+                'old_name' => htmlentities(trim($attachmentData['attachment_title']), ENT_QUOTES, 'UTF-8'),
+            ]);
+        }
+
+        return null;
+    }
+
+    private function formatMessageData($messageId)
+    {
+        $message = LaravelMessage::find($messageId);
+        $attachment = null;
+        $attachment_type = null;
+        $attachment_title = null;
+
+        if (isset($message->attachment)) {
+            $attachmentOBJ = json_decode($message->attachment);
+            $attachment = $attachmentOBJ->new_name;
+            $attachment_title = htmlentities(trim($attachmentOBJ->old_name), ENT_QUOTES, 'UTF-8');
+
+            $ext = pathinfo($attachment, PATHINFO_EXTENSION);
+            $attachment_type = in_array($ext, Chatify::getAllowedImages()) ? 'image' : 'file';
+        }
+
+        return [
+            'id' => $message->id,
+            'from_id' => $message->user_id,
+            'to_id' => $message->thread->participants->where('user_id', '!=', $message->user_id)->first()->user_id ?? $message->user_id,
+            'message' => !isset($message->attachment) ? $message->body : null,
+            'attachment' => [$attachment, $attachment_title, $attachment_type],
+            'time' => $message->created_at->diffForHumans(),
+            'fullTime' => $message->created_at->format('Y-m-d H:i:s'),
+            'viewType' => ($message->user_id == Auth::user()->id) ? 'sender' : 'default',
+            'seen' => false,
+        ];
     }
 }
