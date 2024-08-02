@@ -6,6 +6,7 @@ use App\Models\ClientProject;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\UserProject;
+use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\ZoomMeeting;
 use App\Traits\ZoomMeetingTrait;
@@ -32,14 +33,19 @@ class ZoomMeetingController extends Controller
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
+        $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->first();
+
         if(isset($objUser) && isset($currentWorkspace) && $objUser->type !== 'admin'){
             if ($objUser->getGuard() == 'client') {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
-            } elseif ($currentWorkspace->permission == 'Owner') {
-                $meetings = ZoomMeeting::where('created_by', \Auth::user()->id)->where('workspace_id', $currentWorkspace->id)->get();
+            } elseif ($currentWorkspace->permission == 'Owner' || $userWorkspace->hasPermissionTo('zoom_meeting_index')) {
+                $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
+                        // ->where('created_by', \Auth::user()->id)
+                        ->get();
             } else {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")->where('workspace_id', $currentWorkspace->id)->get();
             }
+
             $this->statusUpdate($slug);
 
             return view('zoom_meeting.index', compact('meetings', 'currentWorkspace'));
@@ -129,7 +135,7 @@ class ZoomMeetingController extends Controller
                 return redirect()->back()->with('error', __('Meeting not created.'));
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', __("Invalid Zoom Api Token!"));
+            return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => $slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> ! '));
         }
     }
 

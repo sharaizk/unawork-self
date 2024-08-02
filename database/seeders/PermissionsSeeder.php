@@ -21,5 +21,8 @@ class PermissionsSeeder extends Seeder
 
         Permission::firstOrCreate(['name' => 'projects_index', 'guard_name' => 'web']);
         Permission::firstOrCreate(['name' => 'projects_edit', 'guard_name' => 'web']);
+
+        Permission::firstOrCreate(['name' => 'zoom_meeting_index', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'zoom_meeting_edit', 'guard_name' => 'web']);
     }
 }

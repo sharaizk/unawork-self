@@ -62,6 +62,23 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td>Zoom Meetings</td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="permissions[]" value="zoom_meeting_index" id="permission-zoom_meeting_index"
+                            @if($userWorkspace->hasPermissionTo('zoom_meeting_index')) checked @endif>
+                            <label class="form-check-label" for="permission-zoom_meeting_index"></label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="permissions[]" value="zoom_meeting_edit" id="permission-zoom_meeting_edit"
+                            @if($userWorkspace->hasPermissionTo('zoom_meeting_edit')) checked @endif>
+                            <label class="form-check-label" for="permission-zoom_meeting_edit"></label>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
         <button type="submit" class="btn btn-primary">Save</button>

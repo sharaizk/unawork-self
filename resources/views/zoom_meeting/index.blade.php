@@ -12,6 +12,7 @@
 @endsection
 @php
     $logo = \App\Models\Utility::get_file('users-avatar/');
+    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
 @endphp
 @push('css-page')
     <style>
@@ -44,7 +45,7 @@
 
 @section('action-button')
     @auth('web')
-        @if (isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id())
+        @if (isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id() || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
             <a href="{{ route('zoommeeting.Calender', $currentWorkspace->slug) }}" class="btn btn-sm btn-primary mx-1"
                 id="" data-toggle="tooltip" title="{{ __('calendar') }}"> <i class="ti ti-calendar"></i></a>
 
@@ -84,7 +85,7 @@
                                     <th> {{ __('Duration') }} </th>
                                     <th> {{ __('Join URL') }} </th>
                                     <th> {{ __('Status') }} </th>
-                                    @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                    @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
                                         <th class="text-right"> {{ __('Action') }}</th>
                                     @endif
                                 </tr>
@@ -150,7 +151,7 @@
                                                     class="badge badge-danger p-2 px-3 rounded">{{ __('End') }}</span>
                                             @endif
                                         </td>
-                                        @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                        @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
                                             <td class="text-right">
 
                                                 <a href="#"

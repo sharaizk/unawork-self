@@ -1214,6 +1214,17 @@ class ProjectController extends Controller
             'task_title' => $task->title,
 
         ];
+
+        ActivityLog::create(
+            [
+                'user_id' => \Auth::user()->id,
+                'user_type' => get_class(\Auth::user()),
+                'project_id' => $projectID,
+                'log_type' => 'Commented',
+                'remark' => json_encode(['title' => $task->title]),
+            ]
+        );
+
         if (isset($settings['taskcom_notificaation']) && $settings['taskcom_notificaation'] == 1) {
 
             Utility::send_slack_msg('New Task Comment', $user1, $uArr);
@@ -1326,6 +1337,17 @@ class ProjectController extends Controller
             $TaskFile->delete();
         } else {
             $TaskFile->result = 1;
+            $project = Project::find($projectID);
+            $task = Task::find($taskID);
+            ActivityLog::create(
+                [
+                    'user_id' => \Auth::user()->id,
+                    'user_type' => get_class(\Auth::user()),
+                    'project_id' => $project->id,
+                    'log_type' => 'Upload Task File',
+                    'remark' => json_encode(['title' => $task->title]),
+                ]
+            );
         }
 
         return $TaskFile->toJson();
@@ -1666,6 +1688,17 @@ class ProjectController extends Controller
             ]
         );
 
+        $task = Task::find($taskID);
+        ActivityLog::create(
+            [
+                'user_id' => \Auth::user()->id,
+                'user_type' => get_class(\Auth::user()),
+                'project_id' => $projectID,
+                'log_type' => 'Create Subtask',
+                'remark' => json_encode(['title' => $task->title]),
+            ]
+        );
+
         return $subtask->toJson();
     }
 
@@ -1755,49 +1788,30 @@ class ProjectController extends Controller
 
     public function fileDownload($slug, $id, $file_id)
     {
-
-        $project = Project::find($id);
-
-        $project = Project::find($id);
-
-        // $file = ProjectFile::find($file_id);
-        // if ($file) {
-        //     $file_path = storage_path('project_files/' . $file->file_path);
-        //     $filename = $file->file_name;
-
-        //     return \Response::download(
-        //         $file_path, $filename, [
-        //             'Content-Length: ' . filesize($file_path),
-        //         ]
-        //     );
-        // } else {
-        //     return redirect()->back()->with('error', __('File is not exist.'));
-        // }
-
         $file = ProjectFile::find($file_id);
         if ($file) {
-            $logo = Utility::get_file('project_files/');
-
-            $settings = Utility::getAdminPaymentSetting();
             try {
-                if ($settings['storage_setting'] == 'local') {
-
-                    $file_path = storage_path('project_files/' . $file->file_path);
-                } else {
-                    $file_path = $logo . $file->file_path;
+                $storageSetting = Utility::getAdminPaymentSetting()['storage_setting'];
+                
+                $filePath = \Storage::disk($storageSetting)->path('project_files/' . $file->file_path);
+                
+                if (!file_exists($filePath)) {
+                    return redirect()->back()->with('error', __('File does not exist.'));
                 }
+
 
                 $filename = $file->file_name;
 
-                return \Response::download(
-                    $file_path,
+                return response()->download(
+                    $filePath, 
                     $filename,
                     [
-                        'Content-Length: ' . filesize($file_path),
+                        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                        'Content-Length' => filesize($filePath),
                     ]
                 );
             } catch (\Exception $e) {
-                return redirect()->back()->with('error', __("File Not Exists."));
+                return redirect()->back()->with('error', __("File Not Exists".$e->getMessage()));
             }
         } else {
             return redirect()->back()->with('error', __('File is not exist.'));
@@ -2974,6 +2988,7 @@ class ProjectController extends Controller
         $duplicate['workspace'] = $currentWorkspace->id;
         $duplicate['created_by'] = $project->created_by;
         $duplicate['is_active'] = $project->is_active;
+        $duplicate['project_category_id'] = $project->project_category_id;
         $duplicate->save();
 
 

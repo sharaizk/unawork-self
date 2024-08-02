@@ -38,11 +38,11 @@
                             @endforeach
                         </select>
                         <div class="input-group-append">
-                            <a href="#" id="createMilestoneButton" class="btn btn-sm h-100 btn-primary d-flex align-items-center" data-ajax-popup="true"
-                            data-title="{{ __('Create Milestone') }}"
-                            data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
-                            data-toggle="popover" title="{{ __('Create') }}">
+                            
+                            <a href="#" id="createMilestoneButton" class="btn btn-sm h-100 btn-primary d-flex align-items-center" " 
+                                        data-url="{{ route('projects.milestone', [$currentWorkspace->slug, $project->id]) }}">
                                 <i class="ti ti-plus"></i>
+                                
                             </a>
                         </div>
                     </div>
@@ -104,66 +104,111 @@
         </div>
 
     </form>
-    <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
-    <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1040;"></div>
     <script>
-        $(document).on('change', "select[name=project_id]", function() {
-            let projectId = $(this).val();
-            let url = '{{ route('tasks.create', [$currentWorkspace->slug, 'projectIdPlace']) }}';
-            url = url.replace('projectIdPlace', projectId); 
-
-            // Update milestone creation URL and title
-            let milestoneButton = $('#createMilestoneButton');
-            if (milestoneButton) {console.log(123);}
-            let milestoneUrl = '{{ route('projects.milestone', [$currentWorkspace->slug, 'projectIdPlace']) }}';
-            milestoneUrl = milestoneUrl.replace('projectIdPlace', projectId);
-            milestoneButton.attr('data-url', milestoneUrl);
-            milestoneButton.attr('data-title', '{{ __('Create Milestone') }}: ' + projectId);
-
-            $.ajax({
-                url: url + '?json=true',
-                type: 'GET',
-                success: function(response) {
-                    let assignToContainer = $('#assign_to').closest('.form-group');
-                    $('#assign_to').closest('.form-group').html(''); 
-
-                    let label = $('<label>', {
-                        class: 'col-form-label',
-                        text: '{{ __('Assign To') }}'
-                    });
-                    assignToContainer.append(label);
-
-                    let newSelect = $('<select>', {
-                        id: 'assign_to',
-                        name: 'assign_to[]',
-                        class: 'multi-select form-control',
-                        multiple: 'multiple',
-                        'data-toggle': 'select2',
-                        'data-placeholder': '{{ __("Select User ...") }}'
-                    });
-
-                    if (response.users && response.users.length > 0) {
-                        response.users.forEach(function(user) {
-                            newSelect.append('<option value="' + user.id + '">' + user.name + ' - ' + user.email + '</option>');
+        $(document).ready(function(){
+            $('#createMilestoneButton').click(function(e){
+                e.preventDefault();
+                var url = $('#createMilestoneButton').attr('data-url');
+                var title = "Create New Milestone";
+                $("#commonModalOver .modal-title").html(title);
+                
+                $('#commonModalOver .modal-body').load(url, function() {
+                    $('#overlay').show();
+                    $('#commonModalOver').modal('show');
+                    
+                    $('#commonModalOver').find('form').off('submit').on('submit', function(e) {
+                        e.preventDefault(); 
+                        
+                        var form = $(this);
+                        var formData = form.serialize(); 
+                        
+                        $.ajax({
+                            type: 'POST',
+                            url: form.attr('action'), 
+                            data: formData,
+                            success: function(response) {
+                                $('#commonModalOver').modal('hide');
+                                $('#overlay').hide(); 
+                                updateProjectMilestones();
+                            },
+                            error: function(response) {
+                                console.log('Error creating milestone.', response);
+                            }
                         });
-                    } 
-
-                    assignToContainer.append(newSelect); // Додаємо новий селект
-                    choicesInstance = new Choices('#assign_to', { removeItemButton: true });
-
-                    $('#task-milestone').html('<option value="">{{ __('Select Milestone') }}</option>');
-                    if (response.milestones.length > 0) {
-                        response.milestones.forEach(function(milestone) {
-                            $('#task-milestone').append('<option value="' + milestone.id + '">' + milestone.title + '</option>');
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                }
+                    });
+                });
             });
+            $('#commonModalOver').on('hidden.bs.modal', function () {
+                $('#overlay').hide();
+            });
+
+            function updateProjectMilestones() {
+                let projectId = $("select[name=project_id]").val();
+                let url = '{{ route('tasks.create', [$currentWorkspace->slug, 'projectIdPlace']) }}';
+                url = url.replace('projectIdPlace', projectId); 
+
+                // Update milestone creation URL and title
+                let milestoneButton = $('#createMilestoneButton');
+                let milestoneUrl = '{{ route('projects.milestone', [$currentWorkspace->slug, 'projectIdPlace']) }}';
+                milestoneUrl = milestoneUrl.replace('projectIdPlace', projectId);
+                milestoneButton.attr('data-url', milestoneUrl);
+
+                $.ajax({
+                    url: url + '?json=true',
+                    type: 'GET',
+                    success: function(response) {
+                        let assignToContainer = $('#assign_to').closest('.form-group');
+                        assignToContainer.html(''); 
+
+                        let label = $('<label>', {
+                            class: 'col-form-label',
+                            text: '{{ __('Assign To') }}'
+                        });
+                        assignToContainer.append(label);
+
+                        let newSelect = $('<select>', {
+                            id: 'assign_to',
+                            name: 'assign_to[]',
+                            class: 'multi-select form-control',
+                            multiple: 'multiple',
+                            'data-toggle': 'select2',
+                            'data-placeholder': '{{ __("Select User ...") }}'
+                        });
+
+                        if (response.users && response.users.length > 0) {
+                            response.users.forEach(function(user) {
+                                newSelect.append('<option value="' + user.id + '">' + user.name + ' - ' + user.email + '</option>');
+                            });
+                        } 
+
+                        assignToContainer.append(newSelect); 
+                        new Choices('#assign_to', { removeItemButton: true });
+
+                        $('#task-milestone').html('<option value="">{{ __('Select Milestone') }}</option>');
+                        if (response.milestones.length > 0) {
+                            response.milestones.forEach(function(milestone) {
+                                $('#task-milestone').append('<option value="' + milestone.id + '">' + milestone.title + '</option>');
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
+
+            $(document).on('change', "select[name=project_id]", function() {
+                updateProjectMilestones();
+            });
+
+            // Optional: Call updateProjectMilestones() on page load if needed
+            // updateProjectMilestones();
         });
     </script>
+    <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
+    <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    
     <script>
         if ($(".multi-select").length > 0) {
             $($(".multi-select")).each(function(index, element) {

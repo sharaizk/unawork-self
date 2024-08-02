@@ -2765,7 +2765,7 @@ main {
   display: block;
 }
 #header .header__container .nav__left {
-  padding-left: 120px;
+  padding-left: 0px;
 }
 #header .header__container .nav__right {
   margin-left: auto;
@@ -2778,6 +2778,9 @@ main {
 #header .header__container .nav__list li a {
   font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
   color: #022d4d;
+}
+#header .header__container .nav__left .nav__list li a {
+  font-size: 1.3rem;
 }
 #header .header__container .nav__list li.active a {
   color: #cfaa40;
