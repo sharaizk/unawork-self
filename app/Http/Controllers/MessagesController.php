@@ -77,8 +77,15 @@ class MessagesController extends Controller
 
         $profile_img  = Utility::get_file(config('chatify.user_avatar.folder'));
 
+        $thread = Thread::find($request['id']);
+        $fetch = new \stdClass();
+        $fetch->name = $thread->subject;
+        $invites = [];
+        $invites['workspaces'] = null;
+        $invites['pods'] = null;
+
         // User data
-        if ($request['type'] == 'user') {
+        if ($thread->participants()->count() == 2) {
             $fetch = User::where('id', $request['id'])->first();
             $invites = [];
             $invites['workspaces'] = Auth::user()->invitableWorkspaces($request['id']);
@@ -139,8 +146,7 @@ class MessagesController extends Controller
         }
     
         $userId = Auth::user()->id;
-        $recipientId = $request['id'];
-        $thread = $this->findOrCreateThread($userId, $recipientId);
+        $thread = Thread::find($request['id']);
     
         $message = CustomMessage::create([
             'thread_id' => $thread->id,
@@ -166,8 +172,7 @@ class MessagesController extends Controller
         $allMessages = null;
     
         $userId = Auth::user()->id;
-        $recipientId = $request['id'];
-        $thread = $this->findOrCreateThread($userId, $recipientId);
+        $thread = Thread::find($request['id']);
     
         if ($thread) {
             $messages = $thread->messages()->orderBy('created_at', 'asc')->get();
@@ -176,6 +181,7 @@ class MessagesController extends Controller
                     $messageData = $this->formatMessageData($message->id);
                     $allMessages .= Chatify::messageCard($messageData);
                 }
+                $thread->markAsRead($userId);
                 return Response::json([
                     'count' => $messages->count(),
                     'messages' => $allMessages,
@@ -228,26 +234,15 @@ class MessagesController extends Controller
         $userId = Auth::user()->id;
     
         // Get all threads the user is part of
-        $threads = Thread::forUser($userId)->latest('updated_at')->get();
-    
-        // Get unique users that are participants in these threads
-        $users = collect();
-        foreach ($threads as $thread) {
-            $participants = $thread->participants()->where('user_id', '!=', $userId)->get();
-            foreach ($participants as $participant) {
-                $users->push($participant->user);
-            }
-        }
-        $users = $users->unique('id');
-    
-        // Fetch contacts
+        $threads = Thread::forUser($userId)->latest('updated_at')->get()->unique('id');
+        // Fetch threads to contacts
         $contacts = '';
-        foreach ($users as $user) {
-            if ($user->id != Auth::user()->id) {
-                // Get user data
-                $userCollection = User::where('id', $user->id)->first();
-                $contacts .= Chatify::getContactItem($request['messenger_id'], $userCollection);
+        foreach ($threads as $thread) {
+            if ($thread->subject == "Saved Messages") {
+                continue;
             }
+                // Get user data
+                $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
         }
     
         // Get members of the current workspace
@@ -271,7 +266,7 @@ class MessagesController extends Controller
         }
     
         return Response::json([
-            'contacts' => $users->count() > 0 ? $contacts : '<br><p class="message-hint"><span>' . __('Your contact list is empty') . '</span></p>',
+            'contacts' => $contacts,
             'allUsers' => $members->count() > 0 ? $getRecords : '<br><p class="message-hint"><span>' . __('Your member list is empty') . '</span></p>',
         ], 200);
     }
@@ -681,4 +676,25 @@ class MessagesController extends Controller
             'seen' => false,
         ];
     }
-}
+
+    private function getContactItem($messenger_id, $thread, $objUser){
+        // get last message
+        $lastMessage = $thread->getLatestMessageAttribute(); // $this->getLastMessageQuery(!empty($user)?$user->id:0);
+        // Get Unseen messages counter
+        $unseenCounter = $thread->userUnreadMessagesCount($objUser->id); // $this->countUnseenMessages(!empty($user)?$user->id:0);
+        
+        $contact = new \stdClass();
+        $contact->id = $thread->id;
+        $contact->name = $thread->subject;
+        $contact->avatar = null;
+        $contact->active_status = 0;
+
+        return view('Chatify::layouts.listItem', [
+            'get' => 'users',
+            'user' => $contact,
+            'lastMessage' => $lastMessage,
+            'unseenCounter' => $unseenCounter,
+            'type'=>'user',
+            'id' => $messenger_id,
+        ])->render();
+    }}
