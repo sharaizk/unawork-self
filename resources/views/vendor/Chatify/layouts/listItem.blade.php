@@ -11,7 +11,7 @@ else{
 
 @php
 $logo   = \App\Models\Utility::get_file('/');
-$avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
+$avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
 @endphp
 
 
@@ -58,13 +58,13 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
     <tr data-action="0">
         {{-- Avatar side --}}
         <td style="position: relative">
-                 @if(isset($thread->avatar))
+                 @if(!is_null($user_avatar))
                     <div class="avatar av-m" 
-                    style="background-image: url('{{asset($avatar.$thread->avatar)}}');">
+                    style="background-image: url('{{$user_avatar}}');">
                     </div>
                 @else
                     <div class="avatar av-m"
-                                    style="background-image: url('{{asset($avatar.'avatar.png')}}');">
+                                    style="background-image: url('{{asset($avatar.'logo-dark.png')}}');">
                                 </div>
                 @endif
         </td>
@@ -72,23 +72,31 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
         <td>
         <p data-id="{{ $type.'_'.$thread->id }}">
             {{ strlen($thread->subject) > 12 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
-            <span>{{ $lastMessage->created_at->diffForHumans() }}</span></p>
+            @if ($lastMessage)
+            <span>{{ $lastMessage->created_at->diffForHumans() }}</span>
+            @endif
+        </p>
+
         <span>
-            {{-- Last Message user indicator --}}
-            {!!
-                $lastMessage->from_id == Auth::user()->id 
-                ? '<span class="lastMessageIndicator">You :</span>'
-                : ''
-            !!}
-            {{-- Last message body --}}
-            @if($lastMessage->attachment == null)
-            {{
-                strlen($lastMessage->body) > 30 
-                ? trim(substr($lastMessage->body, 0, 30)).'..'
-                : $lastMessage->body
-            }}
+            @if ($lastMessage)
+                {{-- Last Message user indicator --}}
+                {!!
+                    $lastMessage->from_id == Auth::user()->id 
+                    ? '<span class="lastMessageIndicator">You :</span>'
+                    : ''
+                !!}
+                {{-- Last message body --}}
+                @if($lastMessage->attachment == null)
+                {{
+                    strlen($lastMessage->body) > 30 
+                    ? trim(substr($lastMessage->body, 0, 30)).'..'
+                    : $lastMessage->body
+                }}
+                @else
+                <span class="fas fa-file"></span> Attachment
+                @endif
             @else
-            <span class="fas fa-file"></span> Attachment
+                <span class="lastMessageIndicator">Start Chat</span>
             @endif
         </span>
         {{-- New messages counter --}}

@@ -72,6 +72,7 @@ class MessagesController extends Controller
 
     public function idFetchData(Request $request)
     {
+        $user = null;
         // Favorite
         $favorite = Chatify::inFavorite($request['id']);
 
@@ -84,20 +85,23 @@ class MessagesController extends Controller
 
         // User data
         if ($thread->participants()->count() == 2) {
-            $fetch = User::where('id', $request['id'])->first();
+            $participants = $thread->participants()->pluck('user_id')->toArray();
+            $userID = array_diff($participants, [Auth::user()->id]);
+            $user = User::where('id', $userID)->first();
             $invites = [];
             $invites['workspaces'] = Auth::user()->invitableWorkspaces($request['id']);
             $invites['pods'] = Auth::user()->invitablePods($request['id']);
         }
 
-        if (!empty($fetch->avatar)) {
-            $avatar = Utility::get_file('/' . config('chatify.user_avatar.folder') . '/' . $fetch->avatar);
+        if (($user) && !empty($user->avatar)) {
+            $avatar = Utility::get_file('users-avatar/' . $user->avatar);
         }
 
         // send the response
         return Response::json([
             'favorite' => $favorite,
             'fetch' => $thread,
+            'user' => $user ?? null,
             'user_avatar' => $avatar ?? null,
             'can_invite' => $invites,
             'basic_url' => config('app.url'),
@@ -654,10 +658,12 @@ class MessagesController extends Controller
             $ext = pathinfo($attachment, PATHINFO_EXTENSION);
             $attachment_type = in_array($ext, Chatify::getAllowedImages()) ? 'image' : 'file';
         }
-
+        $from = User::find($message->user_id);
         return [
             'id' => $message->id,
             'from_id' => $message->user_id,
+            'from_avatar' => $from->avatar,
+            'from_name' => $from->name,
             'to_id' => $message->thread->participants->where('user_id', '!=', $message->user_id)->first()->user_id ?? $message->user_id,
             'message' => !isset($message->attachment) ? $message->body : null,
             'attachment' => [$attachment, $attachment_title, $attachment_type],
@@ -674,10 +680,22 @@ class MessagesController extends Controller
         // Get Unseen messages counter
         $unseenCounter = $thread->userUnreadMessagesCount($objUser->id); // $this->countUnseenMessages(!empty($user)?$user->id:0);
 
+        // User data
+        if ($thread->participants()->count() == 2) {
+            $participants = $thread->participants()->pluck('user_id')->toArray();
+            $userID = array_diff($participants, [Auth::user()->id]);
+            $user = User::where('id', $userID)->first();
+
+            if (!empty($user->avatar)) {
+                $avatar = Utility::get_file('users-avatar/' . $user->avatar);
+            }
+        }
+
         return view('Chatify::layouts.listItem', [
             'get' => 'users',
             'thread' => $thread,
-            'lastMessage' => $lastMessage,
+            'user_avatar' => $avatar ?? null,
+            'lastMessage' => $lastMessage ?? null,
             'unseenCounter' => $unseenCounter,
             'type'=>'user',
             'id' => $messenger_id,
