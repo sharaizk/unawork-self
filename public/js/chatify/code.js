@@ -369,6 +369,17 @@ function IDinfo(id, type) {
         $("#message-form").trigger("reset");
         cancelAttachment();
         messageInput.focus();
+        
+        // Add users to the users list
+        $(".users-list").html("");
+          data.users.forEach(user => {
+              const userName = user.name ? user.name : null;
+              const userAvatar = user.avatar ? data.basic_url + '/storage/users-avatar/' + user.avatar : '" avatar="'+user.name +'';
+              $(".users-list").append(
+                  `<img class="theme-avatar" src="${userAvatar}" title="${userName}" style="border-radius: 50%;max-width: 40px;max-height: 40px;">`
+              );
+          });
+
       },
       error: () => {
         console.error("Error, check server response!");
