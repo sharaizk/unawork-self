@@ -94,10 +94,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
         @if ($notification->type == 'task_assign')
             @php
                 if ($project) {
-                    $workspace = \App\Models\Workspace::find($notification->workspace_id);
-                    if (!$workspace) {
-                        continue;
-                    }
+                    $workspace = $project->workspaceData;
                     $link = route('projects.task.board', [$workspace->slug, $notification->project_id]);
                     $text = __('New task assign') . ' <b>' . $data->title . '</b> ' . __('in project') . ' <b>' . $project->name . '</b>';
                     $icon = 'fa fa-clock-o';
@@ -107,7 +104,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                         $icon_color = 'bg-danger';
                     }
                 } else {
-                    return '';
+                    continue;
                 }
             @endphp
             @elseif($notification->type == 'project_assign')
