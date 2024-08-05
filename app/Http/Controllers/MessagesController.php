@@ -78,8 +78,6 @@ class MessagesController extends Controller
         $profile_img  = Utility::get_file(config('chatify.user_avatar.folder'));
 
         $thread = Thread::find($request['id']);
-        $fetch = new \stdClass();
-        $fetch->name = $thread->subject;
         $invites = [];
         $invites['workspaces'] = null;
         $invites['pods'] = null;
@@ -93,21 +91,14 @@ class MessagesController extends Controller
         }
 
         if (!empty($fetch->avatar)) {
-
             $avatar = Utility::get_file('/' . config('chatify.user_avatar.folder') . '/' . $fetch->avatar);
-            // $avatar = url('/').$avatar;
-        } else {
-
-            $avatar = Utility::get_file('/' . config('chatify.user_avatar.folder') . '/avatar.png');
-
-            //  $avatar = url('/').$avatar;
         }
 
         // send the response
         return Response::json([
             'favorite' => $favorite,
-            'fetch' => $fetch,
-            'user_avatar' => $avatar,
+            'fetch' => $thread,
+            'user_avatar' => $avatar ?? null,
             'can_invite' => $invites,
             'basic_url' => config('app.url'),
         ]);
@@ -408,8 +399,8 @@ class MessagesController extends Controller
         // Get current authenticated user ID
         $userId = Auth::user()->id;
 
-        // Find the thread between the authenticated user and the specified user ID
-        $thread = Thread::between([$userId, $request['id']])->first();
+        // Find the thread
+        $thread = Thread::find($request['id']);
 
         if ($thread) {
             // Delete all messages in the thread
@@ -682,16 +673,10 @@ class MessagesController extends Controller
         $lastMessage = $thread->getLatestMessageAttribute(); // $this->getLastMessageQuery(!empty($user)?$user->id:0);
         // Get Unseen messages counter
         $unseenCounter = $thread->userUnreadMessagesCount($objUser->id); // $this->countUnseenMessages(!empty($user)?$user->id:0);
-        
-        $contact = new \stdClass();
-        $contact->id = $thread->id;
-        $contact->name = $thread->subject;
-        $contact->avatar = null;
-        $contact->active_status = 0;
 
         return view('Chatify::layouts.listItem', [
             'get' => 'users',
-            'user' => $contact,
+            'thread' => $thread,
             'lastMessage' => $lastMessage,
             'unseenCounter' => $unseenCounter,
             'type'=>'user',

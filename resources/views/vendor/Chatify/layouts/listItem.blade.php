@@ -54,17 +54,13 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
 
 {{-- -------------------- All users/group list -------------------- --}}
 @if($get == 'users')
-<table class="messenger-list-item @if($user->id == $id && $id != "0") m-list-active @endif" data-contact="{{ $user->id }}">
+<table class="messenger-list-item @if($thread->id == $id && $id != "0") m-list-active @endif" data-contact="{{ $thread->id }}">
     <tr data-action="0">
         {{-- Avatar side --}}
         <td style="position: relative">
-            @if($user->active_status)
-                <span class="activeStatus"></span>
-            @endif
-            
-                 @if(!empty($user->avatar))
+                 @if(isset($thread->avatar))
                     <div class="avatar av-m" 
-                    style="background-image: url('{{asset($avatar.$user->avatar)}}');">
+                    style="background-image: url('{{asset($avatar.$thread->avatar)}}');">
                     </div>
                 @else
                     <div class="avatar av-m"
@@ -74,8 +70,8 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
         </td>
         {{-- center side --}}
         <td>
-        <p data-id="{{ $type.'_'.$user->id }}">
-            {{ strlen($user->name) > 12 ? trim(substr($user->name,0,12)).'..' : $user->name }} 
+        <p data-id="{{ $type.'_'.$thread->id }}">
+            {{ strlen($thread->subject) > 12 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
             <span>{{ $lastMessage->created_at->diffForHumans() }}</span></p>
         <span>
             {{-- Last Message user indicator --}}
@@ -109,16 +105,13 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
     <tr data-action="0">
         {{-- Avatar side --}}
             <td style="position: relative">
-             @if($user->active_status)
-                    <span class="activeStatus"></span>
-                @endif
-                {{-- @dd($user) --}}
-                 @if(!empty($user->avatar))  
+                {{-- @dd($subject) --}}
+                 @if(!empty($thread->avatar))  
                     <div class="avatar av-m"
                     style="background-image:url('{{asset($avatar.$user->avatar)}}');">
                     </div> 
                 @else
-                    {{-- @dd($user->avatar)  --}}
+                    {{-- @dd($thread->avatar)  --}}
                     <div class="avatar av-m"
                                     style="background-image: url('{{asset($avatar.'avatar.png')}}');">
                                 </div>
@@ -127,7 +120,7 @@ $avatar = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
         {{-- center side --}}
         <td>
         <p data-id="{{ $type.'_'.$user->id }}">
-            {{ strlen($user->name) > 12 ? trim(substr($user->name,0,12)).'..' : $user->name }} 
+            {{ strlen($thread->subject) > 12 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
         </td>
         
     </tr>

@@ -359,8 +359,8 @@ function IDinfo(id, type) {
         //put info in select invite
         insertSelectsForInviteUser(data);
         // update info in view
-        $(".messenger-infoView .info-name").html(data.fetch.name);
-        $(".m-header-messaging .user-name").html(data.fetch.name);
+        $(".messenger-infoView .info-name").html(data.fetch.subject);
+        $(".m-header-messaging .user-name").html(data.fetch.subject);
         // Star status
         data.favorite > 0
           ? $(".add-to-favorite").addClass("favorite")
