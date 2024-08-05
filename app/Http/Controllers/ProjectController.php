@@ -49,6 +49,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Expense;
 use App\Models\Notification;
+use App\Services\ChatService;
 use Illuminate\Support\Facades\File;
 
 
@@ -204,6 +205,7 @@ class ProjectController extends Controller
 
     public function store($slug, Request $request)
     {
+        $usersIdList = [];
         $objUser = Auth::user();
         $plan = Plan::find($objUser->plan);
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);        
@@ -247,6 +249,7 @@ class ProjectController extends Controller
                         if ($registerUsers->id == $objUser->id) {
                             $permission = 'Owner';
                         }
+                        $usersIdList[] .= $registerUsers->id;
                         Utility::sendNotification('project_new', null, $registerUsers->id, $objProject);
                     } else {
                         $arrUser = [];
@@ -307,6 +310,15 @@ class ProjectController extends Controller
                     //     // return redirect()->back()->with('error', __('Webhook call failed.'));
                     // }
                 }
+
+                //create chat
+                $groupChatService = new ChatService;
+                $subject = "Project ".$post['name']." Chat";
+                $message = "Chat for project created successfully";
+                $slug = "project";
+                $attachmentData = [];
+                $thread = $groupChatService->createGroupChat($subject, $usersIdList, $message, $slug, $attachmentData);
+
 
                 if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
                     return redirect()->route('pods.projects', $currentWorkspace->ownerable_id)->with('success', __('Project Created Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''));

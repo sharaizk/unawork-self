@@ -417,7 +417,8 @@
                                                 @if ($notification->type == 'task_assign')
                                                     @php
                                                         if ($project) {
-                                                            $link = route('projects.task.board', [$notification->workspace_id, $notification->project_id]);
+                                                            $workspace = $project->workspaceData;
+                                                            $link = route('projects.task.board', [$workspace->slug, $notification->project_id]);
                                                             $text = __('New task assign') . ' <b>' . $data->title . '</b> ' . __('in project') . ' <b>' . $project->name . '</b>';
                                                             $icon = 'fa fa-clock-o';
                                                             if ($data->priority == 'Low') {

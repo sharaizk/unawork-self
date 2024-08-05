@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
+use App\Models\CmgmyrMessenger\Message as CustomMessage;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 use App\Models\User;
 use App\Models\Utility;
@@ -14,7 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-
+use Cmgmyr\Messenger\Models\Thread;
+use Cmgmyr\Messenger\Models\Message as LaravelMessage;
+use Cmgmyr\Messenger\Models\Participant;
 
 class MessagesController extends Controller
 {
@@ -69,35 +72,37 @@ class MessagesController extends Controller
 
     public function idFetchData(Request $request)
     {
+        $user = null;
         // Favorite
         $favorite = Chatify::inFavorite($request['id']);
 
         $profile_img  = Utility::get_file(config('chatify.user_avatar.folder'));
 
+        $thread = Thread::find($request['id']);
+        $invites = [];
+        $invites['workspaces'] = null;
+        $invites['pods'] = null;
+
         // User data
-        if ($request['type'] == 'user') {
-            $fetch = User::where('id', $request['id'])->first();
+        if ($thread->participants()->count() == 2) {
+            $participants = $thread->participants()->pluck('user_id')->toArray();
+            $userID = array_diff($participants, [Auth::user()->id]);
+            $user = User::where('id', $userID)->first();
             $invites = [];
             $invites['workspaces'] = Auth::user()->invitableWorkspaces($request['id']);
             $invites['pods'] = Auth::user()->invitablePods($request['id']);
         }
 
-        if (!empty($fetch->avatar)) {
-
-            $avatar = Utility::get_file('/' . config('chatify.user_avatar.folder') . '/' . $fetch->avatar);
-            // $avatar = url('/').$avatar;
-        } else {
-
-            $avatar = Utility::get_file('/' . config('chatify.user_avatar.folder') . '/avatar.png');
-
-            //  $avatar = url('/').$avatar;
+        if (($user) && !empty($user->avatar)) {
+            $avatar = Utility::get_file('users-avatar/' . $user->avatar);
         }
 
         // send the response
         return Response::json([
             'favorite' => $favorite,
-            'fetch' => $fetch,
-            'user_avatar' => $avatar,
+            'fetch' => $thread,
+            'user' => $user ?? null,
+            'user_avatar' => $avatar ?? null,
             'can_invite' => $invites,
             'basic_url' => config('app.url'),
         ]);
@@ -129,108 +134,58 @@ class MessagesController extends Controller
 
     public function send(Request $request)
     {
-        $currentWorkspace = Utility::getWorkspaceBySlug('');
-        // default variables
-        $error = (object)[
-            'status' => 0,
-            'message' => null
-        ];
-        $attachment = null;
-        $attachment_title = null;
-
-        // if there is attachment [file]
-        if ($request->hasFile('file')) {
-            // allowed extensions
-            $allowed_images = Chatify::getAllowedImages();
-            $allowed_files  = Chatify::getAllowedFiles();
-            $allowed        = array_merge($allowed_images, $allowed_files);
-
-            $file = $request->file('file');
-
-            if (in_array($file->getClientOriginalExtension(), $allowed)) {
-                // get attachment name
-                $attachment_title = $file->getClientOriginalName();
-                // upload attachment and store the new name
-                $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
-
-                // $file->storeAs(config('chatify.attachments.folder'), $attachment);
-
-                $dir = 'attachments/';
-
-                $path_store = Utility::upload_file($request, 'file', $attachment, $dir, []);
-                if ($path_store['flag'] == 1) {
-                    $file = $path_store['url'];
-                } else {
-
-                    return redirect()->back()->with('error', __($path_store['msg']));
-                }
-            } else {
-                $error->status = 1;
-                $error->message = "File extension not allowed!";
-            }
+        $attachmentData = $this->handleAttachment($request);
+    
+        if ($attachmentData['error']->status) {
+            return redirect()->back()->with('error', __($attachmentData['error']->message));
         }
-
-        if (!$error->status) {
-            // send to database
-            $messageID = mt_rand(9, 999999999) + time();
-            Chatify::newMessage([
-                'id' => $messageID,
-                'type' => $request['type'],
-                'workspace_id' => $currentWorkspace->id,
-                'from_id' => Auth::user()->id,
-                'to_id' => $request['id'],
-                'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
-                'attachment' => ($attachment) ? json_encode((object)[
-                    'new_name' => $attachment,
-                    'old_name' => htmlentities(trim($attachment_title), ENT_QUOTES, 'UTF-8'),
-                ]) : null,
-            ]);
-
-            // fetch message to send it with the response
-            $messageData = Chatify::fetchMessage($messageID);
-
-            // send to user using pusher
-            Chatify::push('private-chatify', 'messaging', [
-                'from_id' => Auth::user()->id,
-                'to_id' => $request['id'],
-                'message' => Chatify::messageCard($messageData, 'default')
-            ]);
-        }
-
-        // send the response
+    
+        $userId = Auth::user()->id;
+        $thread = Thread::find($request['id']);
+    
+        $message = CustomMessage::create([
+            'thread_id' => $thread->id,
+            'user_id' => $userId,
+            'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
+            'attachment' => $this->formatAttachment($attachmentData),
+        ]);
+    
+        $thread->touch();
+    
+        $messageData = $this->formatMessageData($message->id);
+    
         return Response::json([
             'status' => '200',
-            'error' => $error,
-            'message' => Chatify::messageCard(@$messageData),
+            'error' => $attachmentData['error'],
+            'message' => Chatify::messageCard($messageData),
             'tempID' => $request['temporaryMsgId'],
         ]);
     }
-
+    
     public function fetch(Request $request)
     {
-        // messages variable
         $allMessages = null;
-
-        // fetch messages
-        $query = Chatify::fetchMessagesQuery($request['id'])->orderBy('created_at', 'asc');
-        $messages = $query->get();
-
-        // if there is a messages
-        if ($query->count() > 0) {
-            foreach ($messages as $message) {
-                $allMessages .= Chatify::messageCard(
-                    Chatify::fetchMessage($message->id)
-                );
+    
+        $userId = Auth::user()->id;
+        $thread = Thread::find($request['id']);
+    
+        if ($thread) {
+            $messages = $thread->messages()->orderBy('created_at', 'asc')->get();
+            if ($messages->count() > 0) {
+                foreach ($messages as $message) {
+                    $messageData = $this->formatMessageData($message->id);
+                    $allMessages .= Chatify::messageCard($messageData);
+                }
+                $thread->markAsRead($userId);
+                return Response::json([
+                    'count' => $messages->count(),
+                    'messages' => $allMessages,
+                ]);
             }
-            // send the response
-            return Response::json([
-                'count' => $query->count(),
-                'messages' => $allMessages,
-            ]);
         }
-        // send the response
+    
         return Response::json([
-            'count' => $query->count(),
+            'count' => 0,
             'messages' => '<p class="message-hint center-el"><span>Say \'hi\' and start messaging</span></p>',
         ]);
     }
@@ -238,20 +193,31 @@ class MessagesController extends Controller
 
     public function seen(Request $request)
     {
-        // make as seen
-        $seenmessage =  Message::Where('from_id', $request['id'])->where('to_id', Auth::user()->id)->where('seen', 0)->count();
-        $messageCount = Message::where('to_id', Auth::user()->id)->where('seen', 0)->count();
+        $userId = Auth::user()->id;
 
-        $seen = Chatify::makeSeen($request['id']);
+        $thread = Thread::between([$userId, $request['id']])->first();
 
-        if ($seen) {
-            $messageCount = $messageCount - $seenmessage;
+        // is created thread between users 
+        if (!$thread || !$thread->isUnread($userId)) {
+                return Response::json(
+                    [
+                        'status' => false,
+                        'messengerCount' => 0
+                    ],
+                    200
+                );
         }
-        // send the response
+
+        // unreadMessages counting
+        $unreadMessagesCount = $thread->userUnreadMessagesCount($userId);
+
+        // mark thread as read
+        $thread->markAsRead($userId);
+
         return Response::json(
             [
-                'status' => $seen,
-                'messengerCount' => $messageCount
+                'status' => true,
+                'messengerCount' => $unreadMessagesCount
             ],
             200
         );
@@ -259,63 +225,45 @@ class MessagesController extends Controller
 
     public function getContacts(Request $request)
     {
-        // get all users that received/sent message from/to [Auth user]
         $currentWorkspace = Utility::getWorkspaceBySlug('');
-        $users = Message::join('users',  function ($join) {
-            $join->on('ch_messages.from_id', '=', 'users.id')
-                ->orOn('ch_messages.to_id', '=', 'users.id');
-        })
-        //    ->where('ch_messages.workspace_id', '=', $currentWorkspace->id)
-            ->where(function ($q) {
-                $q->where('ch_messages.from_id', Auth::user()->id)
-                    ->orWhere('ch_messages.to_id', Auth::user()->id);
-            })
-            ->orderBy('ch_messages.created_at', 'desc')
-            ->get()
-            ->unique('id');
-        $users = $users->where('id', '!=', Auth::user()->id);
-        if ($users->count() > 0) {
-            // fetch contacts
-            $contacts = '';
-            foreach ($users as $user) {
-                if ($user->id != Auth::user()->id) {
-                    // Get user data
-                    $userCollection = User::where('id', $user->id)->first();
-                    $contacts .= Chatify::getContactItem($request['messenger_id'], $userCollection);
-                }
+        $userId = Auth::user()->id;
+    
+        // Get all threads the user is part of
+        $threads = Thread::forUser($userId)->latest('updated_at')->get()->unique('id');
+        // Fetch threads to contacts
+        $contacts = '';
+        foreach ($threads as $thread) {
+            if ($thread->subject == "Saved Messages") {
+                continue;
             }
+                // Get user data
+                $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
         }
-
-        $objUser = Auth::user();
-
+    
+        // Get members of the current workspace
         if ($currentWorkspace) {
             $members = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active')
                 ->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id')
-                ->where('user_workspaces.workspace_id', '=', $currentWorkspace->id)->where('users.id', '!=', $objUser->id)->get();
+                ->where('user_workspaces.workspace_id', '=', $currentWorkspace->id)
+                ->where('users.id', '!=', $userId)
+                ->get();
         } else {
             $members = User::where('type', '!=', 'admin')->get();
         }
-
-        $getRecords = null;
+    
+        $getRecords = '';
         foreach ($members as $record) {
-
-            $getRecords .= view(
-                'vendor.Chatify.layouts.listItem',
-                [
-                    'get' => 'all_members',
-                    'type' => 'user',
-                    'user' => $record,
-                ]
-            )->render();
+            $getRecords .= view('vendor.Chatify.layouts.listItem', [
+                'get' => 'all_members',
+                'type' => 'user',
+                'user' => $record,
+            ])->render();
         }
-
-        return Response::json(
-            [
-                'contacts' => $users->count() > 0 ? $contacts : '<br><p class="message-hint"><span>' . __('Your contact list is empty') . '</span></p>',
-                'allUsers' => $members->count() > 0 ? $getRecords : '<br><p class="message-hint"><span>' . __('Your member list is empty') . '</span></p>',
-            ],
-            200
-        );
+    
+        return Response::json([
+            'contacts' => $contacts,
+            'allUsers' => $members->count() > 0 ? $getRecords : '<br><p class="message-hint"><span>' . __('Your member list is empty') . '</span></p>',
+        ], 200);
     }
 
 
@@ -452,13 +400,29 @@ class MessagesController extends Controller
 
     public function deleteConversation(Request $request)
     {
-        // delete
-        $delete = Chatify::deleteConversation($request['id']);
+        // Get current authenticated user ID
+        $userId = Auth::user()->id;
 
-        // send the response
-        return Response::json([
-            'deleted' => $delete ? 1 : 0,
-        ], 200);
+        // Find the thread
+        $thread = Thread::find($request['id']);
+
+        if ($thread) {
+            // Delete all messages in the thread
+            $thread->messages()->delete();
+
+            // Delete the thread
+            $thread->delete();
+
+            // send the response
+            return Response::json([
+                'deleted' => 1,
+            ], 200);
+        } else {
+            // Thread not found
+            return Response::json([
+                'deleted' => 0,
+            ], 404);
+        }
     }
 
     public function updateSettings(Request $request)
@@ -587,4 +551,153 @@ class MessagesController extends Controller
             'status' => $update,
         ], 200);
     }
-}
+
+    protected function handleAttachment(Request $request)
+    {
+        $attachment = null;
+        $attachment_title = null;
+        $error = (object)[
+            'status' => 0,
+            'message' => null
+        ];
+
+        if ($request->hasFile('file')) {
+            $allowed_images = Chatify::getAllowedImages();
+            $allowed_files  = Chatify::getAllowedFiles();
+            $allowed = array_merge($allowed_images, $allowed_files);
+
+            $file = $request->file('file');
+
+            if (in_array($file->getClientOriginalExtension(), $allowed)) {
+                $attachment_title = $file->getClientOriginalName();
+                $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
+                $dir = 'attachments/';
+
+                $path_store = Utility::upload_file($request, 'file', $attachment, $dir, []);
+                if ($path_store['flag'] == 1) {
+                    $file = $path_store['url'];
+                } else {
+                    $error->status = 1;
+                    $error->message = $path_store['msg'];
+                }
+            } else {
+                $error->status = 1;
+                $error->message = "File extension not allowed!";
+            }
+        }
+
+        return compact('attachment', 'attachment_title', 'error');
+    }
+
+    protected function findOrCreateThread($userId, $recipientId)
+    {
+        if ($userId == $recipientId) {
+            $thread = Thread::whereHas('participants', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->where('subject', 'Saved Messages')->first();
+
+            if (!$thread) {
+                $thread = Thread::create([
+                    'subject' => 'Saved Messages'
+                ]);
+
+                Participant::create([
+                    'thread_id' => $thread->id,
+                    'user_id' => $userId,
+                    'last_read' => new \Carbon\Carbon,
+                ]);
+            }
+        } else {
+            $thread = Thread::between([$userId, $recipientId])->first();
+            if (!$thread) {
+                $thread = Thread::create([
+                    'subject' => 'New Message'
+                ]);
+
+                Participant::create([
+                    'thread_id' => $thread->id,
+                    'user_id' => $userId,
+                    'last_read' => new \Carbon\Carbon,
+                ]);
+
+                Participant::create([
+                    'thread_id' => $thread->id,
+                    'user_id' => $recipientId,
+                    'last_read' => new \Carbon\Carbon,
+                ]);
+            }
+        }
+
+        return $thread;
+    }
+
+    private function formatAttachment($attachmentData)
+    {
+        if ($attachmentData['attachment']) {
+            return json_encode((object)[
+                'new_name' => $attachmentData['attachment'],
+                'old_name' => htmlentities(trim($attachmentData['attachment_title']), ENT_QUOTES, 'UTF-8'),
+            ]);
+        }
+
+        return null;
+    }
+
+    private function formatMessageData($messageId)
+    {
+        $message = LaravelMessage::find($messageId);
+        $attachment = null;
+        $attachment_type = null;
+        $attachment_title = null;
+
+        if (isset($message->attachment)) {
+            $attachmentOBJ = json_decode($message->attachment);
+            $attachment = $attachmentOBJ->new_name;
+            $attachment_title = htmlentities(trim($attachmentOBJ->old_name), ENT_QUOTES, 'UTF-8');
+
+            $ext = pathinfo($attachment, PATHINFO_EXTENSION);
+            $attachment_type = in_array($ext, Chatify::getAllowedImages()) ? 'image' : 'file';
+        }
+        $from = User::find($message->user_id);
+        return [
+            'id' => $message->id,
+            'from_id' => $message->user_id,
+            'from_avatar' => $from->avatar,
+            'from_name' => $from->name,
+            'to_id' => $message->thread->participants->where('user_id', '!=', $message->user_id)->first()->user_id ?? $message->user_id,
+            'message' => !isset($message->attachment) ? $message->body : null,
+            'attachment' => [$attachment, $attachment_title, $attachment_type],
+            'time' => $message->created_at->diffForHumans(),
+            'fullTime' => $message->created_at->format('Y-m-d H:i:s'),
+            'viewType' => ($message->user_id == Auth::user()->id) ? 'sender' : 'default',
+            'seen' => false,
+        ];
+    }
+
+    private function getContactItem($messenger_id, $thread, $objUser){
+        // get last message
+        $lastMessage = $thread->getLatestMessageAttribute(); // $this->getLastMessageQuery(!empty($user)?$user->id:0);
+        // Get Unseen messages counter
+        $unseenCounter = $thread->userUnreadMessagesCount($objUser->id); // $this->countUnseenMessages(!empty($user)?$user->id:0);
+
+        // User data
+        if ($thread->participants()->count() == 2) {
+            $participants = $thread->participants()->pluck('user_id')->toArray();
+            $userID = array_diff($participants, [Auth::user()->id]);
+            $user = User::where('id', $userID)->first();
+
+            if (!empty($user->avatar)) {
+                $avatar = Utility::get_file('users-avatar/' . $user->avatar);
+            }
+        }
+
+        return view('Chatify::layouts.listItem', [
+            'get' => 'users',
+            'thread' => $thread,
+            'user_avatar' => $avatar ?? null,
+            'lastMessage' => $lastMessage ?? null,
+            'unseenCounter' => $unseenCounter,
+            'type'=>'user',
+            'id' => $messenger_id,
+        ])->render();
+    }}
