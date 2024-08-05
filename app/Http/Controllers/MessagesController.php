@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
-use App\Models\CustomMessage;
+use App\Models\CmgmyrMessenger\Message as CustomMessage;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 use App\Models\User;
 use App\Models\Utility;
