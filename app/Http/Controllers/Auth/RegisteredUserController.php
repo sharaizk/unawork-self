@@ -215,7 +215,6 @@ class RegisteredUserController extends Controller
 
         $userWorkspace->assignAllPermissionsToCreator();
 
-
         $user->currant_workspace = $objWorkspace->id;
         $user->save();
 
