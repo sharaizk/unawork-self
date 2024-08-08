@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PodUser\Permission as EnumPermission;
 use App\Models\BugReport;
 use App\Models\BugStage;
 use App\Models\EmailTemplate;
@@ -24,6 +25,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Permission;
 
 class WorkspaceController extends Controller
 {
@@ -1588,5 +1590,30 @@ class WorkspaceController extends Controller
         } else {
             return redirect()->back()->with('error', __('Something is wrong'));
         }
+    }
+
+    public function editPermissions(Workspace $workspace, User $user)
+    {   
+        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        $permissions = Permission::all();
+
+        return view('users.edit_permissions', compact('permissions', 'user', 'workspace', 'userWorkspace'));
+    }
+
+    public function updatePermissions(Request $request, Workspace $workspace, User $user)
+    {
+        // policies 
+        $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
+        $workspaceUserEditor = $workspace->users()->where('user_id', Auth::id())->first();
+
+        if (!$userWorkspaceEditor->hasPermissionTo('users_edit') && $workspaceUserEditor->pivot->permission != EnumPermission::OWNER->value ) {
+            return redirect()->back()->with('error', __('Error: you do not have permission for this!'));
+        }
+
+        $permissions = $request->input('permissions', []);
+        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        $userWorkspace->syncPermissions($permissions);
+
+        return redirect()->back()->with('success', 'Permissions updated successfully.');
     }
 }

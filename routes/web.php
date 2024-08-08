@@ -122,6 +122,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/account/job-vacancies/{vacancy}/applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
 
+    Route::get('/workspace/{workspace}/users/{user}/edit-permissions', [WorkspaceController::class, 'editPermissions'])->name('workspace.users.editPermissions');
+    Route::put('/workspace/{workspace}/users/{user}', [WorkspaceController::class, 'updatePermissions'])->name('workspace.users.updatePermissions');
+
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

@@ -1306,6 +1306,7 @@ class UserController extends Controller
                     'status' => Status::EMPLOYEE_PENDING->value,
                 ]);
                 $userWorkspace->refresh();
+                $userWorkspace->syncPermissions(['users_index', 'projects_index']);
 
                 $workspace_name = Workspace::where('id', $authuser->currant_workspace)->first();
 
