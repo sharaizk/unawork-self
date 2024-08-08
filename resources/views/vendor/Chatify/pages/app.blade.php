@@ -113,7 +113,7 @@
                             <a href="#" class="show-listView"><i class="fas fa-arrow-left"></i> </a>
                             @if (!empty(Auth::user()->avatar))
                                 <div class="avatar av-s header-avatar"
-                                    style="margin: 0px 10px; margin-top: -5px; margin-bottom: -5px;background-image: url('{{ ($avatar . Auth::user()->avatar) }}');">
+                                    style="margin: 0px 10px; margin-top: -5px; margin-bottom: -5px;background-image: url('{{ ($avatar . Auth::user()->avatar) }}'); background-size: cover;">
                                 </div>
                             @else
                                 <div class="avatar av-s header-avatar"

@@ -70,7 +70,7 @@
                </div>
                <div class="navbar-content">
                    <ul class="dash-navbar">
-                       
+                        
                        @if (\Auth::guard('client')->check())
                            <li class="dash-item dash-hasmenu">
                                <a href="{{ route('client.home') }}"
@@ -96,6 +96,13 @@
                                         <span class="dash-mtext">{{ __('Job Vacancies') }}</span>
                                     </a>
                                 </li>
+                        @endif
+                        @if ($adminSetting['enable_chat'] == 'on')
+                            <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
+                                <a href="{{ route('chats') }}" class="dash-link"><span class="dash-micon"><i
+                                            class="ti ti-message-circle"></i></span><span
+                                        class="dash-mtext">{{ __('Messenger') }}</span></a>
+                            </li>
                         @endif
                        @if (\Auth::user()->type != "admin")
                             <!-- <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
@@ -156,32 +163,52 @@
                                                class="dash-mtext"> {{ __('Clients') }}</span></a>
                                    </li> -->
                                @endif
-                               <li
-                                   class="dash-item {{ Request::route()->getName() == 'projects.index' || Request::segment(2) == 'projects' ? ' active' : '' }}">
-                                   <a href="{{ route('projects.index', $currentWorkspace->slug) }}" class="dash-link"><span
-                                           class="dash-micon"> <i data-feather="briefcase"></i></span><span
-                                           class="dash-mtext">{{ __('Projects') }}</span></a>
-                               </li>
-                               <li class="dash-item {{ Request::route()->getName() == 'tasks.index' ? ' active' : '' }}">
-                                   <a href="{{ route('tasks.index', $currentWorkspace->slug) }}" class="dash-link "><span
-                                           class="dash-micon"><i data-feather="list"></i></span><span
-                                           class="dash-mtext">{{ __('Tasks') }}</span></a>
-                               </li>
+                               
+                               @if ($userWorkspace->hasPermissionTo('projects_index'))
+                                <li
+                                    class="dash-item {{ Request::route()->getName() == 'projects.index' || Request::segment(2) == 'projects' ? ' active' : '' }}">
+                                    <a href="{{ route('projects.index', $currentWorkspace->slug) }}" class="dash-link"><span
+                                            class="dash-micon"> <i data-feather="briefcase"></i></span><span
+                                            class="dash-mtext">{{ __('Projects') }}</span></a>
+                                </li>
+                                <li class="dash-item {{ Request::route()->getName() == 'tasks.index' ? ' active' : '' }}">
+                                    <a href="{{ route('tasks.index', $currentWorkspace->slug) }}" class="dash-link "><span
+                                            class="dash-micon"><i data-feather="list"></i></span><span
+                                            class="dash-mtext">{{ __('Tasks') }}</span></a>
+                                </li>
+                                <li
+                                    class="dash-item {{ Request::route()->getName() == 'project_report.index' || Request::segment(2) == 'project_report' ? ' active' : '' }}">
+                                    <a href="{{ route('project_report.index', $currentWorkspace->slug) }}"
+                                        class="dash-link "><span class="dash-micon"><i
+                                                class="ti ti-chart-line"></i></span><span
+                                            class="dash-mtext">{{ __('Project Report') }}</span></a>
+                                </li>
+                               @endif
+                               @if ($userWorkspace->hasPermissionTo('zoom_meeting_index'))
+                                <li
+                                    class="dash-item {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
+                                    <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
+                                        class="dash-link "><span class="dash-micon"><i
+                                                data-feather="video"></i></span><span
+                                            class="dash-mtext">{{ __('Zoom Meeting') }}</span></a>
 
-                               <li
+                                </li>
+                               @endif
+
+                               <!-- <li
                                    class="dash-item {{ Request::route()->getName() == 'timesheet.index' ? ' active' : '' }}">
                                    <a href="{{ route('timesheet.index', $currentWorkspace->slug) }}"
                                        class="dash-link "><span class="dash-micon"><i data-feather="clock"></i></span><span
                                            class="dash-mtext">{{ __('Timesheet') }}</span></a>
-                               </li>
+                               </li> -->
                                @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
-                                   <li
+                                   <!-- <li
                                        class="dash-item {{ \Request::route()->getName() == 'time.tracker' ? 'active' : '' }}">
                                        <a href="{{ route('time.tracker', $currentWorkspace->slug) }}"
                                            class="dash-link "><span class="dash-micon"><i
                                                    data-feather="watch"></i></span><span
                                                class="dash-mtext">{{ __('Tracker') }}</span></a>
-                                   </li>
+                                   </li> -->
                                @endif
                                @if ($currentWorkspace->creater->id == Auth::user()->id)
                                    <!-- <li
@@ -216,40 +243,21 @@
                                        </ul>
                                    </li> -->
                                @endif
-                               <li
+                               <!-- <li
                                    class="dash-item {{ Request::route()->getName() == 'calender.index' ? ' active' : '' }}">
                                    <a href="{{ route('calender.google.calendar', $currentWorkspace->slug) }}"
                                        class="dash-link "><span class="dash-micon"><i
                                                data-feather="calendar"></i></span><span
                                            class="dash-mtext">{{ __('Calendar') }}</span></a>
-                               </li>
-                               <li class="dash-item {{ Request::route()->getName() == 'notes.index' ? ' active' : '' }}">
+                               </li> -->
+                               <!-- <li class="dash-item {{ Request::route()->getName() == 'notes.index' ? ' active' : '' }}">
                                    <a href="{{ route('notes.index', $currentWorkspace->slug) }}" class="dash-link "><span
                                            class="dash-micon"><i data-feather="clipboard"></i></span><span
                                            class="dash-mtext">{{ __('Notes') }} </span></a>
-                               </li>
-                               @if ($adminSetting['enable_chat'] == 'on')
-                                   <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
-                                       <a href="{{ route('chats') }}" class="dash-link"><span class="dash-micon"><i
-                                                   class="ti ti-message-circle"></i></span><span
-                                               class="dash-mtext">{{ __('Messenger') }}</span></a>
-                                   </li>
-                               @endif
-                               <li
-                                   class="dash-item {{ Request::route()->getName() == 'project_report.index' || Request::segment(2) == 'project_report' ? ' active' : '' }}">
-                                   <a href="{{ route('project_report.index', $currentWorkspace->slug) }}"
-                                       class="dash-link "><span class="dash-micon"><i
-                                               class="ti ti-chart-line"></i></span><span
-                                           class="dash-mtext">{{ __('Project Report') }}</span></a>
-                               </li>
-                               <li
-                                   class="dash-item {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
-                                   <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
-                                       class="dash-link "><span class="dash-micon"><i
-                                               data-feather="video"></i></span><span
-                                           class="dash-mtext">{{ __('Zoom Meeting') }}</span></a>
-
-                               </li>
+                               </li> -->
+                               
+                               
+                 
                                @elseauth
                                <li
                                    class="dash-item {{ Request::route()->getName() == 'client.projects.index' || Request::segment(3) == 'projects' ? ' active' : '' }}">

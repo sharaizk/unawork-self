@@ -25,4 +25,22 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
     <div class="shared-photos-list"></div>
 </div>
 
+<div class="messenger-infoView-shared">
+    <p class="messenger-title">Users in thread</p>
+    <div class="users-list"></div>
+</div>
+
+<style>
+
+.theme-avtar {
+    border-radius: 50%;
+    font-size: 16px;
+    max-width: 20px;
+    max-height: 20px;
+    background: #dcdaeb;
+    color: #51459d;
+    object-fit: cover;
+    
+}
+</style>
 

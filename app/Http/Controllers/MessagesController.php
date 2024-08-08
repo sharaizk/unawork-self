@@ -91,10 +91,14 @@ class MessagesController extends Controller
             $invites = [];
             $invites['workspaces'] = Auth::user()->invitableWorkspaces($request['id']);
             $invites['pods'] = Auth::user()->invitablePods($request['id']);
+        } else {
+            $users = $thread->users()->get();
         }
 
         if (($user) && !empty($user->avatar)) {
             $avatar = Utility::get_file('users-avatar/' . $user->avatar);
+        } else {
+            $avatar = Utility::get_file('/logo/logo-dark.png');
         }
 
         // send the response
@@ -102,6 +106,7 @@ class MessagesController extends Controller
             'favorite' => $favorite,
             'fetch' => $thread,
             'user' => $user ?? null,
+            'users' => $users ?? null,
             'user_avatar' => $avatar ?? null,
             'can_invite' => $invites,
             'basic_url' => config('app.url'),

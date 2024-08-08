@@ -76,9 +76,13 @@ class Notification extends Model
             }
         }
         elseif($this->type == 'project_assign'){
-            $link = route('projects.show',[$this->workspace_id,$data->id]);
-            $text = __('New project assign')." <b>".$data->name."</b>";
-            $icon = "fa fa-suitcase";
+            $project = \App\Models\Project::find($data->id);
+            $workspace = \App\Models\Workspace::find($this->workspace_id);
+            if ($project && $workspace) {
+                $link = route('projects.show', [$workspace->slug, $project->id]);
+                $text = __('You were assigned to new project: ') . ' <b>' . $project->name . '</b>';
+                $icon = 'fa fa-suitcase';
+            }
         }
         elseif($this->type == 'bug_assign'){
             $project = Project::find($data->project_id);
