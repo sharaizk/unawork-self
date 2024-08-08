@@ -29,23 +29,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>News</td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="permissions[]" value="news_index" id="permission-news_index"
-                            @if($userWorkspace->hasPermissionTo('news_index')) checked @endif>
-                            <label class="form-check-label" for="permission-news_index"></label>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="permissions[]" value="news_edit" id="permission-news_edit"
-                            @if($userWorkspace->hasPermissionTo('news_edit')) checked @endif>
-                            <label class="form-check-label" for="permission-news_edit"></label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
                     <td>Projects</td>
                     <td>
                         <div class="form-check form-switch">
@@ -97,8 +80,6 @@
         // Set the switches to the state of the first screenshot
         document.getElementById('permission-users_index').checked = true;
         document.getElementById('permission-users_edit').checked = false;
-        document.getElementById('permission-news_index').checked = true;
-        document.getElementById('permission-news_edit').checked = false;
         document.getElementById('permission-projects_index').checked = true;
         document.getElementById('permission-projects_edit').checked = false;
         document.getElementById('permission-zoom_meeting_index').checked = true;
@@ -110,8 +91,6 @@
         // Set the switches to the state of the second screenshot
         document.getElementById('permission-users_index').checked = true;
         document.getElementById('permission-users_edit').checked = false;
-        document.getElementById('permission-news_index').checked = true;
-        document.getElementById('permission-news_edit').checked = false;
         document.getElementById('permission-projects_index').checked = false;
         document.getElementById('permission-projects_edit').checked = false;
         document.getElementById('permission-zoom_meeting_index').checked = false;
