@@ -132,11 +132,11 @@ class Workspace extends Model
     {
         if($created_by)
         {
-            return $this->belongsToMany('App\Models\User', 'user_workspaces', 'workspace_id', 'user_id')->withPivot('is_active', 'status')->where('users.id', "!=", $created_by)->get();
+            return $this->belongsToMany('App\Models\User', 'user_workspaces', 'workspace_id', 'user_id')->withPivot('is_active', 'status', 'permission')->where('users.id', "!=", $created_by)->get();
         }
         else
         {
-            return $this->belongsToMany('App\Models\User', 'user_workspaces', 'workspace_id', 'user_id')->withPivot('is_active', 'status');
+            return $this->belongsToMany('App\Models\User', 'user_workspaces', 'workspace_id', 'user_id')->withPivot('is_active', 'status', 'permission');
         }
     }
 

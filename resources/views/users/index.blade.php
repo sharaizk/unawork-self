@@ -100,7 +100,7 @@
                                              </button>
                                              <div class="dropdown-menu dropdown-menu-end">
                                                  @if (Auth::user()->type == 'admin' && isset($user->getPlan))
-                                                     <a href="#" class="dropdown-item" data-ajax-popup="true"
+                                                    <a href="#" class="dropdown-item" data-ajax-popup="true"
                                                          data-size="lg" data-title="{{ __('Change Plan') }}"
                                                          data-url="{{ route('users.change.plan', $user->id) }}"><i
                                                              class="ti ti-exchange"></i>
@@ -160,12 +160,21 @@
                                                          $currentWorkspace &&
                                                          $currentWorkspace->permission == 'Owner' &&
                                                          Auth::user()->id != $user->id)
-                                                     <a href="#" class="dropdown-item" data-ajax-popup="true"
-                                                         data-size="md" data-title="{{ __('Edit User') }}"
-                                                         data-url="{{ route('users.edit', [$currentWorkspace->slug, $user->id]) }}"><i
-                                                             class="ti ti-edit"></i>
-                                                         <span>{{ __('Edit') }}</span>
-                                                     </a>
+                                                    
+                                                        <a href="#" class="dropdown-item" 
+                                                            data-ajax-popup="true" 
+                                                        data-size="lg" 
+                                                        data-title="Edit Permissions"
+                                                        data-url="{{ route('workspace.users.editPermissions', ['workspace' => $currentWorkspace, 'user' => $user]) }}">
+                                                            <i class="ti ti-flag"></i> 
+                                                            Edit Permissions
+                                                        </a>  
+                                                        <a href="#" class="dropdown-item" data-ajax-popup="true"
+                                                            data-size="md" data-title="{{ __('Edit User') }}"
+                                                            data-url="{{ route('users.edit', [$currentWorkspace->slug, $user->id]) }}"><i
+                                                                class="ti ti-edit"></i>
+                                                            <span>{{ __('Edit') }}</span>
+                                                        </a>
 
                                                      <a href="#" class="dropdown-item" data-ajax-popup="true"
                                                          data-size="md" data-title="{{ __('Reset Password') }}"
