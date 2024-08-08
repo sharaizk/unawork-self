@@ -25,7 +25,6 @@ class HomeController extends Controller
     public function landingPage()
     {
         if (!file_exists(storage_path() . "/installed")) {
-            
             header('location:install');
             die;
         }
