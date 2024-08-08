@@ -81,6 +81,40 @@
                 </tr>
             </tbody>
         </table>
-        <button type="submit" class="btn btn-primary">Save</button>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <div style="padding-right: 20px;">
+                <button id="outer-circle-btn" class="btn btn-secondary">Outer Circle</button>
+                <button id="inner-circle-btn" class="btn btn-secondary">Inner Circle</button>
+            </div>
+        </div>
     </form>
 </div>
+
+<script>
+    document.getElementById('inner-circle-btn').addEventListener('click', function() {
+        event.preventDefault();
+        // Set the switches to the state of the first screenshot
+        document.getElementById('permission-users_index').checked = true;
+        document.getElementById('permission-users_edit').checked = false;
+        document.getElementById('permission-news_index').checked = true;
+        document.getElementById('permission-news_edit').checked = false;
+        document.getElementById('permission-projects_index').checked = true;
+        document.getElementById('permission-projects_edit').checked = false;
+        document.getElementById('permission-zoom_meeting_index').checked = true;
+        document.getElementById('permission-zoom_meeting_edit').checked = false;
+    });
+
+    document.getElementById('outer-circle-btn').addEventListener('click', function() {
+        event.preventDefault();
+        // Set the switches to the state of the second screenshot
+        document.getElementById('permission-users_index').checked = true;
+        document.getElementById('permission-users_edit').checked = false;
+        document.getElementById('permission-news_index').checked = true;
+        document.getElementById('permission-news_edit').checked = false;
+        document.getElementById('permission-projects_index').checked = false;
+        document.getElementById('permission-projects_edit').checked = false;
+        document.getElementById('permission-zoom_meeting_index').checked = false;
+        document.getElementById('permission-zoom_meeting_edit').checked = false;
+    });
+</script>
