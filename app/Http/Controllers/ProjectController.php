@@ -317,6 +317,7 @@ class ProjectController extends Controller
                 $message = "Chat for project created successfully";
                 $slug = "project";
                 $attachmentData = [];
+                $usersIdList = array_diff(array_unique($usersIdList), [Auth::id()]);
                 $thread = $groupChatService->createGroupChat($subject, $usersIdList, $message, $slug, $attachmentData);
 
 
