@@ -227,7 +227,7 @@ class ProjectController extends Controller
                     $userList = $post['users_list'];
                 }
                 $userList[] = $objUser->email;
-                $userList = array_filter($userList);
+                $userList = array_unique($userList);
                 $objProject = Project::create($post);
 
                 $data = [];
@@ -250,7 +250,7 @@ class ProjectController extends Controller
                             $permission = 'Owner';
                         }
                         $usersIdList[] .= $registerUsers->id;
-                        Utility::sendNotification('project_new', null, $registerUsers->id, $objProject);
+                    Utility::sendNotification('project_new', null, $registerUsers->id, $objProject);
                     } else {
                         $arrUser = [];
                         $arrUser['name'] = 'No Name';
@@ -310,6 +310,14 @@ class ProjectController extends Controller
                     //     // return redirect()->back()->with('error', __('Webhook call failed.'));
                     // }
                 }
+
+                //send notification to all project->workspace members
+                $workspaceUsers = $currentWorkspace->users->pluck('id')->toArray();
+                $workspaceUsers = array_diff($workspaceUsers, array_unique($usersIdList));
+                foreach ($workspaceUsers as $notifyUser) {
+                    Utility::sendNotification('project_new', null, $notifyUser, $objProject);
+                }
+
 
                 //create chat
                 $groupChatService = new ChatService;
