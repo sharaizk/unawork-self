@@ -97,6 +97,8 @@ class MessagesController extends Controller
 
         if (($user) && !empty($user->avatar)) {
             $avatar = Utility::get_file('users-avatar/' . $user->avatar);
+        } else {
+            $avatar = Utility::get_file('/logo/logo-dark.png');
         }
 
         // send the response

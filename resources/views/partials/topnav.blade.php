@@ -1,7 +1,5 @@
 @php
-    $unseenCounter = App\Models\ChMessage::where('to_id', Auth::user()->id)
-        ->where('seen', 0)
-        ->count();
+    $unseenCounter = Auth::user()->unreadMessagesCount();
     $notificationCounter = App\Models\Notification::where('user_id', Auth::user()->id)
         ->where('is_read', 0)
         ->count();
