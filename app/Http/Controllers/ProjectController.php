@@ -315,6 +315,12 @@ class ProjectController extends Controller
                 $workspaceUsers = $currentWorkspace->users->pluck('id')->toArray();
                 $workspaceUsers = array_diff($workspaceUsers, array_unique($usersIdList));
                 foreach ($workspaceUsers as $notifyUser) {
+                    if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
+                        $userWorkspace = UserWorkspace::where('user_id', $notifyUser)->where('workspace_id', $currentWorkspace->id)->first();
+                        if (!$userWorkspace->hasPermissionTo('projects_index')) {
+                            continue;
+                        }
+                    }
                     Utility::sendNotification('project_new', null, $notifyUser, $objProject);
                 }
 
