@@ -646,6 +646,22 @@
                                                         $icon = 'fa fa-bug';
                                                         $name = 'Proj';
                                                     @endphp
+                                                @elseif($notification->type == 'project_new_for_inner')
+                                                    @php
+                                                        $workspace = \App\Models\Workspace::find($data->workspace);
+                                                        $project = \App\Models\Project::find($data->id);
+                                                        if (!$workspace || !$project) {
+                                                            continue;
+                                                        }
+                                                        $text = __('New project : ') . '
+                                                                         <b>' . $data->name . '</b> in your workspace:  <b>'. $workspace->name . ' </b>
+                                                                         <br>
+                                                                         <a href="'.route('pods.projects.join', ['project' => $data->id]).'" class="button btn btn-sm btn-primary w-50">Join</a>
+                                                                    ';
+                                                        
+                                                        $icon = 'fa fa-bug';
+                                                        $name = 'Proj';
+                                                    @endphp
                                                 @elseif($notification->type == 'bug_assign')
                                                     @php
                                                         if ($project) {

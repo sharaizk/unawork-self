@@ -214,14 +214,15 @@
                 let employeeId = this.getAttribute('data-employee-id');
                 console.log(employeeId);
                 let data = {
-                    id: employeeId,
+                    recipient_id: employeeId,
                     type: 'user',
                     message: message.replace(/\s/g, ''),
                     temporaryMsgId: 'temp_1',
                     _token: '{{ csrf_token() }}'
                 };
+                let url = `{{ route('api.send-message') }}`;
 
-                fetch('/chatify/api/sendMessage', {
+                fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

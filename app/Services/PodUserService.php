@@ -7,6 +7,7 @@ use App\Models\PodUser;
 use App\Models\User;
 use App\Enums\PodUser\Permission;
 use App\Enums\PodUser\Status;
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
 use App\Jobs\SendEmail;
 use App\Models\Project;
@@ -226,7 +227,7 @@ class PodUserService
     {
         $userWorkspace = UserWorkspace::where('user_id', $ownId)->where('workspace_id', $workspaceId)->firstOrFail();
         
-        if ($userWorkspace->hasPermissionTo('users_index') || $pod->created_by == $ownId) {
+        if ($userWorkspace->hasPermissionTo(UserWorkspacePermission::USERS_INDEX->value) || $pod->created_by == $ownId) {
             $users = $pod->users;
         } else {
             $users = $pod->users->where('id', $ownId);

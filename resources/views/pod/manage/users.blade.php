@@ -198,14 +198,15 @@
                 let employeeId = this.getAttribute('data-employee-id');
                 console.log(employeeId);
                 let data = {
-                    id: employeeId,
+                    recipient_id: employeeId,
                     type: 'user',
                     message: message.replace(/\s/g, ''),
                     temporaryMsgId: 'temp_1',
                     _token: '{{ csrf_token() }}'
                 };
+                let url = `{{ route('api.send-message') }}`;
 
-                fetch('/chatify/api/sendMessage', {
+                fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -233,6 +234,7 @@
         });
     </script>
 
+    <!-- add new user -->
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll(".btn-addnew-project").forEach(a => {
@@ -272,6 +274,7 @@
             });
         });
     </script>
+    <!-- remove user -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
         const removeUserLinks = document.querySelectorAll('.remove-user');

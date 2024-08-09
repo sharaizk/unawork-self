@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Enums\UserWorkspace\Status;
 use App\Exports\projectsExport;
 use App\Imports\projectsImport;
@@ -32,6 +33,7 @@ use App\Models\UserProject;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
+use App\Models\ProjectCategory;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -59,27 +61,37 @@ class ProjectController extends Controller
 {
     use ApiResponser;
 
-    public function index($slug)
+    public function index($slug, Request $request)
     {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->firstOrFail();
 
+        $categories = ProjectCategory::all();
+        $selectedCategoryId = $request->query('category_id');
+
         if ($objUser->getGuard() == 'client') {
-            $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
+            $projectsQuery = Project::select('projects.*')
+                ->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id);
         } else {
-            if ($userWorkspace->hasPermissionTo('projects_index') || $currentWorkspace->created_by == $objUser->id) {
-                $projects = Project::select('projects.*')
-                ->where('projects.workspace', '=', $currentWorkspace->id)->get();
+            if ($userWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value) || $currentWorkspace->created_by == $objUser->id) {
+                $projectsQuery = Project::select('projects.*')
+                    ->where('projects.workspace', '=', $currentWorkspace->id);
             } else {
-                $projects = Project::select('projects.*')
-                ->join('user_projects', 'projects.id', '=', 'user_projects.project_id')
-                ->where('user_projects.user_id', '=', $objUser->id)
-                ->where('projects.workspace', '=', $currentWorkspace->id)->get();
+                $projectsQuery = Project::select('projects.*')
+                    ->join('user_projects', 'projects.id', '=', 'user_projects.project_id')
+                    ->where('user_projects.user_id', '=', $objUser->id)
+                    ->where('projects.workspace', '=', $currentWorkspace->id);
             }
         }
 
-        return view('projects.index', compact('currentWorkspace', 'projects'));
+        if ($selectedCategoryId) {
+            $projectsQuery->where('projects.project_category_id', $selectedCategoryId);
+        }
+
+        $projects = $projectsQuery->get();
+
+        return view('projects.index', compact('currentWorkspace', 'projects', 'categories', 'selectedCategoryId'));
     }
 
     public function list(Request $request)
@@ -315,13 +327,13 @@ class ProjectController extends Controller
                 $workspaceUsers = $currentWorkspace->users->pluck('id')->toArray();
                 $workspaceUsers = array_diff($workspaceUsers, array_unique($usersIdList));
                 foreach ($workspaceUsers as $notifyUser) {
-                    if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
+                    // if ($currentWorkspace->ownerable_type == "App\Models\Pod") {
                         $userWorkspace = UserWorkspace::where('user_id', $notifyUser)->where('workspace_id', $currentWorkspace->id)->first();
-                        if (!$userWorkspace->hasPermissionTo('projects_index')) {
+                        if (!$userWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value)) {
                             continue;
                         }
-                    }
-                    Utility::sendNotification('project_new', null, $notifyUser, $objProject);
+                    // }
+                    Utility::sendNotification('project_new_for_inner', null, $notifyUser, $objProject);
                 }
 
 
@@ -766,7 +778,7 @@ class ProjectController extends Controller
         $workspace = $project->workspaceData;
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $workspace->id)->first();
 
-        if ($project->created_by == $objUser->id || $userWorkspace->hasPermissionTo('projects_edit')) {
+        if ($project->created_by == $objUser->id || $userWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_EDIT->value)) {
             UserProject::where('project_id', '=', $projectID)->delete();
             ProjectFile::where('project_id', '=', $projectID)->delete();
             $project->delete();

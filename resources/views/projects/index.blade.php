@@ -17,6 +17,23 @@
 @section('action-button')
     @auth('web')
 
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-sm dropdown-toggle m-1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-filter"></i>
+            </button>
+            <ul class="dropdown-menu" style="max-height: 400px; overflow-y: auto;">
+                <li>
+                    <a class="dropdown-item" href="{{ route('projects.index', ['slug' => $currentWorkspace->slug]) }}">{{ __('All Categories') }}</a>
+                </li>
+                @foreach($categories as $category)
+                    <li>
+                        <a class="dropdown-item" href="{{ route('projects.index', ['slug' => $currentWorkspace->slug, 'category_id' => $category->id]) }}">
+                            {{ $category->name }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
         <a href="{{ route('project.export') }}"  class="btn btn-sm btn-primary "  data-toggle="tooltip" title="{{ __('Export Project') }}" > <i class="ti ti-file-x"></i></a>
         <a href="#"  class="btn btn-sm btn-primary mx-1" data-ajax-popup="true" data-title="{{__('Import Project')}}" data-url="{{ route('project.file.import' ,$currentWorkspace->slug) }}"  data-toggle="tooltip" title="{{ __('Import Project') }}"><i class="ti ti-file-import"></i> </a>
 

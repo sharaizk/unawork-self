@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Models\News;
 use App\Models\Pod;
 use App\Models\UserWorkspace;
@@ -22,7 +23,7 @@ class NewsService
             // policies 
             $workspace = $newsable->workspace;
             $userWorkspaceEditor = UserWorkspace::where('user_id', $data['created_by'])->where('workspace_id', $workspace->id)->first();
-            if (!$userWorkspaceEditor->hasPermissionTo('news_edit')) {
+            if (!$userWorkspaceEditor->hasPermissionTo(UserWorkspacePermission::NEWS_EDIT->value)) {
                 throw new \Exception('You do not have permission!');
             }
         } else {

@@ -91,9 +91,10 @@ class MessagesController extends Controller
             $invites = [];
             $invites['workspaces'] = Auth::user()->invitableWorkspaces($request['id']);
             $invites['pods'] = Auth::user()->invitablePods($request['id']);
-        } else {
-            $users = $thread->users()->get();
         }
+        
+        $users = $thread->users()->get();
+        
 
         if (($user) && !empty($user->avatar)) {
             $avatar = Utility::get_file('users-avatar/' . $user->avatar);
@@ -685,13 +686,14 @@ class MessagesController extends Controller
         // Get Unseen messages counter
         $unseenCounter = $thread->userUnreadMessagesCount($objUser->id); // $this->countUnseenMessages(!empty($user)?$user->id:0);
 
+        $participants = $thread->participants()->pluck('user_id')->toArray();
         // User data
-        if ($thread->participants()->count() == 2) {
+        if (count($participants) == 2) {
             $participants = $thread->participants()->pluck('user_id')->toArray();
             $userID = array_diff($participants, [Auth::user()->id]);
-            $user = User::where('id', $userID)->first();
+            $user = User::find($userID)->first();
 
-            if (!empty($user->avatar)) {
+            if (($user)) {
                 $avatar = Utility::get_file('users-avatar/' . $user->avatar);
             }
         }
@@ -700,6 +702,7 @@ class MessagesController extends Controller
             'get' => 'users',
             'thread' => $thread,
             'user_avatar' => $avatar ?? null,
+            'user_name' => $user->name ?? null,
             'lastMessage' => $lastMessage ?? null,
             'unseenCounter' => $unseenCounter,
             'type'=>'user',

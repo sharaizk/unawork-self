@@ -153,6 +153,9 @@
 
 
 <style type="text/css">
+    .btn-primary.dropdown-toggle::after {
+        display: none;
+    }
     [dir="rtl"] .dash-sidebar {
         left: auto !important;
     }
