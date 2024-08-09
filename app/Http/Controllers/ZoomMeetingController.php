@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Models\ClientProject;
 use App\Models\Project;
 use App\Models\User;
@@ -38,7 +39,7 @@ class ZoomMeetingController extends Controller
         if(isset($objUser) && isset($currentWorkspace) && $objUser->type !== 'admin'){
             if ($objUser->getGuard() == 'client') {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
-            } elseif ($currentWorkspace->permission == 'Owner' || $userWorkspace->hasPermissionTo('zoom_meeting_index')) {
+            } elseif ($currentWorkspace->permission == 'Owner' || $userWorkspace->hasPermissionTo(UserWorkspacePermission::ZOOM_MEETING_INDEX->value)) {
                 $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
                         // ->where('created_by', \Auth::user()->id)
                         ->get();

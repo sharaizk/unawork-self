@@ -31,7 +31,7 @@
                             
                             @php
                                 $hasOptions = false;
-                                $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
+                                $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::USERS_EDIT->value));
                                 $isPendingUser = $user->pivot->status == 'pod_pending';
                                 $isCurrentUser = $user->id == Auth::user()->id;
                                 $isChatEnabled = $adminSetting['enable_chat'] == 'on';

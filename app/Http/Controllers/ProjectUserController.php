@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserWorkspace\Status;
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Models\Notification;
 use App\Models\Project;
 use App\Models\UserProject;
@@ -26,7 +27,7 @@ class ProjectUserController extends Controller
             $userInProject = $project->users()->where('user_projects.user_id', $user->id)->exists();
             if (!$userInProject) {
 
-                if ($userInWorkspace->hasPermissionTo('projects_index')) {
+                if ($userInWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value)) {
                     $userProject = UserProject::create([
                         'project_id' => $project->id,
                         'user_id' => $user->id,

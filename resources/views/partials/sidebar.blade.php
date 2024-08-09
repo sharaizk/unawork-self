@@ -126,7 +126,7 @@
                                             <span class="dash-mtext">{{ __('Users') }}</span>
                                         </a>
                                     </li>
-                                    @if ($currentWorkspace->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('news_index'))
+                                    @if ($currentWorkspace->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value))
                                     <li class="dash-item dash-hasmenu">
                                             @php
                                                 $currentRoute = Request::route()->getName();
@@ -164,7 +164,7 @@
                                    </li> -->
                                @endif
                                
-                               @if ($userWorkspace->hasPermissionTo('projects_index') || $currentWorkspace->creater->id == Auth::user()->id)
+                               @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::PROJECTS_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
                                 <li
                                     class="dash-item {{ Request::route()->getName() == 'projects.index' || Request::segment(2) == 'projects' ? ' active' : '' }}">
                                     <a href="{{ route('projects.index', $currentWorkspace->slug) }}" class="dash-link"><span
@@ -184,7 +184,7 @@
                                             class="dash-mtext">{{ __('Project Report') }}</span></a>
                                 </li>
                                @endif
-                               @if ($userWorkspace->hasPermissionTo('zoom_meeting_index') || $currentWorkspace->creater->id == Auth::user()->id)
+                               @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
                                 <li
                                     class="dash-item {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
                                     <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"

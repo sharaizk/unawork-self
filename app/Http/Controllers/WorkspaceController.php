@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Enums\PodUser\Permission as EnumPermission;
 use App\Models\BugReport;
 use App\Models\BugStage;
@@ -1606,7 +1607,7 @@ class WorkspaceController extends Controller
         $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
         $workspaceUserEditor = $workspace->users()->where('user_id', Auth::id())->first();
 
-        if (!$userWorkspaceEditor->hasPermissionTo('users_edit') && $workspaceUserEditor->pivot->permission != EnumPermission::OWNER->value ) {
+        if (!$userWorkspaceEditor->hasPermissionTo(UserWorkspacePermission::USERS_EDIT->value) && $workspaceUserEditor->pivot->permission != EnumPermission::OWNER->value ) {
             return redirect()->back()->with('error', __('Error: you do not have permission for this!'));
         }
 
