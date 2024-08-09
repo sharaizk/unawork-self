@@ -2,7 +2,7 @@
 
 namespace App\Enums\UserWorkspace;
 
-enum Permissions: string
+enum Permission: string
 {
     case USERS_INDEX = 'users_index';
     case USERS_EDIT = 'users_edit';
