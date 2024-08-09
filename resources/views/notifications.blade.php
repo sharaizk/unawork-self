@@ -65,6 +65,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
             $project = $notification->project;
             $task = $notification->task;
             $notifyingUser = $notification->user;
+            $notify = \App\Models\Notification::find($notification->id);
 
             // Define variables for the notification data
             $projectTitle = $project ? $project->title : '';
@@ -112,6 +113,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $project = \App\Models\Project::find($data->id);
                     $workspace = \App\Models\Workspace::find($notification->workspace_id);
                     if (!$project || !$workspace) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('projects.show', [$workspace->slug, $project->id]);
@@ -123,6 +125,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $pod = \App\Models\Pod::find($data->id);
                     $user = \Auth::user();
                     if (!$pod || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
@@ -154,6 +157,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
                     if (!$pod || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
@@ -179,6 +183,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
                     if (!$pod || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('pods.users', ['podId' => $data->pod_id]);
@@ -190,6 +195,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $pod = \App\Models\Pod::find($data->pod_id);
                     if (!$pod) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('pods.users', ['podId' => $data->pod_id]);
@@ -202,6 +208,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $pod = \App\Models\Pod::find($data->pod_id);
                     $user = \App\Models\User::find($data->user_id);
                     if (!$pod || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('pods.users', ['podId' => $data->pod_id]);
@@ -213,6 +220,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $pod = \App\Models\Pod::find($data->pod_id);
                     if (!$pod) {
+                        $notify->delete();
                         continue;
                     }
                     $text = __('You have beed declined to join pod : ') . ' <b>' . $pod->title . '</b>';
@@ -224,6 +232,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $user = \App\Models\User::find($data->user_id);
                     $project = \App\Models\Project::find($data->project_id);
                     if (!$project || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $acceptLink = route('pods.projects.join.accept', ['record' => $data->id]);
@@ -244,6 +253,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $project = \App\Models\Project::find($data->id);
                     if (!$project) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]);
@@ -255,6 +265,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $project = \App\Models\Project::find($data->id);
                     if (!$project) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('home');
@@ -267,6 +278,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $user = \App\Models\User::find($data->user_id);
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     if (!$workspace || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
@@ -287,6 +299,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $data = \App\Models\UserWorkspace::find($data->id);
                     if (!$data) {
+                        $notify->delete();
                         continue;
                     }
                     $acceptLink = route('users.accept', ['workspace' => $data->workspace->id]);
@@ -308,6 +321,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     $user = \App\Models\User::find($data->user_id);
                     if (!$workspace || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $text = __('User : ') . ' <b>' . $user->name . '</b> joined your workspace:  <b>'. $workspace->name . ' </b>';
@@ -318,6 +332,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     if (!$workspace) {
+                        $notify->delete();
                         continue;
                     }
                     $text = __('You joined workspace:  <b>'. $workspace->name . ' </b>');
@@ -329,6 +344,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     $user = \App\Models\User::find($data->user_id);
                     if (!$workspace || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $text = __('User : ') . ' <b>' . $user->name . '</b> declined to join your workspace:  <b>'. $workspace->name . ' </b>';
@@ -340,6 +356,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $workspace = \App\Models\Workspace::find($data->workspace_id);
                     $user = \App\Models\User::find($data->user_id);
                     if (!$workspace || !$user) {
+                        $notify->delete();
                         continue;
                     }
                     $text = __('Your request to join workspace : ') . ' <b>' . $workspace->name . '</b> were declined';
@@ -350,10 +367,28 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $workspace = \App\Models\Workspace::find($data->workspace);
                     if (!$workspace) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('projects.index', ['slug' => $workspace->slug]);
                     $text = __('New project : ') . ' <b>' . $data->name . '</b> in your workspace:  <b>'. $workspace->name . ' </b>';
+                    $icon = 'fa fa-bug';
+                    $name = 'Proj';
+                @endphp
+            @elseif($notification->type == 'project_new_for_inner')
+                @php
+                    $workspace = \App\Models\Workspace::find($data->workspace);
+                    $project = \App\Models\Project::find($data->id);
+                    if (!$workspace || !$project) {
+                        $notify->delete();
+                        continue;
+                    }
+                    $text = __('New project : ') . '
+                                        <b>' . $data->name . '</b> in your workspace:  <b>'. $workspace->name . ' </b>
+                                        <br>
+                                        <a href="'.route('pods.projects.join', ['project' => $data->id]).'" class="button btn btn-sm btn-primary w-50">Join</a>
+                                ';
+                    
                     $icon = 'fa fa-bug';
                     $name = 'Proj';
                 @endphp
@@ -374,6 +409,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @php
                     $vacancy = \App\Models\JobVacancy::find($data->job_vacancy_id);
                     if (!$vacancy) {
+                        $notify->delete();
                         continue;
                     }
                     $link = route('job-applications.index', ['vacancy' => $data->job_vacancy_id]);

@@ -6,6 +6,7 @@ use App\Enums\UserWorkspace\Status;
 use App\Models\Notification;
 use App\Models\Project;
 use App\Models\UserProject;
+use App\Models\UserWorkspace;
 use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,20 +18,35 @@ class ProjectUserController extends Controller
         $user = Auth::user();
         $workspace = $project->workspaceData;
 
-        $userInWorkspace = $workspace->users()->wherePivot('status', Status::ACTIVE->value)->where('user_id', $user->id)->exists();
-
+        $userInWorkspace = UserWorkspace::where('workspace_id', $workspace->id)
+                ->where('user_id', $user->id)
+                ->where('status', Status::ACTIVE->value)
+                ->first();
         if ($userInWorkspace) {
             $userInProject = $project->users()->where('user_projects.user_id', $user->id)->exists();
             if (!$userInProject) {
-                $userProject = UserProject::create([
-                    'project_id' => $project->id,
-                    'user_id' => $user->id,
-                    'is_active' => 0,
-                    'status' => 'pending'
-                ]);    
 
-                Utility::sendNotification('project_request', null, $workspace->created_by, $userProject);
-                return redirect()->back()->with('success', __('You have been successfully sended join request'));
+                if ($userInWorkspace->hasPermissionTo('projects_index')) {
+                    $userProject = UserProject::create([
+                        'project_id' => $project->id,
+                        'user_id' => $user->id,
+                        'is_active' => 1,
+                        'status' => 'active',
+                        'permission' => json_encode(Utility::getAllPermission())
+                    ]);
+                    $responseText = 'You have been successfully joined project';
+                    Notification::where('type', 'project_new_for_inner')->where('user_id', $user->id)->whereJsonContains('data->id', $project->id)->delete();
+                } else {
+                    $userProject = UserProject::create([
+                        'project_id' => $project->id,
+                        'user_id' => $user->id,
+                        'is_active' => 0,
+                        'status' => 'pending'
+                    ]);  
+                    Utility::sendNotification('project_request', null, $workspace->created_by, $userProject);
+                    $responseText = 'You have been successfully sended join request';
+                }
+                return redirect()->back()->with('success', $responseText);
             } else {
                 return redirect()->back()->with('error', __('You already send Join request!'));
 
