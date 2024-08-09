@@ -71,7 +71,11 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
         {{-- center side --}}
         <td>
         <p data-id="{{ $type.'_'.$thread->id }}">
-            {{ strlen($thread->subject) > 12 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
+            @if (is_null($user_name))
+            {{ strlen($thread->subject) > 16 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
+            @else 
+            {{ strlen($user_name) > 16 ? trim(substr($user_name,0,12)).'..' : $user_name }} 
+            @endif
             @if ($lastMessage)
             <span>{{ $lastMessage->created_at->diffForHumans() }}</span>
             @endif

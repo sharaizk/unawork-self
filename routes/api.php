@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\MessagesController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ProjectCategoryController;
 use App\Http\Controllers\Api\JobApplicationController;
@@ -43,6 +44,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('stop-tracker', [apicontroller::class, 'stopTracker']);
     Route::post('upload-photos', [apicontroller::class, 'uploadImage']);
 
+    Route::post('send-message', [MessagesController::class, 'store'])->name('api.send-message');
 
 
 
