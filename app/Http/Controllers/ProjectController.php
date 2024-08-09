@@ -33,6 +33,7 @@ use App\Models\UserProject;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
+use App\Models\ProjectCategory;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -60,27 +61,37 @@ class ProjectController extends Controller
 {
     use ApiResponser;
 
-    public function index($slug)
+    public function index($slug, Request $request)
     {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->firstOrFail();
 
+        $categories = ProjectCategory::all();
+        $selectedCategoryId = $request->query('category_id');
+
         if ($objUser->getGuard() == 'client') {
-            $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
+            $projectsQuery = Project::select('projects.*')
+                ->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id);
         } else {
             if ($userWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value) || $currentWorkspace->created_by == $objUser->id) {
-                $projects = Project::select('projects.*')
-                ->where('projects.workspace', '=', $currentWorkspace->id)->get();
+                $projectsQuery = Project::select('projects.*')
+                    ->where('projects.workspace', '=', $currentWorkspace->id);
             } else {
-                $projects = Project::select('projects.*')
-                ->join('user_projects', 'projects.id', '=', 'user_projects.project_id')
-                ->where('user_projects.user_id', '=', $objUser->id)
-                ->where('projects.workspace', '=', $currentWorkspace->id)->get();
+                $projectsQuery = Project::select('projects.*')
+                    ->join('user_projects', 'projects.id', '=', 'user_projects.project_id')
+                    ->where('user_projects.user_id', '=', $objUser->id)
+                    ->where('projects.workspace', '=', $currentWorkspace->id);
             }
         }
 
-        return view('projects.index', compact('currentWorkspace', 'projects'));
+        if ($selectedCategoryId) {
+            $projectsQuery->where('projects.project_category_id', $selectedCategoryId);
+        }
+
+        $projects = $projectsQuery->get();
+
+        return view('projects.index', compact('currentWorkspace', 'projects', 'categories', 'selectedCategoryId'));
     }
 
     public function list(Request $request)
