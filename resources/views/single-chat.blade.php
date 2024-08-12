@@ -23,10 +23,10 @@
         background: #ffffff;
     }
     .show-infoSide {
-        display: none;
+        /* display: none; */
     }
     .m-header-right {
-        display: none;
+        /* display: none; */
     }
     .messenger-sendCard {
         background: #ffffff;
@@ -54,9 +54,19 @@
     .m-send {
         color: #000;
     }
+    .messenger-infoView {
+        background: #fff;
+        border: 1px solid #b8b8b8;
+    }
+    .messenger-infoView>p {
+        color: #000;
+    }
+    .messenger-infoView-btns {
+        display: none;
+    }
 </style>
 <div class="card rounded-12">
-        <div class="messenger rounded overflow-hidden mt-4 px-4" style="height: 350px;">
+        <div class="messenger rounded overflow-hidden mt-4 px-4" style="height: 500px;">
 
             {{-- ----------------------Messaging side---------------------- --}}
             <div class="messenger-messagingView">
@@ -130,9 +140,13 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         getContacts();
-        messenger = 'user_18';
+        messenger = 'user_{{$threadId}}';
         IDinfo(messenger.split("_")[1], messenger.split("_")[0]);
 
+        $(".messenger-infoView nav a , .show-infoSide").on("click", function() {
+            event.preventDefault();
+            $(".messenger-infoView").toggle();
+        });
     });
 </script>
 <script>
@@ -141,6 +155,6 @@
             const ChatName = "Project Chat";
             $(".m-header-messaging .user-name").html(ChatName);
             $(".messenger-infoView .info-name").html(ChatName);
-        }, 1000); // Таймаут 1 секунда
+        }, 1000); 
     });
 </script>

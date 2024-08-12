@@ -1139,7 +1139,6 @@ $(document).ready(function() {
   // show info side button
   $(".messenger-infoView nav a , .show-infoSide").on("click", function() {
     event.preventDefault();
-    console.log(1);
     $(".messenger-infoView").toggle();
 
   });
