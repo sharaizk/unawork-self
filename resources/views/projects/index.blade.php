@@ -18,20 +18,23 @@
     @auth('web')
 
         <div class="btn-group">
-            <button type="button" class="btn btn-primary btn-sm dropdown-toggle m-1" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-primary btn-sm dropdown-toggle m-1" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                 <i class="ti ti-filter"></i>
             </button>
             <ul class="dropdown-menu" style="max-height: 400px; overflow-y: auto;">
-                <li>
-                    <a class="dropdown-item" href="{{ route('projects.index', ['slug' => $currentWorkspace->slug]) }}">{{ __('All Categories') }}</a>
-                </li>
-                @foreach($categories as $category)
-                    <li>
-                        <a class="dropdown-item" href="{{ route('projects.index', ['slug' => $currentWorkspace->slug, 'category_id' => $category->id]) }}">
-                            {{ $category->name }}
-                        </a>
-                    </li>
-                @endforeach
+                <form action="{{ route('projects.index', ['slug' => $currentWorkspace->slug]) }}" method="GET" class="d-flex m-2">
+                    <select name="category_ids[]" id="category-select" class="form-select select2" multiple >
+                        <option value="" disabled>{{ __('Select categories') }}</option>    
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" @if (in_array($category->id, $selectedCategoryIds)) selected @endif>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm" style="margin-left:5px;">
+                        {{ __('Filter') }}
+                    </button>
+                </form>
             </ul>
         </div>
         <a href="{{ route('project.export') }}"  class="btn btn-sm btn-primary "  data-toggle="tooltip" title="{{ __('Export Project') }}" > <i class="ti ti-file-x"></i></a>
@@ -248,9 +251,20 @@
 @endpush
 
 @push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
+
     <script src="{{asset('assets/custom/js/isotope.pkgd.min.js')}}"></script>
     <script>
         $(document).ready(function () {
+
+            $('#category-select').select2({
+                allowClear: true,
+                width: '350px',
+                tags: true
+            });
+            if ($('#category-select').val() === null || $('#category-select').val().length === 0) {
+                $('#category-select').val(null).trigger('change');
+            }
 
             $('.status-filter button').click(function () {
                 $('.status-filter button').removeClass('active');
