@@ -21,11 +21,13 @@
     <li class="breadcrumb-item">{{ $project->name }}</li>
 @endsection
 @php
+    $adminSetting = App\Models\Utility::getAdminPaymentSetting();
     $permissions = Auth::user()->getPermission($project->id);
     $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+    $isChatEnabled = $adminSetting['enable_chat'] == 'on';
 @endphp
 
 @section('multiple-action-button')
@@ -263,7 +265,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="card " >
                                 <div class="card-header">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -308,6 +310,11 @@
                                                     </div>
                                                     <div class="col-sm-auto text-sm-end d-flex align-items-center">
                                                         @auth('web')
+                                                            @if ($user->id != Auth::user()->id && $isChatEnabled)
+                                                                <a href="#" class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center sendMessageUser" data-employee-id="{{ $user->id }}">
+                                                                    <i class="ti ti-mail"></i> 
+                                                                </a>
+                                                            @endif
                                                             @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
                                                                 <a href="#"
                                                                     class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center"
@@ -700,6 +707,22 @@
         <!-- [ sample-page ] end -->
     </div>
     <!-- [ Main Content ] end -->
+    </div><div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="sendMessage" data-employee-id="">Send</button>
+            </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -806,6 +829,58 @@
             var chart = new ApexCharts(document.querySelector("#task-chart"), options);
             chart.render();
         })();
+    </script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".sendMessageUser").forEach(a => {
+                a.addEventListener("click", function() {
+                    let employeeId = this.dataset.employeeId;
+                    console.log(employeeId);
+
+                    $("#sendMessagePopup").modal('show');
+                    document.getElementById("sendMessage").setAttribute('data-employee-id', employeeId);
+                });
+            });
+
+            document.getElementById("sendMessage").addEventListener("click", function() {
+                let message = document.getElementById("messageInput").value;
+                let employeeId = this.getAttribute('data-employee-id');
+                console.log(employeeId);
+                let data = {
+                    recipient_id: employeeId,
+                    type: 'user',
+                    message: message.replace(/\s/g, ''),
+                    temporaryMsgId: 'temp_1',
+                    _token: '{{ csrf_token() }}'
+                };
+                let url = `{{ route('api.send-message') }}`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw new Error(error.message || 'Something went wrong');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    showNotification('Message successfully sent', 'success');
+                    $("#sendMessagePopup").modal('hide');
+                })
+                .catch(error => {
+                    showNotification('Message sending failed: ' + error.message, 'danger');
+                    console.error('Error:', error);
+                });
+            });
+        });
     </script>
     <script>
         $(document).ready(function() {
