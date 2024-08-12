@@ -147,6 +147,18 @@
             event.preventDefault();
             $(".messenger-infoView").toggle();
         });
+
+        $("#message-form .m-send").on("keyup", (e) => {
+            // if enter key pressed.
+            if (e.which == 13 || e.keyCode == 13) {
+            // if shift + enter key pressed, do nothing (new line).
+            // if only enter key pressed, send message.
+            if (!e.shiftKey) {
+                triggered = isTyping(false);
+                sendMessage();
+            }
+            }
+        });
     });
 </script>
 <script>

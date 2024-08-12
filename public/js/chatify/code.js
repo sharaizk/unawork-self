@@ -357,7 +357,7 @@ function IDinfo(id, type) {
         // focus on messaging input
         messageInput.focus();
         //put info in select invite
-        //insertSelectsForInviteUser(data);
+        insertSelectsForInviteUser(data);
         // update info in view
         if (data.user == null) {
           $(".m-header-messaging .user-name").html(data.fetch.subject);
@@ -1138,9 +1138,7 @@ $(document).ready(function() {
 
   // show info side button
   $(".messenger-infoView nav a , .show-infoSide").on("click", function() {
-    event.preventDefault();
     $(".messenger-infoView").toggle();
-
   });
 
   // make favorites card dragable on click to slide.
