@@ -427,6 +427,7 @@
                             </div> -->
                         </div>
                     </div>
+                    
 
                 </div>
 
@@ -702,8 +703,15 @@
                             </div>
                         </div>
                 @endif
+                
             </div>
-        </div>
+                    
+                <div class="row">
+                    <div class="col-lg-8">
+                        @include('single-chat')
+                    </div>
+                </div>
+            </div>
         <!-- [ sample-page ] end -->
     </div>
     <!-- [ Main Content ] end -->
