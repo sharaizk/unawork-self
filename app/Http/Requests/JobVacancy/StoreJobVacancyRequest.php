@@ -25,6 +25,8 @@ class StoreJobVacancyRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'salary' => 'nullable|numeric',
+            'skills' => 'nullable|array',
+            'skills.*' => 'exists:skills,id',
         ];
     }
 }

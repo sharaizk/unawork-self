@@ -13,12 +13,23 @@ class JobVacancyService
 
     public function create(array $data): JobVacancy
     {
-        return JobVacancy::create($data);
+        $jobVacancy = JobVacancy::create($data);
+
+        if (isset($data['skills'])) {
+            $jobVacancy->skills()->sync($data['skills']);
+        }
+
+        return $jobVacancy;
     }
 
     public function update(JobVacancy $jobVacancy, array $data): JobVacancy
     {
         $jobVacancy->update($data);
+
+        if (isset($data['skills'])) {
+            $jobVacancy->skills()->sync($data['skills']);
+        }
+
         return $jobVacancy;
     }
 

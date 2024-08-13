@@ -21,4 +21,9 @@ class Skill extends Model
     {
         return $this->belongsToMany(Pod::class, 'pods_skills', 'skill_id', 'pod_id');
     }
+
+    public function jobVacancies()
+    {
+        return $this->belongsToMany(JobVacancy::class, 'job_vacancy_skill');
+    }
 }

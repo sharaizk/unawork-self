@@ -24,12 +24,12 @@ class JobVacancyController extends Controller
         $perPage = $request->get('per_page', 10);
         $jobVacancies = $this->jobVacancyService->list($perPage);
         
-        return response()->json($jobVacancies);
+        return response()->json($jobVacancies->load('skills'));
     }
 
     public function show(JobVacancy $jobVacancy)
     {
-        return response()->json($jobVacancy);
+        return response()->json($jobVacancy->load('skills'));
     }
 
     public function store(StoreJobVacancyRequest $request)
