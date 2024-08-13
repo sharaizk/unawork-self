@@ -28,5 +28,10 @@ class JobVacancy extends Model
     {
         return $this->hasMany(JobApplication::class);
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'job_vacancy_skill');
+    }
         
 }

@@ -25,6 +25,8 @@ class UpdateJobVacancyRequest extends FormRequest
             'title' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
             'salary' => 'nullable|numeric',
+            'skills' => 'nullable|array',
+            'skills.*' => 'exists:skills,id',
         ];
     }
 }

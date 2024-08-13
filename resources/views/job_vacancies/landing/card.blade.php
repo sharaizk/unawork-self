@@ -15,6 +15,18 @@
         <p>
             Salary: {{ $vacancy->salary ?? '' }}
         </p>
+        @if($vacancy->skills->isNotEmpty())
+            <p>
+                Skills:
+                {{ $vacancy->skills->pluck('name')->implode(', ') }}
+            </p>
+        @else
+            <p>
+                Skills not selected for this vacation
+            </p>
+        @endif
+
+
         @php
             $limit = 40;
             $description = $vacancy->description ?? '';

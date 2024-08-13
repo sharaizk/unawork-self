@@ -6,6 +6,8 @@
         width: 10px;
     }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+
 <form class="create-vacancy-form position-relative">
         @csrf
     <div class="col-lg-12">
@@ -22,6 +24,17 @@
                     <label for="salary" class="form-label">Salary:</label>
                     <input type="number" class="form-control" name="salary" id="salary" min="0" placeholder="Enter Salary (e.g., 1000)" required>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label for="skills[]" class="form-label">Skills:</label>
+                <select class=" multi-select" id="skills" name="skills[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Skills ...') }}">
+                    @foreach($skills as $skill)
+                        <option value="{{ $skill->id }}">
+                            {{ $skill->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="col-lg-12">

@@ -6,15 +6,21 @@ $profile_img  =\App\Models\Utility::get_file(config('chatify.attachments.folder'
 {{-- -------------------- The default card (white) -------------------- --}}
 @if($viewType == 'default')
     @if($from_id != $to_id)
-    <div>
-        <div class="message-card" data-id="{{ $id }}">
+    <div class="d-flex align-items-center">
+
+        <img class="theme-avtar m-1" style="width:20px; height:20px;"
+                    @if ($from_avatar)
+                        src="{{ \App\Models\Utility::get_file('users-avatar/'. $from_avatar) }}"
+                    @else
+                        avatar="{{ $from_name }}"
+                    @endif
+                alt="{{$from_name}}">
+
+        <div class="message-card ms-1" data-id="{{ $id }}">
             <p>{!! ($message == null && $attachment != null && @$attachment[2] != 'file') 
                 ? $attachment[1] 
-                : nl2br('<img class="theme-avtar" style="width:20px; height:20px;"' .
-                    ($from_avatar
-                        ? ' src="' . \App\Models\Utility::get_file('users-avatar/'. $from_avatar) . '" ' 
-                        : ' avatar="' . $from_name . '" ') .
-                    'alt="' . $from_name . '"> ' . $message) 
+                : nl2br(
+                    '<i><b>'.$from_name.'</b></i><br>' . $message) 
                 !!}
                 <sub title="{{ $fullTime }}">{{ $time }}</sub>
                 {{-- If attachment is a file --}}

@@ -20,6 +20,17 @@
                     <input type="number" class="form-control" name="salary" id="salary" min="0" value="{{ $vacancy->salary }}">
                 </div>
             </div>
+            <div class="form-group">
+                <label for="skills[]" class="form-label">Skills:</label>
+                <select class=" multi-select" id="skills" name="skills[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Skills ...') }}">
+                    @foreach($skills as $skill)
+                        <option value="{{ $skill->id }}" @if (in_array($skill->id, $vacancy->skills->pluck('id')->toArray())) selected @endif>
+                            {{ $skill->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="col-lg-12">
                 <div class="form-group">
                     <label for="description" class="form-label">Description:</label>

@@ -356,8 +356,12 @@ function IDinfo(id, type) {
         fetchMessages(id, type);
         // focus on messaging input
         messageInput.focus();
-        //put info in select invite
-        insertSelectsForInviteUser(data);
+        try {
+          //put info in select invite
+          insertSelectsForInviteUser(data);
+        } catch (error) {
+          console.error("Error in insertSelectsForInviteUser:", error);
+        }
         // update info in view
         if (data.user == null) {
           $(".m-header-messaging .user-name").html(data.fetch.subject);
@@ -377,14 +381,18 @@ function IDinfo(id, type) {
         
         // Add users to the users list
         $(".users-list").html("");
-          data.users.forEach(user => {
-              const userName = user.name ? user.name : null;
-              const userAvatar = user.avatar ? data.basic_url + '/storage/users-avatar/' + user.avatar : '" avatar="'+user.name +'';
-              $(".users-list").append(
-                  `<img class="theme-avatar" src="${userAvatar}" title="${userName}" style="border-radius: 50%;max-width: 40px;max-height: 40px;">`
-              );
-          });
-
+        data.users.forEach(user => {
+            const userName = user.name ? user.name : null;
+            const userAvatar = user.avatar ? data.basic_url + '/storage/users-avatar/' + user.avatar : '" avatar="'+user.name +'';
+            $(".users-list").append(
+                `<img class="theme-avatar" src="${userAvatar}" title="${userName}" style="border-radius: 50%;max-width: 40px;max-height: 40px;">`
+            );
+        });
+        // Scroll to the bottom of the messages
+        setTimeout(function() {
+          const messageBody = $(".m-body.app-scroll");
+          messageBody.scrollTop(messageBody[0].scrollHeight);
+        }, 1000);
       },
       error: () => {
         console.error("Error, check server response!");
