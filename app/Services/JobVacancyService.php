@@ -6,9 +6,17 @@ use App\Models\JobVacancy;
 
 class JobVacancyService
 {
-    public function list(int $perPage = 10)
+    public function list(array $filters = [], int $perPage = 10)
     {
-        return JobVacancy::paginate($perPage);
+        $query = JobVacancy::query();
+
+        if (!empty($filters['skills'])) {
+            $query->whereHas('skills', function ($query) use ($filters) {
+                $query->whereIn('skills.id', $filters['skills']);
+            });
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function create(array $data): JobVacancy

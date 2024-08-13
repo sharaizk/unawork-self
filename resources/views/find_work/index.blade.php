@@ -44,7 +44,7 @@
                     <select id="type" class="form-control" name="type">
                         <option value="" selected>Select Type</option>
                         <option value="pod">Pod</option>
-                        <option value="company">Company</option>
+                        <option value="vacancy">Vacancy</option>
                         <option value="project">Project</option>
                     </select>
                 </div>
@@ -60,15 +60,6 @@
                     </select>
                 </div>
 
-                <div id="countryField" class="col-md-4 form-group" style="display: none;">
-                    <label for="country">Country</label>
-                    <select id="country" class="form-control" name="country">
-                        <option value="" selected>Select Country</option>
-                        @foreach($countries as $country)
-                            <option value="{{ $country }}">{{ $country }}</option>
-                        @endforeach
-                    </select>
-                </div>
 
                 <div id="skillsField" class="col-md-4 form-group" style="display: none;">
                     <label>Select Skills</label>
@@ -114,20 +105,6 @@
                 <div class="row-master">
                     @foreach($vacancies as $vacancy)
                         @include('job_vacancies.landing.card', ['vacancy' => $vacancy])
-                    @endforeach
-                </div>
-            </div>
-        </section>
-
-        <section class="section__layout section_company">
-            <div class="container-master pods__title">
-                <h2>Companies</h2>
-                <a href="{{ route('companies.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
-            </div>
-            <div class="container-master">
-                <div class="row-master">
-                    @foreach($companies as $company)
-                        @include('company.landing.company_card', ['company' => $company])
                     @endforeach
                 </div>
             </div>
@@ -209,20 +186,16 @@
         var countryField = document.getElementById('countryField');
         var skillsField = document.getElementById('skillsField');
 
-        if (type === 'company') {
-            countryField.style.display = 'block';
-            skillsField.style.display = 'none';
+        if (type === 'vacancy') {
+            skillsField.style.display = 'block';
             budgetField.style.display = 'none';
         } else if (type === 'pod') {
             skillsField.style.display = 'block';
-            countryField.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'project') {
             skillsField.style.display = 'none';
-            countryField.style.display = 'none';
             budgetField.style.display = 'block';
         } else {
-            countryField.style.display = 'none';
             skillsField.style.display = 'none';
             budgetField.style.display = 'none';
         }
@@ -233,10 +206,13 @@
         var type = document.getElementById('type').value;
         var formAction = '';
 
-        if (type === 'company') {
-            var country = document.getElementById('country').value;
-            formAction = '{{ route("companies.list") }}';
-            this.action = formAction + '?country=' + country;
+        if (type === 'vacancy') {
+            var skillIds = [];
+            document.querySelectorAll('input[name="skill_ids[]"]:checked').forEach(function (checkbox) {
+                skillIds.push(checkbox.value);
+            });
+            formAction = '{{ route("job-vacancies.landing.list") }}';
+            this.action = formAction + '?skill_ids=' + JSON.stringify(skillIds);
         } else if (type === 'pod') {
             var skillIds = [];
             document.querySelectorAll('input[name="skill_ids[]"]:checked').forEach(function (checkbox) {

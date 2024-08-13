@@ -22,8 +22,14 @@ class JobVacancyController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $jobVacancies = $this->jobVacancyService->list($perPage);
-        
+        $filters = [];
+    
+        if ($request->has('skills')) {
+            $filters['skills'] = $request->get('skills');
+        }
+    
+        $jobVacancies = $this->jobVacancyService->list($filters, $perPage);
+    
         return response()->json($jobVacancies->load('skills'));
     }
 
