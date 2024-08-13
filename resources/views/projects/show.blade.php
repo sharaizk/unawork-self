@@ -21,11 +21,13 @@
     <li class="breadcrumb-item">{{ $project->name }}</li>
 @endsection
 @php
+    $adminSetting = App\Models\Utility::getAdminPaymentSetting();
     $permissions = Auth::user()->getPermission($project->id);
     $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+    $isChatEnabled = $adminSetting['enable_chat'] == 'on';
 @endphp
 
 @section('multiple-action-button')
@@ -263,7 +265,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="card " >
                                 <div class="card-header">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -308,6 +310,11 @@
                                                     </div>
                                                     <div class="col-sm-auto text-sm-end d-flex align-items-center">
                                                         @auth('web')
+                                                            @if ($user->id != Auth::user()->id && $isChatEnabled)
+                                                                <a href="#" class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center sendMessageUser" data-employee-id="{{ $user->id }}">
+                                                                    <i class="ti ti-mail"></i> 
+                                                                </a>
+                                                            @endif
                                                             @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
                                                                 <a href="#"
                                                                     class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center"
@@ -420,6 +427,7 @@
                             </div> -->
                         </div>
                     </div>
+                    
 
                 </div>
 
@@ -526,141 +534,152 @@
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    @if ((isset($permissions) && in_array('show milestone', $permissions)) || $currentWorkspace->permission == 'Owner')
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-0">{{ __('Milestones') }} ({{ count($project->milestones) }})
-                                        </h5>
-                                    </div>
-                                    <div class="float-end">
-                                        @if ((isset($permissions) && in_array('create milestone', $permissions)) || $currentWorkspace->permission == 'Owner')
-                                            <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true"
-                                                data-title="{{ __('Create Milestone') }}"
-                                                data-url="{{ route($client_keyword . 'projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
-                                                data-toggle="popover" title="{{ __('Create') }}"><i
-                                                    class="ti ti-plus"></i></a>
-                                        @endif
+                    <div class="row">
+                        @if ((isset($permissions) && in_array('show milestone', $permissions)) || $currentWorkspace->permission == 'Owner')
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0">{{ __('Milestones') }} ({{ count($project->milestones) }})
+                                            </h5>
+                                        </div>
+                                        <div class="float-end">
+                                            @if ((isset($permissions) && in_array('create milestone', $permissions)) || $currentWorkspace->permission == 'Owner')
+                                                <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true"
+                                                    data-title="{{ __('Create Milestone') }}"
+                                                    data-url="{{ route($client_keyword . 'projects.milestone', [$currentWorkspace->slug, $project->id]) }}"
+                                                    data-toggle="popover" title="{{ __('Create') }}"><i
+                                                        class="ti ti-plus"></i></a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="" class="table table-bordered px-2">
-                                        <thead>
-                                            <tr>
-                                                <th>{{ __('Name') }}</th>
-                                                <th>{{ __('Status') }}</th>
-                                                <th>{{ __('Start Date') }}</th>
-                                                <th>{{ __('End Date') }}</th>
-                                                <th>{{ __('Cost') }}</th>
-                                                <th>{{ __('Progress') }}</th>
-                                                <th>{{ __('Action') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($project->milestones as $key => $milestone)
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="" class="table table-bordered px-2">
+                                            <thead>
                                                 <tr>
-                                                    <td><a href="#" class="d-block font-weight-500 mb-0"
-                                                            data-ajax-popup="true"
-                                                            data-title="{{ __('Milestone Details') }}"
-                                                            data-url="{{ route($client_keyword . 'projects.milestone.show', [$currentWorkspace->slug, $milestone->id]) }}">
-                                                            <h5 class="m-0"> {{ $milestone->title }} </h5>
-                                                        </a></td>
-                                                    <td>
-                                                        @if ($milestone->status == 'complete')
-                                                            <label
-                                                                class="badge bg-success p-2 px-3 rounded">{{ __('Complete') }}</label>
-                                                        @else
-                                                            <label
-                                                                class="badge bg-warning p-2 px-3 rounded">{{ __('Incomplete') }}</label>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ isset($milestone->start_date) ? App\Models\Utility::dateFormat($milestone->start_date) : '' }}</td>
-                                                    <td>{{ isset($milestone->end_date) ? App\Models\Utility::dateFormat($milestone->end_date) : '' }}</td>
-                                                    <td>{{ !empty($currentWorkspace->currency) ? $currentWorkspace->currency : '$' }}{{ $milestone->cost }}
-                                                    </td>
-                                                    <td>
-                                                        <div class="progress_wrapper">
-                                                            <div class="progress">
-                                                                <div class="progress-bar" role="progressbar"
-                                                                    style="width: {{ $milestone->progress }}%;"
-                                                                    aria-valuenow="55" aria-valuemin="0"
-                                                                    aria-valuemax="100"></div>
-                                                            </div>
-                                                            <div class="progress_labels">
-                                                                <div class="total_progress">
-
-                                                                    <strong> {{ $milestone->progress }}%</strong>
+                                                    <th>{{ __('Name') }}</th>
+                                                    <th>{{ __('Status') }}</th>
+                                                    <th>{{ __('Start Date') }}</th>
+                                                    <th>{{ __('End Date') }}</th>
+                                                    <th>{{ __('Cost') }}</th>
+                                                    <th>{{ __('Progress') }}</th>
+                                                    <th>{{ __('Action') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($project->milestones as $key => $milestone)
+                                                    <tr>
+                                                        <td><a href="#" class="d-block font-weight-500 mb-0"
+                                                                data-ajax-popup="true"
+                                                                data-title="{{ __('Milestone Details') }}"
+                                                                data-url="{{ route($client_keyword . 'projects.milestone.show', [$currentWorkspace->slug, $milestone->id]) }}">
+                                                                <h5 class="m-0"> {{ $milestone->title }} </h5>
+                                                            </a></td>
+                                                        <td>
+                                                            @if ($milestone->status == 'complete')
+                                                                <label
+                                                                    class="badge bg-success p-2 px-3 rounded">{{ __('Complete') }}</label>
+                                                            @else
+                                                                <label
+                                                                    class="badge bg-warning p-2 px-3 rounded">{{ __('Incomplete') }}</label>
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ isset($milestone->start_date) ? App\Models\Utility::dateFormat($milestone->start_date) : '' }}</td>
+                                                        <td>{{ isset($milestone->end_date) ? App\Models\Utility::dateFormat($milestone->end_date) : '' }}</td>
+                                                        <td>{{ !empty($currentWorkspace->currency) ? $currentWorkspace->currency : '$' }}{{ $milestone->cost }}
+                                                        </td>
+                                                        <td>
+                                                            <div class="progress_wrapper">
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" role="progressbar"
+                                                                        style="width: {{ $milestone->progress }}%;"
+                                                                        aria-valuenow="55" aria-valuemin="0"
+                                                                        aria-valuemax="100"></div>
                                                                 </div>
+                                                                <div class="progress_labels">
+                                                                    <div class="total_progress">
 
+                                                                        <strong> {{ $milestone->progress }}%</strong>
+                                                                    </div>
+
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </td>
+                                                        </td>
 
-                                                    <td class="text-right">
-                                                        <div class="col-auto">
-                                                            @if ($currentWorkspace->permission == 'Owner')
-                                                                <a href="#"
-                                                                    class="action-btn btn-info mx-1  btn btn-sm d-inline-flex align-items-center"
-                                                                    data-ajax-popup="true" data-size="lg"
-                                                                    data-toggle="popover" title="{{ __('Edit') }}"
-                                                                    data-title="{{ __('Edit Milestone') }}"
-                                                                    data-url="{{ route('projects.milestone.edit', [$currentWorkspace->slug, $milestone->id]) }}"><i
-                                                                        class="ti ti-edit"></i></a>
-                                                                <a href="#"
-                                                                    class="action-btn btn-danger mx-1  btn btn-sm d-inline-flex align-items-center bs-pass-para"
-                                                                    data-confirm="{{ __('Are You Sure?') }}"
-                                                                    data-toggle="popover" title="{{ __('Delete') }}"
-                                                                    data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
-                                                                    data-confirm-yes="delete-form1-{{ $milestone->id }}"><i
-                                                                        class="ti ti-trash"></i></a>
-                                                                <form id="delete-form1-{{ $milestone->id }}"
-                                                                    action="{{ route('projects.milestone.destroy', [$currentWorkspace->slug, $milestone->id]) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            @elseif(isset($permissions))
-                                                                @if (in_array('edit milestone', $permissions))
+                                                        <td class="text-right">
+                                                            <div class="col-auto">
+                                                                @if ($currentWorkspace->permission == 'Owner')
                                                                     <a href="#"
-                                                                        class="action-btn btn-info mx-1  btn btn-sm d-inline-flex align-items-center bs-pass-para"
+                                                                        class="action-btn btn-info mx-1  btn btn-sm d-inline-flex align-items-center"
                                                                         data-ajax-popup="true" data-size="lg"
+                                                                        data-toggle="popover" title="{{ __('Edit') }}"
                                                                         data-title="{{ __('Edit Milestone') }}"
-                                                                        data-toggle="popover"
-                                                                        title="{{ __('Edit') }}"
-                                                                        data-url="{{ route($client_keyword . 'projects.milestone.edit', [$currentWorkspace->slug, $milestone->id]) }}"><i
+                                                                        data-url="{{ route('projects.milestone.edit', [$currentWorkspace->slug, $milestone->id]) }}"><i
                                                                             class="ti ti-edit"></i></a>
-                                                                @endif
-                                                                @if (in_array('delete milestone', $permissions))
                                                                     <a href="#"
                                                                         class="action-btn btn-danger mx-1  btn btn-sm d-inline-flex align-items-center bs-pass-para"
                                                                         data-confirm="{{ __('Are You Sure?') }}"
-                                                                        data-toggle="popover"
-                                                                        title="{{ __('Delete') }}"
+                                                                        data-toggle="popover" title="{{ __('Delete') }}"
                                                                         data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
                                                                         data-confirm-yes="delete-form1-{{ $milestone->id }}"><i
                                                                             class="ti ti-trash"></i></a>
                                                                     <form id="delete-form1-{{ $milestone->id }}"
-                                                                        action="{{ route($client_keyword . 'projects.milestone.destroy', [$currentWorkspace->slug, $milestone->id]) }}"
+                                                                        action="{{ route('projects.milestone.destroy', [$currentWorkspace->slug, $milestone->id]) }}"
                                                                         method="POST" style="display: none;">
                                                                         @csrf
                                                                         @method('DELETE')
                                                                     </form>
+                                                                @elseif(isset($permissions))
+                                                                    @if (in_array('edit milestone', $permissions))
+                                                                        <a href="#"
+                                                                            class="action-btn btn-info mx-1  btn btn-sm d-inline-flex align-items-center bs-pass-para"
+                                                                            data-ajax-popup="true" data-size="lg"
+                                                                            data-title="{{ __('Edit Milestone') }}"
+                                                                            data-toggle="popover"
+                                                                            title="{{ __('Edit') }}"
+                                                                            data-url="{{ route($client_keyword . 'projects.milestone.edit', [$currentWorkspace->slug, $milestone->id]) }}"><i
+                                                                                class="ti ti-edit"></i></a>
+                                                                    @endif
+                                                                    @if (in_array('delete milestone', $permissions))
+                                                                        <a href="#"
+                                                                            class="action-btn btn-danger mx-1  btn btn-sm d-inline-flex align-items-center bs-pass-para"
+                                                                            data-confirm="{{ __('Are You Sure?') }}"
+                                                                            data-toggle="popover"
+                                                                            title="{{ __('Delete') }}"
+                                                                            data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
+                                                                            data-confirm-yes="delete-form1-{{ $milestone->id }}"><i
+                                                                                class="ti ti-trash"></i></a>
+                                                                        <form id="delete-form1-{{ $milestone->id }}"
+                                                                            action="{{ route($client_keyword . 'projects.milestone.destroy', [$currentWorkspace->slug, $milestone->id]) }}"
+                                                                            method="POST" style="display: none;">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                        </form>
+                                                                    @endif
                                                                 @endif
-                                                            @endif
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
 
-                        </div>
-                    @endif
+                            </div>
+                        @endif
+                    </div>
+                    <div class="row">
+                        @php
+                            $thread = \App\Models\CmgmyrMessenger\Thread::where('slug', 'project-'.$project->id)->first();
+                        @endphp
+
+                        @if ($thread)
+                            @include('single-chat', ['threadId' => $thread->id])
+                        @endif
+                    </div>
                 </div>
                 @if (
                     (isset($permissions) && in_array('show uploading', $permissions)) ||
@@ -695,16 +714,33 @@
                             </div>
                         </div>
                 @endif
+                
             </div>
-        </div>
+            </div>
         <!-- [ sample-page ] end -->
     </div>
     <!-- [ Main Content ] end -->
+    </div><div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="sendMessage" data-employee-id="">Send</button>
+            </div>
+            </div>
+        </div>
     </div>
 @endsection
 
 @push('css-page')
-    <link rel="stylesheet" href="{{ asset('assets/custom/css/dropzone.min.css') }}">
+    <!-- <link rel="stylesheet" href="{{ asset('assets/custom/css/dropzone.min.css') }}"> -->
 @endpush
 @push('scripts')
     <!--
@@ -806,6 +842,58 @@
             var chart = new ApexCharts(document.querySelector("#task-chart"), options);
             chart.render();
         })();
+    </script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".sendMessageUser").forEach(a => {
+                a.addEventListener("click", function() {
+                    let employeeId = this.dataset.employeeId;
+                    console.log(employeeId);
+
+                    $("#sendMessagePopup").modal('show');
+                    document.getElementById("sendMessage").setAttribute('data-employee-id', employeeId);
+                });
+            });
+
+            document.getElementById("sendMessage").addEventListener("click", function() {
+                let message = document.getElementById("messageInput").value;
+                let employeeId = this.getAttribute('data-employee-id');
+                console.log(employeeId);
+                let data = {
+                    recipient_id: employeeId,
+                    type: 'user',
+                    message: message.replace(/\s/g, ''),
+                    temporaryMsgId: 'temp_1',
+                    _token: '{{ csrf_token() }}'
+                };
+                let url = `{{ route('api.send-message') }}`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw new Error(error.message || 'Something went wrong');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    showNotification('Message successfully sent', 'success');
+                    $("#sendMessagePopup").modal('hide');
+                })
+                .catch(error => {
+                    showNotification('Message sending failed: ' + error.message, 'danger');
+                    console.error('Error:', error);
+                });
+            });
+        });
     </script>
     <script>
         $(document).ready(function() {

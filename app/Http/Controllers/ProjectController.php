@@ -68,7 +68,7 @@ class ProjectController extends Controller
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->firstOrFail();
 
         $categories = ProjectCategory::all();
-        $selectedCategoryId = $request->query('category_id');
+        $selectedCategoryIds = $request->query('category_ids', []);
 
         if ($objUser->getGuard() == 'client') {
             $projectsQuery = Project::select('projects.*')
@@ -85,13 +85,13 @@ class ProjectController extends Controller
             }
         }
 
-        if ($selectedCategoryId) {
-            $projectsQuery->where('projects.project_category_id', $selectedCategoryId);
+        if (!empty($selectedCategoryIds)) {
+            $projectsQuery->whereIn('projects.project_category_id', $selectedCategoryIds);
         }
 
         $projects = $projectsQuery->get();
 
-        return view('projects.index', compact('currentWorkspace', 'projects', 'categories', 'selectedCategoryId'));
+        return view('projects.index', compact('currentWorkspace', 'projects', 'categories', 'selectedCategoryIds'));
     }
 
     public function list(Request $request)
@@ -341,7 +341,7 @@ class ProjectController extends Controller
                 $groupChatService = new ChatService;
                 $subject = "Project ".$post['name']." Chat";
                 $message = "Chat for project created successfully";
-                $slug = "project";
+                $slug = "project-".$objProject->id;
                 $attachmentData = [];
                 $usersIdList = array_diff(array_unique($usersIdList), [Auth::id()]);
                 $thread = $groupChatService->createGroupChat($subject, $usersIdList, $message, $slug, $attachmentData);

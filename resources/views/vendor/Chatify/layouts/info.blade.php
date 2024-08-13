@@ -29,7 +29,7 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
     <p class="messenger-title">Users in thread</p>
     <div class="users-list"></div>
 </div>
-
+<!-- 
 <style>
 
 .theme-avtar {
@@ -42,5 +42,5 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
     object-fit: cover;
     
 }
-</style>
+</style> -->
 
