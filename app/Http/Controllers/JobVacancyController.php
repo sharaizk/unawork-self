@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobVacancy;
+use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,12 +22,15 @@ class JobVacancyController extends Controller
 
     public function create()
     {
-        return view('job_vacancies.manage.create_form');
+        $skills = Skill::all();
+        return view('job_vacancies.manage.create_form', compact('skills'));
     }
 
     public function edit(JobVacancy $vacancy)
     {
-        return view('job_vacancies.manage.edit_form', compact('vacancy'));
+        $skills = Skill::all();
+
+        return view('job_vacancies.manage.edit_form', compact('vacancy', 'skills'));
     }
 
     public function show(JobVacancy $vacancy)
