@@ -29,7 +29,7 @@
             </div>
             <div class="form-group col-md-12">
                     <label for="project_category" class="form-label">{{ __('Project Category') }}</label>
-                    <select id="project_category" name="project_category_id" class="form-control select2">
+                    <select id="project_category" name="project_category_id" class="form-control">
                         <option value="" {{ $project->project_category_id == null ? 'selected' : '' }}>{{ __('Select Category') }}</option>
                         @foreach(App\Models\ProjectCategory::all() as $category)
                             <option value="{{ $category->id }}" {{ $project->project_category_id == $category->id ? 'selected' : '' }}>
@@ -46,7 +46,7 @@
             
             <div class="form-group col-md-6">
                 <label for="status" class="form-label">{{ __('Status') }}</label>
-                <select id="status" name="status" class="form-control select2">
+                <select id="status" name="status" class="form-control">
                     <option value="Ongoing">{{ __('Ongoing') }}</option>
                     <option value="Finished" @if($project->status == 'Finished') selected @endif>{{ __('Finished') }}</option>
                     <option value="OnHold" @if($project->status == 'OnHold') selected @endif>{{ __('OnHold') }}</option>
