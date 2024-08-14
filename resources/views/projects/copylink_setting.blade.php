@@ -132,7 +132,7 @@
                         </div>
                     </td>
                 </tr>
-                <!-- <tr>
+                <tr>
                     <td>{{ __('Password Protected') }}</td>
                     <td class="action text-right">
                         <div class="form-check form-switch">
@@ -158,7 +158,7 @@
                             </div>
                         </div>
                     </td>
-                </tr> -->
+                </tr>
                 </tr>
             </tbody>
         </table>
