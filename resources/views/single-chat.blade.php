@@ -25,8 +25,8 @@
     .show-infoSide {
         /* display: none; */
     }
-    .m-header-right {
-        /* display: none; */
+    .m-header-right .add-to-favorite {
+        display: none;
     }
     .messenger-sendCard {
         background: #ffffff;
@@ -63,6 +63,24 @@
     }
     .messenger-infoView-btns {
         display: none;
+    }
+    .messenger-sendCard .upload-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .messenger-sendCard .fa-paperclip {
+        font-size: 18px; 
+        margin-right: 5px;
+        margin-top: 10px;
+        color: #bdcbd6;
+    }
+    .messenger-sendCard .fas:hover {
+        cursor: pointer;
     }
 </style>
 <div class="card rounded-12">

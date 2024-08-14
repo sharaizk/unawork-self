@@ -52,10 +52,10 @@
     </div> --}}
 
     @if ((isset($permissions) && in_array('show timesheet', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-        <div class="col-md-auto col-sm-4 pb-3">
+        <!-- <div class="col-md-auto col-sm-4 pb-3">
             <a href="{{ route($client_keyword . 'projects.timesheet.index', [$currentWorkspace->slug, $project->id]) }}"
                 class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Timesheet') }}</a>
-        </div>
+        </div> -->
     @endif
     @if ((isset($permissions) && in_array('show gantt', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
         <div class="col-md-auto col-sm-4 pb-3">
@@ -85,10 +85,10 @@
     </div>
     @endif
 
-    <div class="col-md-auto col-sm-6 pb-3 ">
+    <!-- <div class="col-md-auto col-sm-6 pb-3 ">
         <a href="{{ route($client_keyword . 'projecttime.tracker', [$currentWorkspace->slug, $project->id]) }}"
             class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Tracker') }}</a>
-    </div>
+    </div> -->
 @endsection
 <style type="text/css">
     .fix_img {

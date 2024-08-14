@@ -99,7 +99,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr>
+                <!-- <tr>
                     <td>{{ __('Tracker details') }}</td>
                     <td class="action text-right">
                         <div class="form-check form-switch">
@@ -109,8 +109,8 @@
                             <label class="custom-control-label" for="copy_link_8"></label>
                         </div>
                     </td>
-                </tr>
-                <tr>
+                </tr> -->
+                <!-- <tr>
                     <td>{{ __('Timesheet') }}</td>
                     <td class="action text-right">
                         <div class="form-check form-switch">
@@ -120,7 +120,7 @@
                             <label class="custom-control-label" for="copy_link_9"></label>
                         </div>
                     </td>
-                </tr>
+                </tr> -->
                 <tr>
                     <td>{{ __('Progress') }}</td>
                     <td class="action text-right">

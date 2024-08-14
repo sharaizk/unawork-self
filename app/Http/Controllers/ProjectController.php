@@ -249,6 +249,9 @@ class ProjectController extends Controller
                 $data['attachment'] = 'on';
                 $data['bug_report'] = 'on';
                 $data['task'] = 'on';
+                $data['progress'] = 'on';
+                $data['activity'] = 'on';
+                $data['milestone'] = 'on';
                 $data['password_protected'] = 'off';
                 $objProject->copylinksetting = json_encode($data);
                 $objProject->save();

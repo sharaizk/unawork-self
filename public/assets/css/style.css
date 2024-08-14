@@ -15298,8 +15298,8 @@ body {
 }
 
 a:hover {
-    outline: none;
-    text-decoration: none;
+    color: var(--bs-link-hover-color);
+    text-decoration: underline;
 }
 
 a:not([href]) {
@@ -16227,7 +16227,8 @@ body.theme-3 a:not([class]) {
 }
 
 body.theme-3 a:not([class]):hover {
-    color: #022D4D;
+    color: var(--bs-link-hover-color);
+    text-decoration: underline;
 }
 
 body.theme-3 .text-primary {

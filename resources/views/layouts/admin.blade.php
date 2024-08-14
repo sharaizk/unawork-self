@@ -105,7 +105,6 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css" rel="stylesheet"/>
 
-
     <!-- vendor css -->
     @stack('css-page')
 
@@ -403,6 +402,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
+
 
     <script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
     <script src="{{ asset('assets/custom/libs/moment/min/moment.min.js') }}"></script>

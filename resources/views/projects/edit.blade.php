@@ -29,7 +29,7 @@
             </div>
             <div class="form-group col-md-12">
                     <label for="project_category" class="form-label">{{ __('Project Category') }}</label>
-                    <select id="project_category" name="project_category_id" class="form-control select2">
+                    <select id="project_category" name="project_category_id" class="form-control">
                         <option value="" {{ $project->project_category_id == null ? 'selected' : '' }}>{{ __('Select Category') }}</option>
                         @foreach(App\Models\ProjectCategory::all() as $category)
                             <option value="{{ $category->id }}" {{ $project->project_category_id == $category->id ? 'selected' : '' }}>
@@ -38,15 +38,15 @@
                         @endforeach
                     </select>
                     <button type="button" id="addCategoryButton" class="btn btn-link">{{ __('+ Add New Category') }}</button>
-                    <div class="input-group mb-3" id="newCategoryInput" style="display: none;">
+                    <div class="input-group mb-3 mt-2" id="newCategoryInput" style="display: none;">
                         <input type="text" id="newCategoryName" class="form-control" placeholder="{{ __('Category Name') }}" aria-label="{{ __('Category Name') }}">
-                        <button type="button" id="createCategoryButton" class="btn btn-outline-secondary">{{ __('Create') }}</button>
+                        <button type="button" id="createCategoryButton" class="btn btn-primary">{{ __('Create') }}</button>
                     </div>  
             </div>
             
             <div class="form-group col-md-6">
                 <label for="status" class="form-label">{{ __('Status') }}</label>
-                <select id="status" name="status" class="form-control select2">
+                <select id="status" name="status" class="form-control">
                     <option value="Ongoing">{{ __('Ongoing') }}</option>
                     <option value="Finished" @if($project->status == 'Finished') selected @endif>{{ __('Finished') }}</option>
                     <option value="OnHold" @if($project->status == 'OnHold') selected @endif>{{ __('OnHold') }}</option>
@@ -66,7 +66,7 @@
 
                 <div class="input-group date ">
                     <input class="form-control datepicker2" type="text" id="start_date" name="start_date" value="{{$project->start_date}}" autocomplete="off" required="required">
-                    <span class="input-group-text">
+                    <span class="input-group-text btn btn-primary" id="start-calendar-icon">
                         <i class="feather icon-calendar"></i>
                     </span>
                 </div>
@@ -75,7 +75,7 @@
                 <label class="form-label">{{ __('End Date') }}</label>
                 <div class="input-group date ">
                     <input class="form-control datepicker3" type="text" id="end_date" name="end_date" value="{{$project->end_date}}" autocomplete="off" required="required">
-                    <span class="input-group-text">
+                    <span class="input-group-text btn btn-primary" id="end-calendar-icon">
                         <i class="feather icon-calendar"></i>
                     </span>
                 </div>
@@ -89,6 +89,15 @@
 
 </form>
 
+<script>
+    document.getElementById('start-calendar-icon').addEventListener('click', function() {
+        document.getElementById('start_date').focus(); 
+    });
+
+    document.getElementById('end-calendar-icon').addEventListener('click', function() {
+        document.getElementById('end_date').focus(); 
+    });
+</script>
 <script>
     (function() {
         const d_week = new Datepicker(document.querySelector('.datepicker2'), {
