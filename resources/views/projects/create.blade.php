@@ -20,9 +20,9 @@
                 @endforeach
             </select>
             <button type="button" id="addCategoryButton" class="btn btn-link">{{ __('+ Add New Category') }}</button>
-            <div class="input-group mb-3" id="newCategoryInput" style="display: none;">
+            <div class="input-group mb-3 mt-2" id="newCategoryInput" style="display: none;">
                 <input type="text" id="newCategoryName" class="form-control" placeholder="{{ __('Category Name') }}" aria-label="{{ __('Category Name') }}">
-                <button type="button" id="createCategoryButton" class="btn btn-outline-secondary">{{ __('Create') }}</button>
+                <button type="button" id="createCategoryButton" class="btn btn-primary">{{ __('Create') }}</button>
             </div>  
         </div>
         <div class="form-group col-md-12">
