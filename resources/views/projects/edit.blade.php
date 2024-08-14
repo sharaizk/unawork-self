@@ -38,9 +38,9 @@
                         @endforeach
                     </select>
                     <button type="button" id="addCategoryButton" class="btn btn-link">{{ __('+ Add New Category') }}</button>
-                    <div class="input-group mb-3" id="newCategoryInput" style="display: none;">
+                    <div class="input-group mb-3 mt-2" id="newCategoryInput" style="display: none;">
                         <input type="text" id="newCategoryName" class="form-control" placeholder="{{ __('Category Name') }}" aria-label="{{ __('Category Name') }}">
-                        <button type="button" id="createCategoryButton" class="btn btn-outline-secondary">{{ __('Create') }}</button>
+                        <button type="button" id="createCategoryButton" class="btn btn-primary">{{ __('Create') }}</button>
                     </div>  
             </div>
             
@@ -66,7 +66,7 @@
 
                 <div class="input-group date ">
                     <input class="form-control datepicker2" type="text" id="start_date" name="start_date" value="{{$project->start_date}}" autocomplete="off" required="required">
-                    <span class="input-group-text">
+                    <span class="input-group-text btn btn-primary" id="start-calendar-icon">
                         <i class="feather icon-calendar"></i>
                     </span>
                 </div>
@@ -75,7 +75,7 @@
                 <label class="form-label">{{ __('End Date') }}</label>
                 <div class="input-group date ">
                     <input class="form-control datepicker3" type="text" id="end_date" name="end_date" value="{{$project->end_date}}" autocomplete="off" required="required">
-                    <span class="input-group-text">
+                    <span class="input-group-text btn btn-primary" id="end-calendar-icon">
                         <i class="feather icon-calendar"></i>
                     </span>
                 </div>
@@ -89,6 +89,15 @@
 
 </form>
 
+<script>
+    document.getElementById('start-calendar-icon').addEventListener('click', function() {
+        document.getElementById('start_date').focus(); 
+    });
+
+    document.getElementById('end-calendar-icon').addEventListener('click', function() {
+        document.getElementById('end_date').focus(); 
+    });
+</script>
 <script>
     (function() {
         const d_week = new Datepicker(document.querySelector('.datepicker2'), {
