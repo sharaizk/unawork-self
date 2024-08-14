@@ -63,7 +63,7 @@ Route::get('/pod', [PodController::class, 'index']);
 Route::post('/pod', [PodController::class, 'store']);
 Route::get('/pod/{id}', [PodController::class, 'show']);
 Route::post('/pod/{id}', [PodController::class, 'update']);
-Route::delete('/pod/{id}', [PodController::class, 'destroy']);
+Route::delete('/pod/{id}', [PodController::class, 'destroy'])->name('api.pod.delete');
 
 
 Route::post('/pod/{id}/users', [PodUserController::class, 'inviteExistedUser']);

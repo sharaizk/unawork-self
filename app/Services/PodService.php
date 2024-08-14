@@ -72,6 +72,22 @@ class PodService
         return $pod;
     }
 
+    public function destroyPod(Pod $pod)
+    {
+        $workspace = $pod->workspace;
+        $users = User::where('currant_workspace', $workspace->id)->get();
+        
+        $workspace->delete();
+        $pod->delete();
+
+        //set new currant_workspace for users who was in this pod (to avoid crashes)
+        foreach ($users as $user) {
+            $currantWorkspace = Workspace::where('created_by', $user->id)->first();
+            $user->currant_workspace = $currantWorkspace->id;
+            $user->update();
+        }
+    }
+
     protected function uploadImage(UploadedFile $image, array $settings): string
     {
         $dir = 'pod-images';

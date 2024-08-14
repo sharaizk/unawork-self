@@ -92,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pods', [PodController::class, 'index'])->name('pods.index');
     Route::get('/pods/create', [PodController::class, 'create'])->name('pods.create');
     Route::get('/pods/{podId}/edit', [PodController::class, 'edit'])->name('pods.edit');
+    Route::delete('/pods/{podId}', [PodController::class, 'destroy'])->name('pods.delete');
 
     Route::get('/account/pods/{podId}', [PodController::class, 'show'])->name('pods.show');
     Route::get('/account/pods/{podId}/users', [PodUserController::class, 'index'])->name('pods.users');

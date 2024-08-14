@@ -50,6 +50,17 @@
                                             data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i 
                                                 class="ti ti-pencil"></i> <span>{{ __('Edit') }}</span>
                                         </a>
+                                        <a href="#" class="dropdown-item bs-pass-para "
+                                            data-confirm="{{ __('Are You Sure?') }}"
+                                            data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
+                                            data-confirm-yes="delete_pod_{{ $pod->id }}"><i
+                                                class="ti ti-trash"></i><span>{{ __('Delete') }}</span>
+                                        </a>
+                                        <form action="{{ route('pods.delete', $pod->id) }}" method="post"
+                                            id="delete_pod_{{ $pod->id }}" style="display: none;">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
                                     @endif
                                     <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Go to Pod') }}">

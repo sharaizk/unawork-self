@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pod;
+use App\Models\User;
+use App\Models\Workspace;
 use App\Models\Utility;
 use App\Services\PodService;
 use App\Http\Requests\Pods\StorePodRequest;
@@ -75,8 +77,9 @@ class PodController extends Controller
     public function destroy(int $id): JsonResponse
     {   
         $pod = Pod::findOrFail($id);
-        
-        $pod->delete();
+        $this->authorize('delete', $pod);
+
+        $this->podService->destroyPod($pod);
 
         return response()->json(null, 204);
     }
