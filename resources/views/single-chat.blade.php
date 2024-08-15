@@ -185,6 +185,13 @@
             const ChatName = "Project Chat";
             $(".m-header-messaging .user-name").html(ChatName);
             $(".messenger-infoView .info-name").html(ChatName);
+            $(".m-header-messaging .m-header-right .add-to-favorite").css('display', 'none');
+            $(".m-header-messaging .justify-content-between .show-listView").css('display', 'none');
+            $(".m-header-messaging .justify-content-between a").on('click', function(event) {
+                event.preventDefault();
+            });
+
+
         }, 1000); 
     });
 </script>
