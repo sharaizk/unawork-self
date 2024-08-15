@@ -46,8 +46,8 @@
 @section('action-button')
     @auth('web')
         @if (isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id() || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
-            <a href="{{ route('zoommeeting.Calender', $currentWorkspace->slug) }}" class="btn btn-sm btn-primary mx-1"
-                id="" data-toggle="tooltip" title="{{ __('calendar') }}"> <i class="ti ti-calendar"></i></a>
+            <!-- <a href="{{ route('zoommeeting.Calender', $currentWorkspace->slug) }}" class="btn btn-sm btn-primary mx-1"
+                id="" data-toggle="tooltip" title="{{ __('calendar') }}"> <i class="ti ti-calendar"></i></a> -->
 
             <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
                 data-title="{{ __('Create New Meeting') }}" data-toggle="tooltip" title="{{ __('Add Meeting') }}"
