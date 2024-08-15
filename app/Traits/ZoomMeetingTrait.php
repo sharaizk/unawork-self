@@ -124,12 +124,12 @@ trait ZoomMeetingTrait
      *
      * @return bool[]
      */
-    public function delete($id)
+    public function delete($id, $slug)
     {
         $path = 'meetings/'.$id;
         $url = $this->retrieveZoomUrl();
         $body = [
-            'headers' => $this->headers,
+            'headers' => $this->getHeader($slug),
             'body'    => json_encode([]),
         ];
 

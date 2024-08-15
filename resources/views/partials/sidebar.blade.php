@@ -250,11 +250,11 @@
                                                data-feather="calendar"></i></span><span
                                            class="dash-mtext">{{ __('Calendar') }}</span></a>
                                </li> -->
-                               <!-- <li class="dash-item {{ Request::route()->getName() == 'notes.index' ? ' active' : '' }}">
+                               <li class="dash-item {{ Request::route()->getName() == 'notes.index' ? ' active' : '' }}">
                                    <a href="{{ route('notes.index', $currentWorkspace->slug) }}" class="dash-link "><span
                                            class="dash-micon"><i data-feather="clipboard"></i></span><span
                                            class="dash-mtext">{{ __('Notes') }} </span></a>
-                               </li> -->
+                               </li>
                                
                                
                  

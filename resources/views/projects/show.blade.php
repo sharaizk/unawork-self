@@ -427,114 +427,7 @@
                             </div> -->
                         </div>
                     </div>
-                    
-
-                </div>
-
-                <div class="col-xxl-4">
-                    <div class="row">
-
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header" style="padding: 25px 35px !important;">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="row">
-                                            <h5 class="mb-0">{{ __('Progress') }}<span class="text-end"> (Last Week
-                                                    Tasks) </span></h5>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start">
-                                    </div>
-                                </div>
-                                <div id="task-chart"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0">{{ __('Activity') }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body p-3">
-                            <div class="timeline timeline-one-side top-10-scroll" data-timeline-content="axis"
-                                data-timeline-axis-style="dashed">
-                                @if ((isset($permissions) && in_array('show activity', $permissions)) || $currentWorkspace->permission == 'Owner')
-                                    @foreach ($project->activities as $activity)
-                                        <div class="timeline-block px-2 pt-3">
-                                            @if ($activity->log_type == 'Upload File')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border border-primary text-white">
-                                                    <i class="fas fa-file"></i></span>
-                                            @elseif($activity->log_type == 'Create Milestone')
-                                                <span class="timeline-step timeline-step-sm border border-info text-white">
-                                                    <i class="fas fa-cubes"></i></span>
-                                            @elseif($activity->log_type == 'Create Task')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border border-success text-white">
-                                                    <i class="fas fa-tasks"></i></span>
-                                            @elseif($activity->log_type == 'Create Bug')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border border-warning text-white">
-                                                    <i class="fas fa-bug"></i></span>
-                                            @elseif($activity->log_type == 'Move' || $activity->log_type == 'Move Bug')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
-                                                    <i class="fas fa-align-justify"></i></span>
-                                            @elseif($activity->log_type == 'Create Invoice')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border border-bg-dark text-white">
-                                                    <i class="fas fa-file-invoice"></i></span>
-                                            @elseif($activity->log_type == 'Invite User')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border border-success text-white">
-                                                    <i class="fas fa-plus"></i></span>
-                                            @elseif($activity->log_type == 'Share with Client')
-                                                <span class="timeline-step timeline-step-sm border border-info text-white">
-                                                    <i class="fas fa-share"></i></span>
-                                            @elseif($activity->log_type == 'Create Timesheet')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border border-success text-white">
-                                                    <i class="fas fa-clock-o"></i></span>
-                                            @elseif($activity->log_type == 'Commented')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
-                                                    <i class="fas fa-tasks"></i></span>
-                                            @elseif($activity->log_type == 'Create Subtask')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
-                                                    <i class="fas fa-tasks"></i></span>
-                                            @elseif($activity->log_type == 'Upload Task File')
-                                                <span
-                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
-                                                    <i class="fas fa-tasks"></i></span>
-                                            @endif
-
-                                            <div class="last_notification_text">
-                                                <!--   <p class="m-0"> <span>{{ $activity->log_type }} </span> </p> <br> -->
-                                                <p class="m-0"> <span>{{ $activity->logType($activity->log_type) }}
-                                                    </span> </p> <br>
-                                                <p> {!! $activity->getRemark() !!} </p>
-                                                <div class="notification_time_main">
-                                                    <p>{{ $activity->created_at->diffForHumans() }}</p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-8">
-                    <div class="row">
+                    <!-- <div class="row"> -->
                         @if ((isset($permissions) && in_array('show milestone', $permissions)) || $currentWorkspace->permission == 'Owner')
                             <div class="card">
                                 <div class="card-header">
@@ -670,22 +563,125 @@
 
                             </div>
                         @endif
-                    </div>
+                    <!-- </div> -->
                     <div class="row">
-                        @php
-                            $thread = \App\Models\CmgmyrMessenger\Thread::where('slug', 'project-'.$project->id)->first();
-                        @endphp
+                        <div>
+                            @php
+                                $thread = \App\Models\CmgmyrMessenger\Thread::where('slug', 'project-'.$project->id)->first();
+                            @endphp
 
-                        @if ($thread)
-                            @include('single-chat', ['threadId' => $thread->id])
-                        @endif
+                            @if ($thread)
+                                @include('single-chat', ['threadId' => $thread->id])
+                            @endif
+                        </div>
                     </div>
                 </div>
-                @if (
+
+                <div class="col-xxl-4">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="padding: 25px 35px !important;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="row">
+                                            <h5 class="mb-0">{{ __('Progress') }}<span class="text-end"> (Last Week
+                                                    Tasks) </span></h5>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                    </div>
+                                </div>
+                                <div id="task-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">{{ __('Activity') }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="timeline timeline-one-side top-10-scroll" data-timeline-content="axis"
+                                data-timeline-axis-style="dashed">
+                                @if ((isset($permissions) && in_array('show activity', $permissions)) || $currentWorkspace->permission == 'Owner')
+                                    @foreach ($project->activities as $activity)
+                                        <div class="timeline-block px-2 pt-3">
+                                            @if ($activity->log_type == 'Upload File')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border border-primary text-white">
+                                                    <i class="fas fa-file"></i></span>
+                                            @elseif($activity->log_type == 'Create Milestone')
+                                                <span class="timeline-step timeline-step-sm border border-info text-white">
+                                                    <i class="fas fa-cubes"></i></span>
+                                            @elseif($activity->log_type == 'Create Task')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border border-success text-white">
+                                                    <i class="fas fa-tasks"></i></span>
+                                            @elseif($activity->log_type == 'Create Bug')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border border-warning text-white">
+                                                    <i class="fas fa-bug"></i></span>
+                                            @elseif($activity->log_type == 'Move' || $activity->log_type == 'Move Bug')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-align-justify"></i></span>
+                                            @elseif($activity->log_type == 'Create Invoice')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border border-bg-dark text-white">
+                                                    <i class="fas fa-file-invoice"></i></span>
+                                            @elseif($activity->log_type == 'Invite User')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border border-success text-white">
+                                                    <i class="fas fa-plus"></i></span>
+                                            @elseif($activity->log_type == 'Share with Client')
+                                                <span class="timeline-step timeline-step-sm border border-info text-white">
+                                                    <i class="fas fa-share"></i></span>
+                                            @elseif($activity->log_type == 'Create Timesheet')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border border-success text-white">
+                                                    <i class="fas fa-clock-o"></i></span>
+                                            @elseif($activity->log_type == 'Commented')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-tasks"></i></span>
+                                            @elseif($activity->log_type == 'Create Subtask')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-tasks"></i></span>
+                                            @elseif($activity->log_type == 'Upload Task File')
+                                                <span
+                                                    class="timeline-step timeline-step-sm border round border-danger text-white">
+                                                    <i class="fas fa-tasks"></i></span>
+                                            @endif
+
+                                            <div class="last_notification_text">
+                                                <!--   <p class="m-0"> <span>{{ $activity->log_type }} </span> </p> <br> -->
+                                                <p class="m-0"> <span>{{ $activity->logType($activity->log_type) }}
+                                                    </span> </p> <br>
+                                                <p> {!! $activity->getRemark() !!} </p>
+                                                <div class="notification_time_main">
+                                                    <p>{{ $activity->created_at->diffForHumans() }}</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @if (
                     (isset($permissions) && in_array('show uploading', $permissions)) ||
                         $currentWorkspace->permission == 'Owner' ||
                         $currentWorkspace->permission == 'Member')
-                    <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -713,9 +709,10 @@
                                 </div>
                             </div>
                         </div>
-                @endif
+                    @endif
+                </div>
                 
-            </div>
+                
             </div>
         <!-- [ sample-page ] end -->
     </div>

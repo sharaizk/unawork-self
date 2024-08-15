@@ -351,19 +351,20 @@
   -ms-flex: 0 0 100px;
   flex: 0 0 100px;
   max-width: 100px;
+  display: contents;
 }
 .tpl-hub-shop .section__introduce .col-left img {
-  width: 100px;
+  width: 100%;
   height: auto;
-  max-height: 150px;
+  max-height: 400px;
   object-fit: cover;
   display: block;
 }
 .tpl-hub-shop .section__introduce .col-right {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 calc(100% - 140px);
-  flex: 0 0 calc(100% - 140px);
-  max-width: calc(100% - 140px);
+  flex: 0 0 calc(100% - 280px);
+  max-width: calc(100% - 280px);
   margin-left: auto;
 }
 .tpl-hub-shop .section__introduce .col-right .item__title h1 {
@@ -385,11 +386,13 @@
 .tpl-hub-shop .section__introduce .col-right .item__content ul li i {
   color: #cfaa40;
   padding-right: 5px;
+  font-size: 16px;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content ul li a,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li span,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li address {
   color: rgba(2, 45, 77, 0.7);
+  font-size: 16px;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content ul li a:hover,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li span:hover,

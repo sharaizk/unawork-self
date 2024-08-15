@@ -17,7 +17,8 @@ class Profile extends Model
         'zip_code',
         'address',
         'phone_number',
-        'cv_file'
+        'cv_file',
+        'about'
     ];
 
     public function user()

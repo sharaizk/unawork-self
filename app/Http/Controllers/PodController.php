@@ -31,6 +31,16 @@ class PodController extends Controller
         return view('pod.create_form', compact('skills'));
     }
 
+    public function destroy(int $id)
+    {   
+        $pod = Pod::findOrFail($id);
+        $this->authorize('delete', $pod);
+
+        $this->podService->destroyPod($pod);
+
+        return redirect()->route('pods.index');
+    }
+
     public function edit(int $podId)
     {
         $pod = Pod::find($podId);

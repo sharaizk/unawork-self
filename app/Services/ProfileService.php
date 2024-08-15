@@ -17,8 +17,8 @@ class ProfileService
             throw new \Exception('User can\t have more than one profile.');
         }
 
-        if (isset($data['cv'])) {
-            $data['cv'] = $this->uploadFile($data['cv']);
+        if (isset($data['cv_file'])) {
+            $data['cv_file'] = $this->uploadFile($data['cv_file']);
         }
     
         try {
@@ -31,12 +31,12 @@ class ProfileService
 
     public function updateProfile(Profile $profile, array $data): Profile
     {
-        if (isset($data['cv'])) {
+        if (isset($data['cv_file'])) {
             //del old image if it was
-            if ($profile->cv) {
-                Storage::delete($profile->cv);
+            if ($profile->cv_file) {
+                Storage::delete($profile->cv_file);
             }
-            $data['cv'] = $this->uploadFile($data['cv']);
+            $data['cv_file'] = $this->uploadFile($data['cv_file']);
         }
 
         if (isset($data['skill_ids'])) {

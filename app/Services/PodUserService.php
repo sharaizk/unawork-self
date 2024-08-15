@@ -186,6 +186,7 @@ class PodUserService
 
         $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $user->id)->first();
         $userWorkspace->givePermissionTo('users_index');
+        $userWorkspace->givePermissionTo('news_index');
     }
 
     private function sendInvitationEmail(User $user, Pod $pod, array $settings): void

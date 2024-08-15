@@ -15,8 +15,10 @@
       <div class="col-12 col-md-12 col-xl-9">
         <section class="section__introduce">
           <div class="col-left">
-            <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
-                                @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif>
+            <div class="cm-shop__image">
+              <img  alt="Thomas Johnson"
+              @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif >
+            </div>
                             
           </div>
           <div class="col-right">
@@ -45,24 +47,42 @@
                 </ul>
               </div>
             </div>
+            <section class="section__about section__layout">
+              
+          
+              <div class="profile__skills">
+                <div class="title">
+                    <span>Skills</span>
+                </div>
+                <ul class="p-0">
+                  @forelse ($employee->skills as $skill) 
+                    <li class="skill__name">{{$skill->name}}</li>
+                  @empty
+                    <li class="skill__name">n/a</li>
+                  @endforelse
+                </ul>
+              </div>
+              <div class="profile__bio">
+                <div class="title">
+                    <span>Bio</span>
+                </div>
+                <p>
+                  @if($employee->profile->about)
+                    {{ $employee->profile->about }} 
+                  @else
+                    Employee has`nt filled profile bio yet.
+                  @endif
+                </p>
+                @if($employee->profile->cv_file)
+                  <hr>
+                    <p class="mt-2">{{ __('Current CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
+                @endif
+              </div>
+           </section>
           </div>
 
         </section>
-        <section class="section__about section__layout">
-          <div class="section__title">
-            <h2>About</h2>
-          </div>
-          <div class="section__content">
-            <p>
-                <strong>Skills:</strong> 
-                    @forelse ($employee->skills as $skill) 
-                        {{$skill->name}},
-                    @empty
-                        n/a
-                    @endforelse
-                </p>
-          </div>
-        </section>
+        
       </div>
       <div class="col-12 col-md-12 col-xl-3">
         <aside class="aside__container">

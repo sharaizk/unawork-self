@@ -1,4 +1,4 @@
-<form action="{{ route('employee.profile.update') }}" method="POST">
+<form action="{{ route('employee.profile.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
     <div class="col-lg-12">
@@ -56,6 +56,18 @@
                         <input type="text" id="newSkillName" class="form-control" placeholder="{{ __('Skill Name') }}" aria-label="{{ __('Skill Name') }}">
                         <button type="button" id="createSkillButton" class="btn btn-outline-secondary">{{ __('Create') }}</button>
                     </div> 
+            </div>
+            
+            <div class="form-group">
+                <label for="about" class="form-label">{{ __('About') }}</label>
+                <textarea class="form-control w-100" name="about" id="about" rows="4">{{ $profile->about }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="cv_file" class="form-label">{{ __('CV File (PDF only)') }}</label>
+                <input type="file" class="form-control" name="cv_file" id="cv_file">
+                @if($profile->cv_file)
+                    <p class="mt-2">{{ __('Current CV File:') }} <a href="{{ asset('storage/'.$profile->cv_file) }}" target="_blank">{{ $profile->cv_file }}</a></p>
+                @endif
             </div>
         </div>
     </div>

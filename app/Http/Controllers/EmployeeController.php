@@ -14,12 +14,10 @@ class EmployeeController extends Controller
     }
 
     public function updateProfile(UpdateRequest $request)
-    {
+    {        
         $data = $request->validated();
-
         $user = auth('sanctum')->user();
         $profileService = new ProfileService;
-
         if ($user->profile->exists === false) {
             try {
                 $profileService->createProfile($user, $data);

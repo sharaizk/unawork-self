@@ -85,7 +85,8 @@ class ZoomMeetingController extends Controller
         $client_ids = ClientProject::getByProjects($request->project_id);
 
         $data['topic']              = $request->title;
-        $data['start_time']         = date('y:m:d H:i:s', strtotime($request->start_date));
+        $data['start_time']         = date('Y-m-d\TH:i:s', strtotime($request->start_date));
+        $data['timezone']           = env('APP_TIMEZONE', 'UTC');
         $data['duration']           = (int) $request->duration;
         $data['password']           = $request->password;
         $data['host_video']         = 0;
@@ -198,9 +199,22 @@ class ZoomMeetingController extends Controller
     public function destroy($slug, ZoomMeeting $zoomMeeting, $id)
     {
         $currentWorkspace   = Utility::getWorkspaceBySlug($slug);
-        $zoomMeeting        = ZoomMeeting::where('id', $id)->where('workspace_id', $currentWorkspace->id)->delete();
+        $zoomMeeting        = ZoomMeeting::where('id', $id)->where('workspace_id', $currentWorkspace->id)->first();
 
-        return redirect()->back()->with('success', __('Meeting deleted successfully.'));
+        if ($zoomMeeting) {
+            try {
+                $zoomDeleted = $this->delete($zoomMeeting->meeting_id, $slug);
+    
+                if ($zoomDeleted['success']) {
+                    $zoomMeeting->delete();
+
+                    return redirect()->back()->with('success', __('Meeting deleted successfully.'));
+                } 
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', __('Meeting not deleted on zoom. Set up scopes'));
+            }
+        }
+        return redirect()->back()->with('error', __('Meeting not found.'));
     }
     public function statusUpdate($slug)
     {
