@@ -28,7 +28,8 @@ class UpdateRequest extends FormRequest
             'zip_code' => 'string|max:20',
             'address' => 'string|max:255',
             'phone_number' => 'string|max:20',
-            'cv_file' => 'file|mimes:pdf|max:10240',
+            'cv_file' => 'nullable|file|mimes:pdf|max:10240',
+            'about' => 'string|max:25500',
             'skill_ids' => 'nullable|array',
             'skill_ids.*' => 'integer|exists:skills,id',
         ];

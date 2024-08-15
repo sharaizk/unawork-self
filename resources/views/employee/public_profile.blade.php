@@ -15,8 +15,10 @@
       <div class="col-12 col-md-12 col-xl-9">
         <section class="section__introduce">
           <div class="col-left">
-            <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
-                                @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif>
+            <div class="cm-shop__image">
+                                  <img  alt="Thomas Johnson"
+                                  @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif >
+            </div>
                             
           </div>
           <div class="col-right">
@@ -45,19 +47,14 @@
                 </ul>
               </div>
             </div>
-          </div>
-
-        </section>
-        <section class="section__about section__layout">
-          <div class="section__title">
-            <h2>About</h2>
-          </div>
+            <section class="section__about section__layout">
+              
           
           <div class="profile__skills">
             <div class="title">
                 <span>Skills</span>
             </div>
-            <ul>
+            <ul class="p-0">
               @forelse ($employee->skills as $skill) 
                 <li class="skill__name">{{$skill->name}}</li>
               @empty
@@ -65,7 +62,20 @@
               @endforelse
             </ul>
           </div>
+          <div class="profile__bio">
+            <div class="title">
+                <span>Bio</span>
+            </div>
+            <p>{{$employee->profile->about}} </p>
+            @if($employee->profile->cv_file)
+                <p class="mt-2">{{ __('Current CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
+            @endif
+          </div>
         </section>
+          </div>
+
+        </section>
+        
       </div>
       <div class="col-12 col-md-12 col-xl-3">
         <aside class="aside__container">
