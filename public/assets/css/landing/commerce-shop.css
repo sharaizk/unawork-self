@@ -329,6 +329,8 @@
     max-width: 275px;
     margin-right: 30px;
     position: relative;
+    align-self: start;
+
   }
   .tpl-hub-shop .cm-shop__image img {
     border-radius: 5px;

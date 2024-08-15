@@ -16,8 +16,8 @@
         <section class="section__introduce">
           <div class="col-left">
             <div class="cm-shop__image">
-                                  <img  alt="Thomas Johnson"
-                                  @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif >
+              <img  alt="Thomas Johnson"
+              @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif >
             </div>
                             
           </div>
@@ -50,28 +50,35 @@
             <section class="section__about section__layout">
               
           
-          <div class="profile__skills">
-            <div class="title">
-                <span>Skills</span>
-            </div>
-            <ul class="p-0">
-              @forelse ($employee->skills as $skill) 
-                <li class="skill__name">{{$skill->name}}</li>
-              @empty
-                <li class="skill__name">n/a</li>
-              @endforelse
-            </ul>
-          </div>
-          <div class="profile__bio">
-            <div class="title">
-                <span>Bio</span>
-            </div>
-            <p>{{$employee->profile->about}} </p>
-            @if($employee->profile->cv_file)
-                <p class="mt-2">{{ __('Current CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
-            @endif
-          </div>
-        </section>
+              <div class="profile__skills">
+                <div class="title">
+                    <span>Skills</span>
+                </div>
+                <ul class="p-0">
+                  @forelse ($employee->skills as $skill) 
+                    <li class="skill__name">{{$skill->name}}</li>
+                  @empty
+                    <li class="skill__name">n/a</li>
+                  @endforelse
+                </ul>
+              </div>
+              <div class="profile__bio">
+                <div class="title">
+                    <span>Bio</span>
+                </div>
+                <p>
+                  @if($employee->profile->about)
+                    {{ $employee->profile->about }} 
+                  @else
+                    Employee has`nt filled profile bio yet.
+                  @endif
+                </p>
+                @if($employee->profile->cv_file)
+                  <hr>
+                    <p class="mt-2">{{ __('Current CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
+                @endif
+              </div>
+           </section>
           </div>
 
         </section>
