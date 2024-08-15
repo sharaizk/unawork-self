@@ -52,15 +52,18 @@
           <div class="section__title">
             <h2>About</h2>
           </div>
-          <div class="section__content">
-            <p>
-                <strong>Skills:</strong> 
-                    @forelse ($employee->skills as $skill) 
-                        {{$skill->name}},
-                    @empty
-                        n/a
-                    @endforelse
-                </p>
+          
+          <div class="profile__skills">
+            <div class="title">
+                <span>Skills</span>
+            </div>
+            <ul>
+              @forelse ($employee->skills as $skill) 
+                <li class="skill__name">{{$skill->name}}</li>
+              @empty
+                <li class="skill__name">n/a</li>
+              @endforelse
+            </ul>
           </div>
         </section>
       </div>

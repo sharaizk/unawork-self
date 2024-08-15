@@ -367,6 +367,14 @@
     font-size: 1.8rem;
     font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
   }
+  .tpl-hub-shop .section__about .title {
+    margin-bottom: 15px;
+  }
+  .tpl-hub-shop .section__about .title span {
+    font-size: 1.8rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  }
+  
   .tpl-commerce-shop .cm-shop__profile .profile__name {
     margin-bottom: 28px;
   }
@@ -394,6 +402,21 @@
     line-height: 16px;
     margin-right: 12px;
   }
+  .tpl-hub-shop .profile__skills ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .tpl-hub-shop .profile__skills .skill__name {
+    padding: 5px 10px;
+    background-color: #cfaa40;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 1.4rem;
+    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    line-height: 16px;
+    margin-right: 12px;
+  }
+  
   .tpl-commerce-shop .cm-shop__profile .profile__bio {
     margin: 20px 0 30px;
   }

@@ -28,8 +28,8 @@
     <div class="card__footer">
         <div class="card__actions">
 
-                <a href="#"><span>View HubShop</span></a>
-                <a href="#"><span>Interview</span></a>
+                <!-- <a href="#"><span>View HubShop</span></a> -->
+                <!-- <a href="#"><span>Interview</span></a> -->
                 
                 @if (Auth::user())
                     @if (Auth::user()->id != $employee->id)
@@ -41,7 +41,7 @@
                     <a href="{{ route('login') }}"><span>Message</span></a>
                 @endif
 
-                <a href="#"><span>Video</span></a>
+                <!-- <a href="#"><span>Video</span></a> -->
         </div>
     </div>
 </div>
