@@ -202,12 +202,10 @@ class ZoomMeetingController extends Controller
         $zoomMeeting        = ZoomMeeting::where('id', $id)->where('workspace_id', $currentWorkspace->id)->first();
 
         if ($zoomMeeting) {
-            // Видалення мітингу на стороні Zoom
             try {
                 $zoomDeleted = $this->delete($zoomMeeting->meeting_id, $slug);
     
                 if ($zoomDeleted['success']) {
-                    // Видалення запису з бази даних
                     $zoomMeeting->delete();
 
                     return redirect()->back()->with('success', __('Meeting deleted successfully.'));
