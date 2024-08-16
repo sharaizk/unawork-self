@@ -23,7 +23,7 @@ class ZoomMeeting extends Model
     {
         $project = Project::select('id', 'name')->where('id', $this->project_id)->first();
 
-        return $project ? $project->name : '';
+        return $project ? $project->name : null;
     }
 
     public function getMembers(){
@@ -59,4 +59,9 @@ class ZoomMeeting extends Model
        public function getUserName(){
         return $this->hasOne('App\Models\User', 'id', 'member_ids');
        }
+
+    public function workspace()
+    {
+        return $this->hasOne('App\Models\Workspace', 'id', 'workspace_id');
+    }
 }

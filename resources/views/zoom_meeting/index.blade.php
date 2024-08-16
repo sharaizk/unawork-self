@@ -74,8 +74,7 @@
                             <thead>
                                 <tr>
                                     <th> {{ __('Title') }} </th>
-
-
+                                    <th> {{ __('Workspace') }} </th>
                                     <th> {{ __('Project') }} </th>
                                     <th> {{ __('Members') }} </th>
                                     @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
@@ -94,7 +93,8 @@
                                 @forelse ($meetings as $item)
                                     <tr>
                                         <td>{{ $item->title }}</td>
-                                        <td>{{ $item->project_name }}</td>
+                                        <td>{{ $item->workspace  ? $item->workspace->name : '---' }}</td>
+                                        <td>{{ $item->project_name  ? $item->project_name : '---' }}</td>
                                         <td>
                                             <div class="user-group">
                                                 @foreach ($item->getMembers() as $user)
@@ -191,4 +191,28 @@
 @endsection
 
 @push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Змінна для фільтрації
+        const filterInput = document.getElementById('projectFilter');
+
+        // Функція фільтрації
+        function filterTable() {
+            const filterValue = filterInput.value.toLowerCase();
+            const rows = document.querySelectorAll('#meetingsTableBody tr');
+
+            rows.forEach(row => {
+                const projectName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                if (projectName.includes(filterValue)) {
+                    row.style.display = ''; // Показати рядок
+                } else {
+                    row.style.display = 'none'; // Сховати рядок
+                }
+            });
+        }
+
+        // Прив'язка фільтрації до події введення
+        filterInput.addEventListener('input', filterTable);
+    });
+</script>
 @endpush

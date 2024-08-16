@@ -17,6 +17,7 @@
                 {{ Form::label('projects', __('Projects'), ['class' => 'col-form-label']) }}
                 <select name="project_id" id="project_id" class="form-control" data-toggle="select" tabindex="2" required>
                     <option value="" disabled selected>{{ __('Select Project') }}</option>
+                    <option value="workspace">{{ __('Workspace users') }}</option>
                     @foreach($projects as $id => $name)
                         <option value="{{ $id }}">{{ $name }}</option>
                     @endforeach
@@ -74,11 +75,13 @@
         var workspace_id = "{{ $currentWorkspace->id }}";
 
         function getMembers(project_id) {
-
-            
-
             $.get("{{ route('projects.members', ['workspace_id ', 'project_id']) }}".replace('workspace_id',
                 workspace_id).replace('project_id', project_id), function(data) {
+                insertInfo(data);
+            });
+        }
+
+        function insertInfo(data) {               
                 var list = '';
                 $('.js-data-example-ajax').empty();
                 if (data.length > 0) {
@@ -86,7 +89,6 @@
                 } else {
                     list += "<option value=''> {{ __('No Projects') }} </option>";
                 }
-
                 $("#members-div").html('');
                 $('#members-div').append('<select class="form-control" id="members" name="members[]" multiple></select>');
 
@@ -98,16 +100,21 @@
                 var multipleCancelButton = new Choices(
                     '#members', {
                         removeItemButton: true,
-
                     }
                 );
-
                 // $('#members').Choices();
-            });
         }
+
         $("#project_id").change(function() {
-            var project_id = $(this).val();
-            getMembers(project_id);
+            if ($(this).val() == "workspace") {
+                var members = @json($currentWorkspace->users->map(function($user) {
+                    return ['id' => $user->id, 'name' => $user->name];
+                }));
+                insertInfo(members);
+            } else {
+                var project_id = $(this).val();
+                getMembers(project_id);
+            }
         });
     });
 
