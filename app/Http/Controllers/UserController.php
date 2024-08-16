@@ -605,7 +605,6 @@ class UserController extends Controller
                 $employeeWorkspace->name = $request->name;
                 $employeeWorkspace->save();
             } catch (\Exception $e) {
-                // Обробка будь-яких інших виключень
                 return response()->json(['error' => 'An error occurred while updating the workspace'], 500);
             }
         }

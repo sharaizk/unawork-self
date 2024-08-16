@@ -25,8 +25,8 @@ class StorePodRequest extends FormRequest
             'title' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'nullable|string|max:2048',
-            'skills' => 'nullable|array', // Додаємо валідацію для скілів
-            'skills.*' => 'integer|exists:skills,id' // Перевірка, що кожен скіл існує в таблиці skills
+            'skills' => 'nullable|array',
+            'skills.*' => 'integer|exists:skills,id'
         ];
     }
 }
