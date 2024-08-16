@@ -1,7 +1,7 @@
 <div class="hire-card">
     <div class="card__header">
-        <div class="card__image" class=">
-                <img @if ($employee->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $employee->avatar, 'small') }}" @else avatar="{{ $employee->name }}" @endif alt="">
+        <div class="card__image" class="">
+                <img @if($employee->avatar)  src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $employee->avatar, 'small') }}" @else avatar="{{ $employee->name }}" @endif alt="">
         </div>
         <div class="card__title">
             <a href="{{ route('employee.show', ['employee' => $employee->id]) }}">{{$employee->name}}</a>
