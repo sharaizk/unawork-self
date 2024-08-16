@@ -99,7 +99,7 @@
                                             <div class="user-group">
                                                 @foreach ($item->getMembers() as $user)
                                                     <a href="#" class="img_group" data-toggle="tooltip"
-                                                        data-placement="top" title=""
+                                                        data-placement="top" title="{{ $user->name }}"
                                                         data-original-title="{{ $user->name }}">
                                                         <img alt="{{ $user->name }}"
                                                             @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif>
