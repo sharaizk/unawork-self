@@ -57,7 +57,14 @@
                         </nav>
                     </nav>
                     {{-- Search input --}}
-                    <input type="text" class="messenger-search" placeholder="{{ __('Search') }}" />
+                    <div class="row w-100 d-flex justify-content-end">
+                        <div class="col-lg-10 p-0">
+                            <input type="text" class="messenger-search" placeholder="{{ __('Search') }}" />
+                        </div>
+                        <div class="col-lg-2 p-0 d-flex justify-content-end">
+                            <button class="btn btn-sm btn-primary"> + </button>
+                        </div>
+                    </div>
                     {{-- Tabs --}}
                     <div class="messenger-listView-tabs">
                         <a href="#" @if ($route == 'user') class="active-tab" @endif data-view="users">
