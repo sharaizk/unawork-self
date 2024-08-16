@@ -109,7 +109,7 @@ $profile_img  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'
                 <h5 class="modal-title">Create new chat</h5>
             </div>
             <form action="{{ route('chat.create') }}" method="POST">
-                @csrf <!-- додаємо CSRF токен -->
+                @csrf
                 <div class="app-modal-body">
                     <div class="form-group col-md-12">
                         <label for="name" class="col-form-label">{{ __('Thread name') }}</label>

@@ -124,7 +124,7 @@
 
 <script>
     $(document).on('shown.bs.modal', function () {
-        // Перевіряємо наявність форми перед прив'язкою обробників
+        // check form
         if ($('#createProjectForm, #editProjectForm').length) {
             $('#addCategoryButton').off('click').on('click', function() {
                 $('#newCategoryInput').show();

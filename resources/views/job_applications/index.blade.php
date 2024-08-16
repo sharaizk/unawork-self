@@ -144,13 +144,13 @@
             $('#descriptionModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget); // Button that triggered the modal
                 var description = button.data('description'); // Extract info from data-* attributes
-                var name = button.data('name'); // Ім'я користувача
-                var profileUrl = button.data('profile-url'); // Посилання на профіль
+                var name = button.data('name'); // user name
+                var profileUrl = button.data('profile-url'); // profile limk
 
                 var modal = $(this);
                 modal.find('.modal-body #fullDescriptionText').text(description);
-                modal.find('.modal-body #applicantName').text(name); // Встановити ім'я користувача
-                modal.find('.modal-footer #viewProfileButton').attr('href', profileUrl); // Встановити посилання на профіль
+                modal.find('.modal-body #applicantName').text(name); // set user name
+                modal.find('.modal-footer #viewProfileButton').attr('href', profileUrl); // set user link
             });
         });
     </script>

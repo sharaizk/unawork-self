@@ -193,10 +193,10 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Змінна для фільтрації
+        // filtration
         const filterInput = document.getElementById('projectFilter');
 
-        // Функція фільтрації
+        // filter func
         function filterTable() {
             const filterValue = filterInput.value.toLowerCase();
             const rows = document.querySelectorAll('#meetingsTableBody tr');
@@ -204,14 +204,14 @@
             rows.forEach(row => {
                 const projectName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
                 if (projectName.includes(filterValue)) {
-                    row.style.display = ''; // Показати рядок
+                    row.style.display = ''; // show row
                 } else {
-                    row.style.display = 'none'; // Сховати рядок
+                    row.style.display = 'none'; // hide row
                 }
             });
         }
 
-        // Прив'язка фільтрації до події введення
+        // filter
         filterInput.addEventListener('input', filterTable);
     });
 </script>
