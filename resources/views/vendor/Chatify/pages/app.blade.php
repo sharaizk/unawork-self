@@ -62,7 +62,7 @@
                             <input type="text" class="messenger-search" placeholder="{{ __('Search') }}" />
                         </div>
                         <div class="col-lg-2 p-0 d-flex justify-content-end">
-                            <button class="btn btn-sm btn-primary"> + </button>
+                            <button class="btn btn-sm btn-primary newChatBtn"> + </button>
                         </div>
                     </div>
                     {{-- Tabs --}}

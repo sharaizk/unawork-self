@@ -74,6 +74,7 @@ use App\Http\Controllers\PodNewsController;
 use App\Http\Controllers\PodUserController;
 use App\Http\Controllers\ProjectUserController;
 use App\Http\Controllers\JobVacancyController;
+use App\Http\Controllers\MessagesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/workspace/{workspace}/users/{user}/edit-permissions', [WorkspaceController::class, 'editPermissions'])->name('workspace.users.editPermissions');
     Route::put('/workspace/{workspace}/users/{user}', [WorkspaceController::class, 'updatePermissions'])->name('workspace.users.updatePermissions');
 
+    Route::post('/account/create-chat', [MessagesController::class, 'createChat'])->name('chat.create');
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

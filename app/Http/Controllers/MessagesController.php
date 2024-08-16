@@ -11,6 +11,7 @@ use App\Models\CmgmyrMessenger\Message as CustomMessage;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 use App\Models\User;
 use App\Models\Utility;
+use App\Services\ChatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Str;
@@ -68,7 +69,24 @@ class MessagesController extends Controller
         }
     }
 
+    public function createChat(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'users' => 'required|array',
+            'users.*' => 'exists:users,id', 
+        ]);
 
+        $name = $request->input('name');
+        $users = $request->input('users');
+        
+        $message = 'Chat created';
+
+        $chatService = new ChatService ;
+        $thread = $chatService->createGroupChat($name, $users, $message);
+
+        return redirect()->back()->with('success', 'Chat created successfully');
+    }
 
     public function idFetchData(Request $request)
     {
