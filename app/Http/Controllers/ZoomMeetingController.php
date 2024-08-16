@@ -83,7 +83,6 @@ class ZoomMeetingController extends Controller
      */
     public function store($slug, Request $request)
     {
-
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $client_ids = ClientProject::getByProjects($request->project_id);
 
