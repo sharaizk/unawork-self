@@ -33,28 +33,21 @@
         </div>
         </div>
          <div class="row">
-        <div class="col-md-6 ">
-            <div class="form-group">
-                <label><b>{{__('Client Name')}}</b></label>
-                <p>{{!empty($ZoomMeeting->client_id)?$ZoomMeeting->getclientname->name:'' }}  </p>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label><b>{{__('Date')}}</b></label>
+                    <p>{{App\Models\Utility::dateFormat($ZoomMeeting->start_date)}}</p>
+                </div>
             </div>
-        </div>
-    
-  
-        <div class="col-md-6">
-            <div class="form-group">
-                <label><b>{{__('Date')}}</b></label>
-                <p>{{App\Models\Utility::dateFormat($ZoomMeeting->start_date)}}</p>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label><b>{{__('Time')}}</b></label>
+                    <p>{{$ZoomMeeting->start_date}}</p>
+                </div>
             </div>
-        </div>
         </div>
         <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label><b>{{__('Time')}}</b></label>
-                <p>{{$ZoomMeeting->start_date}}</p>
-            </div>
-        </div>
     
     
         <div class="col-md-6">

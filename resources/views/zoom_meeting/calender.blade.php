@@ -36,6 +36,11 @@
 @endsection
 
 @section('content')
+<style>
+    .meeting-item:hover {
+        background-color: #f0f0f0;
+    }
+</style>
     <div class="row">
         <!-- [ sample-page] start -->
         <div class="col-lg-8">
@@ -72,23 +77,27 @@
                                 $year =date('y', strtotime($meeting->start_date));
                             @endphp
                             @if (($date == $month) && ($date1 == $year))
-                                <li class="list-group-item card mb-3">
-                                    <div class="row align-items-center justify-content-between">
-                                        <div class="col-auto mb-3 mb-sm-0">
-                                            <div class="d-flex align-items-center">
-                                                <div class="theme-avtar bg-primary">
-                                                    <i class="fa fa-tasks"></i>
-                                                </div>
-                                                <div class="ms-3">
-                                                    <h6 class="m-0">{{ $meeting->title }}</h6>
-                                                    <small class="text-muted">{{ $meeting->start_date }} </small>
-                                                </div>
+                                    <a href="" data_title="{{ $meeting->title }}"
+                                            data_url="{{ route('zoom_meeting.show', ['slug' => $currentWorkspace->slug, 'id' => $meeting->id]) }}"
+                                            data_ajax_popup="true"
+                                            data_size="lg">
+                                        <li class="list-group-item card mb-3 meeting-item">
+                                            <div class="row align-items-center justify-content-between">
+                                                <div class="col-auto mb-3 mb-sm-0">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="theme-avtar bg-primary">
+                                                            <i class="fa fa-tasks"></i>
+                                                        </div>
+                                                        <div class="ms-3">
+                                                            <h6 class="m-0">{{ $meeting->title }}</h6>
+                                                            <small class="text-muted">{{ $meeting->start_date }} </small>
+                                                        </div>
 
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                    </div>
-                                </li>
+                                        </li>
+                                    </a>
                             @endif
                         @endforeach
                     </ul>
@@ -96,6 +105,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @if ($currentWorkspace)
@@ -103,11 +113,20 @@
     @endpush
     @push('scripts')
 
-    <script src="{{ asset('assets/js/plugins/main.min.js') }}"></script>
+    <!-- <script src="{{ asset('assets/custom/js/fullcalendar.min.js') }}"></script> -->
+    <!-- <script src="{{ asset('assets/js/plugins/main.min.js') }}"></script> -->
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@5.11.5/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@5.11.5/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.5/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.11.5/main.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function()
         {
+            console.log(FullCalendar.version);
             get_data();
+
         });
         function get_data()
         {
@@ -117,10 +136,11 @@
                 method:"POST",
                 data: {"_token": "{{ csrf_token() }}",'calender_type':calender_type},
                 success: function(data) {
+                    console.log(data);
                     (function() {
-                        var etitle;
-                        var etype;
-                        var etypeclass;
+                        // var etitle;
+                        // var etype;
+                        // var etypeclass;
                         var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                             headerToolbar: {
                                 left: 'prev,next today',
@@ -141,14 +161,18 @@
                             themeSystem: 'bootstrap',
                             slotDuration: '00:10:00',
                             navLinks: true,
-                            droppable: true,
+                            droppable: false,
                             selectable: true,
                             selectMirror: true,
-                            editable: true,
+                            editable: false,
                             dayMaxEvents: true,
                             handleWindowResize: true,
                             height: 'auto',
-                            timeFormat: 'H(:mm)',
+                            eventTimeFormat: {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            },
                             events: data,
                         });
                         calendar.render();
