@@ -1,4 +1,9 @@
-
+<style>
+    .img_group img:hover {
+            z-index: 5;
+            cursor: default;
+        }
+</style>
 <div class="form-body px-5">
     <div class="row">
         
@@ -73,7 +78,7 @@
                                 data-original-title="{{ $user->name }}">
                                 <img alt="{{ $user->name }}"
                                     @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif
-                                    style="border-radius: 50%; height: 25px; width: 25px; object-fit: cover;">
+                                    style="border-radius: 50%; height: 25px; width: 25px; object-fit: cover; position: relative;">
                             </a>
                         @endforeach
                     @else
