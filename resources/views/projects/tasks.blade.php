@@ -54,7 +54,7 @@
         </div>
         @if ($currentWorkspace->permission == 'Owner')
             <div class="col-sm-6 col-xl-2 pb-2">
-                <select class="select2 form-select" name="all_users" id="all_users">
+                <select class="form-select" name="all_users" id="all_users">
                     <option value="" class="px-4">{{ __('All Users') }}</option>
                     @foreach ($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -63,7 +63,7 @@
             </div>
         @endif
         <div class="col-sm-6 col-xl-2 pb-2">
-            <select class="select2 form-select" name="status" id="status">
+            <select class="form-select" name="status" id="status">
                 <option value="" class="px-4">{{ __('All Status') }}</option>
                 @foreach ($stages as $stage)
                     <option value="{{ $stage->id }}">{{ __($stage->name) }}</option>
@@ -71,7 +71,7 @@
             </select>
         </div>
         <div class="col-sm-6 col-xl-2 pb-2">
-            <select class="select2 form-select"  name="priority" id="priority">
+            <select class="form-select"  name="priority" id="priority">
                 <option value="" class="px-4">{{ __('All Priority') }}</option>
                 <option value="Low">{{ __('Low') }}</option>
                 <option value="Medium">{{ __('Medium') }}</option>

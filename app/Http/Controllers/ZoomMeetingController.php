@@ -50,7 +50,7 @@ class ZoomMeetingController extends Controller
                 ->get();
             }
 
-            $this->statusUpdate($slug);
+            // $this->statusUpdate($slug);
 
             return view('zoom_meeting.index', compact('meetings', 'currentWorkspace'));
 

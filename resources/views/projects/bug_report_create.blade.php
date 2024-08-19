@@ -17,7 +17,7 @@
 
             <div class="form-group col-md-4">
                 <label for="task-priority" class="col-form-label">{{ __('Priority')}}</label>
-                <select class="form-control select2" name="priority" id="task-priority" required>
+                <select class="form-control select" name="priority" id="task-priority" required>
                     <option value="Low">{{ __('Low')}}</option>
                     <option value="Medium">{{ __('Medium')}}</option>
                     <option value="High">{{ __('High')}}</option>
@@ -25,7 +25,7 @@
             </div>
             <div class="form-group col-md-6">
                 <label for="assign_to" class="col-form-label">{{ __('Assign To')}}</label>
-                <select class="form-control select2" id="assign_to" name="assign_to" required>
+                <select class="form-control select" id="assign_to" name="assign_to" required>
                     @foreach($users as $u)
                         <option value="{{$u->id}}">{{$u->name}} - {{$u->email}}</option>
                     @endforeach
@@ -33,7 +33,7 @@
             </div>
             <div class="form-group col-md-6">
                 <label for="status" class="col-form-label">{{ __('Status')}}</label>
-                <select class="form-control select2" id="status" name="status" required>
+                <select class="form-control select" id="status" name="status" required>
                     @foreach($arrStatus as $id => $status)
                         <option value="{{$id}}">{{__($status)}}</option>
                     @endforeach

@@ -363,7 +363,7 @@
                 <div class="col-sm-12 mt-3 mb-1 row d-sm-flex align-items-center justify-content-end" id="show_filter">
                     @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
                         <div class="col-sm-6 col-md-3 pb-3">
-                            <select class="select2 form-select" name="all_users" id="all_users">
+                            <select class="select form-select" name="all_users" id="all_users">
                                 <option value="" class="px-4">{{ __('All Users') }}</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -373,7 +373,7 @@
                     @endif
 
                     <div class="col-sm-6 col-md-2 pb-3">
-                        <select class="select2 form-select" name="milestone_id" id="milestone_id">
+                        <select class="select form-select" name="milestone_id" id="milestone_id">
                             <option value="" class="px-4">{{ __('All Milestones') }}</option>
                             @foreach ($milestones as $milestone)
                                 <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
@@ -381,7 +381,7 @@
                         </select>
                     </div>
                     <div class="col-sm-6 col-md-3 pb-3">
-                        <select class="select2 form-select" name="status" id="status">
+                        <select class="select form-select" name="status" id="status">
                             <option value="" class="px-4">{{ __('All Status') }}</option>
                             @foreach ($stages as $stage)
                                 <option value="{{ $stage->id }}">{{ __($stage->name) }}</option>
@@ -389,7 +389,7 @@
                         </select>
                     </div>
                     <div class="col-sm-6 col-md-2 pb-3">
-                        <select class="select2 form-select" name="priority" id="priority">
+                        <select class="select form-select" name="priority" id="priority">
                             <option value="" class="px-4">{{ __('All Priority') }}</option>
                             <option value="Low">{{ __('Low') }}</option>
                             <option value="Medium">{{ __('Medium') }}</option>
