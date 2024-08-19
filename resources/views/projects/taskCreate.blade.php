@@ -16,7 +16,7 @@
 
                 <div class="form-group col-md-8">
                     <label class="col-form-label">{{ __('Project') }}</label>
-                    <select class="form-control form-control-light select2" name="project_id" required>
+                    <select class="form-control form-control-light select" name="project_id" required>
 
                         @if ($projectID != null) 
                         <option value="{{ $project->id }}">{{ $project->name }}</option>
@@ -31,7 +31,7 @@
                 <div class="form-group col-md-4">
                     <label class="col-form-label">{{ __('Milestone') }}</label>
                     <div class="input-group">
-                        <select class="form-control form-control-light select2" name="milestone_id" id="task-milestone" required>
+                        <select class="form-control form-control-light select" name="milestone_id" id="task-milestone" required>
                             <option value="">{{ __('Select Milestone') }}</option>
                             @foreach ($project->milestones as $milestone)
                                 <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
@@ -54,7 +54,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label class="col-form-label">{{ __('Priority') }}</label>
-                    <select class="form-control form-control-light select2" name="priority" id="task-priority" required>
+                    <select class="form-control form-control-light select" name="priority" id="task-priority" required>
                         <option value="Low">{{ __('Low') }}</option>
                         <option value="Medium">{{ __('Medium') }}</option>
                         <option value="High">{{ __('High') }}</option>

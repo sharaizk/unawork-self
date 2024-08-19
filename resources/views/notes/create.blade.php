@@ -28,7 +28,7 @@ else{
         </div>
         <div class="col-md-12">
             <label for="color" class="col-form-label">{{__('Color')}}</label>
-            <select class="form-control select2" name="color" id="color" required>
+            <select class="form-control select" name="color" id="color" required>
                 <option value="bg-primary">{{ __('Primary')}}</option>
                 <option value="bg-secondary">{{ __('Secondary')}}</option>
                 <option value="bg-info">{{ __('Info')}}</option>
