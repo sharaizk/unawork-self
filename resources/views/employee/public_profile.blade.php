@@ -133,7 +133,7 @@
               <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
             </div>
             <div class="aside__card__actions">
-              <button>
+              <button data-bs-toggle="modal" data-bs-target="#newMeetingPopup">
                 <span>
                   <img src="{{ asset('assets/images/landing/icon-video.png') }}" alt="">
                   Start Now
@@ -186,6 +186,39 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="inviteUser">Send</button>
       </div>
+    </div>
+  </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Meeting</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
+        @csrf
+        <div class="modal-body">
+          <input type="hidden" name="members[0]" value="{{ $employee->id }}">
+          <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" id="title" class="form-control" placeholder="Title" required>
+          </div>
+          <div class="mb-3">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="datetime-local" name="start_date" id="start_date" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input type="number" name="duration" id="duration" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Create Meeting</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

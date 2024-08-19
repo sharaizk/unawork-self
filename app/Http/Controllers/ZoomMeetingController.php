@@ -41,10 +41,13 @@ class ZoomMeetingController extends Controller
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
             } elseif ($currentWorkspace->permission == 'Owner' || $userWorkspace->hasPermissionTo(UserWorkspacePermission::ZOOM_MEETING_INDEX->value)) {
                 $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
+                            ->orwhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
                         // ->where('created_by', \Auth::user()->id)
                         ->get();
             } else {
-                $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")->where('workspace_id', $currentWorkspace->id)->get();
+                $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                // ->where('workspace_id', $currentWorkspace->id)
+                ->get();
             }
 
             $this->statusUpdate($slug);
@@ -80,7 +83,6 @@ class ZoomMeetingController extends Controller
      */
     public function store($slug, Request $request)
     {
-
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $client_ids = ClientProject::getByProjects($request->project_id);
 

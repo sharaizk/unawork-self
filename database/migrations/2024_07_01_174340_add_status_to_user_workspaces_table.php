@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_workspaces', function (Blueprint $table) {
-            $table->dropColumn('status'); // Видаляємо колонку 'status' при відкаті міграції
+            $table->dropColumn('status'); 
         });
     }
 };

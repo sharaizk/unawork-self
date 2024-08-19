@@ -74,8 +74,7 @@
                             <thead>
                                 <tr>
                                     <th> {{ __('Title') }} </th>
-
-
+                                    <th> {{ __('Workspace') }} </th>
                                     <th> {{ __('Project') }} </th>
                                     <th> {{ __('Members') }} </th>
                                     @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
@@ -94,12 +93,13 @@
                                 @forelse ($meetings as $item)
                                     <tr>
                                         <td>{{ $item->title }}</td>
-                                        <td>{{ $item->project_name }}</td>
+                                        <td>{{ $item->workspace  ? $item->workspace->name : '---' }}</td>
+                                        <td>{{ $item->project_name  ? $item->project_name : '---' }}</td>
                                         <td>
                                             <div class="user-group">
                                                 @foreach ($item->getMembers() as $user)
                                                     <a href="#" class="img_group" data-toggle="tooltip"
-                                                        data-placement="top" title=""
+                                                        data-placement="top" title="{{ $user->name }}"
                                                         data-original-title="{{ $user->name }}">
                                                         <img alt="{{ $user->name }}"
                                                             @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif>
@@ -191,4 +191,28 @@
 @endsection
 
 @push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // filtration
+        const filterInput = document.getElementById('projectFilter');
+
+        // filter func
+        function filterTable() {
+            const filterValue = filterInput.value.toLowerCase();
+            const rows = document.querySelectorAll('#meetingsTableBody tr');
+
+            rows.forEach(row => {
+                const projectName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                if (projectName.includes(filterValue)) {
+                    row.style.display = ''; // show row
+                } else {
+                    row.style.display = 'none'; // hide row
+                }
+            });
+        }
+
+        // filter
+        filterInput.addEventListener('input', filterTable);
+    });
+</script>
 @endpush

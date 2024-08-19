@@ -100,3 +100,45 @@ $profile_img  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'
         </div>
     </div>
 </div>
+
+{{-- ---------------------- Create chat modal ---------------------- --}}
+<div class="app-modal m-header-create-chat" data-name="create">
+    <div class="app-modal-container">
+        <div class="app-modal-card" data-name='create' data-modal='0'>
+            <div class="app-modal-header">
+                <h5 class="modal-title">Create new chat</h5>
+            </div>
+            <form action="{{ route('chat.create') }}" method="POST">
+                @csrf
+                <div class="app-modal-body">
+                    <div class="form-group col-md-12">
+                        <label for="name" class="col-form-label">{{ __('Thread name') }}</label>
+                        <input type="text" id="name" name="name" placeholder="Enter thread name" class="form-control" required>
+                    </div>
+                    @php
+                        $objUser = \Auth::user();
+                        $workspace = $objUser->currentWorkspace;
+                        $users = $workspace->users
+                    @endphp
+                    <div class="form-group col-md-12">
+                        <label for="selectUsersItem" class="col-form-label">{{ __('Users') }}</label>
+                        <select id="selectUsersItem" name="users[]" class="form-control selectUsersItem" multiple required>
+                            @foreach ($users as $user)
+                                @php
+                                    $userWorkspace = \App\Models\UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+                                @endphp
+                                @if ($userWorkspace->hasPermissionTo('zoom_meeting_index') && $objUser->id != $user->id)
+                                    <option value="{{$user->id}}">{{$user->email}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="app-modal-footer">
+                    <a href="javascript:void(0)" class="app-btn cancel">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

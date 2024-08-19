@@ -124,6 +124,17 @@
         }
     </script>
 
+    @if (Session::has('success'))
+        <script>
+            showNotification('{!! session('success') !!}', 'success');
+        </script>
+    @endif
+    @if (Session::has('error'))
+        <script>
+            showNotification('{!! session('error') !!}', 'error');
+        </script>
+    @endif
+
 @yield('scripts')
 
 </body>

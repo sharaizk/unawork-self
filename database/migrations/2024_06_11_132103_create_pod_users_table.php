@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('reason')->nullable();
             $table->timestamps();
 
-            // Додаємо зовнішні ключі
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('pod_id')->references('id')->on('pods')->onDelete('cascade');
         });
