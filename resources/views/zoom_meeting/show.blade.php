@@ -59,9 +59,27 @@
     <div class="row">
         <div class="col-md-6 ">
             <div class="form-group">
-                <label><b>{{__('User Name')}}</b></label>
+                <label><b>{{__('Users')}}</b></label>
+                <p class="ms-3">
+                    @php
+                        $users = $ZoomMeeting->getUserName();
+                        $logo = \App\Models\Utility::get_file('users-avatar/');
+                    @endphp
 
-                <p>{{!empty($ZoomMeeting->member_ids)?$ZoomMeeting->getUserName->name:'' }}</p>
+                    @if($users->isNotEmpty())
+                        @foreach($users as $user)
+                            <a class="avatar rounded-circle avatar-sm img_group"
+                                data-toggle="tooltip" data-placement="top" title="{{ $user->name }}"
+                                data-original-title="{{ $user->name }}">
+                                <img alt="{{ $user->name }}"
+                                    @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" @else avatar="{{ $user->name }}" @endif
+                                    style="border-radius: 50%; height: 25px; width: 25px; object-fit: cover;">
+                            </a>
+                        @endforeach
+                    @else
+                        {{ __('No users assigned') }}
+                    @endif
+                </p>
             </div>
         </div>
         <div class="col-md-6">
