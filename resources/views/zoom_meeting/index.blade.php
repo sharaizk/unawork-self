@@ -23,6 +23,7 @@
 
         .user-group img:hover {
             z-index: 5;
+            cursor: default;
         }
 
         table .user-group img {
