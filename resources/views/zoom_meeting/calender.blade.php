@@ -124,7 +124,6 @@
     <script type="text/javascript">
         $(document).ready(function()
         {
-            console.log(FullCalendar.version);
             get_data();
 
         });
@@ -136,7 +135,6 @@
                 method:"POST",
                 data: {"_token": "{{ csrf_token() }}",'calender_type':calender_type},
                 success: function(data) {
-                    console.log(data);
                     (function() {
                         // var etitle;
                         // var etype;
