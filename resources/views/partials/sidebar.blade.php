@@ -126,7 +126,7 @@
                                             <span class="dash-mtext">{{ __('Users') }}</span>
                                         </a>
                                     </li>
-                                    @if ($currentWorkspace->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value))
+                                    @if ($currentWorkspace->created_by == Auth::user()->id || ($userWorkspace && $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value)))
                                     <li class="dash-item dash-hasmenu">
                                             @php
                                                 $currentRoute = Request::route()->getName();
