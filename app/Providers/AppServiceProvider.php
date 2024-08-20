@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Chatify\Http\Controllers\MessagesController;
 use App\Http\Controllers\MessagesController as AppMessagesController;
+use App\Models\Workspace;
+use App\Observers\WorkspaceObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +30,6 @@ class AppServiceProvider extends ServiceProvider
     {
        Schema::defaultStringLength(191);
        $this->app->bind(MessagesController::class, AppMessagesController::class);
+       Workspace::observe(WorkspaceObserver::class);
     }
 }
