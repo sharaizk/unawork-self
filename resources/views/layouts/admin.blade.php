@@ -14,6 +14,10 @@
         // $SITE_RTL = env('SITE_RTL');
         $SITE_RTL = $setting['site_rtl'];
     } else {
+        if (!$currentWorkspace) {
+            $AuthUser = Auth::user();
+            $currentWorkspace = $AuthUser->updateCurrentWorkspace();
+        }
         $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
         // $plan = App\Models\Plan::find(Auth::user()->plan);
         $color = $setting->theme_color;

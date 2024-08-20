@@ -51,14 +51,14 @@ class ZoomMeeting extends Model
     }
 
 
-      public function getclientname(){
-
+    public function getclientname(){
        return $this->hasOne('App\Models\Client', 'id', 'client_id');
     }
 
-       public function getUserName(){
-        return $this->hasOne('App\Models\User', 'id', 'member_ids');
-       }
+    public function getUserName(){
+        $memberIds = explode(',', $this->member_ids);
+        return User::whereIn('id', $memberIds)->get();
+    }
 
     public function workspace()
     {

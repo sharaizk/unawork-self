@@ -40,6 +40,9 @@
     .meeting-item:hover {
         background-color: #f0f0f0;
     }
+    .fc-event, .fc-event:hover {
+        cursor: pointer;
+    }
 </style>
     <div class="row">
         <!-- [ sample-page] start -->

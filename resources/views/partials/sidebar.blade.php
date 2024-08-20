@@ -14,12 +14,22 @@
                $adminSetting['enable_chat'] = 'on';
                
            } else {
-               if (!is_null(Auth::user()->currant_workspace)) {
-                $currentWorkspace = \App\Models\Workspace::find(Auth::user()->currant_workspace);
+               $AuthUser = Auth::user();
+               if (!is_null($AuthUser->currant_workspace)) {
+                $currentWorkspace = \App\Models\Workspace::find($AuthUser->currant_workspace);
                }
 
-                $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+               if (!$currentWorkspace) {
+                $currentWorkspace = $AuthUser->updateCurrentWorkspace();
+               }
                 
+               $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
+                
+                if (!$userWorkspace) {
+                    $currentWorkspace = $AuthUser->updateCurrentWorkspace();
+                    $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
+                }
+
                $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
                $color = $setting->theme_color;
                $dark_mode = $setting->cust_darklayout;
@@ -126,19 +136,19 @@
                                             <span class="dash-mtext">{{ __('Users') }}</span>
                                         </a>
                                     </li>
-                                    @if ($currentWorkspace->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value))
-                                    <li class="dash-item dash-hasmenu">
-                                            @php
-                                                $currentRoute = Request::route()->getName();
-                                            @endphp
-                                        <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
-                                            class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
-                                                    <span class="dash-micon"> 
-                                                        <i data-feather="clipboard"></i>
-                                                    </span>
-                                                <span class="dash-mtext">{{ __('News') }}</span>
-                                            </a>
-                                    </li>
+                                    @if ($currentWorkspace->created_by == Auth::user()->id || ($userWorkspace && $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value)))
+                                        <li class="dash-item dash-hasmenu">
+                                                @php
+                                                    $currentRoute = Request::route()->getName();
+                                                @endphp
+                                            <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
+                                                class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
+                                                        <span class="dash-micon"> 
+                                                            <i data-feather="clipboard"></i>
+                                                        </span>
+                                                    <span class="dash-mtext">{{ __('News') }}</span>
+                                                </a>
+                                        </li>
                                     @endif
                                 @else
                                 <li class="dash-item dash-hasmenu">
