@@ -126,6 +126,13 @@ class PodUserService
 
         self::detachUserFromWorkspaceProjects($workspace, $userId);
 
+        $user = User::find($userId);
+        if ($user->currant_workspace == $workspace->id) {
+            $currentWorkspace = $user->workspacesOwner()->first();
+            $user->currant_workspace = $currentWorkspace->id;
+            $user->update();
+        }
+
         $workspace->users()->detach($userId);
     }
 
