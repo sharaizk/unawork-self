@@ -127,18 +127,18 @@
                                         </a>
                                     </li>
                                     @if ($currentWorkspace->created_by == Auth::user()->id || ($userWorkspace && $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value)))
-                                    <li class="dash-item dash-hasmenu">
-                                            @php
-                                                $currentRoute = Request::route()->getName();
-                                            @endphp
-                                        <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
-                                            class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
-                                                    <span class="dash-micon"> 
-                                                        <i data-feather="clipboard"></i>
-                                                    </span>
-                                                <span class="dash-mtext">{{ __('News') }}</span>
-                                            </a>
-                                    </li>
+                                        <li class="dash-item dash-hasmenu">
+                                                @php
+                                                    $currentRoute = Request::route()->getName();
+                                                @endphp
+                                            <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
+                                                class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
+                                                        <span class="dash-micon"> 
+                                                            <i data-feather="clipboard"></i>
+                                                        </span>
+                                                    <span class="dash-mtext">{{ __('News') }}</span>
+                                                </a>
+                                        </li>
                                     @endif
                                 @else
                                 <li class="dash-item dash-hasmenu">
