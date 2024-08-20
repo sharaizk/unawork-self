@@ -14,11 +14,16 @@
                $adminSetting['enable_chat'] = 'on';
                
            } else {
-               if (!is_null(Auth::user()->currant_workspace)) {
-                $currentWorkspace = \App\Models\Workspace::find(Auth::user()->currant_workspace);
+               $AuthUser = Auth::user();
+               if (!is_null($AuthUser->currant_workspace)) {
+                $currentWorkspace = \App\Models\Workspace::find($AuthUser->currant_workspace);
                }
-
-                $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+               if (!$currentWorkspace) {
+                $currentWorkspace = $AuthUser->workspacesOwner()->first();
+                $AuthUser->currant_workspace = $currentWorkspace->id;
+                $AuthUser->update();
+               }
+                $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
                 
                $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
                $color = $setting->theme_color;
