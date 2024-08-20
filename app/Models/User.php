@@ -1047,6 +1047,15 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('ownerable_type', '!=', 'App\Models\Pod');
     }
 
+    public function updateCurrentWorkspace()
+    {
+        $currentWorkspace = $this->workspacesOwner()->first();
+        $this->currant_workspace = $currentWorkspace->id;
+        $this->save();
+
+        return $currentWorkspace;
+    }
+
     public function invitableWorkspaces(int $userId = null)
     {
         if ($userId) {

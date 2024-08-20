@@ -18,13 +18,18 @@
                if (!is_null($AuthUser->currant_workspace)) {
                 $currentWorkspace = \App\Models\Workspace::find($AuthUser->currant_workspace);
                }
+
                if (!$currentWorkspace) {
-                $currentWorkspace = $AuthUser->workspacesOwner()->first();
-                $AuthUser->currant_workspace = $currentWorkspace->id;
-                $AuthUser->update();
+                $currentWorkspace = $AuthUser->updateCurrentWorkspace();
                }
-                $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
                 
+               $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
+                
+                if (!$userWorkspace) {
+                    $currentWorkspace = $AuthUser->updateCurrentWorkspace();
+                    $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
+                }
+
                $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
                $color = $setting->theme_color;
                $dark_mode = $setting->cust_darklayout;

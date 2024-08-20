@@ -128,9 +128,7 @@ class PodUserService
 
         $user = User::find($userId);
         if ($user->currant_workspace == $workspace->id) {
-            $currentWorkspace = $user->workspacesOwner()->first();
-            $user->currant_workspace = $currentWorkspace->id;
-            $user->update();
+            $user->updateCurrentWorkspace();
         }
 
         $workspace->users()->detach($userId);
