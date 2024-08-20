@@ -148,14 +148,14 @@ class ZoomMeetingController extends Controller
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
-        $ZoomMeeting = ZoomMeeting::where('id', $id)->where('workspace_id', $currentWorkspace->id)->first();
+        $ZoomMeeting = ZoomMeeting::find($id);
 
-        if ($ZoomMeeting->workspace_id == $currentWorkspace->id) {
+        // if ($ZoomMeeting->workspace_id == $currentWorkspace->id) {
 
             return view('zoom_meeting.show', compact('ZoomMeeting'));
-        } else {
-            return redirect()->back()->with('error', 'permission Denied');
-        }
+        // } else {
+        //     return redirect()->back()->with('error', 'permission Denied');
+        // }
     }
 
     public function calender($slug, Request $request)
@@ -164,12 +164,17 @@ class ZoomMeetingController extends Controller
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
-        if($objUser->getGuard() == 'client'){
+        if ($objUser->getGuard() == 'client') {
             $meetings = ZoomMeeting::whereRaw("find_in_set(".\Auth::user()->id.",client_id)")->where('workspace_id',$currentWorkspace->id)->get();
-        }elseif($currentWorkspace->permission == 'Owner'){
-            $meetings = ZoomMeeting::where('created_by',\Auth::user()->id)->where('workspace_id',$currentWorkspace->id)->get();
-        }else{
-            $meetings = ZoomMeeting::whereRaw("find_in_set(".\Auth::user()->id.",member_ids)")->where('workspace_id',$currentWorkspace->id)->get();
+        } elseif ($currentWorkspace->permission == 'Owner') {
+            $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
+                            ->orwhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                        // ->where('created_by', \Auth::user()->id)
+                        ->get();
+        } else {
+            $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                // ->where('workspace_id', $currentWorkspace->id)
+                ->get();
         }
 
         $arrMeeting = [];
@@ -273,9 +278,14 @@ class ZoomMeetingController extends Controller
             if ($objUser->getGuard() == 'client') {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
             } elseif ($currentWorkspace->permission == 'Owner') {
-                $meetings = ZoomMeeting::where('created_by', \Auth::user()->id)->where('workspace_id', $currentWorkspace->id)->get();
+                $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
+                            ->orwhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                        // ->where('created_by', \Auth::user()->id)
+                        ->get();
             } else {
-                $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")->where('workspace_id', $currentWorkspace->id)->get();
+                $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                // ->where('workspace_id', $currentWorkspace->id)
+                ->get();
             }
 
             // dd($meetings);
