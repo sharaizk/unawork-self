@@ -133,7 +133,7 @@
               <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
             </div>
             <div class="aside__card__actions">
-              <button data-bs-toggle="modal" data-bs-target="#newMeetingPopup">
+              <button id="startNowButton" data-member-id="{{ $employee->id }}" data-bs-toggle="modal" data-bs-target="#newMeetingPopup">
                 <span>
                   <img src="{{ asset('assets/images/landing/icon-video.png') }}" alt="">
                   Start Now
@@ -189,42 +189,19 @@
     </div>
   </div>
 </div>
-<div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create Meeting</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
-        @csrf
-        <div class="modal-body">
-          <input type="hidden" name="members[0]" value="{{ $employee->id }}">
-          <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
-          <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" name="title" id="title" class="form-control" placeholder="Title" required>
-          </div>
-          <div class="mb-3">
-            <label for="start_date" class="form-label">Start Date</label>
-            <input type="datetime-local" name="start_date" id="start_date" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label for="duration" class="form-label">Duration (minutes)</label>
-            <input type="number" name="duration" id="duration" class="form-control" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Create Meeting</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
 @endsection
 
 @section('scripts')
+
+    <!-- set member id in modal  -->
+    <script type="text/javascript">
+        document.getElementById('startNowButton').addEventListener('click', function() {
+            var memberId = this.getAttribute('data-member-id');
+            document.getElementById('memberIdInput').value = memberId;
+        });
+    </script>
+    <!-- invite user modal + js -->
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
           const inviteUserModal = new bootstrap.Modal(document.getElementById("inviteUserPopup"));
@@ -294,6 +271,7 @@
             });
         });
     </script>
+    <!-- send message -->
     <script type="text/javascript">
         const sendMessageModal = new bootstrap.Modal(document.getElementById("sendMessagePopup"));
         document.addEventListener("DOMContentLoaded", function () {
@@ -311,7 +289,7 @@
                 let data = {
                     recipient_id: employeeId,
                     type: 'user',
-                    message: message.replace(/\s/g, ''),
+                    message: message,
                     temporaryMsgId: 'temp_1',
                     _token: '{{ csrf_token() }}'
                 };
