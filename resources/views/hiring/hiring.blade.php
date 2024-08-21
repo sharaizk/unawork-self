@@ -183,7 +183,7 @@
                 let data = {
                     recipient_id: employeeId,
                     type: 'user',
-                    message: message.replace(/\s/g, ''),
+                    message: message,
                     temporaryMsgId: 'temp_1',
                     _token: '{{ csrf_token() }}'
                 };
