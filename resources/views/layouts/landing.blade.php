@@ -76,8 +76,42 @@
             </div>
         </div>
     </div>
+    <!-- create meeting popup -->
+    <div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Meeting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                <input type="hidden" name="members[0]" value="{{ $employee->id }}">
+                <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" name="title" id="title" class="form-control" placeholder="Title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Duration (minutes)</label>
+                    <input type="number" name="duration" id="duration" class="form-control" required>
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Create Meeting</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
 
-<script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
+    <script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
     <script src="{{ asset('assets/custom/libs/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
@@ -122,6 +156,28 @@
                 notificationContainer.style.display = 'none';
             }, 3000);
         }
+    </script>
+
+    <!-- datepicker -->
+    <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
+    <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    
+    <!-- make datepicker for create meeting popup  -->
+    <script>
+            $('#newMeetingPopup').on('shown.bs.modal', function () {
+                var dateInput = $(this).find('.date');
+                dateInput.daterangepicker({
+                    "singleDatePicker": true,
+                    "timePicker": true,
+                    "locale": {
+                        "format": 'MM/DD/YYYY H:mm'
+                    },
+                    "timePicker24Hour": true,
+                }, function(start, end, label) {
+                    // console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format(
+                    //     'YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+                });
+            });
     </script>
 
     @if (Session::has('success'))

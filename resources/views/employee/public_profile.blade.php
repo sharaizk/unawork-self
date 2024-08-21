@@ -189,61 +189,12 @@
     </div>
   </div>
 </div>
-<div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create Meeting</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
-        @csrf
-        <div class="modal-body">
-          <input type="hidden" name="members[0]" value="{{ $employee->id }}">
-          <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
-          <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" name="title" id="title" class="form-control" placeholder="Title" required>
-          </div>
-          <div class="mb-3">
-            <label for="start_date" class="form-label">Start Date</label>
-            {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
-          </div>
-          <div class="mb-3">
-            <label for="duration" class="form-label">Duration (minutes)</label>
-            <input type="number" name="duration" id="duration" class="form-control" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Create Meeting</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
 @endsection
 
 @section('scripts')
 
-    <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
-    <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
     
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function () {
-          $('.date').daterangepicker({
-                "singleDatePicker": true,
-                "timePicker": true,
-                "locale": {
-                    "format": 'MM/DD/YYYY H:mm'
-                },
-                "timePicker24Hour": true,
-            }, function(start, end, label) {
-                // console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format(
-                //     'YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-            });
-        });
-    </script>
     <!-- invite user modal + js -->
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
