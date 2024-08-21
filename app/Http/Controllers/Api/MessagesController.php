@@ -21,10 +21,13 @@ class MessagesController extends Controller
         $recipientId = $validatedData['recipient_id'];
         $messageText = $request->input('message');
 
-        $thread = Thread::where('subject', 'New Message')
-        ->whereHas('participants', function ($query) use ($userId, $recipientId) {
-            $query->where('user_id', $userId)
-                  ->Where('user_id', $recipientId);
+
+        $thread = Thread::where('slug', null)
+        ->whereHas('participants', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+        ->whereHas('participants', function ($query) use ($recipientId) {
+            $query->where('user_id', $recipientId);
         })
         ->withCount('participants')
         ->having('participants_count', 2)
