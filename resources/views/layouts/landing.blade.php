@@ -87,7 +87,7 @@
             <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                <input type="hidden" name="members[0]" value="{{ $employee->id }}">
+                <input type="hidden" name="members[0]" id="memberIdInput" value="">
                 <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>

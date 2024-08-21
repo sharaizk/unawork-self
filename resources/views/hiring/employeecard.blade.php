@@ -39,7 +39,7 @@
                     <a href="{{ route('login') }}"><span>Message</span></a>
                 @endif
 
-                <!-- <a href="#"><span>Video</span></a> -->
+                <a href="#" data-bs-toggle="modal" data-bs-target="#newMeetingPopup"><span>Video</span></a>
         </div>
     </div>
 </div>

@@ -133,7 +133,7 @@
               <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
             </div>
             <div class="aside__card__actions">
-              <button data-bs-toggle="modal" data-bs-target="#newMeetingPopup">
+              <button id="startNowButton" data-member-id="{{ $employee->id }}" data-bs-toggle="modal" data-bs-target="#newMeetingPopup">
                 <span>
                   <img src="{{ asset('assets/images/landing/icon-video.png') }}" alt="">
                   Start Now
@@ -194,7 +194,13 @@
 
 @section('scripts')
 
-    
+    <!-- set member id in modal  -->
+    <script type="text/javascript">
+        document.getElementById('startNowButton').addEventListener('click', function() {
+            var memberId = this.getAttribute('data-member-id');
+            document.getElementById('memberIdInput').value = memberId;
+        });
+    </script>
     <!-- invite user modal + js -->
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
