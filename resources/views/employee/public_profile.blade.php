@@ -207,7 +207,7 @@
           </div>
           <div class="mb-3">
             <label for="start_date" class="form-label">Start Date</label>
-            <input type="datetime-local" name="start_date" id="start_date" class="form-control" required>
+            {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
           </div>
           <div class="mb-3">
             <label for="duration" class="form-label">Duration (minutes)</label>
@@ -225,6 +225,26 @@
 @endsection
 
 @section('scripts')
+
+    <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
+    <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+          $('.date').daterangepicker({
+                "singleDatePicker": true,
+                "timePicker": true,
+                "locale": {
+                    "format": 'MM/DD/YYYY H:mm'
+                },
+                "timePicker24Hour": true,
+            }, function(start, end, label) {
+                // console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format(
+                //     'YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+            });
+        });
+    </script>
+    <!-- invite user modal + js -->
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
           const inviteUserModal = new bootstrap.Modal(document.getElementById("inviteUserPopup"));
@@ -294,6 +314,7 @@
             });
         });
     </script>
+    <!-- send message -->
     <script type="text/javascript">
         const sendMessageModal = new bootstrap.Modal(document.getElementById("sendMessagePopup"));
         document.addEventListener("DOMContentLoaded", function () {

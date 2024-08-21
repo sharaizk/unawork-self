@@ -139,7 +139,7 @@ class ZoomMeetingController extends Controller
                 return redirect()->back()->with('error', __('Meeting not created.'));
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => $slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> ! '));
+            return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => $slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> Error on creation! '));
         }
     }
 
