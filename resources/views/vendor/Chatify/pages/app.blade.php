@@ -45,7 +45,7 @@
 @endsection
 
 @section('content')
-    <div class="card rounded-12">
+    <div class="card rounded-12" style="max-height: 55rem;">
         <div class="messenger rounded min-h-750 overflow-hidden mt-4 px-4">
             {{-- ----------------------Users/Groups lists side---------------------- --}}
             <div class="messenger-listView">
@@ -85,7 +85,7 @@
                         <div class="messenger-favorites app-scroll-thin"></div>
 
                         {{-- Saved Messages --}}
-                        {!! view('Chatify::layouts.listItem', ['get' => 'saved', 'id' => $id])->render() !!}
+                        {{-- {!! view('Chatify::layouts.listItem', ['get' => 'saved', 'id' => $id])->render() !!} --}}
 
                         {{-- Contact --}}
                         <div class="listOfContacts" style="width: 100%;height: calc(100% - 200px);position: relative;">
