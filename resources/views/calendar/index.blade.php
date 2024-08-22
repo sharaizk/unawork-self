@@ -19,6 +19,7 @@
     @else
         <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
     @endif
+    <li class="breadcrumb-item"><a href="{{ route('tasks.index', $currentWorkspace->slug) }}">{{ __('Tasks') }}</a></li>
     <li class="breadcrumb-item"> {{ __('Calendar') }}</li>
 @endsection
 
@@ -30,7 +31,7 @@
 @section('multiple-action-button')
     <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-8 pt-lg-3 pt-xl-2">
         <div class=" form-group col-auto">
-            <select class="  form-select select2" id="project_id"
+            <select class="  form-select select" id="project_id"
                 onchange="get_data()">
                 <option value="">{{ __('All Projects') }}</option>
             @foreach ($projects as $project)
@@ -41,6 +42,14 @@
     </div>
 @endsection
 @section('content')
+<style>
+    .task-item:hover {
+        background-color: #f0f0f0;
+    }
+    .fc-event, .fc-event:hover {
+        cursor: pointer;
+    }
+</style>
     <div class="row">
         <!-- [ sample-page] start -->
         <div class="col-lg-8">
@@ -49,11 +58,11 @@
                     <h5 style="width: 150px;">{{ __('Calendar') }}</h5>
                     <div  id="google_cal">
                     @if($currentWorkspace->is_googlecalendar_enabled == 'on' )
-                        <select class="form-control " name="calender_type" id="calender_type"
+                        <!-- <select class="form-control " name="calender_type" id="calender_type"
                         style="float: right;width: 180px;margin-top: -30px;" onchange="get_data()">
                         <option value="google_calendar">{{ __('Google Calendar') }}</option>
                         <option value="local_calendar" selected="true">{{ __('Local Calendar') }}</option>
-                        </select>
+                        </select> -->
                     @endif
                     </div>
                 </div>
@@ -82,22 +91,27 @@
                                     $year = date('y', strtotime($t->start_date));
                                 @endphp
                                 @if ($date == $month && $date1 == $year)
-                                    <li class="list-group-item card mb-3">
-                                        <div class="row align-items-center justify-content-between">
-                                            <div class="col-auto mb-3 mb-sm-0">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="theme-avtar bg-primary">
-                                                        <i class="fa fa-tasks"></i>
-                                                    </div>
-                                                    <div class="ms-3">
-                                                        <h6 class="m-0">{{ $t->title }}</h6>
-                                                        <small class="text-muted">{{ $t->start_date }} to
-                                                            {{ $t->due_date }}</small>
+                                    <a href="" data_title="{{ $t->title }}"
+                                                data_url="{{ route('tasks.show', ['slug' => $currentWorkspace->slug, 'id' => $t->project->id, 'tid' => $t->id]) }}"
+                                                data_ajax_popup="true"
+                                                data_size="lg">
+                                        <li class="list-group-item card mb-3 task-item">
+                                            <div class="row align-items-center justify-content-between">
+                                                <div class="col-auto mb-3 mb-sm-0">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="theme-avtar bg-primary">
+                                                            <i class="fa fa-tasks"></i>
+                                                        </div>
+                                                        <div class="ms-3">
+                                                            <h6 class="m-0">{{ $t->title }}</h6>
+                                                            <small class="text-muted">{{ $t->start_date }} to
+                                                                {{ $t->due_date }}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </li>
+                                        </li>
+                                    </a>
                                 @endif
                             @endforeach
                         @endforeach
@@ -116,7 +130,9 @@
 
             function get_data() {
                 var element = document.getElementById("calender_type");
-                var calender_type = $('#calender_type :selected').val();
+                // var calender_type = $('#calender_type :selected').val();
+                var calender_type = "local_calendar";
+                
                 var project_id = $('#project_id :selected').val();
                 var is_googlecalendar_enabled = "{{ $currentWorkspace->is_googlecalendar_enabled }}";
 
@@ -163,10 +179,10 @@
                                 themeSystem: 'bootstrap',
                                 slotDuration: '00:10:00',
                                 navLinks: true,
-                                droppable: true,
+                                droppable: false,
                                 selectable: true,
                                 selectMirror: true,
-                                editable: true,
+                                editable: false,
                                 dayMaxEvents: true,
                                 handleWindowResize: true,
                                 height: 'auto',
@@ -227,6 +243,7 @@
 
                             $("#comments").prepend(html);
                             $("#form-comment textarea[name='comment']").val('');
+                            $('#commonModal').modal('hide');
                             show_toastr('{{ __('Success') }}', '{{ __('Comment Added Successfully!') }}',
                                 'success');
                         },

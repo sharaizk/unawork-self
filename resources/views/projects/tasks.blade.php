@@ -12,6 +12,8 @@
     <li class="breadcrumb-item"> {{ __('Tasks') }}</li>
 @endsection
 @section('action-button')
+    <a href="{{ route('calender.google.calendar', $currentWorkspace->slug) }}" class="btn btn-sm btn-primary mx-1"
+                id="" data-toggle="tooltip" title="{{ __('calendar') }}"> <i class="ti ti-calendar"></i></a>
     <a href="#" class="btn btn-sm btn-primary filter" data-toggle="tooltip" title="{{ __('Filter') }}">
         <i class="ti ti-filter"></i>
     </a>

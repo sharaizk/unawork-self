@@ -19,7 +19,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="milestone-status" class="col-form-label">{{ __('Status')}}</label>
-                    <select class="form-control select2" name="status" id="milestone-status" required>
+                    <select class="form-control select" name="status" id="milestone-status" required>
                         <option value="incomplete" @if($milestone->status=='incomplete') selected @endif>{{ __('Incomplete')}}</option>
                         <option value="complete" @if($milestone->status=='complete') selected @endif>{{ __('Complete')}}</option>
                     </select>
