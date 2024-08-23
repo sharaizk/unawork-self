@@ -12,7 +12,7 @@
             
             <div class="form-group col-md-8">
                 <label class="col-form-label">{{ __('Project')}}</label>
-                <select class="form-control form-control-light select2" name="project_id" required>
+                <select class="form-control form-control-light select" name="project_id" required>
                     @foreach($projects as $p)
                         <option value="{{$p->id}}" @if($task->project_id == $p->id) selected @endif>{{$p->name}}</option>
                     @endforeach
@@ -20,7 +20,7 @@
             </div>
             <div class="form-group col-md-4">
                 <label class="col-form-label">{{ __('Milestone')}}</label>
-                <select class="form-control form-control-light select2" name="milestone_id" id="task-milestone">
+                <select class="form-control form-control-light select" name="milestone_id" id="task-milestone">
                     <option value="">{{__('Select Milestone')}}</option>
                     @foreach($project->milestones as $milestone)
                         <option value="{{$milestone->id}}" @if($task->milestone_id == $milestone->id) selected @endif>{{$milestone->title}}</option>
@@ -33,7 +33,7 @@
             </div>
             <div class="form-group col-md-4">
                 <label class="col-form-label">{{ __('Priority')}}</label>
-                <select class="form-control form-control-light select2" name="priority" id="task-priority" required>
+                <select class="form-control form-control-light select" name="priority" id="task-priority" required>
                     <option value="Low" @if($task->priority=='Low') selected @endif>{{ __('Low')}}</option>
                     <option value="Medium" @if($task->priority=='Medium') selected @endif>{{ __('Medium')}}</option>
                     <option value="High" @if($task->priority=='High') selected @endif>{{ __('High')}}</option>

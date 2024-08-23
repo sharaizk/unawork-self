@@ -1665,7 +1665,7 @@ class Utility
         $path = storage_path() . '/' . $currentWorkspace['google_calender_json_file'];
 
         if (!file_exists($path)) {
-            return false; // Повертаємо false, якщо файл не знайдено
+            return false;
         }
 
         config([
