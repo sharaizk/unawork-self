@@ -16,9 +16,6 @@ class JobVacancy extends Model
         'salary',
     ];
 
-    /**
-     * Визначення зв'язку з моделлю User.
-     */
     public function company()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -32,6 +29,12 @@ class JobVacancy extends Model
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'job_vacancy_skill');
+    }
+
+    //salary accessor to remove .00 
+    public function getSalaryAttribute($value)
+    {
+        return (int) $value;
     }
         
 }
