@@ -144,6 +144,12 @@
         });
     </script>
 
+    <!-- loaded to body -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('loaded');
+        });
+    </script>
     <script>
         function showNotification(message, type = 'info') {
             const notificationContainer = document.getElementById('notification-container');

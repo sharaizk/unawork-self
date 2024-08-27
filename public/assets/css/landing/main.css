@@ -2703,6 +2703,15 @@ body {
   overflow-x: hidden !important;
   padding: 0;
   position: relative;
+  
+}
+body {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+body.loaded {
+  opacity: 1;
 }
 body::-webkit-scrollbar-track {
   box-shadow: none;

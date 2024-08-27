@@ -154,18 +154,31 @@
 @section('scripts')
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('.search__box');
-        form.addEventListener('submit', function(event) {
-            const name = document.getElementById('name');
-            const country = document.getElementById('country');
-            if (name.value.trim() === '') {
-                name.remove();
-            }
-            if (country.value.trim() === '') {
-                country.remove();
-            }
+            const form = document.querySelector('.search__box');
+
+            form.addEventListener('submit', function(event) {
+                const name = document.getElementById('name');
+                const country = document.getElementById('country');
+                
+                // Список інпутів, які потрібно очистити
+                const inputsToClear = [];
+
+                if (name.value.trim() === '') {
+                    name.setAttribute('disabled', 'disabled');
+                    inputsToClear.push(name);
+                }
+
+                if (country.value.trim() === '') {
+                    country.setAttribute('disabled', 'disabled');
+                    inputsToClear.push(country);
+                }
+
+                // add timeout to clear `disabled` after submitting form
+                setTimeout(() => {
+                    inputsToClear.forEach(input => input.removeAttribute('disabled'));
+                }, 0);
+            });
         });
-    });
     </script>
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
