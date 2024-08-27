@@ -31,6 +31,9 @@
             z-index: 1050;
             max-width: 300px;
         }
+        #notification-container a {
+            color: blue !important;
+        }
     </style>
 </head>
 
@@ -46,7 +49,7 @@
 
 
 <div class="container mt-3">
-    <div id="notification-container" class="alert" style="display: none;"></div>
+    <div id="notification-container" class="alert" style="display: none; color:#000;"></div>
 </div>
 <div class="modal fade" id="commonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -162,7 +165,7 @@
 
             setTimeout(() => {
                 notificationContainer.style.display = 'none';
-            }, 3000);
+            }, 5000);
         }
     </script>
 
@@ -195,7 +198,7 @@
     @endif
     @if (Session::has('error'))
         <script>
-            showNotification('{!! session('error') !!}', 'error');
+            showNotification('{!! session('error') !!}', 'danger');
         </script>
     @endif
 
