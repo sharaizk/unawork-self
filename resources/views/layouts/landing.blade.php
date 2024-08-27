@@ -31,6 +31,9 @@
             z-index: 1050;
             max-width: 300px;
         }
+        #notification-container a {
+            color: blue !important;
+        }
     </style>
 </head>
 
@@ -46,7 +49,7 @@
 
 
 <div class="container mt-3">
-    <div id="notification-container" class="alert" style="display: none;"></div>
+    <div id="notification-container" class="alert" style="display: none; color:#000;"></div>
 </div>
 <div class="modal fade" id="commonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -76,6 +79,7 @@
             </div>
         </div>
     </div>
+    @auth('web')
     <!-- create meeting popup -->
     <div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
         <div class="modal-dialog" role="document">
@@ -110,6 +114,7 @@
             </div>
         </div>
     </div>
+    @endauth
 
     <script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
     <script src="{{ asset('assets/custom/libs/moment/min/moment.min.js') }}"></script>
@@ -142,6 +147,12 @@
         });
     </script>
 
+    <!-- loaded to body -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('loaded');
+        });
+    </script>
     <script>
         function showNotification(message, type = 'info') {
             const notificationContainer = document.getElementById('notification-container');
@@ -154,7 +165,7 @@
 
             setTimeout(() => {
                 notificationContainer.style.display = 'none';
-            }, 3000);
+            }, 5000);
         }
     </script>
 
@@ -187,7 +198,7 @@
     @endif
     @if (Session::has('error'))
         <script>
-            showNotification('{!! session('error') !!}', 'error');
+            showNotification('{!! session('error') !!}', 'danger');
         </script>
     @endif
 

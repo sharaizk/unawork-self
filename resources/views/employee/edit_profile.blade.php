@@ -79,15 +79,25 @@
     </div>
 </form>
 
-
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 <script>
+    $(document).ready(function() {
+        // Initialize Chosen on page load
+        $(".chosen-select").chosen({
+            width: "100%",
+            placeholder_text_multiple: "Select Skills"
+        });
+
+        // Event listener for the Add Skill button
         let addCategoryButton = document.getElementById('addSkillButton');
         addCategoryButton.addEventListener('click', function () {
             document.getElementById('newSkillInput').style.display = "flex";
             document.getElementById('addSkillButton').style.display = "none";
-            
         });
 
+        // Event listener for the Create Skill button
         document.getElementById('createSkillButton').addEventListener('click', function () {
             const newSkillName = document.getElementById('newSkillName').value;
 
@@ -112,9 +122,11 @@
             })
             .then(data => {
                 let newOption = new Option(data.name, data.id, true, true);
-                let skillSelect = document.getElementById('skillSelect');
-                skillSelect.add(newOption);
-                $(skillSelect).trigger("chosen:updated");
+                let skillSelect = $('#skillSelect');
+                skillSelect.append(newOption);
+                
+                // Update Chosen to recognize the new option
+                skillSelect.trigger("chosen:updated");
 
                 document.getElementById('newSkillInput').style.display = "none";
                 document.getElementById('newSkillName').value = '';
@@ -122,12 +134,6 @@
             })
             .catch(error => console.error('Error:', error));
         });
+    });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
-<script>
-        $(".chosen-select").chosen({
-            width: "100%",
-            placeholder_text_multiple: "Select Skills"
-        });
-</script>
+@endpush
