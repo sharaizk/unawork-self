@@ -76,6 +76,7 @@
             </div>
         </div>
     </div>
+    @auth('web')
     <!-- create meeting popup -->
     <div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
         <div class="modal-dialog" role="document">
@@ -110,6 +111,7 @@
             </div>
         </div>
     </div>
+    @endauth
 
     <script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
     <script src="{{ asset('assets/custom/libs/moment/min/moment.min.js') }}"></script>
