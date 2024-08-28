@@ -332,7 +332,7 @@ function IDinfo(id, type) {
   disableOnLoad();
   if (messenger != 0) {
     // get shared photos
-    getSharedPhotos(id);
+    // getSharedPhotos(id);
     // Get info
     $.ajax({
       url: url + "/idInfo",

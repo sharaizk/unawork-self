@@ -20,10 +20,10 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
     <a href="#" class="default invite-user"><I class="fas fa-user-plus"></I> Invite User</a>
 </div>
 {{-- shared photos --}}
-<div class="messenger-infoView-shared">
+<!-- <div class="messenger-infoView-shared">
     <p class="messenger-title">shared photos</p>
     <div class="shared-photos-list"></div>
-</div>
+</div> -->
 
 <div class="messenger-infoView-shared">
     <p class="messenger-title">Users in thread</p>
