@@ -162,16 +162,15 @@ class ProjectController extends Controller
 
             $customerData = new Project();
 
+            $customerData->created_by = $objUser->id;
+            $customerData->workspace = $currentWorkspace->id;
             $customerData->name = $customer[0];
             $customerData->status = $customer[1];
             $customerData->description = $customer[2];
             $customerData->start_date = $customer[3];
-
             $customerData->end_date = $customer[4];
             $customerData->budget = $customer[5];
-            $customerData->workspace = $currentWorkspace->id;
 
-            $customerData->created_by = $objUser->id;
 
             if (empty($customerData)) {
                 $errorArray[] = $customerData;
