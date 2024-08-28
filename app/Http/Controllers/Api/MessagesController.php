@@ -47,7 +47,7 @@ class MessagesController extends Controller
             Participant::create([
                 'thread_id' => $thread->id,
                 'user_id' => $recipientId,
-                'last_read' => new \Carbon\Carbon,
+                'last_read' => null,
             ]);
         }
 
