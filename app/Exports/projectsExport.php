@@ -18,7 +18,7 @@ class projectsExport implements FromCollection,WithHeadings
 
         foreach($data as $k => $Projects)
         {
-            unset($Projects->created_by, $Projects->is_active,$Projects->id,$Projects->copylinksetting ,$Projects->password );
+            unset($Projects->id, $Projects->workspace, $Projects->password, $Projects->copylinksetting, $Projects->private, $Projects->created_by, $Projects->is_active, $Projects->created_at, $Projects->updated_at, $Projects->project_category_id );
 
 
             $data[$k]["name"]           = $Projects->name;
@@ -27,7 +27,6 @@ class projectsExport implements FromCollection,WithHeadings
             $data[$k]["start_date"]       = $Projects->start_date;
             $data[$k]["end_date"]         = $Projects->end_date;
             $data[$k]["budget"]          =  $Projects->budget;
-            $data[$k]["workspace"]       = $Projects->workspace;
         }
 
         return $data;
@@ -42,9 +41,6 @@ class projectsExport implements FromCollection,WithHeadings
             "start_date",
             "end_date",
             "budget",
-            "workspace",
-            "Created At",
-            "Updated At",
         ];
     }
 
