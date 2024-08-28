@@ -141,7 +141,7 @@ class ProjectController extends Controller
         $objUser = Auth::user();
 
         $rules = [
-            'file' => 'required|mimes:csv,txt',
+            'file' => 'required|mimes:csv,txt,xlsx',
         ];
 
         $validator = \Validator::make($request->all(), $rules);
