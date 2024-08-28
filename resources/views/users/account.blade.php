@@ -58,9 +58,10 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-
-                                    <img @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif
-                                        id="myAvatar" alt="user-image" class="rounded-circle img-thumbnail img_hight w-25">
+                                    <div class="card__image" style="display: flex; align-items: center; justify-content: center; width: 75px; height: 75px; border-radius: 50%; overflow: hidden;">
+                                        <img @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif
+                                        id="myAvatar" alt="user-image" class="" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
                                     {{-- @if ($user->avatar != '')
                                         <div class=" ">
                                             <a href="#"
