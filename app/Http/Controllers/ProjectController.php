@@ -401,6 +401,12 @@ class ProjectController extends Controller
         if (!$is_invited) {
             $arrData['permission'] = json_encode(Utility::getAllPermission());
             UserProject::create($arrData);
+
+            //invite user to project chat via slug
+            $slug = "project-".$project->id;
+            $chatService = new ChatService;
+            $chatService->inviteUserBySlug($slug, $user->id);
+
             if ($permission != 'Owner') {
 
                 try {
@@ -658,6 +664,11 @@ class ProjectController extends Controller
             if (count($project->user_tasks($user_id)) == 0) {
 
                 UserProject::where('user_id', '=', $user_id)->where('project_id', '=', $project->id)->delete();
+
+                 //remove user from project chat via slug
+                $slug = "project-".$project->id;
+                $chatService = new ChatService;
+                $chatService->removeUserBySlug($slug, $user_id);
 
                 return redirect()->back()->with('success', __('User Deleted Successfully!'));
             } else {
