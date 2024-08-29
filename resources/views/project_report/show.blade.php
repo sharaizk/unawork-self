@@ -361,50 +361,53 @@
                 </div>
 
                 <div class="col-sm-12 mt-3 mb-1 row d-sm-flex align-items-center justify-content-end" id="show_filter">
-                    @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                    <div class="row m-0">
+                        @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                            <div class="col-sm-6 col-md-2 p-0">
+                                <select class="select form-select" name="all_users" id="all_users">
+                                    <option value="">{{ __('All Users') }}</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
                         <div class="col-sm-6 col-md-3 pb-3">
-                            <select class="select form-select" name="all_users" id="all_users">
-                                <option value="" class="px-4">{{ __('All Users') }}</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            <select class="select form-select" name="milestone_id" id="milestone_id">
+                                <option value="">{{ __('All Milestones') }}</option>
+                                @foreach ($milestones as $milestone)
+                                    <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
                                 @endforeach
                             </select>
                         </div>
-                    @endif
-
-                    <div class="col-sm-6 col-md-2 pb-3">
-                        <select class="select form-select" name="milestone_id" id="milestone_id">
-                            <option value="" class="px-4">{{ __('All Milestones') }}</option>
-                            @foreach ($milestones as $milestone)
-                                <option value="{{ $milestone->id }}">{{ $milestone->title }}</option>
-                            @endforeach
-                        </select>
+                        <div class="col-sm-6 col-md-2 pb-3">
+                            <select class="select form-select" name="status" id="status">
+                                <option value="">{{ __('All Status') }}</option>
+                                @foreach ($stages as $stage)
+                                    <option value="{{ $stage->id }}">{{ __($stage->name) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-6 col-md-2 pb-3">
+                            <select class="select form-select" name="priority" id="priority">
+                                <option value="">{{ __('All Priority') }}</option>
+                                <option value="Low">{{ __('Low') }}</option>
+                                <option value="Medium">{{ __('Medium') }}</option>
+                                <option value="High">{{ __('High') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 col-md-3 pb-3">
+                            <div class="d-flex">
+                                <button class="btn btn-primary ms-4">{{ __('Apply') }}</button>
+                                <button class="btn btn-primary ms-4"> 
+                                    <a href="{{ route($client_keyword . 'project_report.export', $project->id) }}" class="text-white">
+                                        {{ __('Export') }}
+                                    </a>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-sm-6 col-md-3 pb-3">
-                        <select class="select form-select" name="status" id="status">
-                            <option value="" class="px-4">{{ __('All Status') }}</option>
-                            @foreach ($stages as $stage)
-                                <option value="{{ $stage->id }}">{{ __($stage->name) }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-sm-6 col-md-2 pb-3">
-                        <select class="select form-select" name="priority" id="priority">
-                            <option value="" class="px-4">{{ __('All Priority') }}</option>
-                            <option value="Low">{{ __('Low') }}</option>
-                            <option value="Medium">{{ __('Medium') }}</option>
-                            <option value="High">{{ __('High') }}</option>
-                        </select>
-                    </div>
-
-                    <button class=" btn btn-primary col-1 btn-filter apply">{{ __('Apply') }}</button>
-
-                    <button class=" btn btn-primary col-1 mx-2 btn-filter apply"> <a
-                            href="{{ route($client_keyword . 'project_report.export', $project->id) }}" class="text-white">
-
-                            {{ __('Export') }}
-                        </a></button>
-
                 </div>
                 <div class="col-md-12">
                     <div class="card">
