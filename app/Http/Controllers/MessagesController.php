@@ -107,8 +107,8 @@ class MessagesController extends Controller
             $userID = array_diff($participants, [Auth::user()->id]);
             $user = User::where('id', $userID)->first();
             $invites = [];
-            $invites['workspaces'] = Auth::user()->invitableWorkspaces($request['id']);
-            $invites['pods'] = Auth::user()->invitablePods($request['id']);
+            $invites['workspaces'] = Auth::user()->invitableWorkspaces($user->id);
+            $invites['pods'] = Auth::user()->invitablePods($user->id);
         }
         
         $users = $thread->users()->get();
