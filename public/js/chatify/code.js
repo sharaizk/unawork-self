@@ -1107,7 +1107,7 @@ $(document).ready(function() {
   getContacts();
 
   // get contacts list
-  getFavoritesList();
+  // getFavoritesList();
 
   // Clear typing timeout
   clearTimeout(typingTimeout);
