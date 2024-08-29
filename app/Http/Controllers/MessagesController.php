@@ -102,7 +102,7 @@ class MessagesController extends Controller
         $invites['pods'] = null;
 
         // User data
-        if ($thread->participants()->count() == 2) {
+        if ($thread->participants()->count() == 2 && $thread->subject == "New Message") {
             $participants = $thread->participants()->pluck('user_id')->toArray();
             $userID = array_diff($participants, [Auth::user()->id]);
             $user = User::where('id', $userID)->first();
@@ -706,7 +706,7 @@ class MessagesController extends Controller
 
         $participants = $thread->participants()->pluck('user_id')->toArray();
         // User data
-        if (count($participants) == 2) {
+        if (count($participants) == 2 && $thread->subject == "New Message") {
             $participants = $thread->participants()->pluck('user_id')->toArray();
             $userID = array_diff($participants, [Auth::user()->id]);
             $user = User::find($userID)->first();
