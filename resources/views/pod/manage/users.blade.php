@@ -82,11 +82,13 @@
                                                             <i class="ti ti-flag"></i> 
                                                             Edit Permissions
                                                         </a>
+                                                        @if ($pod->created_by != $user->id)
                                                         <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
                                                             data-title="{{ __('Remove user from pod') }}">
                                                             <i class="ti ti-pencil"></i> 
                                                             <span>{{ __('Remove user from pod') }}</span>
                                                         </a>
+                                                        @endif
                                                     <!-- endif -->
                                                 @endif
                                             @elseif ($isCurrentUser)

@@ -49,4 +49,41 @@ class ChatService
 
         return $thread;
     }
+
+    public function inviteUserBySlug($slug, $userId)
+    {
+        $thread = Thread::where('slug', $slug)->first();
+
+        if (!$thread) {
+            throw new \Exception('Error occured on invite user to project chat!');
+        }
+
+        // Add participant
+        Participant::create([
+            'thread_id' => $thread->id,
+            'user_id' => $userId,
+        ]);
+
+        return $thread;
+    }
+
+    public function removeUserBySlug($slug, $userId)
+    {
+        $thread = Thread::where('slug', $slug)->first();
+
+        if (!$thread) {
+            throw new \Exception('Error occured on remove user from project chat!');
+        }
+
+        // Add participant
+        $participant = Participant::where('thread_id', $thread->id)->where('user_id', $userId);
+
+        if (!$participant) {
+            throw new \Exception('Error occured on remove user from project chat!');
+        }
+        $participant->delete();
+
+        return $thread;
+    }
+    
 }

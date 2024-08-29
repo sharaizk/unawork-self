@@ -81,8 +81,8 @@
                     <div class="@if ($route == 'user') show @endif messenger-tab app-scroll" data-view="users">
 
                         {{-- Favorites --}}
-                        <p class="messenger-title">Favorites</p>
-                        <div class="messenger-favorites app-scroll-thin"></div>
+                        <!-- <p class="messenger-title">Favorites</p>
+                        <div class="messenger-favorites app-scroll-thin"></div> -->
 
                         {{-- Saved Messages --}}
                         {{-- {!! view('Chatify::layouts.listItem', ['get' => 'saved', 'id' => $id])->render() !!} --}}
@@ -131,8 +131,8 @@
                         </div>
                         {{-- header buttons --}}
                         <nav class="m-header-right">
-                            <a href="#" class="add-to-favorite my-lg-1 my-xl-1 mx-lg-1 mx-xl-1"><i
-                                    class="fas fa-star"></i></a>
+                            <!-- <a href="#" class="add-to-favorite my-lg-1 my-xl-1 mx-lg-1 mx-xl-1"><i
+                                    class="fas fa-star"></i></a> -->
                             <a href="#" class="show-infoSide my-lg-1 my-xl-1 mx-lg-1 mx-xl-2"><i
                                     class="fas fa-info-circle"></i></a>
                         </nav>

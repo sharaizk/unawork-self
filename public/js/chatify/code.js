@@ -332,7 +332,7 @@ function IDinfo(id, type) {
   disableOnLoad();
   if (messenger != 0) {
     // get shared photos
-    getSharedPhotos(id);
+    // getSharedPhotos(id);
     // Get info
     $.ajax({
       url: url + "/idInfo",
@@ -385,7 +385,7 @@ function IDinfo(id, type) {
             const userName = user.name ? user.name : null;
             const userAvatar = user.avatar ? data.basic_url + '/storage/users-avatar/' + user.avatar : '" avatar="'+user.name +'';
             $(".users-list").append(
-                `<img class="theme-avatar" src="${userAvatar}" title="${userName}" style="border-radius: 50%;max-width: 40px;max-height: 40px;">`
+                `<img class="theme-avatar" src="${userAvatar}" title="${userName}" style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover;">`
             );
         });
         // Scroll to the bottom of the messages
@@ -1107,7 +1107,7 @@ $(document).ready(function() {
   getContacts();
 
   // get contacts list
-  getFavoritesList();
+  // getFavoritesList();
 
   // Clear typing timeout
   clearTimeout(typingTimeout);

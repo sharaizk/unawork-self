@@ -16,7 +16,7 @@
 
             <div class="form-group col-md-6">
                 <label for="assign_to" class="col-form-label">{{ __('Tasks') }}</label>
-                <select class="form-control select2" id="tasks" name="tasks" required>
+                <select class="form-control select" id="tasks" name="tasks" required>
                     <option selected disabled>Select Tasks</option>
                     @foreach ($allTask as $task)
                         <option value="{{ $task->id }}">{{ $task->title }}</option>

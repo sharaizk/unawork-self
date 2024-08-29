@@ -737,7 +737,7 @@
 @endsection
 
 @push('css-page')
-    <!-- <link rel="stylesheet" href="{{ asset('assets/custom/css/dropzone.min.css') }}"> -->
+    <link rel="stylesheet" href="{{ asset('assets/custom/css/dropzone.min.css') }}">
 @endpush
 @push('scripts')
     <!--
@@ -906,9 +906,9 @@
         Dropzone.autoDiscover = false;
         myDropzone = new Dropzone("#dropzonewidget", {
             maxFiles: 20,
-            // maxFilesize: 209715200,
+            maxFilesize: 209715200,
             parallelUploads: 1,
-            //acceptedFiles: ".jpeg,.jpg,.png,.gif,.svg,.pdf,.txt,.doc,.docx,.zip,.rar",
+            acceptedFiles: ".jpeg,.jpg,.png,.gif,.svg,.pdf,.txt,.doc,.docx,.zip,.rar",
             url: "{{ route('projects.file.upload', [$currentWorkspace->slug, $project->id]) }}",
             success: function(file, response) {
                 if (response.is_success) {
