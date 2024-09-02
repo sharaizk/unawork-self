@@ -153,11 +153,11 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
                 @endif
                 @if(!empty($user->avatar))   
                     <div class="avatar av-m"
-                         style="background-image: url('{{asset($avatar.'/'.$user->avatar)}}');">
+                         style="background-image: url('{{asset($logo.'users-avatar/'.$user->avatar)}}');">
                     </div> 
                 @else
                     <div class="avatar av-m"
-                         style="background-image: url('{{asset($avatar.'/avatar.png')}}');">
+                         style="background-image: url('{{asset($logo.'logo/'.'logo-light.png')}}');">
                     </div>
                 @endif
             </td>

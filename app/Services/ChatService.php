@@ -55,7 +55,7 @@ class ChatService
         $thread = Thread::where('slug', $slug)->first();
 
         if (!$thread) {
-            throw new \Exception('Error occured on invite user to project chat!');
+            return null;
         }
 
         // Add participant

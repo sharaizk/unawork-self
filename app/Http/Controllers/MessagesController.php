@@ -250,7 +250,8 @@ class MessagesController extends Controller
     public function getContacts(Request $request)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug('');
-        $userId = Auth::user()->id;
+        $user = Auth::user();
+        $userId = $user->id;
     
         // Get all threads the user is part of
         $threads = Thread::forUser($userId)->latest('updated_at')->get()->unique('id');
@@ -264,17 +265,14 @@ class MessagesController extends Controller
                 $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
         }
     
-        // Get members of the current workspace
-        if ($currentWorkspace) {
-            $members = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active')
-                ->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id')
-                ->where('user_workspaces.workspace_id', '=', $currentWorkspace->id)
-                ->where('users.id', '!=', $userId)
-                ->get();
-        } else {
-            $members = User::where('type', '!=', 'admin')->get();
-        }
-    
+        // Get all workspaces of user
+        $workspaceIds = $user->workspace->pluck('id');
+
+        // Get all users uniqued(distinct) from those workspaces, except user
+        $members = User::whereHas('workspace', function ($query) use ($workspaceIds) {
+            $query->whereIn('workspace_id', $workspaceIds);
+        })->where('id', '!=', $user->id)->distinct()->get();
+
         $getRecords = '';
         foreach ($members as $record) {
             $getRecords .= view('vendor.Chatify.layouts.listItem', [
@@ -290,6 +288,72 @@ class MessagesController extends Controller
         ], 200);
     }
 
+
+    public function isThreadExist(Request $request)
+    {
+        $userId = $request->id;
+        $ownId = Auth::id();
+
+        $thread = Thread::where('slug', null)
+        ->whereHas('participants', function ($query) use ($ownId) {
+            $query->where('user_id', $ownId);
+        })
+        ->whereHas('participants', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+        ->withCount('participants')
+        ->having('participants_count', 2)
+        ->first();
+
+        if ($thread) {
+            return $thread;
+        } else {
+            return null;
+        }
+
+    }
+
+    public function createThread(Request $request)
+    {
+        $userId = Auth::id();
+        $recipientId = $request['id'];
+
+        $thread = Thread::where('slug', null)
+        ->whereHas('participants', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+        ->whereHas('participants', function ($query) use ($recipientId) {
+            $query->where('user_id', $recipientId);
+        })
+        ->withCount('participants')
+        ->having('participants_count', 2)
+        ->first();
+
+        if (!$thread) {
+            $thread = Thread::create([
+                'subject' => 'New Message'
+            ]);
+
+            Participant::create([
+                'thread_id' => $thread->id,
+                'user_id' => $userId,
+                'last_read' => new \Carbon\Carbon,
+            ]);
+
+            Participant::create([
+                'thread_id' => $thread->id,
+                'user_id' => $recipientId,
+                'last_read' => null,
+            ]);
+        }
+
+        $thread->touch();
+
+        return response()->json([
+            'status' => 'success',
+            'thread_id' => $thread->id,
+        ], 200);
+    }
 
     public function updateContactItem(Request $request)
     {
