@@ -1192,17 +1192,25 @@ $(document).ready(function() {
     isThreadExist(messenger.split("_")[1], messenger.split("_")[0], image, username);
   });
 
-  function isThreadExist(id, type, image, username) {
+  function isThreadExist(recipient_id, type, image, username) {
       $.ajax({
         url: url + "/user/is-thread-exist",
         method: "POST",
-        data: { _token: access_token, id: id, type: type },
+        data: { _token: access_token, id: recipient_id, type: type },
         dataType: "JSON",
         success: (data) => {
+          newId = "user_" + data.id
+          var pElement = document.querySelector('.all_members p[data-id="user_'+recipient_id+'"]');
+
+          if (pElement) {
+            pElement.setAttribute('data-id', newId);
+            messenger = newId;
+          }
+
           IDinfo(data.id);
         },
         error: () => {
-          threadNotExist(image, username, id);
+          threadNotExist(image, username, recipient_id);
         },
       });
   }
@@ -1257,7 +1265,15 @@ $(document).ready(function() {
       data: { _token: access_token, id: recipient_id},
       dataType: "JSON",
       success: (data) => {
-        IDinfo(data.thread_id);
+        newId = "user_" + data.id
+        var pElement = document.querySelector('.all_members p[data-id="user_'+recipient_id+'"]');
+
+        if (pElement) {
+          pElement.setAttribute('data-id', newId);
+          messenger = newId;
+        }
+
+        IDinfo(data.id);
       },
       error: () => {
         threadNotExist(image, username, id);

@@ -250,7 +250,8 @@ class MessagesController extends Controller
     public function getContacts(Request $request)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug('');
-        $userId = Auth::user()->id;
+        $user = Auth::user();
+        $userId = $user->id;
     
         // Get all threads the user is part of
         $threads = Thread::forUser($userId)->latest('updated_at')->get()->unique('id');
@@ -264,8 +265,13 @@ class MessagesController extends Controller
                 $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
         }
     
-        // Get members of the current workspace
-        $members = User::where('type', '!=', 'admin')->get();
+        // Get all workspaces of user
+        $workspaceIds = $user->workspace->pluck('id');
+
+        // Get all users uniqued(distinct) from those workspaces, except user
+        $members = User::whereHas('workspace', function ($query) use ($workspaceIds) {
+            $query->whereIn('workspace_id', $workspaceIds);
+        })->where('id', '!=', $user->id)->distinct()->get();
 
         $getRecords = '';
         foreach ($members as $record) {
