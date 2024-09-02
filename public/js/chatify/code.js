@@ -278,6 +278,7 @@ function disableOnLoad(action = true) {
     $(".messenger-sendCard").hide();
     // add loading opacity to messages container
     messagesContainer.css("opacity", ".5");
+    messagesContainer.css("display", "block");
     // disable message form fields
     messageInput.attr("readonly", "readonly");
     $("#message-form button").attr("disabled", "disabled");
@@ -291,6 +292,7 @@ function disableOnLoad(action = true) {
     $(".messenger-sendCard").show();
     // remove loading opacity to messages container
     messagesContainer.css("opacity", "1");
+    messagesContainer.css("display", "block");
     // enable message form fields
     messageInput.removeAttr("readonly");
     $("#message-form button").removeAttr("disabled");
@@ -1153,7 +1155,7 @@ $(document).ready(function() {
   hScroller(".messenger-favorites");
 
   // click action for list item [user/group]
-  $("body").on("click", ".messenger-list-item", function() {
+  $("body").on("click", ".listOfContacts .messenger-list-item", function() {
     if (
       $(this)
         .find("tr[data-action]")
@@ -1166,6 +1168,103 @@ $(document).ready(function() {
       .attr("data-id");
     IDinfo(messenger.split("_")[1], messenger.split("_")[0]);
   });
+
+  $("body").on("click", ".all_members .messenger-list-item", function() {
+    if (
+      $(this)
+        .find("tr[data-action]")
+        .attr("data-action") == "1"
+    ) {
+      $(".messenger-listView").hide();
+    }
+    messenger = $(this)
+      .find("p[data-id]")
+      .attr("data-id");
+
+    image = $(this)
+    .find("div[style]")
+    .css('background-image').replace(/(url\(|\)|"|')/g, '');
+
+    username = $(this)
+    .find("p[data-id]")
+    .html();
+
+    isThreadExist(messenger.split("_")[1], messenger.split("_")[0], image, username);
+  });
+
+  function isThreadExist(id, type, image, username) {
+      $.ajax({
+        url: url + "/user/is-thread-exist",
+        method: "POST",
+        data: { _token: access_token, id: id, type: type },
+        dataType: "JSON",
+        success: (data) => {
+          IDinfo(data.id);
+        },
+        error: () => {
+          threadNotExist(image, username, id);
+        },
+      });
+  }
+
+  function threadNotExist(image, username, recipient_id) {
+        disableOnLoad(false);
+
+        $(".messenger-infoView")
+          .find(".avatar")
+          .css("background-image", 'url("' + image + '")');
+        $(".header-avatar").css(
+          "background-image",
+          'url("' + image + '")'
+        );
+
+        // update info in view
+        $(".m-header-messaging .user-name").html(username);
+        $(".messenger-infoView .info-name").html(username);
+
+        $(".messages").html("");
+
+        messagesContainer.css("opacity", "0");
+        messagesContainer.css("display", "none");
+        var newDiv = $('<div/>', {
+            'class': 'm-body app-scroll',
+            'css': {
+                'display': 'flex',
+                'align-items': 'center', 
+                'justify-content': 'center', 
+                'height': '100%'
+            }
+        });
+    
+        var startButton = $('<button/>', {
+            'text': 'Start',
+            'class': 'btn btn-primary',
+            'click': function() {
+              createThreadOpenChat(recipient_id);
+            }
+        });
+    
+        newDiv.append(startButton);
+
+        $(".messenger-messagingView").append(newDiv);
+  }
+
+  function createThreadOpenChat(recipient_id)
+  {
+    $.ajax({
+      url: url + "/user/create-thread",
+      method: "POST",
+      data: { _token: access_token, id: recipient_id},
+      dataType: "JSON",
+      success: (data) => {
+        IDinfo(data.thread_id);
+      },
+      error: () => {
+        threadNotExist(image, username, id);
+      },
+    });
+  }
+
 
   // click action for favorite button
   $("body").on("click", ".favorite-list-item", function() {

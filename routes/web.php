@@ -1223,3 +1223,12 @@ Route::group(['middleware' => ['verified']], function () {
 
 
 Route::get('/{slug}/projects/{id}/task-board/{tid}/{cid?}', [ProjectController::class, 'taskShow'])->name('tasks.show');
+
+
+
+Route::group(['prefix' => config('chatify.routes.prefix'), 'middleware' => config('chatify.routes.middleware'), 'namespace' => config('chatify.routes.namespace')], function() {
+    // chatify route
+    Route::POST('user/is-thread-exist', [\Chatify\Http\Controllers\MessagesController::class, 'isThreadExist'])->name('chats.is-thread-exist');
+    Route::POST('user/create-thread', [\Chatify\Http\Controllers\MessagesController::class, 'createThread'])->name('chats.create-thread');
+    
+});
