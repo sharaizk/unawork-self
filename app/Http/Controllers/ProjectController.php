@@ -263,8 +263,8 @@ class ProjectController extends Controller
                         if ($registerUsers->id == $objUser->id) {
                             $permission = 'Owner';
                         }
-                        $usersIdList[] .= $registerUsers->id;
-                    Utility::sendNotification('project_new', null, $registerUsers->id, $objProject);
+                        $usersIdList[] = $registerUsers->id;
+                        Utility::sendNotification('project_new', null, $registerUsers->id, $objProject);
                     } else {
                         $arrUser = [];
                         $arrUser['name'] = 'No Name';
