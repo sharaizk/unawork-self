@@ -1056,6 +1056,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $currentWorkspace;
     }
 
+    public function ownWorkspace()
+    {
+        return $this->workspacesOwner()->first();
+    }
+
     public function invitableWorkspaces(int $userId = null)
     {
         if ($userId) {

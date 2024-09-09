@@ -18,7 +18,12 @@ class CompanyController extends Controller
 
     public function show(Workspace $company)
     {
-        return view('company.landing.index', compact('company'));
+        $owner = $company->creater;
+        if (!$owner) {
+            return redirect()->back()->with('error', 'Access denied!');
+        }
+        $vacancies = $owner->jobVacancies;
+        return view('company.landing.index', compact('company', 'vacancies'));
     }
 
 

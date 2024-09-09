@@ -499,6 +499,29 @@
                                                     <input class="form-control" name="telephone" type="text"
                                                         value="{{ $currentWorkspace->telephone }}" id="telephone">
                                                 </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="website"
+                                                        class="form-label">{{ __('Website') }}</label>
+                                                    <input class="form-control" name="website" type="text"
+                                                        value="{{ $currentWorkspace->website }}" id="website">
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="linkedin"
+                                                        class="form-label">{{ __('Linkedin') }}</label>
+                                                    <input class="form-control" name="linkedin" type="text"
+                                                        value="{{ $currentWorkspace->linkedin }}" id="linkedin">
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="facebook"
+                                                        class="form-label">{{ __('Facebook') }}</label>
+                                                    <input class="form-control" name="facebook" type="text"
+                                                        value="{{ $currentWorkspace->facebook }}" id="facebook">
+                                                </div>
+                                                <div class="form-group col-md-12">
+                                                    <label for="description"
+                                                        class="form-label">{{ __('Description') }}</label>
+                                                        <textarea class="form-control" name="description" id="description" rows="4">{{ $currentWorkspace->description }}</textarea>
+                                                </div>
                                             </div>
                                             <div class="text-end">
                                                 <button type="submit"

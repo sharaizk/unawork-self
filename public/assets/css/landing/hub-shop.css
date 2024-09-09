@@ -492,7 +492,7 @@
 .tpl-hub-shop .section__courses .section__content .courses__header {
   overflow: hidden;
   border-radius: 4px 4px 0 0;
-  max-height: 142px;
+  max-height: 71px;
 }
 .tpl-hub-shop .section__courses .section__content .courses__header img {
   display: block;
@@ -510,14 +510,22 @@
 .tpl-hub-shop .section__courses .section__content .courses__title {
   height: 4rem;
   overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 .tpl-hub-shop .section__courses .section__content .courses__title a {
   font-size: 1.4rem;
   font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
   color: #000;
+  flex: 1;
 }
 .tpl-hub-shop .section__courses .section__content .courses__title a:hover {
   color: #cfaa40;
+}
+.tpl-hub-shop .section__courses .section__content .courses__dot {
+  flex-shrink: 0;
 }
 .tpl-hub-shop .section__courses .section__content .courses__subtitle {
   font-size: 1.4rem;
