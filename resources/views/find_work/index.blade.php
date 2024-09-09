@@ -44,7 +44,7 @@
                     <select id="type" class="form-control" name="type">
                         <option value="" selected>Select Type</option>
                         <option value="pod">Pod</option>
-                        <option value="vacancy">Vacancy</option>
+                        <!-- <option value="vacancy">Vacancy</option> -->
                         <option value="project">Project</option>
                     </select>
                 </div>
@@ -103,8 +103,8 @@
             </div>
             <div class="container-master">
                 <div class="row-master">
-                    @foreach($vacancies as $vacancy)
-                        @include('job_vacancies.landing.card', ['vacancy' => $vacancy])
+                    @foreach($usersWithVacancies as $userWithVacancies)
+                        @include('company.landing.company_card', ['company' => $userWithVacancies->ownWorkspace()])
                     @endforeach
                 </div>
             </div>

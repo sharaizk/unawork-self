@@ -7,6 +7,12 @@
 
 
 @section('content')
+
+<!-- <section class="section__titlepage">
+        <div class="container-master">
+            <h1 class="section__titlepage--headertitle"><span>Job Vacancies</span></h1>
+        </div>
+    </section> -->
 <div class="container-master">
     <div class="row-master">
         <div class="col-12 col-md-12 col-xl-9">

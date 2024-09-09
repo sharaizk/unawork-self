@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JobVacancy;
 use App\Models\Skill;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\JobVacancyService;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,8 @@ class JobVacancyController extends Controller
 
         $vacancies = $jobVacancies;
         $skills = Skill::all();
-        return view('job_vacancies.landing.list', compact('vacancies', 'skills'));
+        $usersWithVacancies = User::whereHas('jobVacancies') 
+            ->get();
+        return view('job_vacancies.landing.list', compact('vacancies', 'skills', 'usersWithVacancies'));
     }
 }

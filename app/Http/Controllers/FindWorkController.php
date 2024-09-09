@@ -30,8 +30,10 @@ class FindWorkController extends Controller
             $joinedPods = $user->pods()->pluck('pod_id')->toArray();
         }
 
-        $vacancies = JobVacancy::limit(4)->get();
+        $vacancies = JobVacancy::get();
+        $usersWithVacancies = User::whereHas('jobVacancies') 
+            ->limit(4)->get();
 
-        return view('find_work.index', compact('vacancies', 'companies', 'pods', 'countries', 'skills', 'projects', 'joinedPods', 'user'));
+        return view('find_work.index', compact('vacancies', 'companies', 'pods', 'countries', 'skills', 'projects', 'joinedPods', 'user', 'usersWithVacancies'));
     }
 }
