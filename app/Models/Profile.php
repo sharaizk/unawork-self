@@ -19,7 +19,8 @@ class Profile extends Model
         'phone_number',
         'cv_file',
         'about',
-        'job_title_id'
+        'job_title_id',
+        'industry_id'
     ];
 
     public function user()
@@ -30,10 +31,5 @@ class Profile extends Model
     public function jobTitle()
     {
         return $this->belongsTo(JobTitle::class, 'job_title_id');
-    }
-
-    public function industry()
-    {
-        return $this->belongsTo(Industry::class);
     }
 }
