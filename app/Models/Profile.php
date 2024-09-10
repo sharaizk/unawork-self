@@ -25,4 +25,9 @@ class Profile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function jobTitle()
+    {
+        return $this->belongsTo(JobTitle::class, 'job_title_id');
+    }
 }
