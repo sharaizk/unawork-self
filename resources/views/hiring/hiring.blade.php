@@ -93,6 +93,17 @@
                         @endforeach
                     </select>
                 </div>
+                @php
+                    $jobTitles = \App\Models\JobTitle::all();
+                @endphp
+                <div class="search__field">
+                    <select name="job_title_id" id="job_title_id" class="form-control">
+                        <option value="">Select Job Title</option>
+                        @foreach($jobTitles as $jobTitle)
+                            <option value="{{ $jobTitle->id }}" {{ request('job_title_id') == $jobTitle->id ? 'selected' : '' }}>{{ $jobTitle->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="search__list">
                     <div class="dropdown">
                         <button class="btn btn-xl btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -159,6 +170,7 @@
             form.addEventListener('submit', function(event) {
                 const name = document.getElementById('name');
                 const country = document.getElementById('country');
+                const jobTitle = document.getElementById('job_title_id');
                 
                 // Список інпутів, які потрібно очистити
                 const inputsToClear = [];
@@ -171,6 +183,11 @@
                 if (country.value.trim() === '') {
                     country.setAttribute('disabled', 'disabled');
                     inputsToClear.push(country);
+                }
+
+                if (jobTitle.value.trim() === '') {
+                    jobTitle.setAttribute('disabled', 'disabled');
+                    inputsToClear.push(jobTitle);
                 }
 
                 // add timeout to clear `disabled` after submitting form
