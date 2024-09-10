@@ -31,4 +31,9 @@ class Profile extends Model
     {
         return $this->belongsTo(JobTitle::class, 'job_title_id');
     }
+
+    public function industry()
+    {
+        return $this->belongsTo(Industry::class);
+    }
 }
