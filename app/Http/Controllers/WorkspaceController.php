@@ -1228,6 +1228,7 @@ class WorkspaceController extends Controller
                 $currentWorkspace->website = $request->website;
                 $currentWorkspace->linkedin = $request->linkedin;
                 $currentWorkspace->facebook = $request->facebook;
+                $currentWorkspace->industry_id = $request->industry_id;
             }
             $currentWorkspace->save();
 
