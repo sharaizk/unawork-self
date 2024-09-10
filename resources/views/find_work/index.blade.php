@@ -45,7 +45,7 @@
                         <option value="" selected>Select Type</option>
                         <option value="pod">Pod</option>
                         <!-- <option value="vacancy">Vacancy</option> -->
-                        <option value="project">Project</option>
+                        <!-- <option value="project">Project</option> -->
                     </select>
                 </div>
 
@@ -110,7 +110,7 @@
             </div>
         </section>
 
-        <section class="section__layout section__project">
+        <!-- <section class="section__layout section__project">
             <div class="container-master teams__title">
                 <h2>Projects Availables</h2>
                 <a href="{{ route('project.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
@@ -122,7 +122,7 @@
                         @endforeach
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <section class="section__layout section_pod">
             <div class="container-master pods__title">
