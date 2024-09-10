@@ -9,4 +9,8 @@ class Industry extends Model
 {
     use HasFactory;
 
+    public function workspaces()
+    {
+        return $this->hasMany('App\Models\Workspace', 'industry_id');
+    }
 }

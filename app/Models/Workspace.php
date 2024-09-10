@@ -150,6 +150,11 @@ class Workspace extends Model
         return $this->hasMany('App\Models\Project', 'workspace', 'id');
     }
 
+    public function industry()
+    {
+        return $this->belongsTo('App\Models\Industry', 'industry_id');
+    }
+
     public function languages()
     {
         $dir     = base_path() . '/resources/lang/';
