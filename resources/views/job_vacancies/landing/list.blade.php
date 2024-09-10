@@ -62,7 +62,7 @@
         }
     </style>
 
-    <section class="header__search">
+    <!-- <section class="header__search">
         <div class="container-master">
             <div class="search__wrap">
                 <form id="searchForm" class="row col-lg-3 searchForm" method="GET" action="{{ route('job-vacancies.landing.list') }}">
@@ -91,22 +91,22 @@
                 </form>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <section class="section__titlepage">
         <div class="container-master">
             <h1 class="section__titlepage--headertitle"><span>Companies hiring</span></h1>
             <ul class="breadcrumb mt-1">
                 <li class="breadcrumb-item"><a href="{{ route('landing.find-work') }}">Find Work</a></li>
-                <li class="breadcrumb-item"> {{ __('Vacancies') }}</li>
+                <li class="breadcrumb-item"> {{ __('Companies hiring') }}</li>
             </ul>
         </div>
     </section>
     <section class="section__layout section_company">
         <div class="container-master">
             <div class="row-master">
-            @foreach($vacancies as $vacancy)
-                @include('job_vacancies.landing.card', ['vacancy' => $vacancy])
+            @foreach($usersWithVacancies as $userWithVacancies)
+                @include('company.landing.company_card', ['company' => $userWithVacancies->ownWorkspace()])
             @endforeach
             </div>
         </div>

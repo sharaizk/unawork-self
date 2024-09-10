@@ -1224,6 +1224,10 @@ class WorkspaceController extends Controller
                 $currentWorkspace->zipcode = $request->zipcode;
                 $currentWorkspace->country = $request->country;
                 $currentWorkspace->telephone = $request->telephone;
+                $currentWorkspace->description = $request->description;
+                $currentWorkspace->website = $request->website;
+                $currentWorkspace->linkedin = $request->linkedin;
+                $currentWorkspace->facebook = $request->facebook;
             }
             $currentWorkspace->save();
 

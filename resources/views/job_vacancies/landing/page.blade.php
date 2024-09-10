@@ -21,6 +21,15 @@
         }
     @endphp
     <main>
+    <section class="section__titlepage">
+        <div class="container-master">
+            <h1 class="section__titlepage--headertitle"><span>Job Vacancies</span></h1>
+            <ul class="breadcrumb mt-1">
+                <li class="breadcrumb-item"><a href="{{ route('landing.company.show', $company->ownWorkspace()) }}">{{ $company->name }}</a></li>
+                <li class="breadcrumb-item"> {{$vacancy->title}} </li>
+            </ul>
+        </div>
+    </section>
         <div class="container-master">
             <div class="row-master">
                 <div class="col-12 col-xl-9">
