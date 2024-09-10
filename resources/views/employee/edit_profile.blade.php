@@ -40,9 +40,27 @@
                     <input type="text" class="form-control" name="phone_number" id="phone_number" value="{{ $profile->phone_number }}" required>
                 </div>
             </div>
+
+            @php
+                $jobTitles = \App\Models\JobTitle::all();
+                $currentUserJobTitleId = auth()->user()->profile->job_title_id ?? null;
+            @endphp
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label for="job_title_id" class="form-label">Job Title:</label>
+                    <select class="form-control" name="job_title_id" id="job_title_id">
+                        <option value="">Select your job title</option>
+                        @foreach($jobTitles as $jobTitle)
+                            <option value="{{ $jobTitle->id }}" {{ $currentUserJobTitleId == $jobTitle->id ? 'selected' : '' }}>
+                                {{ $jobTitle->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-lg-12">
                 <div class="row skillContainer">
-                    <h4>Skills:</h4>
+                    <label for="skill_ids" class="form-label">Skills:</label>
                     <select class="form-control chosen-select" multiple name="skill_ids[]" id="skillSelect">
                         @foreach($skills as $skill)
                             <option value="{{ $skill->id }}" {{ in_array($skill->id, \Auth::user()->skills->pluck('id')->toArray()) ? 'selected' : '' }}>

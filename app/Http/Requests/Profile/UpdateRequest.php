@@ -30,6 +30,7 @@ class UpdateRequest extends FormRequest
             'phone_number' => 'string|max:20',
             'cv_file' => 'nullable|file|mimes:pdf|max:10240',
             'about' => 'string|max:25500',
+            'job_title_id' => 'integer|exists:job_titles,id',
             'skill_ids' => 'nullable|array',
             'skill_ids.*' => 'integer|exists:skills,id',
         ];

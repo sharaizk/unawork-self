@@ -18,7 +18,8 @@ class Profile extends Model
         'address',
         'phone_number',
         'cv_file',
-        'about'
+        'about',
+        'job_title_id'
     ];
 
     public function user()
