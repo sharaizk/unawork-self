@@ -44,6 +44,7 @@
                     <select id="type" class="form-control" name="type">
                         <option value="" selected>Select Type</option>
                         <option value="pod">Pod</option>
+                        <option value="company">Company</option>
                         <!-- <option value="vacancy">Vacancy</option> -->
                         <!-- <option value="project">Project</option> -->
                     </select>
@@ -60,6 +61,21 @@
                     </select>
                 </div>
 
+                @php
+                    $industries = \App\Models\Industry::all();
+                    $currentIndustryId = $currentWorkspace->industry_id ?? null;
+                @endphp
+                <div id="industryField" class="col-md-4 form-group" style="display: none;">
+                    <label for="industry">Industry</label>
+                    <select id="industry" class="form-control" name="industry">
+                        <option value="">Select Industry </option>
+                        @foreach($industries as $industry)
+                            <option value="{{ $industry->id }}">
+                                    {{ $industry->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                 <div id="skillsField" class="col-md-4 form-group" style="display: none;">
                     <label>Select Skills</label>
@@ -186,17 +202,21 @@
         var countryField = document.getElementById('countryField');
         var skillsField = document.getElementById('skillsField');
 
-        if (type === 'vacancy') {
-            skillsField.style.display = 'block';
+        if (type === 'company') {
+            industryField.style.display = 'block';
+            skillsField.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'pod') {
             skillsField.style.display = 'block';
+            industryField.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'project') {
             skillsField.style.display = 'none';
+            industryField.style.display = 'none';
             budgetField.style.display = 'block';
         } else {
             skillsField.style.display = 'none';
+            industryField.style.display = 'none';
             budgetField.style.display = 'none';
         }
     });
@@ -224,6 +244,10 @@
             var budget = document.getElementById('budget').value;
             formAction = '{{ route("project.list") }}';
             this.action = formAction + '?budget=' + encodeURIComponent(budget);
+        } else if (type === 'company') {
+            var industry = document.getElementById('industry').value;
+            formAction = '{{ route("job-vacancies.landing.list") }}';
+            this.action = formAction + '?industry=' + budget;
         }
 
         this.submit();
