@@ -80,6 +80,11 @@ class EmployeeFilter
         $this->builder->where('profiles.phone_number', 'like', "%$value%");
     }
 
+    protected function job_title_id(string $value): void
+    {
+        $this->builder->where('profiles.job_title_id', $value);
+    }
+
     protected function skill_ids(array $value): void
     {
         $this->builder->whereHas('skills', function ($query) use ($value) {

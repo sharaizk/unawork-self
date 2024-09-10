@@ -18,11 +18,17 @@ class Profile extends Model
         'address',
         'phone_number',
         'cv_file',
-        'about'
+        'about',
+        'job_title_id'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function jobTitle()
+    {
+        return $this->belongsTo(JobTitle::class, 'job_title_id');
     }
 }

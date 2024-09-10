@@ -27,6 +27,7 @@ class StoreRequest extends FormRequest
             'city' => 'required|string|max:255',
             'zip_code' => 'required|string|max:20',
             'address' => 'required|string|max:255',
+            'job_title_id' => 'integer|exists:job_titles,id',
             'phone_number' => 'required|string|max:20',
             'cv_file' => 'file|mimes:pdf|max:10240',
         ];

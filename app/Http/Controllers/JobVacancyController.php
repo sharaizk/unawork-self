@@ -55,8 +55,15 @@ class JobVacancyController extends Controller
 
         $vacancies = $jobVacancies;
         $skills = Skill::all();
-        $usersWithVacancies = User::whereHas('jobVacancies') 
+
+        $usersWithVacancies = User::whereHas('jobVacancies')
+            ->whereHas('workspacesOwner', function ($query) use ($request) {
+                if ($request->has('industry')) {
+                    $query->where('industry_id', $request->industry)->orderBy('created_at')->take(1);
+                }
+            })
             ->get();
+
         return view('job_vacancies.landing.list', compact('vacancies', 'skills', 'usersWithVacancies'));
     }
 }

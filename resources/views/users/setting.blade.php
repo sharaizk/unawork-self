@@ -466,6 +466,21 @@
                                                         class="form-control" value="{{ $currentWorkspace->company }}"
                                                         required="required" />
                                                 </div>
+                                                @php
+                                                    $industries = \App\Models\Industry::all();
+                                                    $currentIndustryId = $currentWorkspace->industry_id ?? null;
+                                                @endphp
+                                                    <div class="form-group col-md-6">
+                                                        <label for="industry_id" class="form-label">Job Title:</label>
+                                                        <select class="form-control" name="industry_id" id="industry_id">
+                                                            <option value="">Select your Industry </option>
+                                                            @foreach($industries as $industry)
+                                                                <option value="{{ $industry->id }}" {{ $currentIndustryId == $industry->id ? 'selected' : '' }}>
+                                                                    {{ $industry->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 <div class="form-group col-md-6">
                                                     <label for="address" class="form-label">{{ __('Address') }}</label>
                                                     <input type="text" name="address" id="address"
