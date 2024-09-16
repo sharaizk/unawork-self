@@ -22,15 +22,15 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'country' => 'string|max:255',
-            'state' => 'string|max:255',
-            'city' => 'string|max:255',
-            'zip_code' => 'string|max:20',
-            'address' => 'string|max:255',
-            'phone_number' => 'string|max:20',
-            'cv_file' => 'nullable|file|mimes:pdf|max:10240',
-            'about' => 'string|max:25500',
-            'job_title_id' => 'integer|exists:job_titles,id',
+            'country' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
+            'cv_file' => 'nullable|file|mimes:pdf,doc,docx,odt,txt|max:10240',
+            'about' => 'nullable|string|max:25500',
+            'job_title_id' => 'nullable|integer|exists:job_titles,id',
             'skill_ids' => 'nullable|array',
             'skill_ids.*' => 'integer|exists:skills,id',
         ];
