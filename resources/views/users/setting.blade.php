@@ -471,7 +471,7 @@
                                                     $currentIndustryId = $currentWorkspace->industry_id ?? null;
                                                 @endphp
                                                     <div class="form-group col-md-6">
-                                                        <label for="industry_id" class="form-label">Job Title:</label>
+                                                        <label for="industry_id" class="form-label">Industry:</label>
                                                         <select class="form-control" name="industry_id" id="industry_id">
                                                             <option value="">Select your Industry </option>
                                                             @foreach($industries as $industry)
