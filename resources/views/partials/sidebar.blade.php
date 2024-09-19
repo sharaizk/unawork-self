@@ -98,6 +98,20 @@
                                         class="dash-mtext">{{ __('Messenger') }}</span></a>
                             </li>
                         @endif
+                        {{-- 
+                            @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
+                            --}} 
+                            <li
+                                class="dash-item  {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
+                                <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
+                                    class="dash-link "><span class="dash-micon"><i
+                                            data-feather="video"></i></span><span
+                                        class="dash-mtext">{{ __('Zoom Meeting') }}</span></a>
+
+                            </li>
+                        {{-- 
+                        @endif
+                        --}} 
                        @if (\Auth::user()->type != "admin")
                             <!-- <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
                                 <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
@@ -107,7 +121,7 @@
                             <li class="dash-item {{ Route::currentRouteName() === 'pods.index' ? 'active' : '' }}">
                                 <a class="dash-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" style="z-index: 1000;">
                                     <span class="dash-micon"><i class="ti ti-message-circle"></i></span>
-                                    <span class="dash-mtext">{{ __('PODS') }}</span> 
+                                    <span class="dash-mtext">{{ __('PODs') }}</span> 
                                 </a>
                                 @php
                                     $pods = Auth::user()->pods;
@@ -127,17 +141,24 @@
                         @endif
                             <!-- <div class="dependsOnWorkspace">    -->
                                             <hr>
-                                            <li class="dash-item dash-hasmenu dependsOnWorkspace">
+                                            <li class="dash-item dash-hasmenu {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }}">
                                                 <a href="{{ route('home') }}"
                                                     class="dash-link  {{ Request::route()->getName() == 'home' || Request::route()->getName() == null || Request::route()->getName() == 'client.home' ? ' active' : '' }}">
                                                     <span class="dash-micon"><i class="ti ti-home"></i></span>
                                                     <span class="dash-mtext">{{ __('Dashboard') }}</span>
                                                 </a>
                                             </li>
+
+                                            @if($currentWorkspace->isPartOfPod())
+                                            <hr>
+                                                <div class="row d-flex justify-content-center align-items-center text-center">
+                                                    <span>Outer Circle</span>
+                                                </div>
+                                            @endif
                                         @if (isset($currentWorkspace) && $currentWorkspace)
                                             @auth('web')
                                                 @if ($currentWorkspace->ownerable_type == "App\Models\Pod")
-                                                        <li class="dash-item dash-hasmenu dependsOnWorkspace">
+                                                        <li class="dash-item dash-hasmenu {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }}">
                                                             @php
                                                                 $currentRoute = Request::route()->getName();
                                                             @endphp
@@ -150,7 +171,7 @@
                                                             </a>
                                                         </li>
                                                         @if ($currentWorkspace->created_by == Auth::user()->id || ($userWorkspace && $userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::NEWS_INDEX->value)))
-                                                            <li class="dash-item dash-hasmenu dependsOnWorkspace">
+                                                            <li class="dash-item dash-hasmenu {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }}">
                                                                     @php
                                                                         $currentRoute = Request::route()->getName();
                                                                     @endphp
@@ -164,7 +185,7 @@
                                                             </li>
                                                         @endif
                                                     @else
-                                                    <li class="dash-item dash-hasmenu dependsOnWorkspace">
+                                                    <li class="dash-item dash-hasmenu {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }}">
                                                         @php
                                                             $currentRoute = Request::route()->getName();
                                                         @endphp
@@ -187,40 +208,6 @@
                                                     </li> -->
                                                 @endif
                                                 
-                                                @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::PROJECTS_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
-                                                    <li
-                                                        class="dash-item dependsOnWorkspace {{ Request::route()->getName() == 'projects.index' || Request::segment(2) == 'projects' ? ' active' : '' }}">
-                                                        <a href="{{ route('projects.index', $currentWorkspace->slug) }}" class="dash-link"><span
-                                                                class="dash-micon"> <i data-feather="briefcase"></i></span><span
-                                                                class="dash-mtext">{{ __('Projects') }}</span></a>
-                                                    </li>
-                                                    <li class="dash-item dependsOnWorkspace {{ Request::route()->getName() == 'tasks.index' ? ' active' : '' }}">
-                                                        <a href="{{ route('tasks.index', $currentWorkspace->slug) }}" class="dash-link "><span
-                                                                class="dash-micon"><i data-feather="list"></i></span><span
-                                                                class="dash-mtext">{{ __('Tasks') }}</span></a>
-                                                    </li>
-                                                    <li
-                                                        class="dash-item dependsOnWorkspace {{ Request::route()->getName() == 'project_report.index' || Request::segment(2) == 'project_report' ? ' active' : '' }}">
-                                                        <a href="{{ route('project_report.index', $currentWorkspace->slug) }}"
-                                                            class="dash-link "><span class="dash-micon"><i
-                                                                    class="ti ti-chart-line"></i></span><span
-                                                                class="dash-mtext">{{ __('Project Report') }}</span></a>
-                                                    </li>
-                                                @endif
-                                                {{-- 
-                                                    @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
-                                                    --}} 
-                                                    <li
-                                                        class="dash-item dependsOnWorkspace {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
-                                                        <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
-                                                            class="dash-link "><span class="dash-micon"><i
-                                                                    data-feather="video"></i></span><span
-                                                                class="dash-mtext">{{ __('Zoom Meeting') }}</span></a>
-
-                                                    </li>
-                                                {{-- 
-                                                @endif
-                                                --}} 
 
                                                 <!-- <li
                                                     class="dash-item {{ Request::route()->getName() == 'timesheet.index' ? ' active' : '' }}">
@@ -277,13 +264,38 @@
                                                                 data-feather="calendar"></i></span><span
                                                             class="dash-mtext">{{ __('Calendar') }}</span></a>
                                                 </li> -->
-                                                <li class="dash-item dependsOnWorkspace {{ Request::route()->getName() == 'notes.index' ? ' active' : '' }}">
+                                                <li class="dash-item {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }} {{ Request::route()->getName() == 'notes.index' ? ' active' : '' }}">
                                                     <a href="{{ route('notes.index', $currentWorkspace->slug) }}" class="dash-link "><span
                                                             class="dash-micon"><i data-feather="clipboard"></i></span><span
                                                             class="dash-mtext">{{ __('Notes') }} </span></a>
                                                 </li>
                                                 
-                                                
+                                                @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::PROJECTS_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
+                                                    @if($currentWorkspace->isPartOfPod())
+                                                        <hr>
+                                                        <div class="row d-flex justify-content-center align-items-center text-center">
+                                                            <span>Inner Circle</span>
+                                                        </div>
+                                                    @endif
+                                                    <li
+                                                        class="dash-item {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }} {{ Request::route()->getName() == 'projects.index' || Request::segment(2) == 'projects' ? ' active' : '' }}">
+                                                        <a href="{{ route('projects.index', $currentWorkspace->slug) }}" class="dash-link"><span
+                                                                class="dash-micon"> <i data-feather="briefcase"></i></span><span
+                                                                class="dash-mtext">{{ __('Projects') }}</span></a>
+                                                    </li>
+                                                    <li class="dash-item {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }} {{ Request::route()->getName() == 'tasks.index' ? ' active' : '' }}">
+                                                        <a href="{{ route('tasks.index', $currentWorkspace->slug) }}" class="dash-link "><span
+                                                                class="dash-micon"><i data-feather="list"></i></span><span
+                                                                class="dash-mtext">{{ __('Tasks') }}</span></a>
+                                                    </li>
+                                                    <li
+                                                        class="dash-item {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }} {{ Request::route()->getName() == 'project_report.index' || Request::segment(2) == 'project_report' ? ' active' : '' }}">
+                                                        <a href="{{ route('project_report.index', $currentWorkspace->slug) }}"
+                                                            class="dash-link "><span class="dash-micon"><i
+                                                                    class="ti ti-chart-line"></i></span><span
+                                                                class="dash-mtext">{{ __('Project Report') }}</span></a>
+                                                    </li>
+                                                @endif
                                     
                                                 @elseauth
                                                 <li
@@ -417,8 +429,15 @@
                                                 $currentWorkspace &&
                                                 $currentWorkspace->creater->id == Auth::user()->id &&
                                                 Auth::user()->getGuard() != 'client' && Auth::user()->role('company'))
+                                                
+                                                @if($currentWorkspace->isPartOfPod())
+                                                    <hr>
+                                                    <div class="row d-flex justify-content-center align-items-center text-center">
+                                                        <span>Owner</span>
+                                                    </div>
+                                                @endif
                                                 <li
-                                                class="dash-item dependsOnWorkspace {{ Request::route()->getName() == 'workspace.settings' ? ' active' : '' }}">
+                                                class="dash-item {{$currentWorkspace->isPartOfPod() ? 'dependsOnWorkspace' : '' }} {{ Request::route()->getName() == 'workspace.settings' ? ' active' : '' }}">
                                                 <a href="{{ route('workspace.settings', $currentWorkspace->slug) }}"
                                                     class="dash-link "><span class="dash-micon"><i
                                                             data-feather="settings"></i></span><span
