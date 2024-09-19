@@ -1,4 +1,5 @@
 @php
+    $settings = \Modules\LandingPage\Entities\LandingPageSetting::settings();
     $logo = \App\Models\Utility::get_file('users-avatar/');
 @endphp
 <header id="header">
@@ -7,7 +8,8 @@
                 <div class="header__container">
                     <div class="logoHeader">
                         <a href="/" title="UnaWork">
-                            <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork">
+                            <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
+                            <!-- <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork"> -->
                         </a>
                     </div>
                     <div class="header__main">
