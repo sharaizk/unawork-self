@@ -36,6 +36,12 @@
                         </thead>
                         <tbody>
                             @foreach ($users as $user)
+                                @php
+                                    $tUserWorkspace = \App\Models\UserWorkspace::where('user_id', $user->id)->where('workspace_id', $currentWorkspace->id)->first();
+                                    if (!$tUserWorkspace) {
+                                        continue;
+                                    }
+                                @endphp
                                 <tr>
                                     <td>
                                         @if ($user->hasRole('employee'))
@@ -52,7 +58,11 @@
                                             @if ($user->pivot->permission == 'Owner')
                                                 <span class="badge bg-primary">{{ __($user->pivot->permission) }}</span>
                                             @elseif ($user->pivot->status == 'active')
-                                                <span class="badge bg-dark">{{ __('Member') }}</span>
+                                                @if ($tUserWorkspace->hasPermissionTo('projects_index'))
+                                                    <span class="badge bg-dark">{{ __('Member Inner Circle') }}</span>
+                                                @else
+                                                    <span class="badge bg-dark">{{ __('Member Outer Circle') }}</span>
+                                                @endif
                                             @elseif ($user->pivot->status == 'pod_pending')
                                                 <span class="badge bg-dark">{{ __('Pending Pod') }}</span>
                                             @elseif ($user->pivot->status == 'employee_pending')
