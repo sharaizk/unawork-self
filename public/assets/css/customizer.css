@@ -6,6 +6,15 @@ Support: [support link]
 File: style.css
 =========================================================================
 =================================================================================== */
+@font-face {
+    font-family: "Caros-Medium";
+    src: local("Caros-Medium"),
+        url("/assets/fonts/Caros/Caros-Medium.otf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 .pct-customizer {
     position: fixed;
     right: -360px;
@@ -391,4 +400,71 @@ File: style.css
 
 .auth-wrapper ~ .pct-customizer {
     display: none;
+}
+
+.header-links {
+    min-width: 20%;
+}
+.header-links .row {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.header-links .row .col {
+    text-align: center;
+}
+.header-links .row .col:hover a {
+    color: #cfaa40;
+    text-decoration: none;
+}
+
+.header-links .row a {
+    font-family: "Caros-Medium", Arial, Helvetica, sans-serif;
+    color: #022d4d;
+    font-size: 0.9rem;
+}
+
+
+.pods-menu {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.pods-menu > li {
+    margin-bottom: 10px;
+}
+
+.pods-menu ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.pods-menu li {
+    cursor: pointer;
+}
+
+.pods-menu li:hover {
+    background-color: #E0E0E0; /* Світло-сірий для hover */
+}
+
+.pods-menu li strong {
+    font-weight: bold;
+}
+
+.pods-menu li.selected {
+    background-color: #0D3B66; /* Темно-синій */
+    color: white;
+    font-weight: bold;
+}
+
+.dependsOnWorkspace {
+    width: 80%;
+    margin-left: auto;   /* Вирівнюємо по правому краю */
+}
+
+.dependsOnWorkspace .dash-link {
+    display: flex;
+    justify-content: flex-start;  /* Вирівнюємо текст і іконку по лівому краю */
+    align-items: center;          /* Вирівнюємо вертикально по центру */
 }

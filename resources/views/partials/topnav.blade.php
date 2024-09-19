@@ -72,6 +72,19 @@
 <header class="dash-header {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
 
     <div class="header-wrapper">
+        <div class="header-links">
+            <div class="row">
+                <div class="col col-lg-3 p-1">
+                    <a href="{{ route('login') }}">Home</a>
+                </div>
+                <div class="col col-lg-5 p-1">
+                    <a href="{{ route('landing.find-work') }}">Find Work</a>
+                </div>
+                <div class="col col-lg-4 p-1">
+                    <a href="{{ route('landing.hiring') }}">Hiring</a>
+                </div>
+            </div>
+        </div>
         <div class="dash-mob-drp">
             <ul class="list-unstyled">
                 <li class="dash-h-item mob-hamburger">
@@ -849,10 +862,10 @@
                             <span>{{ __('My Profile') }}</span>
                         </a>
                         @if (Auth::user()->type != "admin")
-                            <a href="{{ route('pods.index') }}" class="dropdown-item">
+                            <!-- <a href="{{ route('pods.index') }}" class="dropdown-item">
                                 <i class="ti ti-message-circle"></i>
                                 <span>{{ __('PODS') }}</span> 
-                            </a>
+                            </a> -->
                         @endif
                         <!--   @if (env('CHAT_MODULE') == 'on')
                             @if (\Auth::user()->type == 'user')

@@ -1,6 +1,11 @@
 @extends('layouts.admin')
 @section('page-title')
+
+    @if ($currentWorkspace->isPartOfPod())
+        POD "{{ $currentWorkspace->ownerable->title  }}"
+    @endif
     {{ __('Dashboard') }}
+    
 @endsection
 @php
     use App\Models\Utility;

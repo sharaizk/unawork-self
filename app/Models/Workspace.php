@@ -115,6 +115,11 @@ class Workspace extends Model
         return $this->morphTo();
     }
 
+    public function isPartOfPod()
+    {
+        return $this->ownerable_type === 'App\\Models\\Pod';
+    }
+
     public function is_chagpt_enable()
     {
         $owner1 = UserWorkspace::where('workspace_id', $this->id)->where('permission', 'Owner')->first();
