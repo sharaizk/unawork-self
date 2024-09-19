@@ -117,7 +117,7 @@ class Workspace extends Model
 
     public function isPartOfPod()
     {
-        return $this->ownerable_type === 'App\\Models\\Pod';
+        return $this->ownerable_type === (new Pod())->getMorphClass();
     }
 
     public function is_chagpt_enable()
