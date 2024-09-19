@@ -1,6 +1,25 @@
 @extends('layouts.admin')
+@php
+    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+    if (!$userWorkspace) {
+        return redirect()->back()->with('error', 'permission denied!');
+    }
+    $adminSetting = App\Models\Utility::getAdminPaymentSetting();
+@endphp
 @section('page-title')
-    {{ __('Dashboard') }}
+
+    @if ($currentWorkspace->isPartOfPod())
+        POD "{{ $currentWorkspace->ownerable->title  }}"
+    @endif
+    {{ __('Dashboard') }} 
+    @if ($currentWorkspace->isPartOfPod() && $userWorkspace->hasPermissionTo('projects_index'))
+        - Inner Circle
+    @elseif ($currentWorkspace->isPartOfPod())
+        - Outer Circle
+    @else
+    @endif
+    
+    
 @endsection
 @php
     use App\Models\Utility;

@@ -72,6 +72,19 @@
 <header class="dash-header {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
 
     <div class="header-wrapper">
+        <div class="header-links">
+            <div class="row">
+                <div class="col col-lg-3 p-1">
+                    <a href="{{ route('login') }}">Home</a>
+                </div>
+                <div class="col col-lg-5 p-1">
+                    <a href="{{ route('landing.find-work') }}">Find Work</a>
+                </div>
+                <div class="col col-lg-4 p-1">
+                    <a href="{{ route('landing.hiring') }}">Hiring</a>
+                </div>
+            </div>
+        </div>
         <div class="dash-mob-drp">
             <ul class="list-unstyled">
                 <li class="dash-h-item mob-hamburger">
@@ -105,7 +118,14 @@
                         role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti ti-folder"></i>
                         
-                        <span class="hide-mob ms-2">{{ __('') }}{{ $currentWorkspace->name }}</span>
+                        <span class="hide-mob ms-2">
+                            {{ __('') }} 
+                            @if (!$currentWorkspace->isPartOfPod())
+                                {{ $currentWorkspace->name }}
+                            @elseif($currentWorkspace->isPartOfPod())
+                                POD {{ $currentWorkspace->ownerable->title }}
+                            @endif
+                        </span>
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
@@ -114,21 +134,23 @@
                     <!--all about workspaces, not for employee -->
                         {{-- @foreach (Auth::user()->workspace as $workspace)
                                 @if ($workspace->is_active)
-                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
-                                        title="{{ $workspace->name }}" class="dropdown-item">
-                                        @if (Auth::user()->currant_workspace == $workspace->id)
-                                            <i class="ti ti-checks text-success"></i>
-                                        @endif
-                                        <span>{{ $workspace->name }}</span>
-                                        @if (isset($workspace->pivot->permission))
-                                            @if ($workspace->pivot->permission == 'Owner')
-                                                <span
-                                                    class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
-                                            @else
-                                                <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                    @if (!$workspace->isPartOfPod())
+                                        <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
+                                            title="{{ $workspace->name }}" class="dropdown-item">
+                                            @if (Auth::user()->currant_workspace == $workspace->id)
+                                                <i class="ti ti-checks text-success"></i>
                                             @endif
-                                        @endif
-                                    </a>
+                                            <span>{{ $workspace->name }}</span>
+                                            @if (isset($workspace->pivot->permission))
+                                                @if ($workspace->pivot->permission == 'Owner')
+                                                    <span
+                                                        class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
+                                                @else
+                                                    <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                                @endif
+                                            @endif
+                                        </a>
+                                    @endif
                                 @else
                                     <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" 
                                         class="dropdown-item" title="{{ __('Locked') }}">
@@ -156,40 +178,42 @@
                             @foreach (Auth::user()->workspace as $workspace)
                                     {{-- @dump($workspace) --}}
                                     @if ($workspace->is_active)
-                                        @php
-                                            $user = Auth::user();
-                                            $userWorkspace = App\Models\UserWorkspace::where([['user_id', $user->id], ['workspace_id', $workspace->id]])->first();
-                                            $currentWorkspace = App\Models\Utility::getWorkspaceBySlug();
-                                        @endphp
-                                        @if (isset($userWorkspace))
-                                            @if ($userWorkspace->is_active == 1 && $userWorkspace->status == "active")
-                                                @php
-                                                    $login_status = true;
-                                                @endphp
-                                                <a href="@if (Auth::user()->currant_workspace == $workspace->id) #@else {{ route('change-workspace', $workspace->id) }} @endif"
-                                                    title="{{ $workspace->name }}" class="dropdown-item">
-                                                    @if (Auth::user()->currant_workspace == $workspace->id)
-                                                        <i class="ti ti-checks text-success"></i>
-                                                    @endif
-                                                    <span>{{ $workspace->name }}</span>
-
-                                                    @if ($workspace->ownerable_type == "App\Models\Pod")
-                                                        <span class="badge bg-primary">{{ __('POD') }}</span>
-                                                    @elseif ($workspace->creater->hasRole('company'))
-                                                        <span class="badge bg-primary">{{ __('Company') }}</span>
-                                                    @elseif ($workspace->creater->hasRole('employee'))
-                                                        <span class="badge bg-primary">{{ __('Own') }}</span>
-                                                    @endif
-
-                                                    @if (isset($workspace->pivot->permission))
-                                                        @if ($workspace->pivot->permission == 'Owner')
-                                                            <span
-                                                                class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
-                                                        @else
-                                                            <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                        @if (!$workspace->isPartOfPod())
+                                            @php
+                                                $user = Auth::user();
+                                                $userWorkspace = App\Models\UserWorkspace::where([['user_id', $user->id], ['workspace_id', $workspace->id]])->first();
+                                                $currentWorkspace = App\Models\Utility::getWorkspaceBySlug();
+                                            @endphp
+                                            @if (isset($userWorkspace))
+                                                @if ($userWorkspace->is_active == 1 && $userWorkspace->status == "active")
+                                                    @php
+                                                        $login_status = true;
+                                                    @endphp
+                                                    <a href="@if (Auth::user()->currant_workspace == $workspace->id) #@else {{ route('change-workspace', $workspace->id) }} @endif"
+                                                        title="{{ $workspace->name }}" class="dropdown-item">
+                                                        @if (Auth::user()->currant_workspace == $workspace->id)
+                                                            <i class="ti ti-checks text-success"></i>
                                                         @endif
-                                                    @endif
-                                                </a>
+                                                        <span>{{ $workspace->name }}</span>
+
+                                                        @if ($workspace->ownerable_type == "App\Models\Pod")
+                                                            <span class="badge bg-primary">{{ __('POD') }}</span>
+                                                        @elseif ($workspace->creater->hasRole('company'))
+                                                            <span class="badge bg-primary">{{ __('Company') }}</span>
+                                                        @elseif ($workspace->creater->hasRole('employee'))
+                                                            <span class="badge bg-primary">{{ __('Own') }}</span>
+                                                        @endif
+
+                                                        @if (isset($workspace->pivot->permission))
+                                                            @if ($workspace->pivot->permission == 'Owner')
+                                                                <span
+                                                                    class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
+                                                            @else
+                                                                <span class="badge bg-dark">{{ __('Shared') }}</span>
+                                                            @endif
+                                                        @endif
+                                                    </a>
+                                                @endif
                                             @endif
                                         @endif
                                     @else
@@ -849,10 +873,10 @@
                             <span>{{ __('My Profile') }}</span>
                         </a>
                         @if (Auth::user()->type != "admin")
-                            <a href="{{ route('pods.index') }}" class="dropdown-item">
+                            <!-- <a href="{{ route('pods.index') }}" class="dropdown-item">
                                 <i class="ti ti-message-circle"></i>
                                 <span>{{ __('PODS') }}</span> 
-                            </a>
+                            </a> -->
                         @endif
                         <!--   @if (env('CHAT_MODULE') == 'on')
                             @if (\Auth::user()->type == 'user')

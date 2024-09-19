@@ -8,10 +8,137 @@
     }
     $adminSetting = App\Models\Utility::getAdminPaymentSetting();
 @endphp
+        @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
+            <div class="row d-flex align-items-end">
+                <div class="col-lg-11">
+                </div>
+                <div class="col-lg-1">
+                    <a href="#" class="btn btn-primary" data-ajax-popup="true" data-size="lg"
+                    data-title="{{ __('Invite New User') }}" data-url="{{ route('pods.invite', $podId=$pod->id) }}"
+                    data-toggle="tooltip" title="{{ __('Invite New User') }}">
+                        <i class="ti ti-plus"></i>
+                    </a>
+                </div>
+            </div>
+        @endif
 <div class="row">
+    <div class="col-lg-12">
         
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('Email') }}</th>
+                                <th>{{ __('Role/Status') }}</th>
+                                <th>{{ __('Skills') }}</th>
+                                <th>{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($users as $user)
+                                @php
+                                    $tUserWorkspace = \App\Models\UserWorkspace::where('user_id', $user->id)->where('workspace_id', $currentWorkspace->id)->first();
+                                    if (!$tUserWorkspace) {
+                                        continue;
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>
+                                        @if ($user->hasRole('employee'))
+                                            <a href="{{ route('employee.show', ['employee' => $user]) }}">
+                                                {{ $user->name }} <i class="ti ti-eye"></i>
+                                            </a>
+                                        @else
+                                            {{ $user->name }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>
+                                        @if (isset($user->pivot->permission))
+                                            @if ($user->pivot->permission == 'Owner')
+                                                <span class="badge bg-primary">{{ __($user->pivot->permission) }}</span>
+                                            @elseif ($user->pivot->status == 'active')
+                                                @if ($tUserWorkspace->hasPermissionTo('projects_index'))
+                                                    <span class="badge bg-dark">{{ __('Member Inner Circle') }}</span>
+                                                @else
+                                                    <span class="badge bg-dark">{{ __('Member Outer Circle') }}</span>
+                                                @endif
+                                            @elseif ($user->pivot->status == 'pod_pending')
+                                                <span class="badge bg-dark">{{ __('Pending Pod') }}</span>
+                                            @elseif ($user->pivot->status == 'employee_pending')
+                                                <span class="badge bg-dark">{{ __('Pending Employee') }}</span>
+                                            @else
+                                                <span class="badge bg-dark">{{ __('Declined') }}</span>
+                                            @endif
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if (count($user->skills) >= 1) 
+                                            {{ implode(', ', $user->skills->pluck('name')->toArray()) }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @php
+                                            $hasOptions = false;
+                                            $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
+                                            $isPendingUser = $user->pivot->status == 'pod_pending';
+                                            $isCurrentUser = $user->id == Auth::user()->id;
+                                            $isChatEnabled = $adminSetting['enable_chat'] == 'on';
+                                            
+                                            if ($isCreatorOrHasPermission || (!$isCurrentUser && $isChatEnabled)) {
+                                                $hasOptions = true;
+                                            }
+                                        @endphp
+
+                                        @if ($hasOptions)
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    {{ __('Actions') }}
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    @if ($isCreatorOrHasPermission)
+                                                        @if ($isPendingUser)
+                                                            <li><a class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}">{{ __('Accept User') }}</a></li>
+                                                            <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline User') }}</a></li>
+                                                        @else
+                                                            <li>
+                                                                <a href="#" class="dropdown-item" 
+                                                                        data-ajax-popup="true" 
+                                                                        data-size="lg" 
+                                                                        data-title="Edit Permissions"
+                                                                        data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
+                                                                    <i class="ti ti-flag"></i> 
+                                                                    Edit Permissions
+                                                                </a>
+                                                            </li>
+                                                            @if ($pod->created_by != $user->id)
+                                                                <li><a class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}">{{ __('Remove from Pod') }}</a></li>
+                                                            @endif
+                                                        @endif
+                                                    @elseif ($isCurrentUser)
+                                                        @if ($isPendingUser)
+                                                            <li><a class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}">{{ __('Accept Invite') }}</a></li>
+                                                            <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline Invite') }}</a></li>
+                                                        @else
+                                                            <li><a class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}">{{ __('Remove me from this Pod') }}</a></li>
+                                                        @endif
+                                                    @endif
+                                                    @if (!$isCurrentUser && $isChatEnabled)
+                                                        <li><a class="dropdown-item sendMessageUser" data-employee-id="{{ $user->id }}">{{ __('Message') }}</a></li>
+                                                    @endif
+                                                </ul>
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+    </div>
+</div>
         @foreach ($users as $user)
-            <div class="col-xl-3 col-lg-4 col-sm-6">
+            <!-- old view (card show) -->
+            <!-- <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="card   text-center">
                     <div class="card-header border-0 pb-0">
                             @if (isset($user->pivot->permission))
@@ -73,7 +200,6 @@
                                                         <span>{{ __('Decline user') }}</span>
                                                     </a>
                                                 @else
-                                                    <!-- if ($user->id != Auth::id()) -->
                                                         <a href="#" class="dropdown-item" 
                                                                 data-ajax-popup="true" 
                                                                 data-size="lg" 
@@ -89,7 +215,6 @@
                                                             <span>{{ __('Remove user from pod') }}</span>
                                                         </a>
                                                         @endif
-                                                    <!-- endif -->
                                                 @endif
                                             @elseif ($isCurrentUser)
                                                 @if ($isPendingUser)
@@ -121,8 +246,8 @@
                                     </div>
                                 @endif
                             </div>
-                    </div>
-                    <div class="card-body">
+                    </div> 
+                     <div class="card-body">
                         <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
                             @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
                             <h4 class="mt-2">
@@ -145,13 +270,13 @@
                                {{ $skill->name }} @if(!$loop->last), @endif
                             @endforeach
                         </small>
-                    </div>
+                    </div> 
                 </div>
-            </div>
+            </div> -->
         @endforeach
 
         @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
-        <div class="col-xl-3 col-lg-4 col-sm-6">
+        <!-- <div class="col-xl-3 col-lg-4 col-sm-6">
             <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
                 data-title="{{ __('Invite New User') }}" data-url="{{ route('pods.invite', $podId=$pod->id) }}"
                 data-toggle="tooltip" title="{{ __('Invite New User') }}">
@@ -161,9 +286,8 @@
                 <h6 class="mt-4 mb-2">{{__('Invite New User')}}</h6>
                 <p class="text-muted text-center">{{__('Click here to invite New User')}}</p>
             </a>
-        </div>
+        </div> -->
         @endif
-    </div>
 
     <div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
         <div class="modal-dialog" role="document">
