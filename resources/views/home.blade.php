@@ -7,19 +7,19 @@
     $adminSetting = App\Models\Utility::getAdminPaymentSetting();
 @endphp
 @section('page-title')
-
     @if ($currentWorkspace->isPartOfPod())
         POD "{{ $currentWorkspace->ownerable->title  }}"
     @endif
     {{ __('Dashboard') }} 
-    @if ($currentWorkspace->isPartOfPod() && $userWorkspace->hasPermissionTo('projects_index'))
-        - Inner Circle
-    @elseif ($currentWorkspace->isPartOfPod())
-        - Outer Circle
-    @else
-    @endif
     
-    
+    {{-- 
+        @if ($currentWorkspace->isPartOfPod() && $userWorkspace->hasPermissionTo('projects_index'))
+            - Inner Circle
+        @elseif ($currentWorkspace->isPartOfPod())
+            - Outer Circle
+        @else 
+        @endif 
+    --}}
 @endsection
 @php
     use App\Models\Utility;
