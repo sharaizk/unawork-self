@@ -68,6 +68,7 @@
            }
 
            $isPartOfPod = $currentWorkspace->isPartOfPod();
+           $currentPod = $isPartOfPod ? $currentWorkspace->ownerable : null;
        @endphp
        <nav
            class="dash-sidebar light-sidebar {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
@@ -154,12 +155,14 @@
                                             @if($isPartOfPod)
                                             <hr>
                                                 <div class="row d-flex justify-content-center align-items-center text-center">
-                                                    <span>Outer Circle</span>
+                                                    <a href="{{ route('landing.pods.show', $pod = $currentPod->id) }}">
+                                                        <span>Outer Circle</span>
+                                                    </a>
                                                 </div>
                                             @endif
                                         @if (isset($currentWorkspace) && $currentWorkspace)
                                             @auth('web')
-                                                @if ($currentWorkspace->ownerable_type == "App\Models\Pod")
+                                                @if ($isPartOfPod)
                                                         <li class="dash-item dash-hasmenu {{$isPartOfPod ? 'dependsOnWorkspace' : '' }}">
                                                             @php
                                                                 $currentRoute = Request::route()->getName();
