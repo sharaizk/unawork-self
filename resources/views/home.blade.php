@@ -1,14 +1,18 @@
 @extends('layouts.admin')
 @php
-    $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
-    if (!$userWorkspace) {
-        return redirect()->back()->with('error', 'permission denied!');
+    if (Auth::user()->type != 'admin') {
+        $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+        if (!$userWorkspace) {
+            return redirect()->back()->with('error', 'permission denied!');
+        }
+        $adminSetting = App\Models\Utility::getAdminPaymentSetting();
     }
-    $adminSetting = App\Models\Utility::getAdminPaymentSetting();
 @endphp
 @section('page-title')
-    @if ($currentWorkspace->isPartOfPod())
-        POD "{{ $currentWorkspace->ownerable->title  }}"
+    @if (Auth::user()->type != 'admin')
+        @if ($currentWorkspace->isPartOfPod())
+            POD "{{ $currentWorkspace->ownerable->title  }}"
+        @endif
     @endif
     {{ __('Dashboard') }} 
     

@@ -12,7 +12,7 @@
                $cust_theme_bg = $setting['cust_theme_bg'];
                $SITE_RTL = $setting['site_rtl'];
                $adminSetting['enable_chat'] = 'on';
-               
+               $isPartOfPod = false;
            } else {
                $AuthUser = Auth::user();
                if (!is_null($AuthUser->currant_workspace)) {
@@ -43,6 +43,9 @@
                if ($company_logo == '' || $company_logo == null) {
                    $company_logo = App\Models\Utility::get_logo();
                }
+
+                $isPartOfPod = $currentWorkspace->isPartOfPod();
+                $currentPod = $isPartOfPod ? $currentWorkspace->ownerable : null;
            }
 
            if ($color == '' || $color == null) {
@@ -67,8 +70,6 @@
                $SITE_RTL = env('SITE_RTL');
            }
 
-           $isPartOfPod = $currentWorkspace->isPartOfPod();
-           $currentPod = $isPartOfPod ? $currentWorkspace->ownerable : null;
        @endphp
        <nav
            class="dash-sidebar light-sidebar {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
@@ -104,14 +105,16 @@
                         {{-- 
                             @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
                             --}} 
-                            <li
-                                class="dash-item  {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
-                                <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
-                                    class="dash-link "><span class="dash-micon"><i
-                                            data-feather="video"></i></span><span
-                                        class="dash-mtext">{{ __('Zoom Meeting') }}</span></a>
+                            @if (Auth::user()->type != 'admin')
+                                <li
+                                    class="dash-item  {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
+                                    <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
+                                        class="dash-link "><span class="dash-micon"><i
+                                                data-feather="video"></i></span><span
+                                            class="dash-mtext">{{ __('Zoom Meeting') }}</span></a>
 
-                            </li>
+                                </li>
+                            @endif
                         {{-- 
                         @endif
                         --}} 
