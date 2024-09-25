@@ -373,17 +373,18 @@
                                                         <i data-feather="user"></i></span><span
                                                         class="dash-mtext">{{ __('Company') }}</span></a>
                                             </li>
+                                            <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
+                                                <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i
+                                                            class="ti ti-trophy"></i></span><span
+                                                        class="dash-mtext">{{ __('Plans') }}</span></a>
+                                            </li>
                                         @endif
                                         @if (
                                             (Auth::user()->type == 'admin' ||
                                                 (isset($currentWorkspace) && $currentWorkspace && $currentWorkspace->creater->id == Auth::user()->id)) &&
                                                 Auth::user()->getGuard() != 'client')
 
-                                            <!-- <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
-                                                <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i
-                                                            class="ti ti-trophy"></i></span><span
-                                                        class="dash-mtext">{{ __('Plans') }}</span></a>
-                                            </li> -->
+                                            
 
 
 
