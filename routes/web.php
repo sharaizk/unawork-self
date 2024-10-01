@@ -128,6 +128,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/workspace/{workspace}/users/{user}', [WorkspaceController::class, 'updatePermissions'])->name('workspace.users.updatePermissions');
 
     Route::post('/account/create-chat', [MessagesController::class, 'createChat'])->name('chat.create');
+
+    Route::get('/pods/{pod}/inner-circle', [PodController::class, 'showInner'])->name('landing.pods.show.inner');
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

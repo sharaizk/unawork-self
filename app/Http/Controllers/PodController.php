@@ -89,4 +89,12 @@ class PodController extends Controller
 
         return view('pod.manage.projects', compact('projects', 'pod', 'currentWorkspace'));
     }
+
+    public function showInner(Pod $pod)
+    {
+        $this->authorize('viewInner', $pod);
+
+        $projects = $pod->projects()->latest('created_at')->get();
+        return view('pod.landing.inner', compact('pod', 'projects'));
+    }
 }

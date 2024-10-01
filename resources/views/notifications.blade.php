@@ -120,6 +120,13 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $text = __('You were assigned to new project: ') . ' <b>' . $project->name . '</b>';
                     $icon = 'fa fa-suitcase';
                 @endphp
+            @elseif($notification->type == 'pod_inner_circle_invite')
+                @php
+                    $link = route('landing.pods.show.inner', ($data) ? $data->id : '#');
+                    $text = __('You have been added to inner circle of pod ') . ' <b>"' . $data->title . '"</b>';
+                    $icon = 'fa fa-bug';
+                    $name = 'POD';
+                @endphp
             @elseif($notification->type == 'pod_invite')
             @php
                     $pod = \App\Models\Pod::find($data->id);

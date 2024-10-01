@@ -15,11 +15,47 @@ use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class PodUserService
 {
+    public function updatePermissions(Pod $pod, User $user, array $permissions): bool
+    {
+        $workspace = $pod->workspace;
+
+        // policies 
+        $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
+        $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
+
+        if (!$userWorkspaceEditor->hasPermissionTo(UserWorkspacePermission::USERS_EDIT->value) && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value) {
+            throw new \Exception(__('You do not have permission for this!'));
+        }
+
+        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        $oldPermissions = $userWorkspace->getPermissionNames()->toArray();
+
+        $userWorkspace->syncPermissions($permissions);
+
+        if (!in_array('projects_index', $oldPermissions) && in_array('projects_index', $permissions)) {
+            $this->sendNotificationJoinedInnerToUser($user, $pod);
+        }
+        
+        return true;
+    }
+
+    protected function sendNotificationJoinedInnerToUser(User $user, Pod $pod)
+    {
+        Utility::sendNotification('pod_inner_circle_invite', null, $user->id, $pod);
+
+        // $message = "You have been invited to join the pods inner circle: ".$pod->title." !";
+        // $subject = 'Inner Circle Invitation';
+        // $settings = Utility::getAdminPaymentSetting();
+
+        // SendEmail::dispatch($user->email, $message, $subject, $settings);
+    }
+
     public function remove(int $userId, int $podId): void
     {
         $pod = Pod::find($podId);

@@ -20,15 +20,20 @@ use Spatie\Permission\Models\Permission;
 
 class PodUserController extends Controller
 {
+    protected $podUserService;
+
+    public function __construct(PodUserService $podUserService)
+    {
+        $this->podUserService = $podUserService;
+    }
+
     public function index(int $podId)
     {
         try {
             $pod = Pod::findOrFail($podId);
             $currentWorkspace = $pod->workspace;
 
-            $podUserService = new PodUserService;
-
-            $users = $podUserService->list($pod, Auth::id(), $currentWorkspace->id);
+            $users = $this->podUserService->list($pod, Auth::id(), $currentWorkspace->id);
 
             return view('pod.manage.users', compact('currentWorkspace', 'pod', 'users'));
         } catch (\Exception $e) {
@@ -50,9 +55,8 @@ class PodUserController extends Controller
         $settings = Utility::getAdminPaymentSetting();
         
         if ($registerUsers) {
-            $podUserService = new PodUserService;
             try {
-                $podUserService->inviteExistedUser($registerUsers->id, $podId, $settings);
+                $this->podUserService->inviteExistedUser($registerUsers->id, $podId, $settings);
                 return response()->json([
                     'code' => 200,
                     'status' => 'Success',
@@ -94,10 +98,9 @@ class PodUserController extends Controller
 
     public function remove($podId, $userId)
     {
-        $podUserService = new PodUserService;
         try {
-            $podUserService->remove($userId, $podId);
-            $location = $podUserService->getBackUrl(Auth::id(), $userId, $podId);
+            $this->podUserService->remove($userId, $podId);
+            $location = $this->podUserService->getBackUrl(Auth::id(), $userId, $podId);
             return response()->json([
                 'message' => 'User removed from pod successfully',
                 'location' => $location
@@ -150,21 +153,16 @@ class PodUserController extends Controller
 
     public function updatePermissions(Request $request, Pod $pod, User $user)
     {
-        $workspace = $pod->workspace;
-
-        // policies 
-        $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
-        $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
-
-        if (!$userWorkspaceEditor->hasPermissionTo(UserWorkspacePermission::USERS_EDIT->value) && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value ) {
-            return redirect()->back()->with('error', __('Error: you do not have permission for this!'));
+        $permissions = $request->input('permissions', []);
+        
+        try {
+            $message = $this->podUserService->updatePermissions($pod, $user, $permissions);
+            $message = __('Permissions updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
 
-        $permissions = $request->input('permissions', []);
-        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
-        $userWorkspace->syncPermissions($permissions);
-
-        return redirect()->back()->with('success', 'Permissions updated successfully.');
+        return redirect()->back()->with('success', $message);
     }
 
     private function deleteNotification($type, $userId, $podUserId)
