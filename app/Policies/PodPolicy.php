@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Pod;
 use App\Models\User;
+use App\Models\UserWorkspace;
 use Illuminate\Auth\Access\Response;
 
 class PodPolicy
@@ -63,4 +64,12 @@ class PodPolicy
     // {
     //     //
     // }
+
+    public function viewInner(User $user, Pod $pod): bool
+    {
+        $workspace = $pod->workspace;
+        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+
+        return $userWorkspace && $userWorkspace->hasPermissionTo('projects_index');
+    }
 }

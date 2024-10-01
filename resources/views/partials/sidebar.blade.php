@@ -282,7 +282,9 @@
                                                     @if($isPartOfPod)
                                                         <hr>
                                                         <div class="row d-flex justify-content-center align-items-center text-center">
-                                                            <span>Inner Circle</span>
+                                                            <a href="{{ route('landing.pods.show.inner', $pod = $currentPod->id) }}">
+                                                                <span>Inner Circle</span>
+                                                            </a>
                                                         </div>
                                                     @endif
                                                     <li
