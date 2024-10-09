@@ -2089,6 +2089,10 @@
     border: 1px solid #B5C2CB;
     padding: 12px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }
 
 .section_company .company-box .title-box {
@@ -2138,6 +2142,7 @@
     background-repeat: no-repeat; 
     background-position: center;
     overflow: hidden;
+    height: 100%;
 }
 
 .section_pod .pod-list .pod-list-item a {

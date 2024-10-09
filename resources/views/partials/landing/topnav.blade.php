@@ -19,10 +19,10 @@
                                     <!-- is going to turn into the manage plate after they sign in -->
                                     <a href="{{ route('login') }}">Home</a>
                                 </li>
-                                <li class="">
-                                    <a href="{{ route('landing.find-work') }}">Find Work</a>
+                                <li class="{{ Request::route()->getName() == 'landing.find-work' ? 'active' : '' }}">
+                                    <a href="{{ route('landing.find-work') }}" class="">Find Work</a>
                                 </li>
-                                <li class="">
+                                <li class="{{ Request::route()->getName() == 'landing.hiring' ? 'active' : '' }}">
                                     <a href="{{ route('landing.hiring') }}">Hiring</a>
                                 </li>
                             </ul>

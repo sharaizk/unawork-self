@@ -5,8 +5,8 @@
 @section('content')
     <style>
         .dropdown-menu-xl {
-            min-width: 200px; 
-            width: 300px; 
+            min-width: 130px; 
+            width: 150px; 
             max-height: 400px; 
             overflow-y: auto; 
         }
@@ -16,29 +16,37 @@
         }
 
         .dropdown-menu-xl .form-check-input {
-            width: 20px; 
-            height: 20px; 
-            margin-right: 10px; 
+            width: 15px; 
+            height: 15px; 
+            margin-right: 6px; 
         }
 
         .dropdown-menu-xl .form-check-label {
-            font-size: 16px; 
+            font-size: 12px; 
         }
 
         .btn-xl {
             font-size: 1.5rem;
-            padding: 10px 20px; 
+            height: 40px; 
         }
         .searchForm {
-            display: inline-flex;
+            display: flex;
+        }
+
+        .form-group {
+            height: 40px;
+        }
+        .header__search{
+            display: flex;
+            justify-items: center;
         }
     </style>
     <main>
     <section class="header__search">
-        <div class="container-master">
-            <div class="search__wrap">
+        <div class="container-master d-flex align-items-center">
+            <div class="search__wrap d-flex align-items-center">
                 <form id="searchForm" class="row g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
-                    <div id="skillsField" class="col-md-8 form-group">
+                    <div id="skillsField" class="col-md-8 form-group d-flex align-items-center">
                         <label>Select Skills</label>
                         <div class="dropdown">
                             <button class="btn btn-xl btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
@@ -57,7 +65,7 @@
                         </div>
                     </div>
                     
-                    <div class="col-md-4 form-group d-flex align-items-end">
+                    <div class="col-md-4 form-group d-flex align-items-center">
                         <button type="submit" class="btn btn-xl btn-primary w-100">Filter</button>
                     </div>
                 </form>

@@ -58,7 +58,8 @@
             padding: 10px 20px; 
         }
         .searchForm {
-            display: inline-flex;
+            display: flex;
+            height: 40px;
         }
     </style>
 
