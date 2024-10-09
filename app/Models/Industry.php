@@ -9,6 +9,10 @@ class Industry extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+    ];
+
     public function workspaces()
     {
         return $this->hasMany('App\Models\Workspace', 'industry_id');

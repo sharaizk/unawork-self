@@ -13,6 +13,7 @@
         display: flex;
         align-items: center;
         font-size: 1.8rem;
+        height: 60px;
     }
 
     .search__box {
@@ -25,19 +26,60 @@
     }
 
     .search__field {
-        flex: 1;
-        display: flex;
+        height: 40px;
+        background-color: #fff;
+        border: 1px solid #88a6b5;
+        border-radius: 3px;
+        overflow: hidden;
+        justify-content: center;
         align-items: center;
-        margin-right: 15px;
-        font-size: 1.8rem;
+        padding: 0 15px;
+        margin-right: 10px;
+        display: flex;
+        color: #022d4d;
+    }
+
+    .skills-button {
+        background-color: #fff;
+        color: #022d4d;
+        height: 40px;
+        font-size: 1.4rem;
+    }
+
+    .filter-btn {
+        height: 40px;
+        font-size: 1.4rem;
+    }
+
+    .skills-dropdown-menu {
+        min-width: 130px; 
+        width: 150px; 
+        max-height: 400px; 
+        overflow-y: auto; 
+    }
+
+
+    .skills-dropdown-menu li {
+        padding: 10px 20px; 
+    }
+
+    .skills-dropdown-menu .form-check-input {
+        width: 15px; 
+        height: 15px; 
+        margin-right: 6px; 
+    }
+
+    .skills-dropdown-menu .form-check-label {
+        font-size: 12px; 
     }
 
     .search__icon {
-        margin-right: 5px;
+        padding-right: 10px;
+        color: #022d4d;
+        font-size: 1rem;
     }
 
     .search__list {
-        flex: 1;
         margin-right: 15px;
         font-size: 1.8rem;
     }
@@ -45,29 +87,10 @@
     .form-control {
         flex: 1;
         margin-right: 5px;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
+        border: none;
     }
 
-    .dropdown-menu-xl {
-        min-width: 200px; 
-        width: 300px; 
-        max-height: 400px; 
-        overflow-y: auto; 
-    }
-
-    .dropdown-menu-xl li {
-        padding: 10px 20px; 
-    }
-
-    .dropdown-menu-xl .form-check-input {
-        width: 20px; 
-        height: 20px; 
-        margin-right: 10px; 
-    }
-
-    .dropdown-menu-xl .form-check-label {
-        font-size: 16px; 
-    }
 
     .btn-xl {
         font-size: 1.5rem;
@@ -106,10 +129,10 @@
                 </div>
                 <div class="search__list">
                     <div class="dropdown">
-                        <button class="btn btn-xl btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <button class="btn btn-secondary dropdown-toggle skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                             Select Skills
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-xl">
+                        <ul class="dropdown-menu skills-dropdown-menu">
                             @foreach($skills as $skill)
                             <li>
                                 <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
@@ -121,7 +144,7 @@
                         </ul>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-xl btn-primary">Filter</button>
+                <button type="submit" class="btn btn-primary filter-btn">Filter</button>
             </form>
         </div>
     </div>

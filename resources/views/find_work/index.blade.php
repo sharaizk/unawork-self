@@ -6,8 +6,8 @@
 @section('content')
 <style>
     .dropdown-menu-xl {
-        min-width: 200px; 
-        width: 300px; 
+        min-width: 130px; 
+        width: 150px; 
         max-height: 400px; 
         overflow-y: auto; 
     }
@@ -17,18 +17,19 @@
     }
 
     .dropdown-menu-xl .form-check-input {
-        width: 20px; 
-        height: 20px; 
-        margin-right: 10px; 
+        width: 15px; 
+        height: 15px; 
+        margin-right: 6px; 
     }
 
     .dropdown-menu-xl .form-check-label {
-        font-size: 16px; 
+        font-size: 12px; 
     }
 
     .btn-xl {
-        font-size: 1.5rem;
-        padding: 10px 20px; 
+        height: 40px;
+        padding: 10px 5px; 
+        font-size: 1.4rem;
     }
     .searchForm {
         display: inline-flex;
@@ -38,7 +39,7 @@
     <section class="header__search">
         <div class="container-master">
             <div class="search__wrap">
-                <form id="searchForm" class="row g-3 searchForm" method="GET">
+                <form id="searchForm" class=" g-3 searchForm" method="GET">
                 <div class="col-md-4 form-group">
                     <label for="type">Type</label>
                     <select id="type" class="form-control" name="type">
@@ -77,10 +78,9 @@
                     </select>
                 </div>
 
-                <div id="skillsField" class="col-md-4 form-group" style="display: none;">
-                    <label>Select Skills</label>
+                <div id="skillsField" class="col-md-2 form-group" style="display: none;">
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                        <button class="btn btn-xl btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
                             Select Skills
                         </button>
                         <ul class="dropdown-menu dropdown-menu-xl">
@@ -97,7 +97,7 @@
                 </div>
 
                 <div class="col-md-4 form-group d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <button type="submit" class="btn btn-xl btn-primary w-100">Filter</button>
                 </div>
                 </form>
             </div>
@@ -118,7 +118,7 @@
                 <a href="{{ route('job-vacancies.landing.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
-                <div class="row-master">
+                <div class="row-master d-flex align-items-stretch">
                     @foreach($usersWithVacancies as $userWithVacancies)
                         @include('company.landing.company_card', ['company' => $userWithVacancies->ownWorkspace()])
                     @endforeach
@@ -146,7 +146,7 @@
                 <a href="{{ route('pods.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container-master">
-                <div class="row-master">
+                <div class="row-master  d-flex align-items-stretch">
                     @foreach($pods as $pod)
                             @php
                                 $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
@@ -203,17 +203,17 @@
         var skillsField = document.getElementById('skillsField');
 
         if (type === 'company') {
-            industryField.style.display = 'block';
+            industryField.style.display = 'flex';
             skillsField.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'pod') {
-            skillsField.style.display = 'block';
+            skillsField.style.display = 'flex';
             industryField.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'project') {
             skillsField.style.display = 'none';
             industryField.style.display = 'none';
-            budgetField.style.display = 'block';
+            budgetField.style.display = 'flex';
         } else {
             skillsField.style.display = 'none';
             industryField.style.display = 'none';

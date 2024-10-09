@@ -6,6 +6,17 @@
     margin-left: auto;
     
 }
+
+.tpl-find-work .form-group{
+    display: flex;
+    justify-content: center;
+}
+
+.tpl-find-work .form-control {
+    height: 40px;
+    font-size: 1.4rem;
+}
+
 .hire__title {
     font-size: 40px;
     margin: 40px 0;

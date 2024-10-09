@@ -25,11 +25,11 @@
                     @endphp
                 @if ($user)
                     @if (is_null($workspace))
-                        <a href="{{ route('company.join', ['workspace' => $company->id]) }}" class="w-100 learn-more">Join</a>
+                        <!-- <a href="{{ route('company.join', ['workspace' => $company->id]) }}" class="w-100 learn-more">Join</a> -->
                     @elseif ($status === "active")
-                        <div class="learn-more"><span class="small">You are member of this company</span></div>
+                        <!-- <div class="learn-more"><span class="small">You are member of this company</span></div> -->
                     @elseif ($status ===  "workspace_pending")
-                        <div class="learn-more"><span class="small">You have sended request to join this company</span></div>
+                        <!-- <div class="learn-more"><span class="small">You have sended request to join this company</span></div> -->
                     @endif
                 @endif
             </div>

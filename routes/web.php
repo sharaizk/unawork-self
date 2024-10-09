@@ -65,7 +65,9 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
 use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
+use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PayHerePaymentController;
@@ -130,6 +132,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/account/create-chat', [MessagesController::class, 'createChat'])->name('chat.create');
 
     Route::get('/pods/{pod}/inner-circle', [PodController::class, 'showInner'])->name('landing.pods.show.inner');
+
+    Route::resource('industries', IndustryController::class)->names([
+        'index' => 'industries.index',
+        'create' => 'industries.create',
+        'store' => 'industries.store',
+        'show' => 'industries.show',
+        'edit' => 'industries.edit',
+        'update' => 'industries.update',
+        'destroy' => 'industries.destroy',
+    ]);
+    Route::resource('job-titles', JobTitleController::class)->names([
+        'index' => 'job-titles.index',
+        'create' => 'job-titles.create',
+        'store' => 'job-titles.store',
+        'show' => 'job-titles.show',
+        'edit' => 'job-titles.edit',
+        'update' => 'job-titles.update',
+        'destroy' => 'job-titles.destroy',
+    ]);
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

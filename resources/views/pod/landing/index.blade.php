@@ -21,6 +21,7 @@
         color: #022D4D;
         border: 1px solid #022D4D;
     }
+
 </style>
 <link rel="stylesheet" href="{{ asset('assets/css/landing/outer-pods.css') }}">
 <section class="section__titlepage">

@@ -1,4 +1,4 @@
-       @php
+@php
            $logo = \App\Models\Utility::get_file('logo/');
            if (Auth::user()->type == 'admin') {
                $setting = App\Models\Utility::getAdminPaymentSetting();
@@ -396,17 +396,31 @@
                                                         class="dash-mtext">{{ __('Orders') }}</span></a>
                                             </li> -->
                                             @if (Auth::user()->type == 'admin')
-                                                <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
+                                                <!-- <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
                                                     <a href="{{ route('plan_request.index') }}" class="dash-link "><span
                                                             class="dash-micon"><i class="ti ti-brand-telegram"></i></span><span
                                                             class="dash-mtext">{{ __('Plan Request') }}</span></a>
-                                                </li>
+                                                </li> -->
                                             @endif
                                         @endif
 
 
                                         @if (Auth::user()->type == 'admin')
                                             <li
+                                                class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">
+                                                <a href="{{ route('industries.index') }}" class="dash-link "><span
+                                                        class="dash-micon">
+                                                        <i class="ti ti-clipboard"></i></span><span
+                                                        class="dash-mtext">{{ __('Industries') }}</span></a>
+                                            </li>
+                                            <li
+                                                class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">
+                                                <a href="{{ route('job-titles.index') }}" class="dash-link "><span
+                                                        class="dash-micon">
+                                                        <i class="ti ti-clipboard"></i></span><span
+                                                        class="dash-mtext">{{ __('Job Titles') }}</span></a>
+                                            </li>
+                                            <!-- <li
                                                 class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">
                                                 <a href="{{ route('referral-programs.index') }}" class="dash-link "><span
                                                         class="dash-micon">
@@ -418,7 +432,7 @@
                                                 <a href="{{ route('coupons.index') }}" class="dash-link "><span class="dash-micon">
                                                         <i class="ti ti-tag"></i></span><span
                                                         class="dash-mtext">{{ __('Coupons') }}</span></a>
-                                            </li>
+                                            </li> -->
 
                                             <li
                                                 class="dash-item {{ Request::route()->getName() == 'email_template*' || Request::segment(1) == 'email_template_lang' ? ' active' : '' }}">
