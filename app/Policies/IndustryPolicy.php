@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\User;
+use App\Models\Industry;
+
+class IndustryPolicy
+{
+    /**
+     * Determine if the user can view the list of industries.
+     */
+    public function viewAny(User $user)
+    {
+        return $user->type == 'admin';
+    }
+
+    /**
+     * Determine if the user can create industries.
+     */
+    public function create(User $user)
+    {
+        return $user->type == 'admin';
+    }
+
+    /**
+     * Determine if the user can update the industry.
+     */
+    public function update(User $user, Industry $industry)
+    {
+        return $user->type == 'admin';
+    }
+
+    /**
+     * Determine if the user can delete the industry.
+     */
+    public function delete(User $user, Industry $industry)
+    {
+        return $user->type == 'admin';
+    }
+}

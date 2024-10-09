@@ -24,6 +24,8 @@ class AuthServiceProvider extends ServiceProvider
         Notification::class => NotificationPolicy::class,
         JobVacancy::class => JobVacancyPolicy::class,
         JobApplication::class => JobApplicationPolicy::class,
+        Industry::class => IndustryPolicy::class,
+        JobTitle::class => JobTitlePolicy::class,
     ];
 
     /**

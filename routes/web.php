@@ -130,6 +130,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/account/create-chat', [MessagesController::class, 'createChat'])->name('chat.create');
 
     Route::get('/pods/{pod}/inner-circle', [PodController::class, 'showInner'])->name('landing.pods.show.inner');
+
+    Route::resource('industries', IndustryController::class)->names([
+        'index' => 'industries.index',
+        'create' => 'industries.create',
+        'store' => 'industries.store',
+        'show' => 'industries.show',
+        'edit' => 'industries.edit',
+        'update' => 'industries.update',
+        'destroy' => 'industries.destroy',
+    ]);
+    Route::resource('job-titles', JobTitleController::class)->names([
+        'index' => 'job-titles.index',
+        'create' => 'job-titles.create',
+        'store' => 'job-titles.store',
+        'show' => 'job-titles.show',
+        'edit' => 'job-titles.edit',
+        'update' => 'job-titles.update',
+        'destroy' => 'job-titles.destroy',
+    ]);
 });
 
 Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');

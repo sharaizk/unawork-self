@@ -9,6 +9,10 @@ class JobTitle extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+    ];
+    
     public function profiles()
     {
         return $this->hasMany(Profile::class);
