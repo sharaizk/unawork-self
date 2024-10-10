@@ -689,6 +689,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('/userProjectJson/{id}', [UserController::class, 'getProjectUserJson'])->name('user.project.json')->middleware(['auth', 'XSS']);
     Route::get('/projectMilestoneJson/{id}', [UserController::class, 'getProjectMilestoneJson'])->name('project.milestone.json')->middleware(['auth', 'XSS']);
     Route::get('/users', [UserController::class, 'index'])->name('users.index')->middleware(['auth', 'CheckPlan', 'XSS']);
+    Route::get('/employee-users', [UserController::class, 'employeeList'])->name('users.employee.index')->middleware(['auth', 'CheckPlan', 'XSS']);
     Route::get('/company-info/{id}', [UserController::class, 'companyInfo'])->name('company.info')->middleware(['auth', 'XSS']);
     Route::post('user-unable', [UserController::class, 'UserUnable'])->name('user.unable')->middleware(['auth', 'XSS']);
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware(['auth', 'XSS']);
