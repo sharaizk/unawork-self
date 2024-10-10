@@ -10,6 +10,7 @@
 
     @php
         $company = $vacancy->company;
+        $company_workspace = $company->ownWorkspace();
         if (Auth::user()) {
             if (Auth::user()->hasRole('employee')) {
                 $sendRequestUrl = route('login');
@@ -25,7 +26,7 @@
         <div class="container-master">
             <h1 class="section__titlepage--headertitle"><span>Job Vacancies</span></h1>
             <ul class="breadcrumb mt-1">
-                <li class="breadcrumb-item"><a href="{{ route('landing.company.show', $company->ownWorkspace()) }}">{{ $company->name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('landing.company.show', $company_workspace) }}">{{ $company_workspace->name }}</a></li>
                 <li class="breadcrumb-item"> {{$vacancy->title}} </li>
             </ul>
         </div>
@@ -37,18 +38,14 @@
                         <div class="row-master">
                             <section class="col-12 cm-shop__information">
                                 <div class="cm-shop__image">
-                                    <img @if ($company->avatar) 
-                                            src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $company->avatar) }}" 
-                                        @else 
-                                            src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" 
-                                        @endif
-                                        alt="{{ $company->name }}">
+                                <img @if ($company_workspace->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company_workspace->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
+                                    alt="Logo Shop">
 
                                 </div>
                                 <div class="cm-shop__profile">
                                     <div class="profile__name">
                                         <h1>{{ $vacancy->title }}</h1>
-                                        <div>For: {{ $company->name }}</div>
+                                        <div>For: {{ $company_workspace->name }}</div>
                                     </div>
                                     <!-- <div class="profile__skills">
                                         <div class="title">
