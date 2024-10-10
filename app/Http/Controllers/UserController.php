@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Status;
 use App\Models\ActivityLog;
 use App\Models\BugComment;
@@ -274,9 +275,25 @@ class UserController extends Controller
                     ['plan', '!=', 'NULL'],
 
                 ])
+                ->role(UserRole::COMPANY->value)
                 ->with('getPlan')
                 ->get();
         }
+        return view('users.index', compact('currentWorkspace', 'users'));
+    }
+
+    public function employeeList($slug = null)
+    {
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $users = User::where('type', '!=', 'admin')
+                ->where([
+                    ['type', '=', 'user'],
+                    ['plan', '!=', 'NULL'],
+
+                ])
+                ->role(UserRole::EMPLOYEE->value)
+                ->with('getPlan')
+                ->get();
         return view('users.index', compact('currentWorkspace', 'users'));
     }
 

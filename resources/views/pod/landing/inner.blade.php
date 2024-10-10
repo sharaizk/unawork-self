@@ -10,6 +10,12 @@
 
 @section('content')
 
+<style>
+    .circle_content .text {
+        min-width: 45vh; /* Set a minimum height for the description */
+    }
+</style>
+
 <section class="header__search">
     <div class="container-master">
         <div class="search__wrap">

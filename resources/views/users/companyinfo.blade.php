@@ -110,7 +110,7 @@
                                 @if ($user_data['total_users'] == 0)
                                 <div class="card mt-4">
                                     <div class="card-body d-flex align-items-center justify-content-center">
-                                        <p class="text-danger">Users Not Found!!!</p>
+                                        <p class="text-danger">No users yet in the workspace!!!</p>
                                     </div>
                                 </div>
                             @endif

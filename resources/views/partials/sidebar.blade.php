@@ -373,7 +373,12 @@
                                             <li class="dash-item {{ Request::route()->getName() == 'users.index' ? ' active' : '' }}">
                                                 <a href="{{ route('users.index', '') }}" class="dash-link "><span class="dash-micon">
                                                         <i data-feather="user"></i></span><span
-                                                        class="dash-mtext">{{ __('Company') }}</span></a>
+                                                        class="dash-mtext">{{ __('Companies') }}</span></a>
+                                            </li>
+                                            <li class="dash-item {{ Request::route()->getName() == 'users.employee.index' ? ' active' : '' }}">
+                                                <a href="{{ route('users.employee.index', '') }}" class="dash-link "><span class="dash-micon">
+                                                        <i data-feather="user"></i></span><span
+                                                        class="dash-mtext">{{ __('Employees') }}</span></a>
                                             </li>
                                             <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
                                                 <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i

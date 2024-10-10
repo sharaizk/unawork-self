@@ -11,7 +11,7 @@
             {{ $company->country ?? '' }} {{ $company->website ?? '' }}
         </p>
         <p>
-            {{ $company->about ?? 'about company' }}
+            {{ $company->description ? \Illuminate\Support\Str::limit($company->description, 120, '...') : 'about company' }}
         </p>
         <div class="row">
             <div class="col lg-6">

@@ -81,6 +81,7 @@
         </div>
     </div>
     @auth('web')
+    @if (\Auth::user()->type != 'admin')
     <!-- create meeting popup -->
     <div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
         <div class="modal-dialog" role="document">
@@ -115,6 +116,7 @@
             </div>
         </div>
     </div>
+    @endif
     @endauth
 
     <script src="{{ asset('assets/custom/js/site.core.js') }}"></script>
