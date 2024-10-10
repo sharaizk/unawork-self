@@ -107,6 +107,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return Workspace::where('created_by', '=', $this->id)->count();
     }
 
+    public function countPods()
+    {
+        return Pod::where('created_by', '=', $this->id)->count();
+    }
+
     public static  function userPlanFrequency($plan_id)
     {
         $userPlanFrequency = Order::where('plan_id', '=', $plan_id)->where('user_id', '=', \Auth::user()->id)->orderBy('updated_at', 'desc')->first();
