@@ -558,6 +558,7 @@ class Utility
         $data = DB::table('admin_payment_settings');
 
         $adminSettings = [
+            'is_manual_enabled' => 'off',
             'is_stripe_enabled' => 'off',
             'stripe_key' => '',
             'stripe_secret' => '',

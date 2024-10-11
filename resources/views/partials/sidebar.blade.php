@@ -143,6 +143,11 @@
                                     @endforeach
                                 </ul>
                             </li>
+                            <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
+                                <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i
+                                            class="ti ti-trophy"></i></span><span
+                                        class="dash-mtext">{{ __('Plans') }}</span></a>
+                            </li>
 
                         @endif
                             <!-- <div class="dependsOnWorkspace">    -->
@@ -401,11 +406,11 @@
                                                         class="dash-mtext">{{ __('Orders') }}</span></a>
                                             </li> -->
                                             @if (Auth::user()->type == 'admin')
-                                                <!-- <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
+                                                <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
                                                     <a href="{{ route('plan_request.index') }}" class="dash-link "><span
                                                             class="dash-micon"><i class="ti ti-brand-telegram"></i></span><span
                                                             class="dash-mtext">{{ __('Plan Request') }}</span></a>
-                                                </li> -->
+                                                </li>
                                             @endif
                                         @endif
 
