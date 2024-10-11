@@ -3269,3 +3269,52 @@ main {
 }
 
 /*# sourceMappingURL=main.css.map */
+
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 1.5rem 2rem;
+  background: #022d4d;
+  color: white;
+}
+
+.modal-title {
+font-size: 2rem;
+}
+
+.modal-body {
+  padding: 2rem;
+  font-size: 1.4rem;
+
+}
+
+.modal-body .form-control {
+  line-height: 3rem;
+  font-size: 1.4rem;
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+}
+
+.modal-footer button {
+  line-height: 2.5rem;
+  font-size: 1.2rem;
+}
+
+.btn-close {
+  font-size: 1.2rem;
+}
+
+.modal .form-select {
+  padding: 0.75rem;
+  border-radius: 5px;
+}
+.modal .btn-close {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M.146.146a.5.5 0 0 1 .708 0L8 7.293 15.146.146a.5.5 0 0 1 .708.708L8.707 8l7.147 7.146a.5.5 0 0 1-.708.708L8 8.707.854 15.854a.5.5 0 1 1-.708-.708L7.293 8 .146.854a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  filter: none;
+}

@@ -148,48 +148,55 @@
   </div>
 </main>
   @auth('web')
-    <div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Send Message</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    
+    <div class="modal fade" tabindex="-1" role="dialog" id="sendMessagePopup">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header text-white">
+                  <h5 class="modal-title">Send Message</h5>
+                  <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="mb-3">
+                      <label for="messageInput" class="form-label">Your Message:</label>
+                      <textarea id="messageInput" class="form-control" rows="3" placeholder="Type your message..."></textarea>
+                  </div>
+              </div>
+              <div class="modal-footer justify-content-between">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
+              </div>
           </div>
-          <div class="modal-body">
-            <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
-          </div>
-        </div>
       </div>
     </div>
-    <div class="modal" tabindex="-1" role="dialog" id="inviteUserPopup">
-      <div class="modal-dialog" role="document">
+    <div class="modal fade" tabindex="-1" role="dialog" id="inviteUserPopup">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Send Invite</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <label for="selectItem">Select Workspace or Pod</label>
-            <select id="selectItem" class="form-control">
-                <option value="" selected disabled>Select Item</option>
-                @foreach (Auth::user()->invitableWorkspaces($employee->id) as $workspace)
-                    <option value="workspace_{{ $workspace->slug }}">Company: {{ $workspace->name }}</option>
-                @endforeach
-                @foreach (Auth::user()->invitablePods($employee->id) as $pod)
-                    <option value="pod_{{ $pod->id }}">POD: {{ $pod->title }}</option>
-                @endforeach
-            </select>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="inviteUser">Send</button>
-          </div>
+            <div class="modal-header text-white">
+                <h5 class="modal-title">Send Invite</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="selectItem" class="form-label">Select Workspace or Pod</label>
+                    <select id="selectItem" class="form-select">
+                        <option value="" selected disabled>Select Item</option>
+                        @foreach (Auth::user()->invitableWorkspaces($employee->id) as $workspace)
+                            <option value="workspace_{{ $workspace->slug }}">Company: {{ $workspace->name }}</option>
+                        @endforeach
+                        @foreach (Auth::user()->invitablePods($employee->id) as $pod)
+                            <option value="pod_{{ $pod->id }}">POD: {{ $pod->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="inviteUser">Send</button>
+            </div>
         </div>
-      </div>
     </div>
+</div>
   @endauth
 @endsection
 
