@@ -1126,4 +1126,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(JobApplication::class);
     }
+
+    public function pendingApplicationsCount()
+    {
+        // Отримуємо всі вакансії користувача
+        return $this->jobVacancies->sum(function ($vacancy) {
+            // Для кожної вакансії підраховуємо кількість пендінг заявок
+            return $vacancy->getPendingApplicationsCount();
+        });
+    }
 }
