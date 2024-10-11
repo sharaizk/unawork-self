@@ -8,9 +8,6 @@
             <h4>{{$company->name}}</h4>
         </div>
         <p>
-            {{ $company->country ?? '' }} {{ $company->website ?? '' }}
-        </p>
-        <p>
             {{ $company->description ? \Illuminate\Support\Str::limit($company->description, 120, '...') : 'about company' }}
         </p>
         <div class="row">
