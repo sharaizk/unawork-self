@@ -36,5 +36,15 @@ class JobVacancy extends Model
     {
         return (int) $value;
     }
+
+    public function getTotalApplicationsCount()
+    {
+        return $this->jobApplications()->count();
+    }
+
+    public function getPendingApplicationsCount()
+    {
+        return $this->jobApplications()->where('status', 'pending')->count();
+    }
         
 }
