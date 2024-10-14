@@ -19,7 +19,7 @@
                 <h3 class="member_name"><a href="#">{{ $user->name }}</a></h3>
                 @if (Auth::user())
                     @if (Auth::user()->id != $user->id)
-                        <button class="btn btn-secondary sendMessageButton" data-employee-id="{{ $user->id }}">
+                        <button class="btn btn-primary sendMessageButton" data-employee-id="{{ $user->id }}">
                             <span> Message </span> 
                         </button>
                     @endif
