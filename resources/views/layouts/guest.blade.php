@@ -196,7 +196,7 @@
     @endphp
 
     <div class="custom-login">
-        <div class="login-bg-img">
+        <!-- <div class="login-bg-img">
             {{-- <img src="{{ asset('assets/img/' . $color . '.svg') }}" class="login-bg-1">
             <img src="{{ asset('assets/img/user2.svg') }}" class="login-bg-2"> --}}
             @if ($color == 'custom-color')
@@ -207,8 +207,8 @@
                 <img src="{{ asset('assets/img/' . $color . '.svg') }}" class="login-bg-1">
                 <img src="{{ asset('assets/img/user2.svg') }}" class="login-bg-2">
             @endif
-        </div>
-        <div class="bg-login bg-primary"></div>
+        </div> -->
+        <!-- <div class="bg-login bg-primary"></div> -->
         <div class="custom-login-inner">
             <header class="dash-header">
                 <nav class="navbar navbar-expand-md default">

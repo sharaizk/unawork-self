@@ -54,7 +54,7 @@
 </div>
 <div class="modal fade" id="commonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel"></h5>
@@ -68,7 +68,7 @@
     </div>
     <div class="modal fade" id="commonModalOver" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel"></h5>
@@ -83,36 +83,40 @@
     @auth('web')
     @if (\Auth::user()->type != 'admin')
     <!-- create meeting popup -->
-    <div class="modal" tabindex="-1" role="dialog" id="newMeetingPopup">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" tabindex="-1" role="dialog" id="newMeetingPopup">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create Meeting</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                <input type="hidden" name="members[0]" id="memberIdInput" value="">
-                <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input type="text" name="title" id="title" class="form-control" placeholder="Title" required>
+                <div class="modal-header text-white">
+                    <h5 class="modal-title">Create Meeting</h5>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="start_date" class="form-label">Start Date</label>
-                    {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
-                </div>
-                <div class="mb-3">
-                    <label for="duration" class="form-label">Duration (minutes)</label>
-                    <input type="number" name="duration" id="duration" class="form-control" required>
-                </div>
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Create Meeting</button>
-                </div>
-            </form>
+                <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="members[0]" id="memberIdInput" value="">
+                        <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" name="title" id="title" class="form-control" placeholder="Enter meeting title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="duration" class="form-label">Duration (minutes)</label>
+                            <input type="number" name="duration" id="duration" class="form-control" placeholder="Enter meeting duration in minutes" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Meeting</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

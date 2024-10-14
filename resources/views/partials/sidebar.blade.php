@@ -1,4 +1,6 @@
 @php
+    $unseenCounter = Auth::user()->unreadMessagesCount();
+    $vacanciesApplicationsCounter = Auth::user()->pendingApplicationsCount();
            $logo = \App\Models\Utility::get_file('logo/');
            if (Auth::user()->type == 'admin') {
                $setting = App\Models\Utility::getAdminPaymentSetting();
@@ -92,14 +94,32 @@
                                         class="dash-link  {{ Request::route()->getName() == 'job-vacancies.index' ? ' active' : '' }}">
                                         <span class="dash-micon"><i class="ti ti-accessible"></i></span>
                                         <span class="dash-mtext">{{ __('Job Vacancies') }}</span>
+                                        
+                                        @if ($vacanciesApplicationsCounter > 0)
+                                            <span
+                                                class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $vacanciesApplicationsCounter }}<span
+                                                    class="sr-only"></span>
+                                            </span>
+                                        @endif
                                     </a>
                                 </li>
                         @endif
                         @if ($adminSetting['enable_chat'] == 'on')
                             <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
-                                <a href="{{ route('chats') }}" class="dash-link"><span class="dash-micon"><i
-                                            class="ti ti-message-circle"></i></span><span
-                                        class="dash-mtext">{{ __('Messenger') }}</span></a>
+                                <a href="{{ route('chats') }}" class="dash-link">
+                                    <span class="dash-micon">
+                                        <i class="ti ti-message-circle"></i>
+                                    </span>
+                                    <span class="dash-mtext">
+                                        {{ __('Messenger') }}
+                                    </span>
+                                    @if ($unseenCounter > 0)
+                                        <span
+                                            class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $unseenCounter }}<span
+                                                class="sr-only"></span>
+                                        </span>
+                                    @endif
+                                </a>
                             </li>
                         @endif
                         {{-- 
@@ -142,6 +162,11 @@
                                         </li>
                                     @endforeach
                                 </ul>
+                            </li>
+                            <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
+                                <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i
+                                            class="ti ti-trophy"></i></span><span
+                                        class="dash-mtext">{{ __('Plans') }}</span></a>
                             </li>
 
                         @endif
@@ -401,11 +426,11 @@
                                                         class="dash-mtext">{{ __('Orders') }}</span></a>
                                             </li> -->
                                             @if (Auth::user()->type == 'admin')
-                                                <!-- <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
+                                                <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
                                                     <a href="{{ route('plan_request.index') }}" class="dash-link "><span
                                                             class="dash-micon"><i class="ti ti-brand-telegram"></i></span><span
                                                             class="dash-mtext">{{ __('Plan Request') }}</span></a>
-                                                </li> -->
+                                                </li>
                                             @endif
                                         @endif
 

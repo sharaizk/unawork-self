@@ -83,6 +83,7 @@
             if (form) {console.log (1);}
             const succesDiv = document.getElementById('success-message');
             if (succesDiv) {console.log (23);}
+            const errorDiv = document.getElementById('failed-message');
 
 
             form.addEventListener('submit', async function(event) {
@@ -92,6 +93,11 @@
                 const dataUrl = form.getAttribute('data-url');
                 const content = tinymce.get('content').getContent();
                 formData.append('content', content);
+
+                document.querySelectorAll('.invalid-feedback').forEach(function (el) {
+                    el.textContent = '';
+                    el.style.display = 'block';
+                });
 
                 try {
                     const response = await axios.post(dataUrl, formData);
@@ -105,8 +111,25 @@
                 } catch (error) {
                     console.log(error);
 
-                    form.reset();
-                    document.getElementById('failed-message').style.display = 'block';
+                    if (error.response && error.response.data.errors) {
+                        const errors = error.response.data.errors;
+
+                        for (let field in errors) {
+                            const errorMessage = errors[field][0];
+                            const errorField = document.getElementById(`error-${field}`);
+                            const inputField = document.querySelector(`[name="${field}"]`);
+
+                            if (inputField) {
+                                inputField.classList.add('is-invalid');
+                            }
+
+                            if (errorField) {
+                                errorField.textContent = errorMessage;
+                                errorField.style.display = 'block';
+                            }
+                        }
+                    }
+                    document.getElementById('invalid-feedback').style.display = 'block';
                     
                     
                 }

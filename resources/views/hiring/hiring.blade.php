@@ -166,20 +166,25 @@
         </div>
     </div>
 </section>
-<div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
-  <div class="modal-dialog" role="document">
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="sendMessagePopup">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header text-white">
         <h5 class="modal-title">Send Message</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <input type="text" id="messageInput" class="form-control" placeholder="Type your message...">
+        <div class="mb-3">
+            <label for="messageInput" class="form-label">Your Message:</label>
+            <textarea id="messageInput" class="form-control" rows="3" placeholder="Type your message..."></textarea>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
-      </div>
+      <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
+        </div>
     </div>
   </div>
 </div>
