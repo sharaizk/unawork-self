@@ -40,11 +40,12 @@
                         </h1>
                         <div class="date">{{ $post->created_at->format('d F y') }}</div>
 
-                        <p class="card-text">
-                        {!! $post->content !!}
-                        </p>
+                        
                     </div>
                 </div>
+                <p class="text">
+                    {!! $post->content !!}
+                </p>
             </div>
         </div>
     </div>
