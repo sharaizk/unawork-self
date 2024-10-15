@@ -69,6 +69,20 @@ class ZoomMeetingController extends Controller
     {
         $objUser            = Auth::user();
         $currentWorkspace   = Utility::getWorkspaceBySlug($slug);
+
+        $settings = Utility::getPaymentSetting($currentWorkspace->id);
+        if (
+            !isset($settings['zoom_account_id']) || empty($settings['zoom_account_id']) ||
+            !isset($settings['zoom_client_id']) || empty($settings['zoom_client_id']) ||
+            !isset($settings['zoom_client_secret']) || empty($settings['zoom_client_secret'])
+        ) {
+            return response()->json([
+                'status' => 'error',
+                'message' => __('<a href="'.route('workspace.settings', ['slug' => $slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up Zoom integration in workspace settings</a> Error on creation!')
+            ]);
+        }
+
+
         $assign_pro_ids     = UserProject::where('user_id', $objUser->id)->pluck('project_id');
         $projects           = Project::with('task')->select(['name', 'id', 'workspace'])->whereIn('id', $assign_pro_ids)->where('workspace', $currentWorkspace->id)->pluck('name', 'id');
         
