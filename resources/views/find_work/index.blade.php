@@ -6,8 +6,8 @@
 @section('content')
 <style>
     .dropdown-menu-xl {
-        min-width: 130px; 
-        width: 150px; 
+        min-width: 40vh; 
+        width: 40vh; 
         max-height: 400px; 
         overflow-y: auto; 
     }

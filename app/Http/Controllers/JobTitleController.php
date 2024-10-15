@@ -27,7 +27,7 @@ class JobTitleController extends Controller
         $this->authorize('create', JobTitle::class);
 
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
         ]);
 
         JobTitle::create($data);

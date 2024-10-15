@@ -13,6 +13,7 @@
 @php
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
+    $settings = \App\Models\Utility::getPaymentSetting($currentWorkspace->id);
 @endphp
 @push('css-page')
     <style>
@@ -51,11 +52,29 @@
         @if (isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id() || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
             
 
-            <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
-                data-title="{{ __('Create New Meeting') }}" data-toggle="tooltip" title="{{ __('Add Meeting') }}"
-                data-url="{{ route('zoom-meeting.create', $currentWorkspace->slug) }}">
-                <i class="ti ti-plus "></i>
-            </a>
+            @if (
+                !isset($settings['zoom_account_id']) || empty($settings['zoom_account_id']) ||
+                !isset($settings['zoom_client_id']) || empty($settings['zoom_client_id']) ||
+                !isset($settings['zoom_client_secret']) || empty($settings['zoom_client_secret'])
+            ) 
+                <button class="btn btn-sm btn-gray"
+                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                        title="Zoom meeting settings are not set. 
+                            @if ($currentWorkspace->creater->id == Auth::id()) 
+                                Please fill in all the information in settings." onclick="window.location.href='{{ route('workspace.settings', $currentWorkspace->slug) }}#zoom-meeting-settings';" 
+                            @else 
+                                Contact workspace owner."
+                            @endif>
+                    <i class="ti ti-plus "></i>
+                </button>
+            @else
+                <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
+                        data-title="{{ __('Create New Meeting') }}" data-toggle="tooltip" title="{{ __('Add Meeting') }}"
+                        data-url="{{ route('zoom-meeting.create', $currentWorkspace->slug) }}">
+                        <i class="ti ti-plus "></i>
+                    </a>
+            @endif
+            
         @endif
     @endauth
 

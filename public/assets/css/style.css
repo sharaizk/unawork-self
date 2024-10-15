@@ -2659,6 +2659,10 @@ textarea.form-control-lg {
     pointer-events: none;
 }
 
+.btn-gray {
+    background: rgb(190, 189, 189) !important;
+}
+
 .btn-check[disabled] + .btn, .btn-check:disabled + .btn {
     pointer-events: none;
     filter: none;
