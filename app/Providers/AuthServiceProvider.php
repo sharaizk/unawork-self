@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use App\Models\Skills;
 use App\Models\News;
+use App\Policies\ProjectPolicy;
 use App\Policies\SkillsPolicy;
 use App\Policies\NewsPolicy;
 
@@ -26,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         JobApplication::class => JobApplicationPolicy::class,
         Industry::class => IndustryPolicy::class,
         JobTitle::class => JobTitlePolicy::class,
+        Workspace::class => ProjectPolicy::class,
     ];
 
     /**

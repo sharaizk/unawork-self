@@ -62,9 +62,16 @@ class ProjectController extends Controller
     use ApiResponser;
 
     public function index($slug, Request $request)
-    {
+    {        
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+
+        // $this->authorize('viewProjects', $currentWorkspace);
+        if (!$objUser->can('viewProjects', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
+
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->firstOrFail();
 
         $categories = ProjectCategory::all();
