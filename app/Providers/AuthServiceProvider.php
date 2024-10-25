@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use App\Models\Skills;
 use App\Models\News;
+use App\Models\Workspace;
 use App\Policies\ProjectPolicy;
 use App\Policies\SkillsPolicy;
 use App\Policies\NewsPolicy;

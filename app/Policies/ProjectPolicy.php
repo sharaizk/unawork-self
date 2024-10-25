@@ -18,10 +18,13 @@ class ProjectPolicy
 
     public function viewProjects(User $user, Workspace $workspace)
     {
-        $creator = $workspace->created_by;
+        $creator = $workspace->creater;
+        if (!$creator) {
+            return false;
+        }
 
         // Get creator plan
-        $plan = Plan::find($creator->plan_id);
+        $plan = Plan::find($creator->plan);
 
         if (!$plan) {
             return false;

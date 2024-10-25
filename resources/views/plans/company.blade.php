@@ -94,6 +94,18 @@
                                                 <li>
                                                     <span class="theme-avtar">
                                                         <i class="text-primary ti ti-circle-plus"></i></span>
+                                                        
+                                                    Projects in pod {{ $plan->allow_pod_project_view === 1 ? __('enabled') : __('disabled') }}
+                                                </li>
+                                                <li>
+                                                    <span class="theme-avtar">
+                                                        <i class="text-primary ti ti-circle-plus"></i></span>
+                                                        
+                                                    Own projects {{ $plan->allow_workspace_project_view === 1 ? __('enabled') : __('disabled') }}
+                                                </li>
+                                                <li>
+                                                    <span class="theme-avtar">
+                                                        <i class="text-primary ti ti-circle-plus"></i></span>
                                                     {{ $plan->storage_limit }}
                                                     {{ __('Storage Limit') }}
                                                 </li>
