@@ -2437,6 +2437,12 @@ class ProjectController extends Controller
         $userObj = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
+        // $this->authorize('viewProjects', $currentWorkspace);
+        if (!$userObj->can('viewProjects', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
+
         if ($userObj->getGuard() == 'client') {
             $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $userObj->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
         } else {

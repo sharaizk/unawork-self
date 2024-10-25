@@ -94,6 +94,14 @@ class PodController extends Controller
     {
         $this->authorize('viewInner', $pod);
 
+        $objUser = Auth::user();
+        $currentWorkspace = $pod->workspace;
+
+        if (!$objUser->can('viewProjects', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
+
         $projects = $pod->projects()->latest('created_at')->get();
         return view('pod.landing.inner', compact('pod', 'projects'));
     }
