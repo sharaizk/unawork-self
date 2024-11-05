@@ -36,4 +36,74 @@ class ProjectPolicy
             return $plan->allow_workspace_project_view;
         }
     }
+
+    public function viewGanntChartManagement(User $user, Workspace $workspace)
+    {
+        $creator = $workspace->creater;
+        if (!$creator) {
+            return false;
+        }
+        // Get creator plan
+        $plan = Plan::find($creator->plan);
+        if (!$plan) {
+            return false;
+        }
+        return $plan->allow_gannt_chart_project_management;
+    }
+
+    public function viewBugReportManagement(User $user, Workspace $workspace)
+    {
+        $creator = $workspace->creater;
+        if (!$creator) {
+            return false;
+        }
+        // Get creator plan
+        $plan = Plan::find($creator->plan);
+        if (!$plan) {
+            return false;
+        }
+        return $plan->allow_bug_report_project_management;
+    }
+
+    public function viewExpesesManagement(User $user, Workspace $workspace)
+    {
+        $creator = $workspace->creater;
+        if (!$creator) {
+            return false;
+        }
+        // Get creator plan
+        $plan = Plan::find($creator->plan);
+        if (!$plan) {
+            return false;
+        }
+        return $plan->allow_expenses_project_management;
+    }
+
+    public function viewFilesManagement(User $user, Workspace $workspace)
+    {
+        $creator = $workspace->creater;
+        if (!$creator) {
+            return false;
+        }
+        // Get creator plan
+        $plan = Plan::find($creator->plan);
+        if (!$plan) {
+            return false;
+        }
+        return $plan->allow_files_project_management;
+    }
+
+    public function viewChatManagement(User $user, Workspace $workspace)
+    {
+        $creator = $workspace->creater;
+        if (!$creator) {
+            return false;
+        }
+        // Get creator plan
+        $plan = Plan::find($creator->plan);
+        if (!$plan) {
+            return false;
+        }
+        return $plan->allow_chat_project_management;
+    }
 }

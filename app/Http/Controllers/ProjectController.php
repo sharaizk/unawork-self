@@ -2056,6 +2056,12 @@ class ProjectController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
         $objUser = Auth::user();
+
+        if (!$objUser->can('viewBugReportManagement', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
+
         if ($objUser->getGuard() == 'client') {
             $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $project_id)->first();
         } else {
@@ -2590,6 +2596,11 @@ class ProjectController extends Controller
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $is_client = '';
+
+        if (!$objUser->can('viewGanntChartManagement', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
 
         if ($objUser->getGuard() == 'client') {
             $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectID)->first();
@@ -3444,6 +3455,12 @@ class ProjectController extends Controller
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $objUser = Auth::user();
+
+        if (!$objUser->can('viewExpesesManagement', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
+
         if ($objUser->getGuard() == 'client') {
             $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $project_id)->first();
             $expenses = Expense::where('project_id', $project->id)->where('workspace_id', $currentWorkspace->id)->with('taskExpenses')->get();

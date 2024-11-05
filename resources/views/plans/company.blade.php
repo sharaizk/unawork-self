@@ -95,7 +95,7 @@
                                                     <span class="theme-avtar">
                                                         <i class="text-primary ti ti-circle-plus"></i></span>
                                                         
-                                                    Projects in pod {{ $plan->allow_pod_project_view === 1 ? __('enabled') : __('disabled') }}
+                                                    Inner circle in pod {{ $plan->allow_pod_project_view === 1 ? __('enabled') : __('disabled') }}
                                                 </li>
                                                 <li>
                                                     <span class="theme-avtar">
