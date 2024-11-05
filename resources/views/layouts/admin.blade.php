@@ -14,8 +14,12 @@
         // $SITE_RTL = env('SITE_RTL');
         $SITE_RTL = $setting['site_rtl'];
     } else {
+        if (!isset($currentWorkspace)) {
+            $authUser = Auth::user();
+            $currentWorkspace = App\Models\Workspace::find($authUser->currant_workspace);
+        }
         if (!$currentWorkspace) {
-            $AuthUser = Auth::user();
+            $authUser = Auth::user();
             $currentWorkspace = $AuthUser->updateCurrentWorkspace();
         }
         $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);

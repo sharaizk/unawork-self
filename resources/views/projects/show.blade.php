@@ -28,6 +28,7 @@
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
     $isChatEnabled = $adminSetting['enable_chat'] == 'on';
+    $plan = $currentWorkspace->creater->getPlan;
 @endphp
 
 @section('multiple-action-button')
@@ -57,11 +58,13 @@
                 class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Timesheet') }}</a>
         </div> -->
     @endif
-    @if ((isset($permissions) && in_array('show gantt', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-        <div class="col-md-auto col-sm-4 pb-3">
-            <a href="{{ route($client_keyword . 'projects.gantt', [$currentWorkspace->slug, $project->id]) }}"
-                class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Gantt Chart') }}</a>
-        </div>
+    @if ($plan->allow_gannt_chart_project_management)
+        @if ((isset($permissions) && in_array('show gantt', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+            <div class="col-md-auto col-sm-4 pb-3">
+                <a href="{{ route($client_keyword . 'projects.gantt', [$currentWorkspace->slug, $project->id]) }}"
+                    class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Gantt Chart') }}</a>
+            </div>
+        @endif
     @endif
 
     @if ((isset($permissions) && in_array('show task', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
@@ -70,19 +73,23 @@
                 class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Task Board') }}</a>
         </div>
     @endif
-
-    @if ((isset($permissions) && in_array('show bug report', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-        <div class="col-md-auto col-sm-6 pb-3">
-            <a href="{{ route($client_keyword . 'projects.bug.report', [$currentWorkspace->slug, $project->id]) }}"
-                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Bug Report') }}</a>
-        </div>
+    
+    @if ($plan->allow_bug_report_project_management)
+        @if ((isset($permissions) && in_array('show bug report', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+            <div class="col-md-auto col-sm-6 pb-3">
+                <a href="{{ route($client_keyword . 'projects.bug.report', [$currentWorkspace->slug, $project->id]) }}"
+                    class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Bug Report') }}</a>
+            </div>
+        @endif
     @endif
 
-    @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-    <div class="col-md-auto col-sm-6 pb-3">
-        <a href="{{ route($client_keyword . 'projects.expense.report', [$currentWorkspace->slug, $project->id]) }}"
-            class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Expenses') }}</a>
-    </div>
+    @if ($plan->allow_expenses_project_management)
+        @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+        <div class="col-md-auto col-sm-6 pb-3">
+            <a href="{{ route($client_keyword . 'projects.expense.report', [$currentWorkspace->slug, $project->id]) }}"
+                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Expenses') }}</a>
+        </div>
+        @endif
     @endif
 
     <!-- <div class="col-md-auto col-sm-6 pb-3 ">
@@ -566,12 +573,14 @@
                     <!-- </div> -->
                     <div class="row">
                         <div>
-                            @php
-                                $thread = \App\Models\CmgmyrMessenger\Thread::where('slug', 'project-'.$project->id)->first();
-                            @endphp
+                            @if ($plan->allow_chat_project_management)
+                                @php
+                                    $thread = \App\Models\CmgmyrMessenger\Thread::where('slug', 'project-'.$project->id)->first();
+                                @endphp
 
-                            @if ($thread)
-                                @include('single-chat', ['threadId' => $thread->id])
+                                @if ($thread)
+                                    @include('single-chat', ['threadId' => $thread->id])
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -678,37 +687,39 @@
                             </div>
                         </div>
                     </div>
-                    @if (
-                    (isset($permissions) && in_array('show uploading', $permissions)) ||
-                        $currentWorkspace->permission == 'Owner' ||
-                        $currentWorkspace->permission == 'Member')
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-0"> {{ __('Files') }}</h5>
+                    @if ($plan->allow_files_project_management)
+                        @if (
+                        (isset($permissions) && in_array('show uploading', $permissions)) ||
+                            $currentWorkspace->permission == 'Owner' ||
+                            $currentWorkspace->permission == 'Member')
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"> {{ __('Files') }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+
+                                    <div class="author-box-name form-control-label mb-4">
+
+                                    </div>
+                                    <div class="col-md-12 dropzone browse-file" id="dropzonewidget">
+                                        <div class="dz-message" data-dz-message>
+                                            <span>
+                                                @if (Auth::user()->getGuard() == 'client')
+                                                    {{ __('No files available') }}
+                                                @else
+                                                    {{ __('Drop files here to upload') }}
+                                                @endif
+                                            </span>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body p-4">
-
-                                <div class="author-box-name form-control-label mb-4">
-
-                                </div>
-                                <div class="col-md-12 dropzone browse-file" id="dropzonewidget">
-                                    <div class="dz-message" data-dz-message>
-                                        <span>
-                                            @if (Auth::user()->getGuard() == 'client')
-                                                {{ __('No files available') }}
-                                            @else
-                                                {{ __('Drop files here to upload') }}
-                                            @endif
-                                        </span>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endif
                     @endif
                 </div>
                 

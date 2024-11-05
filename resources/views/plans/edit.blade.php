@@ -21,7 +21,7 @@
                         required />
                 </div>
             </div>
-            @if ($plan->id != 1)
+    {{--   @if ($plan->id != 1) --}}
                 <div class="form-group col-md-3 pt-3">
                     <div class="form-check form-switch d-inline-block py-4">
                         <input type="hidden" class="form-check-input" name="enable_chatgpt" id="enable_chatgpt"
@@ -64,10 +64,10 @@
                 </div>
 
                 {{-- <div class="form-group col-md-6">
-                <label for="duration" class="form-label">{{ __('Trial Days') }} *</label>
-                <input type="number" class="form-control mb-0" id="trial_days" name="trial_days" value="{{$plan->trial_days}}" required/>
-                <span><small>{{__("Note: '-1' for unlimited")}}</small></span>
-            </div> --}}
+                        <label for="duration" class="form-label">{{ __('Trial Days') }} *</label>
+                        <input type="number" class="form-control mb-0" id="trial_days" name="trial_days" value="{{$plan->trial_days}}" required/>
+                        <span><small>{{__("Note: '-1' for unlimited")}}</small></span>
+                    </div> --}}
                 <div class="form-group col-md-6">
                     <label for="storage_limit" class="form-label">{{ __('Storage Limit') }} *</label>
 
@@ -80,7 +80,7 @@
                     </div>
                     <span class="small">{{ __('Note: upload size (In MB)') }}</span>
                 </div>
-            @endif
+        {{--@endif  --}}
             <div class="form-group col-md-6">
                 <label for="max_workspaces" class="form-label">{{ __('Maximum Workspaces') }} *</label>
                 <input type="number" class="form-control mb-0" id="max_workspaces" name="max_workspaces"
@@ -109,6 +109,68 @@
                 <div class="form-group">
                     <label for="description" class="form-label">{{ __('Description') }}</label>
                     <textarea rows="3" class="form-control" id="description" name="description">{{ $plan->description }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-group col-md-12 pt-12">
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_chat_project_management" id="allow_chat_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_chat_project_management" id="allow_chat_project_management"
+                        value="1" @if ($plan->allow_chat_project_management) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_chat_project_management">{{ __('Enable Chat in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_files_project_management" id="allow_files_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_files_project_management" id="allow_files_project_management"
+                        value="1"   @if ($plan->allow_files_project_management) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_files_project_management">{{ __('Enable Files in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_expenses_project_management" id="allow_expenses_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_expenses_project_management" id="allow_expenses_project_management"
+                        value="1" @if ($plan->allow_expenses_project_management) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_expenses_project_management">{{ __('Enable Expenses in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_bug_report_project_management" id="allow_bug_report_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_bug_report_project_management" id="allow_bug_report_project_management"
+                        value="1" @if ($plan->allow_bug_report_project_management) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_bug_report_project_management">{{ __('Enable Bug Report in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_gannt_chart_project_management" id="allow_gannt_chart_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_gannt_chart_project_management" id="allow_gannt_chart_project_management"
+                        value="1" @if ($plan->allow_gannt_chart_project_management) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_gannt_chart_project_management">{{ __('Enable Gannt Chart in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                </div>
+                <hr>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_workspace_project_view" id="allow_workspace_project_view"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_workspace_project_view" id="allow_workspace_project_view"
+                        value="1" @if ($plan->allow_workspace_project_view) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_workspace_project_view">{{ __('Enable Inner Cirlce in own workspace') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_pod_project_view" id="allow_pod_project_view"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_pod_project_view" id="allow_pod_project_view"
+                        value="1" @if ($plan->allow_pod_project_view) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_pod_project_view">{{ __('Enable Inner Cirlce in pods workspace') }}</label>
                 </div>
             </div>
 

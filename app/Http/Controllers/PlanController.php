@@ -35,11 +35,9 @@ class PlanController extends Controller
             $plans = Plan::get();
 
             return view('plans.admin', compact('plans', 'currentWorkspace', 'paymentSetting'));
-        } elseif ($currentWorkspace->creater->id == \Auth::user()->id) {
-            $plans = Plan::where('status', '1')->where('is_plan_enable', '=', 1)->get();
-            return view('plans.company', compact('plans', 'currentWorkspace', 'paymentSetting'));
         } else {
-            return redirect()->route('home');
+            $plans = Plan::where('status', '1')->get();
+            return view('plans.company', compact('plans', 'currentWorkspace', 'paymentSetting'));
         }
     }
 

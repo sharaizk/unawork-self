@@ -21,6 +21,13 @@ class Plan extends Model
         'description',
         'image',
         'is_trial_disable',
+        'allow_chat_project_management',
+        'allow_files_project_management',
+        'allow_expenses_project_management',
+        'allow_bug_report_project_management',
+        'allow_gannt_chart_project_management',
+        'allow_workspace_project_view',
+        'allow_pod_project_view',
     ];
 
     public function arrDuration()
