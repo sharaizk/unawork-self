@@ -83,6 +83,69 @@ use App\Models\Utility;
                 <textarea  rows="3"class="form-control" id="description" name="description">{{$plan->description}}</textarea>
             </div>
         </div>
+
+        <div class="form-group col-md-12 pt-12">
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_chat_project_management" id="allow_chat_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_chat_project_management" id="allow_chat_project_management"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_chat_project_management">{{ __('Enable Chat in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_files_project_management" id="allow_files_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_files_project_management" id="allow_files_project_management"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_files_project_management">{{ __('Enable Files in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_expenses_project_management" id="allow_expenses_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_expenses_project_management" id="allow_expenses_project_management"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_expenses_project_management">{{ __('Enable Expenses in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_bug_report_project_management" id="allow_bug_report_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_bug_report_project_management" id="allow_bug_report_project_management"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_bug_report_project_management">{{ __('Enable Bug Report in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_gannt_chart_project_management" id="allow_gannt_chart_project_management"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_gannt_chart_project_management" id="allow_gannt_chart_project_management"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_gannt_chart_project_management">{{ __('Enable Gannt Chart in project management') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                </div>
+                <hr>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_workspace_project_view" id="allow_workspace_project_view"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_workspace_project_view" id="allow_workspace_project_view"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_workspace_project_view">{{ __('Enable Inner Cirlce in own workspace') }}</label>
+                </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_pod_project_view" id="allow_pod_project_view"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_pod_project_view" id="allow_pod_project_view"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_pod_project_view">{{ __('Enable Inner Cirlce in pods workspace') }}</label>
+                </div>
+            </div>
+
         <div class="form-group col-md-6 d-flex">
             <label for="is_trial_disable">{{ __('Trial is enable(on/off)') }}</label>
             <div class="form-check form-switch custom-switch-v1 mx-2">
