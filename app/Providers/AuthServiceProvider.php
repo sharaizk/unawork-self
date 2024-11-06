@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Skills;
 use App\Models\News;
 use App\Models\Workspace;
+use App\Models\ZoomMeeting;
 use App\Policies\ProjectPolicy;
 use App\Policies\SkillsPolicy;
 use App\Policies\NewsPolicy;
+use App\Policies\ZoomMeetingPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -29,6 +31,7 @@ class AuthServiceProvider extends ServiceProvider
         Industry::class => IndustryPolicy::class,
         JobTitle::class => JobTitlePolicy::class,
         Workspace::class => ProjectPolicy::class,
+        ZoomMeeting::class => ZoomMeetingPolicy::class,
     ];
 
     /**
