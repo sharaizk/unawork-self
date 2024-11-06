@@ -28,6 +28,7 @@ class Plan extends Model
         'allow_gannt_chart_project_management',
         'allow_workspace_project_view',
         'allow_pod_project_view',
+        'allow_zoom_meeting_creation',
     ];
 
     public function arrDuration()

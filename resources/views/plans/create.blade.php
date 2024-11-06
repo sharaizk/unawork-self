@@ -144,6 +144,14 @@ use App\Models\Utility;
                     <label class="custom-control-label form-check-label"
                         for="allow_pod_project_view">{{ __('Enable Inner Cirlce in pods workspace') }}</label>
                 </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_zoom_meeting_creation" id="allow_zoom_meeting_creation"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_zoom_meeting_creation" id="allow_zoom_meeting_creation"
+                        value="1">
+                    <label class="custom-control-label form-check-label"
+                        for="allow_zoom_meeting_creation">{{ __('Enable Zoom Meetings creation') }}</label>
+                </div>
             </div>
 
         <div class="form-group col-md-6 d-flex">
