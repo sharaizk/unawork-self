@@ -84,6 +84,13 @@ class ZoomMeetingController extends Controller
     public function store($slug, Request $request)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+
+        try {
+            $this->authorize('create', ZoomMeeting::class);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->view('plan_access', [], 403);
+        }
+
         $client_ids = ClientProject::getByProjects($request->project_id);
 
         $data['topic']              = $request->title;

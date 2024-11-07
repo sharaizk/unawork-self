@@ -172,6 +172,14 @@
                     <label class="custom-control-label form-check-label"
                         for="allow_pod_project_view">{{ __('Enable Inner Cirlce in pods workspace') }}</label>
                 </div>
+                <div class="form-check form-switch d-inline-block py-4">
+                    <input type="hidden" class="form-check-input" name="allow_zoom_meeting_creation" id="allow_zoom_meeting_creation"
+                        value="0">
+                    <input type="checkbox" class="form-check-input" name="allow_zoom_meeting_creation" id="allow_zoom_meeting_creation"
+                        value="1" @if ($plan->allow_zoom_meeting_creation) checked @endif>
+                    <label class="custom-control-label form-check-label"
+                        for="allow_zoom_meeting_creation">{{ __('Enable Zoom Meeting Creation') }}</label>
+                </div>
             </div>
 
             @if ($plan->monthly_price > 0 && $plan->annual_price > 0)
