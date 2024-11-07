@@ -89,34 +89,36 @@
                 <div class="modal-header text-white">
                     <h5 class="modal-title">Create Meeting</h5>
                     <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <input type="hidden" name="members[0]" id="memberIdInput" value="">
-                        <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
-
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input type="text" name="title" id="title" class="form-control" placeholder="Enter meeting title" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="start_date" class="form-label">Start Date</label>
-                            {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="duration" class="form-label">Duration (minutes)</label>
-                            <input type="number" name="duration" id="duration" class="form-control" placeholder="Enter meeting duration in minutes" required>
-                        </div>
                     </div>
+                    
+                    <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST" @if (!Auth::user()->isAbleToCreateZoomMeetings()) class="d-none" @endif >
+                        @csrf
+                        <div class="modal-body">
+                            <input type="hidden" name="members[0]" id="memberIdInput" value="">
+                            <input type="hidden" name="members[1]" value="{{ \Auth::id() }}">
 
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create Meeting</button>
-                    </div>
-                </form>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" name="title" id="title" class="form-control" placeholder="Enter meeting title" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                {{ Form::text('start_date', null, ['class' => 'form-control date', 'placeholder' => __('Select Date/Time'), 'required' => 'required']) }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="duration" class="form-label">Duration (minutes)</label>
+                                <input type="number" name="duration" id="duration" class="form-control" placeholder="Enter meeting duration in minutes" required>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Create Meeting</button>
+                        </div>
+                    </form>
+                    @if (!Auth::user()->isAbleToCreateZoomMeetings()) <h1> {{ __('Your plan does not allow creating Zoom meetings.') }}</h1> @endif
             </div>
         </div>
     </div>

@@ -67,12 +67,23 @@
                             @endif>
                     <i class="ti ti-plus "></i>
                 </button>
+            @elseif (Auth::user()->isAbleToCreateZoomMeetings())
+                <a href="#" 
+                    class="btn btn-sm btn-primary" 
+                    data-ajax-popup="true" 
+                    data-size="lg"
+                    data-title="{{ __('Create New Meeting') }}" 
+                    data-toggle="tooltip" 
+                    title="{{ __('Add Meeting') }}"
+                    data-url="{{ route('zoom-meeting.create', $currentWorkspace->slug) }}">
+                    <i class="ti ti-plus"></i>
+                </a>
             @else
-                <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
-                        data-title="{{ __('Create New Meeting') }}" data-toggle="tooltip" title="{{ __('Add Meeting') }}"
-                        data-url="{{ route('zoom-meeting.create', $currentWorkspace->slug) }}">
-                        <i class="ti ti-plus "></i>
-                    </a>
+                <button class="btn btn-sm btn-gray"
+                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                        title="Your plan does not allow creating Zoom meetings.">
+                    <i class="ti ti-plus "></i>
+                </button>
             @endif
             
         @endif

@@ -1133,4 +1133,11 @@ class User extends Authenticatable implements MustVerifyEmail
             return $vacancy->getPendingApplicationsCount();
         });
     }
+
+    public function isAbleToCreateZoomMeetings()
+    {
+        $plan = $this->getPlan;
+
+        return $plan && $plan->allow_zoom_meeting_creation;
+    }
 }
