@@ -46,13 +46,13 @@
                  data-title="{{ __('User Logs') }}" data-toggle="tooltip" title="{{ __('User Logs') }}">
                  <i class="ti ti-user-check"></i>
              </a>
-             @if (!$currentWorkspace->creater->hasRole('employee') && $currentWorkspace->ownerable_id == 0)
+            {{--  @if (!$currentWorkspace->creater->hasRole('employee') && $currentWorkspace->ownerable_id == 0) --}}
                 <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="md"
                     data-title="{{ __('Invite New User') }}" data-url="{{ route('users.invite', $currentWorkspace->slug) }}"
                     data-toggle="tooltip" title="{{ __('Invite') }}">
                     <i class="ti ti-plus"></i>
                 </a>
-             @endif
+            {{--  @endif --}}
          @endif
      @endauth
  @endsection

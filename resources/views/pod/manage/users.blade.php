@@ -363,8 +363,6 @@
     <!-- add new user -->
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll(".btn-addnew-project").forEach(a => {
-                a.addEventListener("click", function() {
                     $(document).on('shown.bs.modal', function (e) {
                         const form = document.querySelector('.invite-user-form');
                         const inviteUserButton = document.getElementById('inviteUserButton');
@@ -372,6 +370,12 @@
 
                         inviteUserButton.addEventListener('click', async function(event) {
                             event.preventDefault();
+                            event.stopPropagation();
+                            
+                            if (!form) {
+                                console.error('Form not found');
+                                return;
+                            }
 
                             const formData = new FormData(form);
 
@@ -379,26 +383,29 @@
                                 const response = await axios.post('{{ route('pods.user.exists', ['podId' => $pod->id]) }}', formData);
                                 console.log(response);
 
-                                form.reset();
                                 document.getElementById('success-message').style.display = 'block';
                                 setTimeout(function() {
                                     location.reload(); 
                                 }, 3000);
                             } catch (error) {
-                                console.log(error);
+                                console.error(error);
 
-                                form.reset();
-                                document.getElementById('failed-message').style.display = 'block';
-                                
+                                const errorMessage = error.response && error.response.data && error.response.data.error
+                                    ? error.response.data.error
+                                    : 'An unexpected error occurred.';
+
+                                const failedMessageElement = document.getElementById('failed-message');
+                                failedMessageElement.textContent = `User invite failed: ${errorMessage}`;
+                                failedMessageElement.style.display = 'block';
+
                                 setTimeout(function() {
-                                    location.reload(); 
-                                }, 1000);
+                                    failedMessageElement.style.display = 'none';
+                                    failedMessageElement.textContent = 'User invite failed!';
+                                }, 5000);
                             }
                         });
                     });
                 });
-            });
-        });
     </script>
     <!-- remove user -->
     <script>
