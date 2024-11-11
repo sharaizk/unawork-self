@@ -144,6 +144,12 @@ use App\Models\Utility;
                     <label class="custom-control-label form-check-label"
                         for="allow_pod_project_view">{{ __('Enable Inner Cirlce in pods workspace') }}</label>
                 </div>
+                <div class="form-group col-md-6 ps_div">
+                    <label for="max_inner_circles" class="form-control-label">{{ __('Number of Inner Cirlces in pods workspace') }} *</label>
+                    <input type="number" class="form-control mb-0" id="max_inner_circles" name="max_inner_circles"
+                        value="0" />
+                    <span><small>{{ __("Note: '-1' for unlimited") }}</small></span>
+                </div>
                 <div class="form-check form-switch d-inline-block py-4">
                     <input type="hidden" class="form-check-input" name="allow_zoom_meeting_creation" id="allow_zoom_meeting_creation"
                         value="0">
