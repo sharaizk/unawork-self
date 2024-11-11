@@ -1140,4 +1140,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return $plan && $plan->allow_zoom_meeting_creation;
     }
+
+    public function ownPods()
+    {
+        return $this->hasMany(Pod::class, 'created_by');
+    }
+
+    public function countOwnPodsWithInnerEnabled()
+    {
+        return $this->ownPods()->where('inner_enabled', true)->count();
+    }
 }

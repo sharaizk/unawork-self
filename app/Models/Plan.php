@@ -29,6 +29,7 @@ class Plan extends Model
         'allow_workspace_project_view',
         'allow_pod_project_view',
         'allow_zoom_meeting_creation',
+        'max_inner_circles',
     ];
 
     public function arrDuration()
