@@ -119,7 +119,7 @@ class PodController extends Controller
 
         // Checking num of pods with enabled inner_enabled  onto plan
         $enabledPodsCount = $user->countOwnPodsWithInnerEnabled();
-        if ($enabledPodsCount >= $plan->max_inner_circles) {
+        if ($plan->max_inner_circles != -1 && $enabledPodsCount >= $plan->max_inner_circles) {
             return redirect()->back()->with('error', __('You have reached the limit of inner circles allowed by your plan.'));
         }
 
