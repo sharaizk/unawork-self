@@ -1284,6 +1284,18 @@ class UserController extends Controller
         $superAdminEmails = User::where('type', '=', 'admin')->pluck('email')->toArray();
         $setting = Utility::fetchAdminPaymentSetting();
 
+        $plan = $authuser->getPlan;
+        $totalWS = $authuser->countUsers($currentWorkspace->id);
+        if ($totalWS >= $plan->max_users && $plan->max_users != -1) {
+            $response = [
+                'code' => 200,
+                'status' => 'Success',
+                'url' => route('users.index', $currentWorkspace->slug),
+                'message' => __('Your user limit is over, Please upgrade plan.') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''),
+            ];
+        
+                return json_encode($response);
+        }
 
         if ($request->has('email')) {
             $email = $request->email;

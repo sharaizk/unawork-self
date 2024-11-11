@@ -45,6 +45,15 @@
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
+                                        @if (!$pod->inner_enabled)
+                                            <a href="{{ route('pods.enableInnerCircle', $pod->id) }}" class="dropdown-item">
+                                                <i class="ti ti-toggle-on"></i> <span>{{ __('Enable Inner Circle') }}</span>
+                                            </a>
+                                        @elseif ($pod->inner_enabled)
+                                            <a href="{{ route('pods.disableInnerCircle', $pod->id) }}" class="dropdown-item">
+                                                <i class="ti ti-toggle-off"></i> <span>{{ __('Disable Inner Circle') }}</span>
+                                            </a>
+                                        @endif
                                         <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" 
                                             data-title="{{ __('Edit') }}"
                                             data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i 

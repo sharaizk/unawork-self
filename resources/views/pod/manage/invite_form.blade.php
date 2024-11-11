@@ -3,9 +3,8 @@
         padding: 20px;
     }
 </style>
-<form class="invite-user-form">
-        @csrf
-
+<form class="invite-user-form" >
+    @csrf
     <div class="row">
         <div class="col-md-12 col-12 text-center">
             <span class="invite-warning"></span>
@@ -24,7 +23,7 @@
     
     <div class="row">
         <div class="text-end">
-            <button id="inviteUserButton" class="btn-submit btn btn-primary check-invite-members ">Invite User</button>
+            <button id="inviteUserButton" type="button" class="btn-submit btn btn-primary check-invite-members">Invite User</button>
         </div>
     </div>
 </form>

@@ -31,7 +31,8 @@ class ProjectPolicy
         }
 
         if ($workspace->isPartOfPod()) {
-            return $plan->allow_pod_project_view;
+            $pod = $workspace->ownerable;
+            return $plan->allow_pod_project_view  && $pod->inner_enabled;
         } else {
             return $plan->allow_workspace_project_view;
         }

@@ -117,6 +117,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pods/{pod}/users/{user}', [PodUserController::class, 'accept'])->name('pods.accept');
     Route::post('/pods/{pod}/users/{user}/decline', [PodUserController::class, 'decline'])->name('pods.decline');
 
+    Route::get('/pods/{pod}/enable-inner-circle', [PodController::class, 'enableInnerCircle'])->name('pods.enableInnerCircle');
+    Route::get('/pods/{pod}/disable-inner-circle', [PodController::class, 'disableInnerCircle'])->name('pods.disableInnerCircle');
+
     Route::get('/pod/{pod}/users/{user}/edit-permissions', [PodUserController::class, 'editPermissions'])->name('pod.users.editPermissions');
     Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
 

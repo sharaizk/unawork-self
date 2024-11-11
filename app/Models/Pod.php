@@ -11,7 +11,7 @@ class Pod extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'image', 'description', 'created_by'
+        'title', 'image', 'description', 'created_by', 'inner_enabled'
     ];
 
     public function skills()

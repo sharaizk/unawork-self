@@ -105,4 +105,41 @@ class PodController extends Controller
         $projects = $pod->projects()->latest('created_at')->get();
         return view('pod.landing.inner', compact('pod', 'projects'));
     }
+
+    public function enableInnerCircle($podId)
+    {
+        $user = Auth::user();
+        $pod = Pod::findOrFail($podId);
+
+        if ($pod->created_by !== $user->id) {
+            return redirect()->back()->with('error', __('You do not have permission to enable inner circle for this pod.'));
+        }
+
+        $plan = $user->getPlan;
+
+        // Checking num of pods with enabled inner_enabled  onto plan
+        $enabledPodsCount = $user->countOwnPodsWithInnerEnabled();
+        if ($enabledPodsCount >= $plan->max_inner_circles) {
+            return redirect()->back()->with('error', __('You have reached the limit of inner circles allowed by your plan.'));
+        }
+
+        $pod->inner_enabled = true;
+        $pod->save();
+
+        return redirect()->back()->with('success', __('Inner circle enabled successfully.'));
+    }
+
+    public function disableInnerCircle($podId)
+    {
+        $pod = Pod::findOrFail($podId);
+
+        if (Auth::id() !== $pod->created_by) {
+            return redirect()->back()->with('error', __('You do not have permission to perform this action.'));
+        }
+
+        $pod->inner_enabled = false;
+        $pod->save();
+
+        return redirect()->back()->with('success', __('Inner Circle has been disabled successfully.'));
+    }
 }

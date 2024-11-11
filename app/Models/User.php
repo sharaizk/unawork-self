@@ -1133,4 +1133,21 @@ class User extends Authenticatable implements MustVerifyEmail
             return $vacancy->getPendingApplicationsCount();
         });
     }
+
+    public function isAbleToCreateZoomMeetings()
+    {
+        $plan = $this->getPlan;
+
+        return $plan && $plan->allow_zoom_meeting_creation;
+    }
+
+    public function ownPods()
+    {
+        return $this->hasMany(Pod::class, 'created_by');
+    }
+
+    public function countOwnPodsWithInnerEnabled()
+    {
+        return $this->ownPods()->where('inner_enabled', true)->count();
+    }
 }
