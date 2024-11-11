@@ -80,7 +80,7 @@
 
                                         </a></span>
                                 @endif
-                                @if ($plan->monthly_price > 0 && $plan->annual_price > 0)
+                                {{-- @if ($plan->monthly_price > 0 && $plan->annual_price > 0) --}}
                                     <span class="btn btn-sm btn-danger px-2 py-2">
                                         <a href="#" class="dropdown-item bs-pass-para"
                                             data-confirm="{{ __('Are You Sure?') }}"
@@ -94,7 +94,7 @@
                                         @method('DELETE')
                                     </form>
                                     </span>
-                                @endif
+                                {{-- @endif --}}
                             </div>
 
 
