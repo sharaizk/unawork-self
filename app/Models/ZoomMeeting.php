@@ -19,11 +19,20 @@ class ZoomMeeting extends Model
             return 0;
         }
     }
-    public function getProjectNameAttribute($value)
+    public function getProjectNameAttribute()
     {
         $project = Project::select('id', 'name')->where('id', $this->project_id)->first();
 
         return $project ? $project->name : null;
+    }
+
+    public function countMembers() {
+        if (!empty($this->member_ids)) {
+            $members_ids = explode(',', $this->member_ids);
+            return count($members_ids);
+        } else {
+            return 0;
+        }
     }
 
     public function getMembers(){
@@ -46,6 +55,11 @@ class ZoomMeeting extends Model
     }
 
      public function projectName()
+    {
+        return $this->hasOne('App\Models\Project', 'id', 'project_id');
+    }
+
+    public function project()
     {
         return $this->hasOne('App\Models\Project', 'id', 'project_id');
     }

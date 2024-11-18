@@ -165,6 +165,47 @@ class ZoomMeetingController extends Controller
         // }
     }
 
+    public function landing($slug, Request $request)
+    {
+        $objUser = Auth::user();
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        if ($currentWorkspace->permission == 'Owner') {
+            $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
+                            ->orwhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                        // ->where('created_by', \Auth::user()->id)
+                        ->get();
+        } else {
+            $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
+                // ->where('workspace_id', $currentWorkspace->id)
+                ->get();
+        }
+
+        $arrMeeting = [];
+        foreach ($meetings as $meeting) {
+            $arr['id']              = $meeting['id'];
+            $arr['title']           = $meeting['title'];
+            $arr['workspace_id']    = $meeting['workspace_id'];
+            $arr['meeting_id']      = $meeting['meeting_id'];
+            $arr['start']           = $meeting['start_date'];
+            $arr['duration']        = $meeting['duration'];
+            $arr['start_url']       = $meeting['start_url'];
+            $arr['className']       = 'bg-red';
+
+            if (\Auth::guard('client')->check()) {
+                $arr['url'] = route('zoom_meetings.show', [$slug, $meeting['id']]);
+            } else {
+                $arr['url'] = route('zoom_meeting.show', [$slug, $meeting['id']]);
+            }
+
+            $arrMeeting[] = $arr;
+        }
+
+        $calandar = array_merge($arrMeeting);
+        $calandar = str_replace('"[', '[', str_replace(']"', ']', json_encode($calandar)));
+
+        return view('zoom_meeting.landing', compact('calandar', 'currentWorkspace', 'meetings'));
+    }
+
     public function calender($slug, Request $request)
     {
 
