@@ -7,6 +7,16 @@
   -moz-transition: all 0.3s !important;
 }
 
+.memberMeeting img {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  z-index: 2;
+  transition: all 0.1s ease-in-out;
+  border: 2px solid #ffffff;
+}
+
 .videobars__list .videobars__video .btn__play, .header-2 .nav__item > a, .header-2 .nav__list {
   display: -webkit-box;
   display: -webkit-flex;

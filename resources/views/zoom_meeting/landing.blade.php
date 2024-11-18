@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
 @section('body-class', 'tpl-meeting')
-@section('title', 'Find Work')
+@section('title', 'Zoom Meetings')
 
 @section('content')
     <main>
@@ -81,149 +81,58 @@
         <section class="meetings ">
             <div class="container-master">
             <div class="row-master">
-                <div class="col-12 col-lg-6">
-                <div class="meetings--content">
-                    <h3 class="title_box">
-                    Team Schedule of Meetings
-                    </h3>
-                    <div class="meetings__list">
-                    <div class="meetings__item">
-                        <div class="timeMeeting">
-                        18:13 PM </div>
-                        <div class="meetings__item--content">
-                        <div class="meetings__item--left">
-                            <h3>Jack Mato</h3>
-                            <p><a href="#">Hong Kong</a></p>
-                            <div class="memberMeeting">
-                            <img src="./images/meeting/img.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy4.png" alt="membermeeting">
-                            </div>
-                        </div>
-                        <div class="meetings__item--right">
-                            <p class="date">Oct 10</p>
-                            <p class="hour">19:36 PM-12:21 PM</p>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="meetings__item">
-                        <div class="timeMeeting">
-                        21:45 PM </div>
-                        <div class="meetings__item--content">
-                        <div class="meetings__item--left">
-                            <h3>Alpha A.I</h3>
-                            <p><a href="#">San Francisco</a></p>
-                            <div class="memberMeeting">
-                            <img src="./images/meeting/img.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy4.png" alt="membermeeting">
-                            </div>
-                        </div>
-                        <div class="meetings__item--right">
-                            <p class="date">Jul 15</p>
-                            <p class="hour">23:43 PM-18:40 PM</p>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="meetings__item">
-                        <div class="timeMeeting">
-                        15:19 PM </div>
-                        <div class="meetings__item--content">
-                        <div class="meetings__item--left">
-                            <h3>Rockefeld</h3>
-                            <p><a href="#">New York</a></p>
-                            <div class="memberMeeting">
-                            <img src="./images/meeting/img.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy4.png" alt="membermeeting">
-                            </div>
-                        </div>
-                        <div class="meetings__item--right">
-                            <p class="date">Jun 10</p>
-                            <p class="hour">20:11 PM-09:53 AM</p>
-                        </div>
+                <div class="col-12 col-lg-12">
+                    <div class="meetings--content">
+                        <h3 class="title_box">
+                        My Meetings
+                        </h3>
+                        <div class="meetings__list">
+                            @foreach ($meetings as $meeting)
+                                <div class="meetings__item">
+                                    <div class="timeMeeting">
+                                    {{ $meeting->start_date }} </div>
+                                    <div class="meetings__item--content">
+                                    <div class="meetings__item--left">
+                                        <h3>{{ $meeting->title }}</h3>
+                                        @php
+                                            $project  = $meeting->project;
+                                            $workspace = $meeting->workspace;
+                                            $participants = $meeting->getMembers();
+                                        @endphp
+                                        <p>Project: 
+                                            @if (!empty($project))
+                                                <a href=" {{ route('projects.show', [$currentWorkspace->slug, $project->id]) }} ">{{ $project->name }}</a> 
+                                            @else —— 
+                                            @endif
+                                        </p>
+                                        <p>
+                                            Workspace: {{ $workspace->name }}
+                                        </p>
+                                        <p>
+                                            Participants: {{ $meeting->countMembers() }}
+                                        </p>
+                                        <div class="memberMeeting">
+                                            @foreach ($participants as $participant)
+                                                <a href="" class="project-person__link" data-toggle="tooltip" data-placement="top" title="{{$participant->name}}">
+                                                    <img alt="{{$participant->name}}" @if ($participant->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $participant->avatar, 'small') }}" @else avatar="{{ $participant->name }}" @endif>
+                                                </a>
+                                            @endforeach
+                                            <!-- <img src="./images/meeting/img.png" alt="membermeeting">
+                                            <img src="./images/meeting/img copy.png" alt="membermeeting">
+                                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
+                                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
+                                            <img src="./images/meeting/img copy4.png" alt="membermeeting"> -->
+                                        </div>
+                                    </div>
+                                    <div class="meetings__item--right">
+                                        <p class="date">{{ $meeting->start_date }}</p>
+                                        <p class="hour">{{ $meeting->start_date }}</p>
+                                    </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
-                    </div>
-                </div>
-                </div>
-                <div class="col-12 col-lg-6">
-                <div class="meetings--content">
-                    <h3 class="title_box">
-                    Team Schedule of Meetings
-                    </h3>
-                    <div class="meetings__list">
-                    <div class="meetings__item">
-                        <div class="timeMeeting">
-                        17:57 PM </div>
-                        <div class="meetings__item--content">
-                        <div class="meetings__item--left">
-                            <h3>Newman Gregory</h3>
-                            <p><a href="#">Stonybrook City</a></p>
-                            <div class="memberMeeting">
-                            <img src="./images/meeting/img.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy4.png" alt="membermeeting">
-                            </div>
-                        </div>
-                        <div class="meetings__item--right">
-                            <p class="date">Jun 17</p>
-                            <p class="hour">23:29 PM-11:07 AM</p>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="meetings__item">
-                        <div class="timeMeeting">
-                        12:34 PM </div>
-                        <div class="meetings__item--content">
-                        <div class="meetings__item--left">
-                            <h3>Regina Stevenson</h3>
-                            <p><a href="#">Colton City</a></p>
-                            <div class="memberMeeting">
-                            <img src="./images/meeting/img.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy4.png" alt="membermeeting">
-                            </div>
-                        </div>
-                        <div class="meetings__item--right">
-                            <p class="date">Jun 16</p>
-                            <p class="hour">21:13 PM-05:28 AM</p>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="meetings__item">
-                        <div class="timeMeeting">
-                        06:58 AM </div>
-                        <div class="meetings__item--content">
-                        <div class="meetings__item--left">
-                            <h3>Alston Oneil</h3>
-                            <p><a href="#">Elliott City</a></p>
-                            <div class="memberMeeting">
-                            <img src="./images/meeting/img.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                            <img src="./images/meeting/img copy4.png" alt="membermeeting">
-                            </div>
-                        </div>
-                        <div class="meetings__item--right">
-                            <p class="date">Nov 17</p>
-                            <p class="hour">12:33 PM-17:51 PM</p>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
                 </div>
             </div>
             </div>
