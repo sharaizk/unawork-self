@@ -36,7 +36,7 @@ class PlanController extends Controller
 
             return view('plans.admin', compact('plans', 'currentWorkspace', 'paymentSetting'));
         } else {
-            $plans = Plan::where('status', '1')->get();
+            $plans = Plan::where('is_plan_enable', '1')->get();
             return view('plans.company', compact('plans', 'currentWorkspace', 'paymentSetting'));
         }
     }
