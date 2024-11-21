@@ -169,41 +169,55 @@ class ZoomMeetingController extends Controller
     {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+
+        $meetingsQuery = ZoomMeeting::query();
+
         if ($currentWorkspace->permission == 'Owner') {
-            $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
-                            ->orwhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
-                        // ->where('created_by', \Auth::user()->id)
-                        ->get();
+            $meetingsQuery->where('workspace_id', $currentWorkspace->id)
+                        ->orWhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)");
         } else {
-            $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)")
-                // ->where('workspace_id', $currentWorkspace->id)
-                ->get();
+            $meetingsQuery->whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)");
         }
 
-        $arrMeeting = [];
-        foreach ($meetings as $meeting) {
-            $arr['id']              = $meeting['id'];
-            $arr['title']           = $meeting['title'];
-            $arr['workspace_id']    = $meeting['workspace_id'];
-            $arr['meeting_id']      = $meeting['meeting_id'];
-            $arr['start']           = $meeting['start_date'];
-            $arr['duration']        = $meeting['duration'];
-            $arr['start_url']       = $meeting['start_url'];
-            $arr['className']       = 'bg-red';
+        $allMeetings = $meetingsQuery->get();
 
-            if (\Auth::guard('client')->check()) {
-                $arr['url'] = route('zoom_meetings.show', [$slug, $meeting['id']]);
-            } else {
-                $arr['url'] = route('zoom_meeting.show', [$slug, $meeting['id']]);
-            }
+        $workspaces = $allMeetings->map(function ($meeting) {
+            return $meeting->workspace;
+        })->unique('id');
 
-            $arrMeeting[] = $arr;
+        $projects = $allMeetings->map(function ($meeting) {
+            return $meeting->project;
+        })->unique('id');
+
+        $participants = $allMeetings->flatMap(function ($meeting) {
+            return $meeting->getMembers();
+        })->unique('id');
+
+        if ($request->filled('workspace')) {
+            $meetingsQuery->where('workspace_id', $request->workspace);
         }
 
-        $calandar = array_merge($arrMeeting);
-        $calandar = str_replace('"[', '[', str_replace(']"', ']', json_encode($calandar)));
+        if ($request->filled('project')) {
+            $meetingsQuery->where('project_id', $request->project);
+        }
 
-        return view('zoom_meeting.landing', compact('calandar', 'currentWorkspace', 'meetings'));
+        if ($request->filled('participants')) {
+            $selectedParticipants = $request->participants;
+    
+            $meetingsQuery->where(function ($query) use ($selectedParticipants) {
+                foreach ($selectedParticipants as $participantId) {
+                    $query->whereRaw("find_in_set(" . $participantId . ",member_ids)");
+                }
+            });
+        }
+
+        if ($request->filled('date')) {
+            $meetingsQuery->whereDate('start_date', $request->date);
+        }
+
+        $meetings = $meetingsQuery->get();
+
+        return view('zoom_meeting.landing', compact('currentWorkspace', 'meetings', 'workspaces', 'projects', 'participants'));
     }
 
     public function calender($slug, Request $request)
@@ -254,15 +268,14 @@ class ZoomMeetingController extends Controller
     public function destroy($slug, ZoomMeeting $zoomMeeting, $id)
     {
         $currentWorkspace   = Utility::getWorkspaceBySlug($slug);
-        $zoomMeeting        = ZoomMeeting::where('id', $id)->where('workspace_id', $currentWorkspace->id)->first();
+        $zoomMeeting        = ZoomMeeting::where('id', $id)->first();
 
         if ($zoomMeeting) {
             try {
+                $zoomMeeting->delete();
                 $zoomDeleted = $this->delete($zoomMeeting->meeting_id, $slug);
     
                 if ($zoomDeleted['success']) {
-                    $zoomMeeting->delete();
-
                     return redirect()->back()->with('success', __('Meeting deleted successfully.'));
                 } 
             } catch (\Exception $e) {

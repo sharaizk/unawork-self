@@ -4,6 +4,11 @@
 @section('title', 'Zoom Meetings')
 
 @section('content')
+<!-- Підключення стилів Choices.js -->
+<link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
+
+<!-- Підключення JavaScript Choices.js -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>    
     <main>
 
         <section class="header-2">
@@ -64,7 +69,7 @@
         <section class="header__alert">
             <div class="container-master">
             <div class="header__alert__content">
-                <img src="./images/meeting/ic_notif.png" alt="iconAlert">
+                <img src="{{ asset('/assets/images/landing/meetings_ic_notif.png') }}" alt="iconAlert">
                 <p>You’ve Been Pinged to the Office - New Meeting at 14:30</p>
             </div>
             </div>
@@ -73,7 +78,43 @@
         <!-- title Page -->
         <section class="section__titlepage">
             <div class="container-master">
-            <h1 class="section__titlepage--headertitle"><span>Meetings</span></h1>
+                <h1 class="section__titlepage--headertitle"><span>Meetings</span></h1>
+                <form method="GET" action="{{ route('zoom-meeting.landing', $currentWorkspace->slug) }}">
+                    <div class="filters">
+                        <select class="filter-select" name="workspace">
+                            <option value="" selected>Choose Workspace</option>
+                            @foreach ($workspaces as $workspace)
+                                <option value="{{ $workspace->id }}" {{ request('workspace') == $workspace->id ? 'selected' : '' }}>
+                                    {{$workspace->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                        
+                        <select class="filter-select" name="project">
+                            @if (!empty($projects) && $projects->count() > 1)
+                            <option value="" disabled selected>Choose Project</option>
+                                @foreach ($projects as $project)
+                                    <option value="{{ $project->id }}" {{ request('project') == $project->id ? 'selected' : '' }}>
+                                        {{ $project->name }}
+                                    </option>
+                                @endforeach
+                            @else
+                                <option value="" disabled selected>No meetings in projects</option>
+                            @endif
+                        </select>
+                        
+                        <select class="filter-select choices-multiple" name="participants[]" multiple>
+                            @foreach ($participants as $participant)
+                                <option value="{{ $participant->id }}" 
+                                    {{ is_array(request('participants')) && in_array($participant->id, request('participants')) ? 'selected' : '' }}>
+                                    {{ $participant->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <input type="date" class="filter-date" name="date" value="{{ request('date') }}" placeholder="Choose Date">
+                        <button type="submit" class="filter-button">Search</button>
+                    </div>
+                </form>
             </div>
         </section>
         <!-- end title Page -->
@@ -87,50 +128,53 @@
                         My Meetings
                         </h3>
                         <div class="meetings__list">
-                            @foreach ($meetings as $meeting)
-                                <div class="meetings__item">
-                                    <div class="timeMeeting">
-                                    {{ $meeting->start_date }} </div>
-                                    <div class="meetings__item--content">
-                                    <div class="meetings__item--left">
-                                        <h3>{{ $meeting->title }}</h3>
-                                        @php
-                                            $project  = $meeting->project;
-                                            $workspace = $meeting->workspace;
-                                            $participants = $meeting->getMembers();
-                                        @endphp
-                                        <p>Project: 
-                                            @if (!empty($project))
-                                                <a href=" {{ route('projects.show', [$currentWorkspace->slug, $project->id]) }} ">{{ $project->name }}</a> 
-                                            @else —— 
-                                            @endif
-                                        </p>
-                                        <p>
-                                            Workspace: {{ $workspace->name }}
-                                        </p>
-                                        <p>
-                                            Participants: {{ $meeting->countMembers() }}
-                                        </p>
-                                        <div class="memberMeeting">
-                                            @foreach ($participants as $participant)
-                                                <a href="" class="project-person__link" data-toggle="tooltip" data-placement="top" title="{{$participant->name}}">
-                                                    <img alt="{{$participant->name}}" @if ($participant->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $participant->avatar, 'small') }}" @else avatar="{{ $participant->name }}" @endif>
-                                                </a>
-                                            @endforeach
-                                            <!-- <img src="./images/meeting/img.png" alt="membermeeting">
-                                            <img src="./images/meeting/img copy.png" alt="membermeeting">
-                                            <img src="./images/meeting/img copy2.png" alt="membermeeting">
-                                            <img src="./images/meeting/img copy3.png" alt="membermeeting">
-                                            <img src="./images/meeting/img copy4.png" alt="membermeeting"> -->
+                            @if ($meetings->isEmpty())
+                                <p class="no-meetings">No Zoom meetings available.</p>
+                            @else
+                                @foreach ($meetings as $meeting)
+                                    <div class="meetings__item">
+                                        <div class="timeMeeting">
+                                            <p class="hour">{{ \Carbon\Carbon::parse($meeting->start_date)->format('h:i A') }}</p>
+                                            <p class="date">{{ \Carbon\Carbon::parse($meeting->start_date)->format('m/d/Y') }}</p>
+                                        </div>
+                                        <div class="meetings__item--content">
+                                        <div class="meetings__item--left">
+                                            <h3>{{ $meeting->title }}</h3>
+                                            @php
+                                                $project  = $meeting->project;
+                                                $workspace = $meeting->workspace;
+                                                $participants = $meeting->getMembers();
+                                            @endphp
+                                            <p>Project: 
+                                                @if (!empty($project))
+                                                    <a href=" {{ route('projects.show', [$currentWorkspace->slug, $project->id]) }} ">{{ $project->name }}</a> 
+                                                @else —— 
+                                                @endif
+                                            </p>
+                                            <p>
+                                                Workspace: {{ $workspace->name }}
+                                            </p>
+                                            <p>
+                                                Participants: {{ $meeting->countMembers() }}
+                                            </p>
+                                            <div class="memberMeeting">
+                                                @foreach ($participants as $participant)
+                                                    <a href="" class="project-person__link" data-toggle="tooltip" data-placement="top" title="{{$participant->name}}">
+                                                        <img alt="{{$participant->name}}" @if ($participant->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $participant->avatar, 'small') }}" @else avatar="{{ $participant->name }}" @endif>
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="meetings__item--right text-left">
+                                            <h3 class="text-white"><i class="fa fa-info-circle"></i></h3>
+                                            <p class="date"> <b>Date:</b>  {{ \Carbon\Carbon::parse($meeting->start_date)->format('Y-m-d') }}</p>
+                                            <p class="hour"> <b>Time:</b>  {{ \Carbon\Carbon::parse($meeting->start_date)->format('H:i:s') }}</p>
+                                            <p class="duration"><b>Duration:</b>  {{ $meeting->duration }} min.</p>
+                                        </div>
                                         </div>
                                     </div>
-                                    <div class="meetings__item--right">
-                                        <p class="date">{{ $meeting->start_date }}</p>
-                                        <p class="hour">{{ $meeting->start_date }}</p>
-                                    </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -138,156 +182,16 @@
             </div>
         </section>
         <!--end Meeting -->
-        <!-- Video Bar -->
-        <section class="videobars">
-            <div class="container-master">
-            <div class="videobars__content">
-                <h3 class="title_box">Video Bar</h3>
-                <div class="videobars__list">
-                <div class="videobars__video">
-                    <a class="content_meets-video" data-fancybox="" href="https://www.youtube.com/watch?v=cnXapYkboRQ">
-                    <img src="./images/thumbnails/video-thumb1.png" class="Image thumb">
-                    <span class="btn__play">
-                        <i class="fa fa-play"></i>
-                    </span>
-                    </a>
-                    <a href="#" class="started">
-                    <span>GET STARTED</span>
-                    </a>
-                </div>
-                <div class="videobars__video">
-                    <a class="content_meets-video" data-fancybox="" href="https://www.youtube.com/watch?v=cnXapYkboRQ">
-                    <img src="./images/thumbnails/video-thumb2.png" class="Image thumb">
-                    <span class="btn__play">
-                        <i class="fa fa-play"></i>
-                    </span>
-                    </a>
-                    <!-- <a href="#" class="started">GET STARTED</a> -->
-                </div>
-                <div class="videobars__video">
-                    <a class="content_meets-video" data-fancybox="" href="https://www.youtube.com/watch?v=cnXapYkboRQ">
-                    <img src="./images/thumbnails/video-thumb6.png" class="Image thumb">
-                    <span class="btn__play">
-                        <i class="fa fa-play"></i>
-                    </span>
-                    </a>
-                    <!-- <a href="#" class="started">GET STARTED</a> -->
-                </div>
-                <div class="videobars__video">
-                    <a class="content_meets-video" data-fancybox="" href="https://www.youtube.com/watch?v=cnXapYkboRQ">
-                    <img src="./images/thumbnails/video-thumb3.png" class="Image thumb">
-                    <span class="btn__play">
-                        <i class="fa fa-play"></i>
-                    </span>
-                    </a>
-                    <!-- <a href="#" class="started">GET STARTED</a> -->
-                </div>
-                <div class="videobars__video">
-                    <a class="content_meets-video" data-fancybox="" href="https://www.youtube.com/watch?v=cnXapYkboRQ">
-                    <img src="./images/thumbnails/video-thumb5.png" class="Image thumb">
-                    <span class="btn__play">
-                        <i class="fa fa-play"></i>
-                    </span>
-                    </a>
-                    <!-- <a href="#" class="started">GET STARTED</a> -->
-                </div>
-                </div>
-            </div>
-            </div>
-        </section>
-        <!--end Video Bar -->
-        <div class="pastmeetingnotes">
-            <div class="container-master">
-            <div class="row-master">
-                <div class="col-12 col-lg-6">
-                <div class="pastmeetingnotes__content">
-                    <h3 class="title_box">Past Meeting Agendas </h3>
-                    <a href="" class="buttonViewAll">View All<svg xmlns="http://www.w3.org/2000/svg" width="8.055" height="15" viewBox="0 0 8.055 15">
-                        <path id="Path" d="M6.852,6.616.857.158a.477.477,0,0,0-.711,0,.574.574,0,0,0,0,.767L5.786,7,.148,13.073a.574.574,0,0,0,0,.767A.483.483,0,0,0,.5,14a.483.483,0,0,0,.355-.158l6-6.457a.574.574,0,0,0,0-.768Z" transform="translate(0.555 0.5)" fill="#cfaa40" stroke="#cfaa40" stroke-miterlimit="10" stroke-width="1"></path>
-                    </svg>
-                    </a>
-                    <div class="pastmeetingnotes__list--meeting">
-                    <div class="pastmeetingnotes__list--meeting--item">
-                        <div class="contentItem">
-                        <p class="date">Yesterday</p>
-                        <p class="time">22 May, 2020</p>
-                        </div>
-                    </div>
-                    <div class="pastmeetingnotes__list--meeting--item">
-                        <div class="contentItem">
-                        <p class="date">Previously this Week</p>
-                        <p class="time">18 - 21 May, 2020</p>
-                        </div>
-                    </div>
-                    <div class="pastmeetingnotes__list--meeting--item">
-                        <div class="contentItem">
-                        <p class="date">3rd Week of May</p>
-                        <p class="time">11- 15 May, 2020</p>
-                        </div>
-                    </div>
-                    <div class="pastmeetingnotes__list--meeting--item">
-                        <div class="contentItem">
-                        <p class="date">Last Month</p>
-                        <p class="time">April, 2020</p>
-                        </div>
-                    </div>
-                    <div class="pastmeetingnotes__list--meeting--item">
-                        <div class="contentItem">
-                        <p class="date">March</p>
-                        <p class="time">2020</p>
-                        </div>
-                    </div>
-                    <div class="pastmeetingnotes__list--meeting--item">
-                        <div class="contentItem">
-                        <p class="date">February</p>
-                        <p class="time">2020</p>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-                </div>
-                <div class="col-12 col-lg-6">
-                <div class="pastmeetingnotes__content">
-                    <h3 class="title_box">Notes</h3>
-                    <a href="" class="buttonViewAll">View All<svg xmlns="http://www.w3.org/2000/svg" width="8.055" height="15" viewBox="0 0 8.055 15">
-                        <path id="Path" d="M6.852,6.616.857.158a.477.477,0,0,0-.711,0,.574.574,0,0,0,0,.767L5.786,7,.148,13.073a.574.574,0,0,0,0,.767A.483.483,0,0,0,.5,14a.483.483,0,0,0,.355-.158l6-6.457a.574.574,0,0,0,0-.768Z" transform="translate(0.555 0.5)" fill="#cfaa40" stroke="#cfaa40" stroke-miterlimit="10" stroke-width="1"></path>
-                    </svg>
-                    </a>
-                    <div class="pastmeetingnotes__list--notes">
-                    <div class="pastmeetingnotes__list--notes--item">
-                        <h3 class="titleNotes"><a href="/document.php">Title of Note</a></h3>
-                        <div class="date">MAY 16</div>
-                        <p class="content">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nam volutpat convallis ipsum, sed pellentesque orci gravida sit amet.
-                        Aliquam at odio lorem.
-                        </p>
-                    </div>
-                    <div class="pastmeetingnotes__list--notes--item">
-                        <h3 class="titleNotes"><a href="/document.php">Title of Note</a></h3>
-                        <div class="date">MAY 16</div>
-                        <p class="content">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nam volutpat convallis ipsum, sed pellentesque orci gravida sit amet.
-                        Aliquam at odio lorem.
-                        </p>
-                    </div>
-                    <div class="pastmeetingnotes__list--notes--item">
-                        <h3 class="titleNotes"><a href="/document.php">Title of Note</a></h3>
-                        <div class="date">MAY 16</div>
-                        <p class="content">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nam volutpat convallis ipsum, sed pellentesque orci gravida sit amet.
-                        Aliquam at odio lorem.
-                        </p>
-                    </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
     </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const multipleChoices = new Choices('.choices-multiple', {
+                removeItemButton: true,          // Кнопка для видалення тегів
+                placeholder: true,
+                placeholderValue: 'Choose Participants', // Місцева підказка
+            });
+        });
+    </script>
 @endsection
 
 @section('scripts')
