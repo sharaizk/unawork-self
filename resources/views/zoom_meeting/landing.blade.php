@@ -4,78 +4,14 @@
 @section('title', 'Zoom Meetings')
 
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Підключення стилів Choices.js -->
 <link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
 
 <!-- Підключення JavaScript Choices.js -->
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>    
     <main>
-
-        <section class="header-2">
-            <div class="container-master">
-                <nav class="nav__menu">
-                <ul class="nav__list">
-                    <li class="nav__item menu__has-children" data-dropdown="1">
-                    <a href="/meeting.php" class="active">Meetings
-                        <svg xmlns="http://www.w3.org/2000/svg" width="10.5" height="5.535" viewBox="0 0 10.5 5.535">
-                        <path id="Path" d="M9.878.113a.441.441,0,0,0-.589,0L5,4.072.711.113a.441.441,0,0,0-.589,0,.364.364,0,0,0,0,.544L4.705,4.887a.441.441,0,0,0,.589,0L9.878.657A.364.364,0,0,0,9.878.113Z" transform="translate(0.25 0.285)" fill="#cfaa40" stroke="#cfaa40" stroke-miterlimit="10" stroke-width="0.5"></path>
-                        </svg>
-                    </a>
-
-                    <ul class="nav-sub__menu">
-                        <li><a href="#">Sub Menu 1</a></li>
-                        <li><a href="#">Sub Menu 2</a></li>
-                        <li><a href="#">Sub Menu 3</a></li>
-                        <li><a href="#">Sub Menu 4</a></li>
-                    </ul>
-                    </li>
-
-                    <li class="nav__item menu__has-children" data-dropdown="2">
-                    <a href="/teams.php" class="">Teams
-                        <svg xmlns="http://www.w3.org/2000/svg" width="10.5" height="5.535" viewBox="0 0 10.5 5.535">
-                        <path id="Path" d="M9.878.113a.441.441,0,0,0-.589,0L5,4.072.711.113a.441.441,0,0,0-.589,0,.364.364,0,0,0,0,.544L4.705,4.887a.441.441,0,0,0,.589,0L9.878.657A.364.364,0,0,0,9.878.113Z" transform="translate(0.25 0.285)" fill="#cfaa40" stroke="#cfaa40" stroke-miterlimit="10" stroke-width="0.5"></path>
-                        </svg>
-                    </a>
-
-                    <ul class="nav-sub__menu">
-                        <li><a href="#">Sub Menu 1</a></li>
-                        <li><a href="#">Sub Menu 2</a></li>
-                        <li><a href="#">Sub Menu 3</a></li>
-                        <li><a href="#">Sub Menu 4</a></li>
-                    </ul>
-                    </li>
-
-                    <li class="nav__item">
-                    <a href="/document.php" class="">Docs</a>
-                    </li>
-                    <li class="nav__item">
-                    <a href="/task.php" class="">Tasks</a>
-                    </li>
-                    <li class="nav__item">
-                    <a href="/document.php">Co. Notes</a>
-                    </li>
-                    <li class="nav__item">
-                    <a href="/finance.php" class="">Finances</a>
-                    </li>
-                    <li class="nav__item">
-                    <a href="/document.php">Resources</a>
-                    </li>
-                </ul>
-                </nav>
-            </div>
-        </section>
-
-        <!-- topAlert -->
-        <section class="header__alert">
-            <div class="container-master">
-            <div class="header__alert__content">
-                <img src="{{ asset('/assets/images/landing/meetings_ic_notif.png') }}" alt="iconAlert">
-                <p>You’ve Been Pinged to the Office - New Meeting at 14:30</p>
-            </div>
-            </div>
-        </section>
-        <!-- end topAlert -->
-        <!-- title Page -->
+        <!-- header search  -->
         <section class="section__titlepage">
             <div class="container-master">
                 <h1 class="section__titlepage--headertitle"><span>Meetings</span></h1>
@@ -91,7 +27,7 @@
                         </select>
                         
                         <select class="filter-select" name="project">
-                            @if (!empty($projects) && $projects->count() > 1)
+                            @if (!empty($projects) && $projects->count() >= 1)
                             <option value="" disabled selected>Choose Project</option>
                                 @foreach ($projects as $project)
                                     <option value="{{ $project->id }}" {{ request('project') == $project->id ? 'selected' : '' }}>
@@ -99,7 +35,7 @@
                                     </option>
                                 @endforeach
                             @else
-                                <option value="" disabled selected>No meetings in projects</option>
+                                <option value="" disabled selected>No projects in meetings</option>
                             @endif
                         </select>
                         
@@ -117,7 +53,7 @@
                 </form>
             </div>
         </section>
-        <!-- end title Page -->
+        <!-- end header search -->
         <!-- Meeting -->
         <section class="meetings ">
             <div class="container-master">
@@ -132,7 +68,7 @@
                                 <p class="no-meetings">No Zoom meetings available.</p>
                             @else
                                 @foreach ($meetings as $meeting)
-                                    <div class="meetings__item">
+                                    <div class="meetings__item" data-meeting="{{ $meeting->toJson() }}">
                                         <div class="timeMeeting">
                                             <p class="hour">{{ \Carbon\Carbon::parse($meeting->start_date)->format('h:i A') }}</p>
                                             <p class="date">{{ \Carbon\Carbon::parse($meeting->start_date)->format('m/d/Y') }}</p>
@@ -183,12 +119,87 @@
         </section>
         <!--end Meeting -->
     </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="meeting-modal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingModalLabel">Meeting Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h2 id="meeting-title" class="text-center"></h2>
+                <br>
+                <label for="meeting-note"><strong>Your Notes:</strong></label>
+                <textarea id="meeting-note" class="form-control" rows="8"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="save-note" type="button" class="btn btn-primary">Save</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const multipleChoices = new Choices('.choices-multiple', {
-                removeItemButton: true,          // Кнопка для видалення тегів
+                removeItemButton: true,          
                 placeholder: true,
-                placeholderValue: 'Choose Participants', // Місцева підказка
+                placeholderValue: 'Choose Participants',
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = new bootstrap.Modal(document.getElementById('meeting-modal'));
+            const modalTitle = document.getElementById('meeting-title');
+            const modalNote = document.getElementById('meeting-note');
+            const saveNoteButton = document.getElementById('save-note');
+
+            let currentMeetingId = null;
+
+            // Open modal and populate data
+            document.querySelectorAll('.meetings__item').forEach(button => {
+                button.addEventListener('click', function () {
+                    const meeting = JSON.parse(this.getAttribute('data-meeting'));
+                    modalTitle.textContent = 'Title: ' + meeting.title;
+                    modalNote.value = meeting.note || '';
+                    currentMeetingId = meeting.id;
+                    modal.show();
+                });
+            });
+
+            // Save note
+            saveNoteButton.addEventListener('click', function () {
+                // Формування URL для запиту
+                var urlTemplate = "{{ route('zoom_meeting.update-note', ['meetingId' => ':meetingId']) }}";
+                var url = urlTemplate.replace(':meetingId', currentMeetingId);
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ note: modalNote.value }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification('Note updated successfully');
+                        modal.hide();
+                    } else {
+                        showNotification('Failed to update note');
+                    }
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred. Please try again.');
+                });
             });
         });
     </script>
