@@ -267,7 +267,12 @@ main .meetings__item--content {
   color: #fff;
   padding: 15px;
   display: flex;
+  cursor: pointer;
 }
+main .meetings__item--content:hover {
+  background: #0c3a63;
+}
+
 main .meetings__item--right {
   text-align: left;
 }

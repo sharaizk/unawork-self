@@ -78,4 +78,15 @@ class ZoomMeeting extends Model
     {
         return $this->hasOne('App\Models\Workspace', 'id', 'workspace_id');
     }
+
+    public function notes()
+    {
+        return $this->hasMany(ZoomMeetingNote::class, 'meeting_id');
+    }
+
+    public function getUserNote($userId)
+    {
+        $note = $this->notes()->where('user_id', $userId)->first();
+        return $note ? $note->text : null;
+    }
 }

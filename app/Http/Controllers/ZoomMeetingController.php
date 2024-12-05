@@ -10,6 +10,7 @@ use App\Models\UserProject;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\ZoomMeeting;
+use App\Models\ZoomMeetingNote;
 use App\Traits\ZoomMeetingTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -173,12 +174,20 @@ class ZoomMeetingController extends Controller
         $meetingsQuery = ZoomMeeting::query();
 
         if ($currentWorkspace->permission == 'Owner') {
-            $meetingsQuery->where('workspace_id', $currentWorkspace->id)
+            $meetingsQuery->where(function ($query) use ($currentWorkspace, $objUser) {
+                $query->where('workspace_id', $currentWorkspace->id)
                         ->orWhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)");
+            });
+            
         } else {
             $meetingsQuery->whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)");
         }
 
+        $meetingsQuery->where(function ($query) {
+            $query->where('start_date', '>=', now()->subDay())
+                  ->orWhere('start_date', '>=', now());
+        });
+    
         $allMeetings = $meetingsQuery->get();
 
         $workspaces = $allMeetings->map(function ($meeting) {
@@ -186,8 +195,11 @@ class ZoomMeetingController extends Controller
         })->unique('id');
 
         $projects = $allMeetings->map(function ($meeting) {
-            return $meeting->project;
-        })->unique('id');
+            if ($meeting->project_id != null) {
+                return $meeting->project;
+            }
+            return null;
+        })->filter()->unique('id');
 
         $participants = $allMeetings->flatMap(function ($meeting) {
             return $meeting->getMembers();
@@ -217,7 +229,30 @@ class ZoomMeetingController extends Controller
 
         $meetings = $meetingsQuery->get();
 
+        $meetings->each(function ($meeting) use ($objUser) {
+            $meeting->note = $meeting->getUserNote($objUser->id);
+        });
+
         return view('zoom_meeting.landing', compact('currentWorkspace', 'meetings', 'workspaces', 'projects', 'participants'));
+    }
+
+    public function updateMeetingNote(Request $request, $meetingId)
+    {
+        $user = Auth::user();
+        $noteText = $request->input('note');
+
+        $note = ZoomMeetingNote::firstOrNew([
+            'meeting_id' => $meetingId,
+            'user_id' => $user->id,
+        ]);
+
+        $note->text = $noteText;
+        $note->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Note updated successfully.',
+        ]);
     }
 
     public function calender($slug, Request $request)

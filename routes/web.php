@@ -1098,6 +1098,9 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('/{slug}/zoom-meeting/store', [ZoomMeetingController::class, 'store'])->name('zoom-meeting.store')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/zoom-meeting/{id}/show', [ZoomMeetingController::class, 'show'])->name('zoom_meeting.show')->middleware(['auth', 'XSS']);
 
+    Route::post('/zoom-meeting/{meetingId}/update-note', [ZoomMeetingController::class, 'updateMeetingNote'])
+    ->name('zoom_meeting.update-note')->middleware(['auth', 'XSS']);
+    
     Route::get('/{slug}/zoom-meetings/{id}/show', [ZoomMeetingController::class, 'show'])->name('zoom_meetings.show')->middleware(['auth:client', 'XSS']);
 
     Route::get('/{slug}/zoom-meeting/{id}/edit', [ZoomMeetingController::class, 'edit'])->name('zoom-meeting.edit')->middleware(['auth', 'XSS']);
