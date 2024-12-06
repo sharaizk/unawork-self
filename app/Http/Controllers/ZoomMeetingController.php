@@ -53,6 +53,10 @@ class ZoomMeetingController extends Controller
 
             // $this->statusUpdate($slug);
 
+            $meetings->each(function ($meeting) use ($objUser) {
+                $meeting->note = $meeting->getUserNote($objUser->id);
+            });
+
             return view('zoom_meeting.index', compact('meetings', 'currentWorkspace'));
 
         }else{
