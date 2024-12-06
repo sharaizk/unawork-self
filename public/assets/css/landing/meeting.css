@@ -271,6 +271,7 @@ main .meetings__item--content {
 }
 main .meetings__item--content:hover {
   background: #0c3a63;
+  border: rgba(150, 230, 117, 1), 3px, solid;
 }
 
 main .meetings__item--right {

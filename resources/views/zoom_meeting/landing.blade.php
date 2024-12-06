@@ -106,6 +106,15 @@
                                             <p class="date"> <b>Date:</b>  {{ \Carbon\Carbon::parse($meeting->start_date)->format('Y-m-d') }}</p>
                                             <p class="hour"> <b>Time:</b>  {{ \Carbon\Carbon::parse($meeting->start_date)->format('H:i:s') }}</p>
                                             <p class="duration"><b>Duration:</b>  {{ $meeting->duration }} min.</p>
+                                            <!-- @if ($meeting->created_by == \Auth::user()->id && $meeting->checkDateTime())
+                                            <a href="{{ $meeting->join_url }}" target="_blank"></a><p class="duration"><b>Go to meeting:</b>  </p></a>   
+                                            @elseif($meeting->checkDateTime())
+                                                <a href="{{ $meeting->join_url }}" target="_blank"> {{ __('Join meeting') }}
+                                                    <i class="fas fa-external-link-square-alt "></i></a>
+                                            @else
+                                                -
+                                            @endif -->
+                                            
                                         </div>
                                         </div>
                                     </div>

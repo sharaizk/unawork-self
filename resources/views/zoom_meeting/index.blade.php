@@ -117,6 +117,7 @@
                                     @endif
                                     <th> {{ __('Meeting Time') }} </th>
                                     <th> {{ __('Duration') }} </th>
+                                    <th> {{ __('Notes') }} </th>
                                     <th> {{ __('Join URL') }} </th>
                                     <th> {{ __('Status') }} </th>
                                     @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
@@ -159,6 +160,11 @@
                                         @endif
                                         <td>{{ $item->start_date }}</td>
                                         <td>{{ $item->duration }} {{ __('Minutes') }}</td>
+                                        <td class="meetings__item" data-meeting="{{ $item->toJson() }}">
+                                            <button class="btn btn-secondary btn-sm">
+                                                <i class="ti ti-list"></i>
+                                            </button>
+                                        </td>
 
                                         <td>
                                             @if ($item->created_by == \Auth::user()->id && $item->checkDateTime())
@@ -215,6 +221,29 @@
         </div>
     </div>
 
+
+    <!-- Modal -->
+    <div class="modal fade" id="meeting-modal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingModalLabel">Meeting Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="meeting-title" class="text-center"></h5>
+                <br>
+                <label for="meeting-note"><strong>Your Notes:</strong></label>
+                <textarea id="meeting-note" class="form-control" rows="8"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="save-note" type="button" class="btn btn-primary">Save</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg ss_modale" role="document">
@@ -249,5 +278,58 @@
         // filter
         filterInput.addEventListener('input', filterTable);
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+            const modal = new bootstrap.Modal(document.getElementById('meeting-modal'));
+            const modalTitle = document.getElementById('meeting-title');
+            const modalNote = document.getElementById('meeting-note');
+            const saveNoteButton = document.getElementById('save-note');
+
+            let currentMeetingId = null;
+
+            // Open modal and populate data
+            document.querySelectorAll('.meetings__item').forEach(button => {
+                button.addEventListener('click', function () {
+                    const meeting = JSON.parse(this.getAttribute('data-meeting'));
+                    modalTitle.textContent = 'Title: ' + meeting.title;
+                    modalNote.value = meeting.note || '';
+                    currentMeetingId = meeting.id;
+                    modal.show();
+                });
+            });
+
+            // Save note
+            saveNoteButton.addEventListener('click', function () {
+                // Формування URL для запиту
+                var urlTemplate = "{{ route('zoom_meeting.update-note', ['meetingId' => ':meetingId']) }}";
+                var url = urlTemplate.replace(':meetingId', currentMeetingId);
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ note: modalNote.value }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification('Note updated successfully');
+                        modal.hide();
+                    } else {
+                        showNotification('Failed to update note');
+                    }
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred. Please try again.');
+                });
+            });
+        });
 </script>
+
 @endpush
