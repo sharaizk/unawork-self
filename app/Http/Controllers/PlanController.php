@@ -31,12 +31,19 @@ class PlanController extends Controller
     {
         $currentWorkspace = Utility::getWorkspaceBySlug('');
         $paymentSetting   = Utility::getAdminPaymentSetting();
+        $userId = \Auth::id();
+
         if (\Auth::user()->type == 'admin') {
             $plans = Plan::get();
 
             return view('plans.admin', compact('plans', 'currentWorkspace', 'paymentSetting'));
         } else {
-            $plans = Plan::where('is_plan_enable', '1')->get();
+            $plans = Plan::where('is_plan_enable', '1')
+                ->where('is_custom', false)
+                ->orWhereHas('users', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->get();
             return view('plans.company', compact('plans', 'currentWorkspace', 'paymentSetting'));
         }
     }
@@ -90,15 +97,19 @@ class PlanController extends Controller
     public function create()
     {
         $plan = new Plan();
+        $users = User::select('id', 'email')->get();
 
-        return view('plans.create', compact('plan'));
+        return view('plans.create', compact('plan', 'users'));
     }
 
 
     public function store(Request $request)
     {
         // dd($request->all());
-        $validation                   = [];
+        $validation                   = [
+            'users_list'     => 'nullable|array',
+            'users_list.*'   => 'exists:users,id',
+        ];
         $validation['name']           = 'required|unique:plans';
         $validation['monthly_price']  = 'required|numeric|min:0';
         $validation['annual_price']   = 'required|numeric|min:0';
@@ -106,7 +117,6 @@ class PlanController extends Controller
         $validation['storage_limit']  = 'required|numeric';
         $validation['max_workspaces'] = 'required|numeric';
         $validation['max_users']      = 'required|numeric';
-        $validation['max_clients']    = 'required|numeric';
         $validation['max_projects']   = 'required|numeric';
         if ($request->image) {
             $validation['image'] = 'required|image';
@@ -127,6 +137,7 @@ class PlanController extends Controller
         $post['is_trial_disable'] =  $request->is_trial_disable == 'on' ? 1 : 0;
 
 
+        $post['is_custom'] = $request->has('is_custom') ? 1 : 0;
 
         if ($request->monthly_price > 0 || $request->annual_price > 0) {
             $paymentSetting = Utility::getAdminPaymentSetting();
@@ -148,7 +159,12 @@ class PlanController extends Controller
             $request->image->storeAs('plans', $avatarName, 'public');
             $post['image'] = $avatarName;
         }
-        if (Plan::create($post)) {
+        $plan = Plan::create($post);
+        if ($request->has('is_custom') && $request->has('users_list')) {
+            $plan->users()->sync($request->users_list);
+        }
+
+        if ($plan) {
             return redirect()->back()->with('success', __('Plan created Successfully!'));
         } else {
             return redirect()->back()->with('error', __('Something is wrong'));
@@ -164,8 +180,9 @@ class PlanController extends Controller
     public function edit($planID)
     {
         $plan = Plan::find($planID);
+        $users = User::select('id', 'email')->get();
 
-        return view('plans.edit', compact('plan'));
+        return view('plans.edit', compact('plan', 'users'));
     }
 
 
@@ -175,7 +192,10 @@ class PlanController extends Controller
         // dd($request->enable_chatgpt);
         $plan = Plan::find($planID);
         if ($plan) {
-            $validation         = [];
+            $validation         = [
+                'users_list'     => 'nullable|array',
+                'users_list.*'   => 'exists:users,id',
+            ];
             $validation['name'] = 'required|unique:plans,name,' . $planID;
             if ($plan->id != 1) {
                 $validation['monthly_price'] = 'required|numeric|min:0';
@@ -185,7 +205,6 @@ class PlanController extends Controller
             }
             $validation['max_workspaces'] = 'required|numeric';
             $validation['max_users']      = 'required|numeric';
-            $validation['max_clients']    = 'required|numeric';
             $validation['max_projects']   = 'required|numeric';
             if ($request->image) {
                 $validation['image'] = 'required|image';
@@ -232,11 +251,21 @@ class PlanController extends Controller
                 // $request->image->storeAs('plans', $avatarName);
                 $post['image'] = $avatarName;
             }
-            if ($plan->update($post)) {
-                return redirect()->back()->with('success', __('Plan updated Successfully!'));
+
+            $post['is_custom'] = $request->has('is_custom') ? 1 : 0;
+            $plan->update($post);
+
+            if ($request->has('is_custom')) {
+                if ($request->has('users_list')) {
+                    $plan->users()->sync($request->users_list);
+                } else {
+                    $plan->users()->detach();
+                }
             } else {
-                return redirect()->back()->with('error', __('Something is wrong'));
+                $plan->users()->detach();
             }
+
+            return redirect()->back()->with('success', __('Plan updated Successfully!'));
         } else {
             return redirect()->back()->with('error', __('Plan not found'));
         }

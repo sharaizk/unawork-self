@@ -30,6 +30,7 @@ class Plan extends Model
         'allow_pod_project_view',
         'allow_zoom_meeting_creation',
         'max_inner_circles',
+        'is_custom',
     ];
 
     public function arrDuration()
@@ -41,6 +42,18 @@ class Plan extends Model
         ];
     }
 
-    
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'access_plans');
+    }
+
+    public function getAvailablePlansForUser($userId)
+    {
+        return Plan::where('is_custom', false)
+            ->orWhereHas('users', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->get();
+    }
 
 }
