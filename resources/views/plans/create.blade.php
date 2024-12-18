@@ -2,6 +2,16 @@
 use App\Models\Utility;
     $setting =  Utility::getAdminPaymentSetting();
 @endphp
+<style>
+    .select2-container .select2-search__field {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+    .select2-container {
+        display: block !important;
+    }
+</style>
+
 <form class="" method="post" action="{{ route('plans.store') }}" enctype="multipart/form-data">
     @csrf
      <div class="modal-body">
@@ -46,6 +56,24 @@ use App\Models\Utility;
         </div>
 
         <div class="form-group col-md-6">
+            <div class="form-check form-switch d-inline-block py-4">
+                <input type="checkbox" class="form-check-input" name="is_custom" id="is_custom">
+                <label class="custom-control-label form-check-label" for="is_custom">
+                    {{ __('Custom Plan') }}
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group col-md-12" id="custom-users-select" style="display: none;">
+            <label for="user_ids">{{ __('Assign to Users') }}</label>
+            <select class="multi-select" name="users_list[]" id="users_list" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->email }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group col-md-6">
             <label for="storage_limit" class="form-control-label">{{ __('Storage Limit') }} *</label>
             <div class="input-group">
                 <input type="text" class="form-control mb-0" id="storage_limit" name="storage_limit" required/>
@@ -66,11 +94,6 @@ use App\Models\Utility;
                 <input type="number" class="form-control mb-0" id="max_users" name="max_users" required/>
                 <span><small>{{__("Note: '-1' for unlimited")}}</small></span>
             </div>
-        </div>
-        <div class="form-group col-md-6">
-            <label for="max_clients" class="form-label">{{ __('Maximum Clients Per Workspace') }} *</label>
-            <input type="number" class="form-control mb-0" id="max_clients" name="max_clients" required/>
-            <span><small>{{__("Note: '-1' for unlimited")}}</small></span>
         </div>
         <div class="form-group col-md-6">
             <label for="max_projects" class="form-label">{{ __('Maximum Projects Per Workspace') }} *</label>
@@ -185,3 +208,12 @@ use App\Models\Utility;
     </div>
 </form>
 
+<script>
+    $(document).ready(function() {
+        $('#user_ids').select2({
+            placeholder: "Search users by email",
+            allowClear: true,
+            minimumInputLength: 1,
+        });
+    });
+</script>
