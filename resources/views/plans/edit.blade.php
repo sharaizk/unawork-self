@@ -63,6 +63,26 @@
                     </div>
                 </div>
 
+                <div class="form-group col-md-6">
+                    <div class="form-check form-switch d-inline-block py-4">
+                        <input type="checkbox" class="form-check-input" name="is_custom" id="is_custom" {{ $plan->is_custom ? 'checked' : '' }}>
+                        <label class="custom-control-label form-check-label" for="is_custom">
+                            {{ __('Custom Plan') }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12" id="custom-users-select" style="{{ $plan->is_custom ? '' : 'display: none;' }}">
+                    <label for="user_ids">{{ __('Assign to Users') }}</label>
+                    <select class="multi-select" name="users_list[]" id="users_list" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" {{ $plan->users->contains($user->id) ? 'selected' : '' }}>
+                                {{ $user->email }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- <div class="form-group col-md-6">
                         <label for="duration" class="form-label">{{ __('Trial Days') }} *</label>
                         <input type="number" class="form-control mb-0" id="trial_days" name="trial_days" value="{{$plan->trial_days}}" required/>
@@ -91,12 +111,6 @@
                 <label for="max_users" class="form-label">{{ __('Maximum Users Per Workspace') }} *</label>
                 <input type="number" class="form-control mb-0" id="max_users" name="max_users"
                     value="{{ $plan->max_users }}" required />
-                <span><small>{{ __("Note: '-1' for unlimited") }}</small></span>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="max_clients" class="form-label">{{ __('Maximum Clients Per Workspace') }} *</label>
-                <input type="number" class="form-control mb-0" id="max_clients" name="max_clients"
-                    value="{{ $plan->max_clients }}" required />
                 <span><small>{{ __("Note: '-1' for unlimited") }}</small></span>
             </div>
             <div class="form-group col-md-6">

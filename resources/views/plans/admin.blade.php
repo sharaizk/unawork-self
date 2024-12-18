@@ -204,6 +204,16 @@
                     $('#trial_days').removeAttr("required");
                 }
             });
+            
+            $(document).on('change', '#is_custom', function() {
+              
+                
+                if ($(this).is(':checked')) {
+                    $('#custom-users-select').show();
+                } else {
+                    $('#custom-users-select').hide();
+                }
+            });
         });
     </script>
 @endpush
