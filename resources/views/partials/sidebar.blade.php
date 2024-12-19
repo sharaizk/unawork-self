@@ -126,8 +126,17 @@
                             @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
                             --}} 
                             @if (Auth::user()->type != 'admin')
-                                <li
-                                    class="dash-item  {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
+                                <li class="dash-item  {{ Request::route()->getName() == 'finances.index' ? ' active' : '' }}">
+                                    <a href="{{ route('finances.index', $currentWorkspace->slug) }}"
+                                        class="dash-link ">
+                                        <span class="dash-micon">
+                                        <i class="fas fa-regular fa-money-bill"></i>
+                                        </span>
+                                        <span class="dash-mtext">{{ __('Finance page') }}</span>
+                                    </a>
+
+                                </li>    
+                                <li class="dash-item  {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
                                     <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
                                         class="dash-link "><span class="dash-micon"><i
                                                 data-feather="video"></i></span><span
