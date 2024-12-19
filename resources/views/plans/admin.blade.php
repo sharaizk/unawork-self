@@ -21,6 +21,9 @@
             data-toggle="tooltip" title="{{ __('Add Plan') }}" data-url="{{ route('plans.create') }}">
             <i class="ti ti-plus"></i>
         </a>
+        <button id="toggleView" class="btn btn-sm btn-primary">
+            <i class="fas fa-solid fa-table"></i>
+        </button>
     @endif
 @endsection
 <style type="text/css">
@@ -29,7 +32,7 @@
     }
 </style>
 @section('content')
-    <div class="row">
+    <div id="cardsView" class="row">
         @foreach ($plans as $key => $plan)
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="card price-card price-1 wow animate__fadeInUp" data-wow-delay="0.2s"
@@ -108,7 +111,16 @@
                         <span
                             class="mb-4 f-w-600 p-price">{{ $setting['currency_symbol'] ? $setting['currency_symbol'] : '$' }}{{ $plan->annual_price }}
                             <small class="text-sm">/{{ __('Annual Price') }}</small></span>
-
+                        
+                        
+                        @if ($plan->is_custom) 
+                            <p class="m-1">
+                                <b>
+                                    <i class="fas fa-solid fa-wrench"></i>
+                                    Custom Plan
+                                </b>
+                            </p>
+                        @endif
                         <p class="mb-0">
                             {{ $plan->description }}
                         </p>
@@ -167,9 +179,111 @@
             </div>
         @endforeach
     </div>
+    <div id="tableView" class="card" style="display: none;">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ __('Name') }}</th>
+                    <th>{{ __('Enable') }}</th>
+                    <th>{{ __('Monthly Price') }}</th>
+                    <th>{{ __('Annual Price') }}</th>
+                    <th>{{ __('Trial Days') }}</th>
+                    <th>{{ __('Max Workspaces') }}</th>
+                    <th>{{ __('Max Users') }}</th>
+                    <th>{{ __('Max Projects') }}</th>
+                    <th>{{ __('Storage Limit') }}</th>
+                    <th>{{ __('Projects in Pods') }}</th>
+                    <th>{{ __('Projects in Workspace') }}</th>
+                    <th>{{ __('Zoom Meetings') }}</th>
+                    <th>{{ __('Gantt Chart') }}</th>
+                    <th>{{ __('Bug Reports') }}</th>
+                    <th>{{ __('Expenses') }}</th>
+                    <th>{{ __('Files') }}</th>
+                    <th>{{ __('Chat') }}</th>
+                    <th>{{ __('Enable ChatGPT') }}</th>
+                    <th>{{ __('Custom Plan') }}</th>
+                    <th>{{ __('Description') }}</th>
+                    <th>{{ __('Actions') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($plans as $plan)
+                    <tr>
+                        <td>{{ $plan->id }}</td>
+                        <td>{{ $plan->name }}</td>
+                        <td>
+                            @if ($plan->monthly_price > 0 && $plan->annual_price > 0)
+                                <input type="checkbox" data-plan-id="{{ $plan->id }}" onclick="togglePlan(this)"
+                                        {{ $plan['is_plan_enable'] == 1 ? 'checked' : '' }}>
+                            @else
+                                <small>~</small>
+                            @endif
+                        </td>
+                        <td>{{ $plan->monthly_price }}</td>
+                        <td>{{ $plan->annual_price }}</td>
+                        <td>{{ $plan->is_trial_disable ?  $plan->trial_days : __('---') }}</td>
+                        <td>{{ $plan->max_workspaces < 0 ? __('Unlimited') : $plan->max_workspaces }}</td>
+                        <td>{{ $plan->max_users < 0 ? __('Unlimited') : $plan->max_users }}</td>
+                        <td>{{ $plan->max_projects < 0 ? __('Unlimited') : $plan->max_projects }}</td>
+                        <td>{{ $plan->storage_limit < 0 ? __('Unlimited') : $plan->storage_limit . ' MB' }}</td>
+                        <td>{{ $plan->allow_pod_project_view ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_workspace_project_view ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_zoom_meeting_creation ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_gannt_chart_project_management ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_bug_report_project_management ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_expenses_project_management ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_files_project_management ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->allow_chat_project_management ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->enable_chatgpt ? __('Enabled') : __('Disabled') }}</td>
+                        <td>{{ $plan->is_custom ? __('Yes') : __('No') }}</td>
+                        <td>{{ $plan->description }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-primary" data-url="{{ route('plans.edit', $plan->id) }}"
+                               data-ajax-popup="true" data-title="{{ __('Edit Plan') }}" data-toggle="tooltip">
+                                <i class="ti ti-pencil"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-danger bs-pass-para"
+                               data-confirm="{{ __('Are You Sure?') }}"
+                               data-text="{{ __('This action cannot be undone. Do you want to continue?') }}"
+                               data-confirm-yes="delete_plan_{{ $plan->id }}">
+                                <i class="ti ti-trash"></i>
+                            </a>
+                            <form id="delete_plan_{{ $plan->id }}"
+                                  action="{{ route('plans.delete', ['planId' => encrypt($plan->id)]) }}" method="post"
+                                  style="display: none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.getElementById('toggleView');
+            const cardsView = document.getElementById('cardsView');
+            const tableView = document.getElementById('tableView');
+
+            toggleButton.addEventListener('click', function () {
+                if (cardsView.style.display === 'none') {
+                    cardsView.style.display = 'flex';
+                    tableView.style.display = 'none';
+                    toggleButton.innerHTML = '<i class="fas fa-solid fa-table"></i>';
+                } else {
+                    cardsView.style.display = 'none';
+                    tableView.style.display = 'block';
+                    toggleButton.innerHTML = '<i class="fas fa-solid fa-address-card"></i>';
+                }
+            });
+        });
+
         function togglePlan(plan) {
             var planId = $(plan).data('plan-id');
             var enableValue = $(plan).prop('checked') ? '1' : '0';
