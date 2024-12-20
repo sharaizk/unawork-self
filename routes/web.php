@@ -63,6 +63,7 @@ use App\Http\Controllers\CinetPayController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FedapayPaymentController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FindWorkController;
 use App\Http\Controllers\HirePageController;
 use App\Http\Controllers\IndustryController;
@@ -122,6 +123,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pod/{pod}/users/{user}/edit-permissions', [PodUserController::class, 'editPermissions'])->name('pod.users.editPermissions');
     Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
+
+    Route::get('/account/finances', [FinanceController::class, 'index'])->name('finances.index');
 
     Route::get('/account/job-vacancies', [JobVacancyController::class, 'index'])->name('job-vacancies.index');
     Route::get('/account/job-vacancies/create', [JobVacancyController::class, 'create'])->name('job-vacancies.create');
