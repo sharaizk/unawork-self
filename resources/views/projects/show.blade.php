@@ -92,6 +92,24 @@
         @endif
     @endif
 
+    @if ($plan->allow_expenses_project_management)
+        @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+        <div class="col-md-auto col-sm-6 pb-3">
+            <a href="{{ route($client_keyword . 'projects.profit.report', [$currentWorkspace->slug, $project->id]) }}"
+                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Profits') }}</a>
+        </div>
+        @endif
+    @endif
+
+    @if ($plan->allow_expenses_project_management)
+        @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+        <div class="col-md-auto col-sm-6 pb-3">
+            <a href="{{ route($client_keyword . 'projects.finance', [$currentWorkspace->slug, $project->id]) }}"
+                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Finances') }}</a>
+        </div>
+        @endif
+    @endif
+
     <!-- <div class="col-md-auto col-sm-6 pb-3 ">
         <a href="{{ route($client_keyword . 'projecttime.tracker', [$currentWorkspace->slug, $project->id]) }}"
             class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Tracker') }}</a>

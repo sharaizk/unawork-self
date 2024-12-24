@@ -51,6 +51,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Expense;
 use App\Models\Notification;
+use App\Models\Profit;
 use App\Services\ChatService;
 use Illuminate\Support\Facades\File;
 
@@ -3449,6 +3450,200 @@ class ProjectController extends Controller
         return redirect()->back()->with('success', __('Copy Link Setting Save Successfully!'));
     }
 
+    // Finance report
+    public function showFinances($slug, $project_id)
+    {
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $project = Project::find($project_id);
+
+        if (!$project || $project->workspace != $currentWorkspace->id) {
+            return redirect()->back()->with('error', 'Access Denied!');
+        }
+
+        return view('projects.finance', compact('currentWorkspace', 'project'));
+    }
+    public function financeReport(Request $request, $slug, $project_id)
+    {
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+
+        $expenses = Expense::where('project_id', $project_id)
+            ->where('workspace_id', $currentWorkspace->id)
+            ->when($request->start_date && $request->end_date, function ($query) use ($request) {
+                $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
+            ->get(['date', 'amount']);
+
+        $profits = Profit::where('project_id', $project_id)
+            ->where('workspace_id', $currentWorkspace->id)
+            ->when($request->start_date && $request->end_date, function ($query) use ($request) {
+                $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
+            ->get(['date', 'amount']);
+
+        return response()->json([
+            'expenses' => $expenses,
+            'profits' => $profits,
+        ]);
+    }
+
+    // Profit Functions
+    public function profitReport($slug, $project_id)
+    {
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $objUser = Auth::user();
+
+        if (!$objUser->can('viewExpesesManagement', $currentWorkspace)) {
+            // Return custom view if user cannot access this page
+            return response()->view('plan_access', [], 403);
+        }
+        
+        $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $project_id)->first();
+        $profits = Profit::where('project_id', $project->id)->where('workspace_id', $currentWorkspace->id)->get();
+        $permissions = Auth::user()->getPermission($project->id);
+        if ((isset($permissions) && in_array('show expenses', $permissions)) || ($currentWorkspace && $currentWorkspace->permission == 'Owner')
+        )
+            return view('projects.profits_show', compact('currentWorkspace', 'project', 'profits'));
+        else {
+            return redirect()->back()->with('error', 'Permission Denied...');
+        }
+
+        return redirect()->back()->with('error', 'Something Went Wrong...');
+    }
+
+    public function profitReportCreate($slug, $project_id)
+    {
+        $objUser = Auth::user();
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+            
+        $project = Project::select('projects.*')->join('user_projects', 'user_projects.project_id', '=', 'projects.id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $project_id)->first();
+        
+        return view('projects.profit_report_create', compact('currentWorkspace', 'project'));
+    }
+
+    public function profitReportStore(Request $request, $slug, $projectId)
+    {
+        $validation = [];
+        $validation['profit_name'] = 'required';
+        $validation['amount'] = 'required';
+        $validation['date'] = 'required';
+        $validation['description'] = 'sometimes';
+
+
+        $validator = \Validator::make($request->all(), $validation);
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+
+            return redirect()->back()->with('error', $messages->first());
+        }
+
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $profit = new Profit();
+        $profit->project_id = $projectId;
+        $profit->title = $request->profit_name;
+        $profit->amount = $request->amount;
+        $profit->date = $request->date;
+        $profit->description = $request->description;
+        $profit->workspace_id = $currentWorkspace->id;
+
+        $logoName = null;
+        $dir = 'profit/';
+        if ($request->has('attachment')) {
+            $logoName = uniqid() . '.png';
+            $path = Utility::upload_file($request, 'attachment', $logoName, $dir, []);
+            if ($path['flag'] == 1) {
+                $avatar = $path['url'];
+            } else {
+                return redirect()->back()->with('error', __($path['msg']));
+            }
+        }
+        $profit->image = $logoName;
+        $profit->save();
+
+        return redirect()->back()->with('success', __('Profit Create Successfully!'));
+    }
+
+    public function profitReportEdit($workspaceSlug, $projectId, $profitId)
+    {
+        $objUser = Auth::user();
+        $currentWorkspace = Utility::getWorkspaceBySlug($workspaceSlug);
+
+        $project = Project::select('projects.*')->join('user_projects', 'user_projects.project_id', '=', 'projects.id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectId)->first();
+        $profitDetails = Profit::where('id', $profitId)->first();
+
+        return view('projects.profit_report_edit', compact('currentWorkspace', 'project', 'profitDetails'));
+    }
+
+    public function profitReportView($workspaceSlug, $projectId, $profitId)
+    {
+        $objUser = Auth::user();
+        $currentWorkspace = Utility::getWorkspaceBySlug($workspaceSlug);
+
+        $project = Project::select('projects.*')->join('user_projects', 'user_projects.project_id', '=', 'projects.id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $projectId)->first();
+        $profitDetails = Profit::where('id', $profitId)->first();
+
+        return view('projects.profit_report_view', compact('currentWorkspace', 'project', 'profitDetails'));
+    }
+
+    public function profitReportUpdate(Request $request, $slug, $projectId, $profitId)
+    {
+        $validation = [];
+        $validation['profit_name'] = 'required';
+        $validation['amount'] = 'required';
+        $validation['date'] = 'required';
+        $validation['description'] = 'required';
+
+        $validator = \Validator::make($request->all(), $validation);
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+            return redirect()->back()->with('error', $messages->first());
+        }
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $profitDetails = Profit::where('id', $profitId)->first();
+        $profitDetails->project_id = $projectId;
+        $profitDetails->title = $request->profit_name;
+        $profitDetails->amount = $request->amount;
+        $profitDetails->date = $request->date;
+        $profitDetails->description = $request->description;
+        $profitDetails->workspace_id = $currentWorkspace->id;
+
+        $dir = 'profit/';
+        $profitAttachment = storage_path('profit/');
+        if ($request->has('attachment')) {
+            if (\File::exists($profitAttachment . $profitDetails->image)) {
+                \File::delete($profitAttachment . $profitDetails->image);
+            }
+
+            $logoName = uniqid() . '.png';
+
+            $path = Utility::upload_file($request, 'attachment', $logoName, $dir, []);
+            if ($path['flag'] == 1) {
+                $avatar = $path['url'];
+            } else {
+                return redirect()->back()->with('error', __($path['msg']));
+            }
+        }
+        $profitDetails->image = !empty($logoName) ? $logoName : $profitDetails->image;
+        $profitDetails->save();
+
+        return redirect()->back()->with('success', __('Profit Updated Successfully!'));
+    }
+
+    public function profitReportDestroy(Request $request, $slug, $projectId, $profitId)
+    {
+        $objUser = Auth::user();
+        $profitDetails = Profit::find($profitId);
+        if ($profitDetails) {
+            $imagePath = storage_path('profit/');
+            if (File::exists($imagePath . $profitDetails->image)) {
+                File::delete($imagePath . $profitDetails->image);
+            }
+            $profitDetails->delete();
+        } else {
+            return redirect()->back()->with('success', __('Profit Not Found !!'));
+        }
+
+        return redirect()->back()->with('success', __('Profit Deleted Successfully!'));
+    }
 
     // Expenses Functions
     public function expenseReport($slug, $project_id)
