@@ -874,6 +874,21 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('/{slug}/projects/{id}/bug_report/{bid}/update', [ProjectController::class, 'bugReportUpdate'])->name('projects.bug.report.update')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/projects/{id}/bug_report/{bid}', [ProjectController::class, 'bugReportDestroy'])->name('projects.bug.report.destroy')->middleware(['auth', 'XSS']);
 
+
+    // Finances 
+    Route::get('/{slug}/project/{project_id}/finances', [ProjectController::class, 'showFinances'])->name('projects.finance');
+    Route::get('/{slug}/projects/{project_id}/finance-report', [ProjectController::class, 'financeReport'])->name('projects.finance.report');
+
+    // Profits for company and user
+    Route::get('/{slug}/projects/{id}/profits', [ProjectController::class, 'profitReport'])->name('projects.profit.report')->middleware(['auth', 'CheckPlan', 'XSS']);
+    Route::get('/{slug}/projects/{id}/profit/create', [ProjectController::class, 'profitReportCreate'])->name('projects.profit.report.create')->middleware(['auth', 'XSS']);
+    Route::post('/{slug}/projects/{id}/profit_report', [ProjectController::class, 'profitReportStore'])->name('projects.profit.report.store')->middleware(['auth', 'XSS']);
+    Route::get('/{slug}/projects/{id}/profit_report/{bid}/edit', [ProjectController::class, 'profitReportEdit'])->name('projects.profit.report.edit')->middleware(['auth', 'XSS']);
+    Route::get('/{slug}/projects/{id}/profit_report/{bid}/view', [ProjectController::class, 'profitReportView'])->name('projects.profit.report.view')->middleware(['auth', 'XSS']);
+    Route::post('/{slug}/projects/{id}/profit_report/{bid}/update', [ProjectController::class, 'profitReportUpdate'])->name('projects.profit.report.update')->middleware(['auth', 'XSS']);
+    Route::delete('/{slug}/projects/{id}/profit_report/{bid}', [ProjectController::class, 'profitReportDestroy'])->name('projects.profit.report.destroy')->middleware(['auth', 'XSS']);
+
+
     // Expenses for company and user
     Route::get('/{slug}/projects/{id}/expenses', [ProjectController::class, 'expenseReport'])->name('projects.expense.report')->middleware(['auth', 'CheckPlan', 'XSS']);
 

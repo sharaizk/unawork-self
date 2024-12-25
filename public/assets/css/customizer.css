@@ -25,6 +25,12 @@ File: style.css
     margin: 0 auto;
 }
 
+
+.chart-view-dashboard .profit-chart {
+    width: 40%; 
+    margin: 0 auto;
+}
+
 .chart-view-dashboard .month-filter-container {
     display: flex;
     align-items: center;
