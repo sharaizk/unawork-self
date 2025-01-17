@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./images/header/favicon.png">
-    <title>@yield('title')</title>    
+    <title>@yield('title')</title>
 
     <!-- CSS -->
 <link rel="stylesheet" href="{{ asset('assets/css/plugins/style.css') }}">
@@ -92,7 +92,7 @@
                     <h5 class="modal-title">Create Meeting</h5>
                     <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    
+
                     <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST" @if (!Auth::user()->isAbleToCreateZoomMeetings()) class="d-none" @endif >
                         @csrf
                         <div class="modal-body">
@@ -183,7 +183,7 @@
     <!-- datepicker -->
     <link rel="stylesheet" href="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.css') }}">
     <script src="{{ asset('assets/custom/libs/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-    
+
     <!-- make datepicker for create meeting popup  -->
     <script>
             $('#newMeetingPopup').on('shown.bs.modal', function () {

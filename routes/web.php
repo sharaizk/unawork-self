@@ -92,7 +92,7 @@ use App\Http\Controllers\MessagesController;
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/employee/profile', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
-    
+
     Route::get('/pods', [PodController::class, 'index'])->name('pods.index');
     Route::get('/pods/create', [PodController::class, 'create'])->name('pods.create');
     Route::get('/pods/{podId}/edit', [PodController::class, 'edit'])->name('pods.edit');
@@ -106,7 +106,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/pods/projects/{project}/request', [ProjectUserController::class, 'store'])->name('pods.projects.join');
     Route::get('/account/pods/projects/{record}/accept', [ProjectUserController::class, 'accept'])->name('pods.projects.join.accept');
     Route::get('/account/pods/projects/{record}/decline', [ProjectUserController::class, 'decline'])->name('pods.projects.join.decline');
-    
+
 
     Route::get('/account/pods/{podId}/news', [NewsController::class, 'index'])->name('pods.news');
     Route::get('/account/pods/{podId}/news/create', [NewsController::class, 'create'])->name('pods.news.create');
@@ -125,6 +125,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
 
     Route::get('/account/finances', [FinanceController::class, 'index'])->name('finances.index');
+    Route::get('/account/finances/report', [FinanceController::class, 'financeReport'])->name('finances.report');
 
     Route::get('/account/job-vacancies', [JobVacancyController::class, 'index'])->name('job-vacancies.index');
     Route::get('/account/job-vacancies/create', [JobVacancyController::class, 'create'])->name('job-vacancies.create');
@@ -707,7 +708,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('/login-manage/{userId}', [UserController::class, 'managelogin'])->name('login.manage')->middleware(['auth', 'XSS']);
 
 
-    //user logs 
+    //user logs
     Route::get('/{slug}/userlogs/', [LoginDetailController::class, 'index'])->name('users_logs.index')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/userlogs/{id}', [LoginDetailController::class, 'destroy'])->name('users_logs.destroy')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/userlogs/{id}', [LoginDetailController::class, 'show'])->name('users_logs.show')->middleware(['auth', 'CheckPlan', 'XSS']);
@@ -786,7 +787,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('/{slug}/projects/{id}', [ProjectController::class, 'show'])->name('projects.show')->middleware(['auth', 'CheckPlan', 'XSS']);
     Route::post('/{slug}/projects', [ProjectController::class, 'store'])->name('projects.store')->middleware(['auth', 'XSS']);
     Route::get('/{slug}/projects/{id}/edit', [ProjectController::class, 'edit'])->name('projects.edit')->middleware(['auth', 'XSS']);
-    
+
     Route::post('/{slug}/projects/{id}/update', [ProjectController::class, 'update'])->name('projects.update')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy')->middleware(['auth', 'XSS']);
 
@@ -875,7 +876,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::delete('/{slug}/projects/{id}/bug_report/{bid}', [ProjectController::class, 'bugReportDestroy'])->name('projects.bug.report.destroy')->middleware(['auth', 'XSS']);
 
 
-    // Finances 
+    // Finances
     Route::get('/{slug}/project/{project_id}/finances', [ProjectController::class, 'showFinances'])->name('projects.finance');
     Route::get('/{slug}/projects/{project_id}/finance-report', [ProjectController::class, 'financeReport'])->name('projects.finance.report');
 
@@ -1118,7 +1119,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::post('/zoom-meeting/{meetingId}/update-note', [ZoomMeetingController::class, 'updateMeetingNote'])
     ->name('zoom_meeting.update-note')->middleware(['auth', 'XSS']);
-    
+
     Route::get('/{slug}/zoom-meetings/{id}/show', [ZoomMeetingController::class, 'show'])->name('zoom_meetings.show')->middleware(['auth:client', 'XSS']);
 
     Route::get('/{slug}/zoom-meeting/{id}/edit', [ZoomMeetingController::class, 'edit'])->name('zoom-meeting.edit')->middleware(['auth', 'XSS']);
@@ -1279,5 +1280,5 @@ Route::group(['prefix' => config('chatify.routes.prefix'), 'middleware' => confi
     // chatify route
     Route::POST('user/is-thread-exist', [\Chatify\Http\Controllers\MessagesController::class, 'isThreadExist'])->name('chats.is-thread-exist');
     Route::POST('user/create-thread', [\Chatify\Http\Controllers\MessagesController::class, 'createThread'])->name('chats.create-thread');
-    
+
 });
