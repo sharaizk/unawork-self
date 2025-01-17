@@ -1,3 +1,25 @@
+.tpl-finance .section #finance-chart {
+    width: 70% !important;
+    height: auto !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tpl-finance .section #toggle-filters {
+    margin-left: auto !important;
+    width: 10vh;
+    margin-right: 5% !important;
+    font-size: 12px;
+}
+.tpl-finance .section #filters-section {
+    padding-left: 40px !important;
+    padding-right: 20px !important;
+}
+
+.tpl-finance .section .skills-dropdown-menu li label {
+    width: 80% !important;
+}
+
 .header-2 .nav-sub__menu li a, .ListFinance .itemFinance .buttonItemFinance span, .select__content .btn-submit span,
 .ListFinance .itemFinance .buttonItemFinance a,
 .select__content .btn-submit a, .ListFinance .itemFinance .buttonItemFinance, .select__content .btn-submit {
