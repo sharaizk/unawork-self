@@ -8,7 +8,7 @@
 @endphp
 
 @section('page-title')
-    {{ __('Finance') }}
+    {{ __('Margin') }}
 @endsection
 
 
@@ -28,7 +28,7 @@
     <li class="breadcrumb-item"><a
             href="{{ route($client_keyword . 'projects.show', [$currentWorkspace->slug, $project->id]) }}">{{ __('Project Details') }}</a>
     </li>
-    <li class="breadcrumb-item">{{ __('Finances') }}</li>
+    <li class="breadcrumb-item">{{ __('Margin') }}</li>
 @endsection
 {{-- @dump($permissions) --}}
 @section('action-button')
@@ -39,7 +39,7 @@
     <button id="toggle-filters" class="btn btn-sm btn-primary mx-1" title="{{ __('Toggle Filters') }}">
         <i class="ti ti-filter"></i>
     </button>
-    
+
 @endsection
 
 @section('content')
