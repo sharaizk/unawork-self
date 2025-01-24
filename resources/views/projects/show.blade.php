@@ -73,7 +73,7 @@
                 class="btn btn-xs btn-primary btn-icon-only col-12 ">{{ __('Task Board') }}</a>
         </div>
     @endif
-    
+
     @if ($plan->allow_bug_report_project_management)
         @if ((isset($permissions) && in_array('show bug report', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
             <div class="col-md-auto col-sm-6 pb-3">
@@ -83,32 +83,42 @@
         @endif
     @endif
 
-    @if ($plan->allow_expenses_project_management)
-        @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-        <div class="col-md-auto col-sm-6 pb-3">
-            <a href="{{ route($client_keyword . 'projects.expense.report', [$currentWorkspace->slug, $project->id]) }}"
-                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Expenses') }}</a>
-        </div>
-        @endif
-    @endif
+    <div class="dropdown col-md-auto col-sm-6 pb-3">
+        <button class="btn btn-xs btn-primary btn-icon-only dropdown-toggle" type="button" id="dropdownFinanceMenu" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ __('Finance Options') }}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownFinanceMenu">
+            @if ($plan->allow_expenses_project_management)
+                @if ((isset($permissions) && in_array('show expenses', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+                    <li>
+                        <a class="dropdown-item" href="{{ route($client_keyword . 'projects.expense.report', [$currentWorkspace->slug, $project->id]) }}">
+                            {{ __('Expenses') }}
+                        </a>
+                    </li>
+                @endif
+            @endif
 
-    @if ($plan->allow_expenses_project_management)
-        @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-        <div class="col-md-auto col-sm-6 pb-3">
-            <a href="{{ route($client_keyword . 'projects.profit.report', [$currentWorkspace->slug, $project->id]) }}"
-                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Profits') }}</a>
-        </div>
-        @endif
-    @endif
+            @if ($plan->allow_expenses_project_management)
+                @if ((isset($permissions) && in_array('show expenses', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+                    <li>
+                        <a class="dropdown-item" href="{{ route($client_keyword . 'projects.profit.report', [$currentWorkspace->slug, $project->id]) }}">
+                            {{ __('Profits') }}
+                        </a>
+                    </li>
+                @endif
+            @endif
 
-    @if ($plan->allow_expenses_project_management)
-        @if ((isset($permissions) && in_array('show expenses',$permissions))  || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-        <div class="col-md-auto col-sm-6 pb-3">
-            <a href="{{ route($client_keyword . 'projects.finance', [$currentWorkspace->slug, $project->id]) }}"
-                class="btn btn-xs btn-primary btn-icon-only col-12">{{ __('Finances') }}</a>
-        </div>
-        @endif
-    @endif
+            @if ($plan->allow_expenses_project_management)
+                @if ((isset($permissions) && in_array('show expenses', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+                    <li>
+                        <a class="dropdown-item" href="{{ route($client_keyword . 'projects.finance', [$currentWorkspace->slug, $project->id]) }}">
+                            {{ __('Margin') }}
+                        </a>
+                    </li>
+                @endif
+            @endif
+        </ul>
+    </div>
 
     <!-- <div class="col-md-auto col-sm-6 pb-3 ">
         <a href="{{ route($client_keyword . 'projecttime.tracker', [$currentWorkspace->slug, $project->id]) }}"
@@ -337,7 +347,7 @@
                                                         @auth('web')
                                                             @if ($user->id != Auth::user()->id && $isChatEnabled)
                                                                 <a href="#" class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center sendMessageUser" data-employee-id="{{ $user->id }}">
-                                                                    <i class="ti ti-mail"></i> 
+                                                                    <i class="ti ti-mail"></i>
                                                                 </a>
                                                             @endif
                                                             @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
@@ -740,8 +750,8 @@
                         @endif
                     @endif
                 </div>
-                
-                
+
+
             </div>
         <!-- [ sample-page ] end -->
     </div>
@@ -975,7 +985,7 @@
         @endif
 
         function dropzoneBtn(file, response) {
-            
+
             var html = document.createElement('span');
             var download = document.createElement('a');
             download.setAttribute('href', response.download);
@@ -986,7 +996,7 @@
             // download.innerHTML = "<i class='fas fa-download mt-2'></i>";
             download.innerHTML = "<i class='ti ti-download'> </i>";
             html.appendChild(download);
-            
+
             @if (isset($permisions) && in_array('show uploading', $permisions))
             @else
                 var del = document.createElement('a');
@@ -1032,8 +1042,8 @@
 
             file.previewTemplate.appendChild(html);
         }
-        
-        @php($setting = App\Models\Utility::getAdminPaymentSetting())  
+
+        @php($setting = App\Models\Utility::getAdminPaymentSetting())
         @php($files = $project->files)
 
         @foreach ($files as $file)
@@ -1057,6 +1067,6 @@
             });
         @endforeach
 
-        
+
     </script>
 @endpush

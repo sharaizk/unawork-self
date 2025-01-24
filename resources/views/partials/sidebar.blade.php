@@ -24,9 +24,9 @@
                if (!$currentWorkspace) {
                 $currentWorkspace = $AuthUser->updateCurrentWorkspace();
                }
-                
+
                $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
-                
+
                 if (!$userWorkspace) {
                     $currentWorkspace = $AuthUser->updateCurrentWorkspace();
                     $userWorkspace = \App\Models\UserWorkspace::where('user_id', $AuthUser->id)->where('workspace_id', $currentWorkspace->id)->first();
@@ -86,15 +86,15 @@
                </div>
                <div class="navbar-content">
                     <ul class="dash-navbar">
-                        
-                       
+
+
                        @if (\Auth::user()->hasRole('company'))
                                 <li class="dash-item dash-hasmenu">
                                     <a href="{{ route('job-vacancies.index') }}"
                                         class="dash-link  {{ Request::route()->getName() == 'job-vacancies.index' ? ' active' : '' }}">
                                         <span class="dash-micon"><i class="ti ti-accessible"></i></span>
                                         <span class="dash-mtext">{{ __('Job Vacancies') }}</span>
-                                        
+
                                         @if ($vacanciesApplicationsCounter > 0)
                                             <span
                                                 class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $vacanciesApplicationsCounter }}<span
@@ -122,9 +122,9 @@
                                 </a>
                             </li>
                         @endif
-                        {{-- 
+                        {{--
                             @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
-                            --}} 
+                            --}}
                             @if (Auth::user()->type != 'admin')
                                 <li class="dash-item  {{ Request::route()->getName() == 'finances.index' ? ' active' : '' }}">
                                     <a href="{{ route('finances.index', $currentWorkspace->slug) }}"
@@ -135,7 +135,7 @@
                                         <span class="dash-mtext">{{ __('Finance page') }}</span>
                                     </a>
 
-                                </li>    
+                                </li>
                                 <li class="dash-item  {{ Request::route()->getName() == 'zoom-meeting.index' ? ' active' : '' }}">
                                     <a href="{{ route('zoom-meeting.index', $currentWorkspace->slug) }}"
                                         class="dash-link "><span class="dash-micon"><i
@@ -144,34 +144,34 @@
 
                                 </li>
                             @endif
-                        {{-- 
+                        {{--
                         @endif
-                        --}} 
+                        --}}
                        @if (\Auth::user()->type != "admin")
                             <!-- <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
                                 <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
                                     class="ti ti-message-circle"></i></span><span
                                     class="dash-mtext">{{ __('PODS') }}</span> </a>
                             </li> -->
-                            <li class="dash-item {{ Route::currentRouteName() === 'pods.index' ? 'active' : '' }}">
-                                <a class="dash-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" style="z-index: 1000;">
-                                    <span class="dash-micon"><i class="ti ti-message-circle"></i></span>
-                                    <span class="dash-mtext">{{ __('PODs') }}</span> 
-                                </a>
-                                @php
-                                    $pods = Auth::user()->pods;
-                                @endphp
-                                <ul class="dropdown-menu" style="display: none;">
-                                    <li><a class="dropdown-item" href="{{ route('pods.index') }}">{{ __('All PODs') }}</a></li>
-                                    @foreach($pods as $pod)
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
-                                                {{ $pod->title }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </li>
+                           <li class="dash-item dropdown {{ Route::currentRouteName() === 'pods.index' ? 'active' : '' }}">
+                               <a class="dash-link dropdown-toggle" href="#" id="podsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                   <span class="dash-micon"><i class="ti ti-message-circle"></i></span>
+                                   <span class="dash-mtext">{{ __('PODs') }}</span>
+                               </a>
+                               @php
+                                   $pods = Auth::user()->pods;
+                               @endphp
+                               <ul class="dropdown-menu" aria-labelledby="podsDropdown">
+                                   <li><a class="dropdown-item" href="{{ route('pods.index') }}">{{ __('All PODs') }}</a></li>
+                                   @foreach($pods as $pod)
+                                       <li>
+                                           <a class="dropdown-item" href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
+                                               {{ $pod->title }}
+                                           </a>
+                                       </li>
+                                   @endforeach
+                               </ul>
+                           </li>
                             <li class="dash-item {{ Request::route()->getName() == 'plans.index' ? ' active' : '' }}">
                                 <a href="{{ route('plans.index') }}" class="dash-link "><span class="dash-micon"> <i
                                             class="ti ti-trophy"></i></span><span
@@ -206,7 +206,7 @@
                                                             @endphp
                                                             <a href="{{ route('pods.users', $podId=$currentWorkspace->ownerable_id) }}"
                                                                 class="dash-link  {{ in_array($currentRoute, ['pods.users']) ? 'active' : '' }}">
-                                                                    <span class="dash-micon"> 
+                                                                    <span class="dash-micon">
                                                                         <i data-feather="user"></i>
                                                                     </span>
                                                                 <span class="dash-mtext">{{ __('Users') }}</span>
@@ -219,7 +219,7 @@
                                                                     @endphp
                                                                 <a href="{{ route('pods.news', $podId=$currentWorkspace->ownerable_id) }}"
                                                                     class="dash-link {{ in_array($currentRoute, ['pods.news']) ? 'active' : '' }}">
-                                                                            <span class="dash-micon"> 
+                                                                            <span class="dash-micon">
                                                                                 <i data-feather="clipboard"></i>
                                                                             </span>
                                                                         <span class="dash-mtext">{{ __('News') }}</span>
@@ -233,7 +233,7 @@
                                                         @endphp
                                                     <a href="{{ route('users.index', $currentWorkspace->slug) }}"
                                                         class="dash-link {{ in_array($currentRoute, ['users.index']) ? 'active' : '' }}">
-                                                                <span class="dash-micon"> 
+                                                                <span class="dash-micon">
                                                                     <i data-feather="user"></i>
                                                                 </span>
                                                             <span class="dash-mtext">{{ __('Users') }}</span>
@@ -249,7 +249,7 @@
                                                                 class="dash-mtext"> {{ __('Clients') }}</span></a>
                                                     </li> -->
                                                 @endif
-                                                
+
 
                                                 <!-- <li
                                                     class="dash-item {{ Request::route()->getName() == 'timesheet.index' ? ' active' : '' }}">
@@ -311,7 +311,7 @@
                                                             class="dash-micon"><i data-feather="clipboard"></i></span><span
                                                             class="dash-mtext">{{ __('Notes') }} </span></a>
                                                 </li>
-                                                
+
                                                 @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::PROJECTS_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
                                                     @if($isPartOfPod)
                                                         <hr>
@@ -340,7 +340,7 @@
                                                                 class="dash-mtext">{{ __('Project Report') }}</span></a>
                                                     </li>
                                                 @endif
-                                    
+
                                                 @elseauth
                                                 <li
                                                     class="dash-item {{ Request::route()->getName() == 'client.projects.index' || Request::segment(3) == 'projects' ? ' active' : '' }}">
@@ -425,7 +425,7 @@
                                                 (isset($currentWorkspace) && $currentWorkspace && $currentWorkspace->creater->id == Auth::user()->id)) &&
                                                 Auth::user()->getGuard() != 'client')
 
-                                            
+
 
 
 
@@ -493,7 +493,7 @@
                                                 $currentWorkspace &&
                                                 $currentWorkspace->creater->id == Auth::user()->id &&
                                                 Auth::user()->getGuard() != 'client' && Auth::user()->role('company'))
-                                                
+
                                                 @if($isPartOfPod)
                                                     <hr>
                                                     <div class="row d-flex justify-content-center align-items-center text-center">
@@ -530,9 +530,9 @@
                                                                     class="ti ti-message-circle"></i></span><span
                                                                 class="dash-mtext">{{ __('Messenger') }}</span></a>
                                                     </li>
-                                                    
+
                                                 @endif
-                                                
+
                                         @endif -->
                             <!-- </div> -->
                </div>
