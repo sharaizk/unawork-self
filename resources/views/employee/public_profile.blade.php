@@ -19,7 +19,7 @@
               <img  alt="Thomas Johnson"
               @if ($employee->avatar) src="{{ asset($logo . $employee->avatar) }}" @else avatar="{{ $employee->name }}" @endif >
             </div>
-                            
+
           </div>
           <div class="col-right">
             <div class="item">
@@ -48,14 +48,14 @@
               </div>
             </div>
             <section class="section__about section__layout">
-              
-          
+
+
               <div class="profile__skills">
                 <div class="title">
                     <span>Skills</span>
                 </div>
                 <ul class="p-0">
-                  @forelse ($employee->skills as $skill) 
+                  @forelse ($employee->skills as $skill)
                     <li class="skill__name">{{$skill->name}}</li>
                   @empty
                     <li class="skill__name">n/a</li>
@@ -68,7 +68,7 @@
                 </div>
                 <p>
                   @if($employee->profile->about)
-                    {{ $employee->profile->about }} 
+                    {{ $employee->profile->about }}
                   @else
                     Employee has`nt filled profile bio yet.
                   @endif
@@ -82,18 +82,18 @@
           </div>
 
         </section>
-        
+
       </div>
       <div class="col-12 col-md-12 col-xl-3">
         <aside class="aside__container">
-        
+
             @auth('web')
               <div class="aside__card">
               <div class="aside__card__title">
                 <span>Invite user</span>
               </div>
               <div class="aside__card__body">
-                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                <span>Chat with this user and invite them into your projects or workspace.</span>
               </div>
               <div class="aside__card__actions">
                 <button class="hireButton" data-employee-email="{{ $employee->email }}">
@@ -111,12 +111,11 @@
                     <span>Send a message</span>
                     </div>
                     <div class="aside__card__body">
-                    <span>Integer scelerisque leo a maximus volutpat. Cras commodo est sed lectus elementum
-                        pulvinar.</span>
+                    <span>Got questions? Send information and strike up a conversation with this user.</span>
                     </div>
                     <div class="aside__card__actions">
                         <button class="sendMessageButton" data-employee-id="{{ $employee->id }}">
-                            <span> 
+                            <span>
                                 <img src="{{ asset('assets/images/landing/icon-fly.png') }}" alt="">
                                 Send a message
                             </span>
@@ -129,7 +128,7 @@
                 <span>Online Video</span>
               </div>
               <div class="aside__card__body">
-                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                <span>Schedule a meeting or interview with this user for your next hire.</span>
               </div>
               <div class="aside__card__actions">
                 <button id="startNowButton" data-member-id="{{ $employee->id }}" data-bs-toggle="modal" data-bs-target="#newMeetingPopup">
@@ -141,14 +140,14 @@
               </div>
             </div>
           @endauth
-          
+
         </aside>
       </div>
     </div>
   </div>
 </main>
   @auth('web')
-    
+
     <div class="modal fade" tabindex="-1" role="dialog" id="sendMessagePopup">
       <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
@@ -227,7 +226,7 @@
                 let selectedItem = document.getElementById("selectItem").value;
                 let type = '';
                 let id = '';
-                
+
                 if (selectedItem) {
                     let splitItem = selectedItem.split('_');
                     type = splitItem[0];
@@ -243,7 +242,7 @@
                     url = `{{ route('pods.user.exists', ['podId' => 'POD_ID_PLACEHOLDER']) }}`.replace('POD_ID_PLACEHOLDER', id);
                     method = 'POST';
                 }
-                
+
                 if (url) {
                     let data = {
                         email: employeeEmail,
@@ -262,7 +261,7 @@
                         if (response.status === 200) {
                             inviteUserModal.hide();
                             showNotification('User successfully invited', 'success');
-                            
+
                         } else {
                             return response.json().then(data => {
                                 console.error('Error:', data.message);
