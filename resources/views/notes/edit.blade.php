@@ -4,10 +4,10 @@ if ($setting['color']) {
     $color = $setting['color'];
 }
 else{
-  $color = 'theme-3';  
+  $color = 'theme-3';
 }
 @endphp
-<form class="" method="post" action="{{ route('notes.update',[$currentWorkspace->slug,$note->id]) }}">
+<form class="" method="post" action="{{ route('notes.update',[$currentWorkspace->slug,$note->id]) }}" enctype="multipart/form-data">
     @csrf
      <div class="modal-body">
     <div class="row">
@@ -27,7 +27,7 @@ else{
         </div>
         <div class="col-md-12">
             <label for="color" class="col-form-label">{{__('Color')}}</label>
-            <select class="form-control select2" name="color" id="color" required>
+            <select class="form-control select" name="color" id="color" required>
                 <option value="bg-primary">{{ __('Primary')}}</option>
                 <option @if($note->color == 'bg-secondary') selected @endif value="bg-secondary">{{ __('Secondary')}}</option>
                 <option @if($note->color == 'bg-info') selected @endif value="bg-info">{{ __('Info')}}</option>
@@ -48,7 +48,6 @@ else{
                 </label>
             </div>
         </div>
-
         <div class="col-md-12 assign_to_selection">
             <label for="assign_to" class="col-form-label">{{__('Assign to')}}</label>
             <select     id="assign_to"    name="assign_to[]" class="multi-select" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}"  >
@@ -57,13 +56,35 @@ else{
                 @endforeach
             </select>
         </div>
+        <div class="col-md-12">
+            <label for="file" class="col-form-label">{{ __('Attach File') }}</label>
+            @if($note->file)
+                <p>
+                    <a href="{{ asset('storage/notes_files/' . $note->file->file_path) }}" target="_blank">{{ $note->file->file_name }}</a>
+                </p>
+            @endif
+            <input type="file" class="form-control" id="file" name="file" accept=".doc,.docx,.pdf">
+        </div>
+        @if($note->files)
+            <div class="col-md-12 mt-3">
+                <label class="col-form-label">{{ __('Attached Files') }}</label>
+                <ul class="list-group">
+                    @foreach($note->files as $file)
+                        <li class="list-group-item d-flex justify-content-between align-items-center m-1">
+                            <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank">{{ $file->file_name }}</a>
+                            <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="btn btn-danger btn-sm">{{ __('Delete') }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 </div>
         <div class="modal-footer">
             <button type="button" class="btn  btn-light" data-bs-dismiss="modal">{{ __('Close')}}</button>
             <input type="submit" value="{{ __('Save Changes')}}" class="btn  btn-primary">
         </div>
- 
+
 </form>
 <script>
     $(document).ready(function() {
@@ -71,7 +92,7 @@ else{
     });
 </script>
 <script type="text/javascript">
-    
+
     if ($(".multi-select").length > 0) {
             $( $(".multi-select") ).each(function( index,element ) {
                 var id = $(element).attr('id');
@@ -91,7 +112,7 @@ else{
     background-color: #51459d !important;
 }
 .selectgroup-button {
-    
+
     border-color: #51459d !important;
     }
 </style>
@@ -103,7 +124,7 @@ else{
     background-color: #1f3996 !important;
 }
 .selectgroup-button {
-    
+
     border-color: #1f3996 !important;
     }
 </style>
@@ -114,7 +135,7 @@ else{
     background-color: #022D4D !important;
 }
 .selectgroup-button {
-    
+
     border-color: #022D4D !important;
     }
 </style>
@@ -125,7 +146,7 @@ else{
     background-color: #584ed2 !important;
 }
 .selectgroup-button {
-    
+
     border-color: #584ed2 !important;
     }
 </style>

@@ -865,6 +865,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('/{slug}/notes/{id}/edit', [NoteController::class, 'edit'])->name('notes.edit')->middleware(['auth', 'XSS']);
     Route::post('/{slug}/notes/{id}/update', [NoteController::class, 'update'])->name('notes.update')->middleware(['auth', 'XSS']);
     Route::delete('/{slug}/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy')->middleware(['auth', 'XSS']);
+    Route::get('/{slug}/notes/file/{file}/delete', [NoteController::class, 'deleteFile'])->name('notes.file.delete');
 
     // bug report for company and user
     Route::get('/{slug}/projects/{id}/bug_report', [ProjectController::class, 'bugReport'])->name('projects.bug.report')->middleware(['auth', 'CheckPlan', 'XSS']);

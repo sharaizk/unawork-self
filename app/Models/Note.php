@@ -9,4 +9,9 @@ class Note extends Model
     protected $fillable = [
         'title','text','workspace','color', 'type', 'assign_to','created_by'
     ];
+
+    public function files(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NoteFile::class);
+    }
 }
