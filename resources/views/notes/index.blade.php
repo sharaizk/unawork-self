@@ -2,7 +2,7 @@
 
 @section('page-title') {{__(' Notes')}} @endsection
 @section('links')
-@if(\Auth::guard('client')->check())   
+@if(\Auth::guard('client')->check())
 <li class="breadcrumb-item"><a href="{{route('client.home')}}">{{__('Home')}}</a></li>
  @else
  <li class="breadcrumb-item"><a href="{{route('home')}}">{{__('Home')}}</a></li>
@@ -11,11 +11,11 @@
 @endsection
 @section('action-button')
     @auth('web')
-  
+
       <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="{{__('Create')}}" data-ajax-popup="true" data-size="lg" data-title="{{ __('Create New Note') }}" data-url="{{route('note.create',$currentWorkspace->slug)}}">
-            <i class="ti ti-plus"></i> 
+            <i class="ti ti-plus"></i>
         </a>
-   
+
 
     @endauth
 @endsection
@@ -63,10 +63,24 @@
                                             </div>
                                         </div>
                                         </div>
-                                        <div class="card-body"style=" height: 210px !important;" >
+                                        <div class="card-body" style=" height: 210px !important;" >
                                              <div class="scrollText note-text ">
                                                 {{$note->text}}
-                                            </div> 
+
+                                                 @if($note->files && $note->files->count() > 0)
+                                                     <div class="mt-3">
+                                                         <h6>{{ __('Attached Files (') }}{{ $note->files->count() }}{{ __('): ') }} </h6>
+                                                         <ul class="list-group">
+                                                             @foreach($note->files as $file)
+                                                                 <li class="list-group-item d-flex justify-content-between align-items-center m-1">
+                                                                     <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank">{{ $file->file_name }}</a>
+                                                                     <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="btn btn-danger btn-sm">{{ __('Delete') }}</a>
+                                                                 </li>
+                                                             @endforeach
+                                                         </ul>
+                                                     </div>
+                                                 @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -132,7 +146,21 @@
                                         <div class="card-body p-4"  style=" height: 210px !important;">
                                             <div class="note-text scrollText">
                                                 {{$note->text}}
-                                            </div> 
+
+                                                @if($note->files && $note->files->count() > 0)
+                                                    <div class="mt-3">
+                                                        <h6>{{ __('Attached Files (') }}{{ $note->files->count() }}{{ __('): ') }} </h6>
+                                                        <ul class="list-group">
+                                                            @foreach($note->files as $file)
+                                                                <li class="list-group-item d-flex justify-content-between align-items-center m-1">
+                                                                    <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank">{{ $file->file_name }}</a>
+                                                                    <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="btn btn-danger btn-sm">{{ __('Delete') }}</a>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -180,7 +208,7 @@
 
 @push('scripts')
     <script>
-        $(document).on('click', 'input[name="type"]', function () {
+        function toggleAssignToSelection() {
             var type = $('input[name="type"]:checked').val();
 
             if (type == 'shared') {
@@ -188,9 +216,16 @@
             } else {
                 $('.assign_to_selection').hide();
             }
+        }
+
+        $(document).on('click', 'input[name="type"]', function () {
+            toggleAssignToSelection();
+        });
+
+        $(document).on('shown.bs.modal', function () {
+            toggleAssignToSelection();
         });
 
 
-     
     </script>
 @endpush

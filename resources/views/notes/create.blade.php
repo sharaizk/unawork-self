@@ -4,12 +4,12 @@ if ($setting['color']) {
     $color = $setting['color'];
 }
 else{
-  $color = 'theme-3';  
+  $color = 'theme-3';
 }
 @endphp
 
-<form class="" method="post" action="{{ route('notes.store',$currentWorkspace->slug) }}">
-    @csrf 
+<form class="" method="post" action="{{ route('notes.store',$currentWorkspace->slug) }}" enctype="multipart/form-data">
+    @csrf
      <div class="modal-body">
     <div class="row">
         @if ($currentWorkspace->is_chagpt_enable())
@@ -50,7 +50,7 @@ else{
             </div>
         </div>
 
-             
+
 
         <div class="col-md-12 assign_to_selection">
             <label for="assign_to" class="col-form-label">{{__('Assign to')}}</label>
@@ -60,18 +60,23 @@ else{
                 @endforeach
             </select>
         </div>
+
+        <div class="col-md-12">
+            <label for="file" class="col-form-label">{{ __('Attach File') }}</label>
+            <input type="file" class="form-control" id="file" name="file" accept=".doc,.docx,.pdf">
+        </div>
     </div>
 </div>
         <div class="modal-footer">
           <button type="button" class="btn  btn-light" data-bs-dismiss="modal">{{ __('Close')}}</button>
              <input type="submit" value="{{ __('Save Changes')}}" class="btn  btn-primary">
         </div>
-    
+
 </form>
 
 
 <script type="text/javascript">
-    
+
     if ($(".multi-select").length > 0) {
             $( $(".multi-select") ).each(function( index,element ) {
                 var id = $(element).attr('id');
@@ -90,7 +95,7 @@ else{
     background-color: #51459d !important;
 }
 .selectgroup-button {
-    
+
     border-color: #51459d !important;
     }
 </style>
@@ -102,7 +107,7 @@ else{
     background-color: #1f3996 !important;
 }
 .selectgroup-button {
-    
+
     border-color: #1f3996 !important;
     }
 </style>
@@ -113,7 +118,7 @@ else{
     background-color: #022D4D !important;
 }
 .selectgroup-button {
-    
+
     border-color: #022D4D !important;
     }
 </style>
@@ -124,7 +129,7 @@ else{
     background-color: #584ed2 !important;
 }
 .selectgroup-button {
-    
+
     border-color: #584ed2 !important;
     }
 </style>

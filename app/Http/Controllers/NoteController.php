@@ -3,17 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Note;
+use App\Models\NoteFile;
 use App\Models\User;
 use App\Models\Utility;
+use App\Services\NoteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
+    protected $noteService;
+
+    public function __construct(NoteService $noteService)
+    {
+        $this->noteService = $noteService;
+    }
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
      */
     public function index($slug)
     {
@@ -29,7 +38,7 @@ class NoteController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
      */
     public function create($slug)
     {
@@ -54,15 +63,17 @@ class NoteController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store($slug,Request $request)
     {
         $request->validate([
-                               'title' => 'required',
-                               'text' => 'required',
-                               'color' => 'required',
-                           ]);
+            'title' => 'required',
+            'text' => 'required',
+            'color' => 'required',
+            'file' => 'nullable|mimes:doc,docx,pdf|max:2048'
+        ]);
+
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $objUser = Auth::user();
         $post = $request->all();
@@ -73,7 +84,16 @@ class NoteController extends Controller
         $post['assign_to'] = implode(',', $assign_to);
         $post['workspace'] = $currentWorkspace->id;
         $post['created_by'] = $objUser->id;
-        Note::create($post);
+        $note = Note::create($post);
+
+        if ($request->hasFile('file')) {
+            try {
+                $this->noteService->handleFileUpload($request, $note);
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
         return redirect()->route('notes.index',$currentWorkspace->slug)->with('success',__('Note Created Successfully!'));
     }
 
@@ -92,7 +112,7 @@ class NoteController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
      */
     public function edit($slug,$noteID)
     {
@@ -122,15 +142,17 @@ class NoteController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $slug,$noteID)
     {
         $request->validate([
-                               'title' => 'required',
-                               'text' => 'required',
-                               'color' => 'required',
-                           ]);
+            'title' => 'required',
+            'text' => 'required',
+            'color' => 'required',
+            'file' => 'nullable|mimes:doc,docx,pdf|max:2048',
+        ]);
+
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $notes = Note::where('workspace','=',$currentWorkspace->id)->where('created_by','=',Auth::user()->id)->where('id','=',$noteID)->first();
@@ -143,21 +165,50 @@ class NoteController extends Controller
         $post['assign_to'] = implode(',', $assign_to);
 
         $notes->update($post);
+
+        if ($request->hasFile('file')) {
+            try {
+                $this->noteService->handleFileUpload($request, $notes);
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
         return redirect()->route('notes.index',$slug)->with('success',__('Note Updated Successfully!'));
+    }
+
+    public function deleteFile($slug, $fileID)
+    {
+        $file = NoteFile::find($fileID);
+
+        if (!$file) {
+            return redirect()->back()->with('error', __('File not found.'));
+        }
+
+        $file_path = 'notes_files/' . $file->file_path;
+        $result = Utility::changeStorageLimit(\Auth::user()->id, $file_path);
+        $file->delete();
+
+        return redirect()->back()->with('success', __('File deleted successfully.'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($slug,$noteID)
     {
         $objUser = Auth::user();
         $note = Note::find($noteID);
         if($note->created_by == $objUser->id) {
-            $note->delete();
+            try {
+                $this->noteService->deleteAllFiles($note);
+                $note->delete();
+            } catch (Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
             return redirect()->route('notes.index',$slug)->with('success',__('Note Deleted Successfully!'));
         }
         else{
