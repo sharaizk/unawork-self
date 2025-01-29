@@ -39,7 +39,7 @@
                     <button class="btn btn-outline-primary" id="show-shared">{{ __('Shared Notes') }}</button>
                 </div>
             </div>
-        <section class="section d-none" id="personal-notes-section">
+        <section class="section" id="personal-notes-section">
             @if(count($personal_notes) > 0)
                 <div class="row">
                     <div class="col-lg-12">
@@ -125,7 +125,7 @@
             @endif
         </section>
 
-        <section class="section" id="shared-notes-section">
+        <section class="section d-none" id="shared-notes-section">
             @if(count($shared_notes) > 0)
                 <div class="row">
                     <div class="col-lg-12">
