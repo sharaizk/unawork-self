@@ -62,7 +62,6 @@ class NoteController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store($slug,Request $request)
@@ -100,7 +99,6 @@ class NoteController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Note  $note
      * @return \Illuminate\Http\Response
      */
     public function show(Note $note)
@@ -111,7 +109,6 @@ class NoteController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Note  $note
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
      */
     public function edit($slug,$noteID)
@@ -140,8 +137,6 @@ class NoteController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Note  $note
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $slug,$noteID)
@@ -195,7 +190,6 @@ class NoteController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Note  $note
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($slug,$noteID)
@@ -206,7 +200,7 @@ class NoteController extends Controller
             try {
                 $this->noteService->deleteAllFiles($note);
                 $note->delete();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return redirect()->back()->with('error', $e->getMessage());
             }
             return redirect()->route('notes.index',$slug)->with('success',__('Note Deleted Successfully!'));

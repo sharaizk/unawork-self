@@ -25,7 +25,12 @@
     @if($currentWorkspace)
         <div class="row justify-content-between align-items-center mb-3">
             <div class="col-xl-12 col-lg-12 col-md-12">
-                <input type="text" id="notes-search" class="form-control" placeholder="{{ __('Search Notes...') }}">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="ti ti-search"></i>
+                    </span>
+                    <input type="text" id="notes-search" class="form-control" placeholder="{{ __('Search Notes...') }}">
+                </div>
             </div>
         </div>
    <div class="row justify-content-between align-items-center mb-3">
