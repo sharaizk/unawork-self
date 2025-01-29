@@ -26,6 +26,17 @@ else{
             <textarea rows="3" class="form-control grammer_textarea" id="description" name="text" placeholder="{{ __('Enter Description') }}" required>{{$note->text}}</textarea>
         </div>
         <div class="col-md-12">
+            <label for="project_id" class="col-form-label">{{ __('Project') }}</label>
+            <select class="form-control select" name="project_id" id="project_id">
+                <option value="">{{ __('No Project') }}</option>
+                @foreach($projects as $project)
+                    <option value="{{ $project->id }}" {{ $note->project_id == $project->id ? 'selected' : '' }}>
+                        {{ $project->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-12">
             <label for="color" class="col-form-label">{{__('Color')}}</label>
             <select class="form-control select" name="color" id="color" required>
                 <option value="bg-primary">{{ __('Primary')}}</option>

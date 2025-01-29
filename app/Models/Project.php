@@ -41,6 +41,11 @@ class Project extends Model
         return $this->hasOne('App\Models\User', 'id', 'created_by');
     }
 
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
     public function workspaceData()
     {
         return $this->hasOne('App\Models\Workspace', 'id', 'workspace');

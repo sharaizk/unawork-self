@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Note;
 use App\Models\NoteFile;
+use App\Models\Project;
 use App\Models\User;
 use App\Models\Utility;
 use App\Services\NoteService;
@@ -32,7 +33,15 @@ class NoteController extends Controller
                             ->whereRaw("find_in_set('".Auth::user()->id."',notes.assign_to)")
                             ->get();
 
-        return view('notes.index',compact('currentWorkspace','personal_notes', 'shared_notes'));
+        $projectIds = Note::where('workspace', '=', $currentWorkspace->id)
+            ->whereNotNull('project_id')
+            ->pluck('project_id')
+            ->unique()
+            ->toArray();
+
+        $projects = Project::whereIn('id', $projectIds)->get();
+
+        return view('notes.index',compact('currentWorkspace','personal_notes', 'shared_notes', 'projects'));
     }
 
     /**
@@ -43,12 +52,13 @@ class NoteController extends Controller
     public function create($slug)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
+        $user = Auth::user();
         if($currentWorkspace)
         {
             $users = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active')
                          ->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id')
                          ->where('user_workspaces.workspace_id', '=', $currentWorkspace->id)
-                         ->where('users.id', '!=', Auth::user()->id)
+                         ->where('users.id', '!=', $user->id)
                          ->get();
         }
         else
@@ -56,7 +66,9 @@ class NoteController extends Controller
             $users = User::where('type', '!=', 'admin')->get();
         }
 
-        return view('notes.create',compact('currentWorkspace', 'users'));
+        $projects = $user->projects()->get();
+
+        return view('notes.create',compact('currentWorkspace', 'users', 'projects'));
     }
 
     /**
@@ -70,7 +82,8 @@ class NoteController extends Controller
             'title' => 'required',
             'text' => 'required',
             'color' => 'required',
-            'file' => 'nullable|mimes:doc,docx,pdf|max:20480'
+            'file' => 'nullable|mimes:doc,docx,pdf|max:20480',
+            'project_id' => 'nullable|exists:projects,id',
         ]);
 
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
@@ -83,6 +96,8 @@ class NoteController extends Controller
         $post['assign_to'] = implode(',', $assign_to);
         $post['workspace'] = $currentWorkspace->id;
         $post['created_by'] = $objUser->id;
+        $post['project_id'] = $request->project_id;
+
         $note = Note::create($post);
 
         if ($request->hasFile('file')) {
@@ -130,8 +145,10 @@ class NoteController extends Controller
         {
             $users = User::where('type', '!=', 'admin')->get();
         }
+        $projects = Auth::user()->projects()->get();
 
-        return view('notes.edit',compact('currentWorkspace','note', 'users'));
+
+        return view('notes.edit',compact('currentWorkspace','note', 'users', 'projects'));
     }
 
     /**
@@ -146,6 +163,7 @@ class NoteController extends Controller
             'text' => 'required',
             'color' => 'required',
             'file' => 'nullable|mimes:doc,docx,pdf|max:20480',
+            'project_id' => 'nullable|exists:projects,id',
         ]);
 
         $objUser = Auth::user();
