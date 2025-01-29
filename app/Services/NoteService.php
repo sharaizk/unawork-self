@@ -30,7 +30,7 @@ class NoteService
             }
 
             $dir = 'notes_files/';
-            $path = Utility::upload_file($request, 'file', $file_path, $dir, []);
+            $path = Utility::upload_file($request, 'file', $file_path, $dir, ["max: 20480"]);
             if ($path['flag'] != 1) {
                 throw new Exception($path['msg']);
             }

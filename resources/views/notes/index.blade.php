@@ -23,7 +23,12 @@
 @section('content')
 
     @if($currentWorkspace)
-   <div class="row justify-content-between align-items-center mt-5 mb-3">
+        <div class="row justify-content-between align-items-center mb-3">
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <input type="text" id="notes-search" class="form-control" placeholder="{{ __('Search Notes...') }}">
+            </div>
+        </div>
+   <div class="row justify-content-between align-items-center mb-3">
             <div class="col-xl-5 col-lg-4 col-md-12 d-flex align-items-center justify-content-between justify-content-md-start">
                 <div class="d-inline-block">
                     <h5 class="h4 d-inline-block font-weight-400">{{ __('Personal Notes') }}</h5>
@@ -34,7 +39,7 @@
             @if(count($personal_notes) > 0)
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row notes-list">
+                        <div class="row notes-list" id="personal-notes-container">
                             @foreach($personal_notes as $note)
                                 <div class="col-md-4">
                                     <div class="card ">
@@ -88,6 +93,7 @@
                         </div>
                     </div>
                 </div>
+                <div id="personal-notes-pagination" class="d-flex justify-content-center mt-4"></div>
             @else
                 <div class="card">
                     <div class="card-body p-4">
@@ -103,7 +109,7 @@
             @endif
         </section>
 
-        <div class="row justify-content-between align-items-center mt-5 mb-3">
+        <div class="row justify-content-between align-items-center mt-2 mb-3">
             <div class="col-xl-5 col-lg-4 col-md-12 d-flex align-items-center justify-content-between justify-content-md-start">
                 <div class="d-inline-block">
                     <h5 class="h4 d-inline-block font-weight-400">{{ __('Shared Notes') }}</h5>
@@ -114,7 +120,7 @@
             @if(count($shared_notes) > 0)
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row notes-list">
+                        <div class="row notes-list" id="shared-notes-container">
                                @foreach($shared_notes as $note)
                                 <div class="col-md-4">
                                     <div class="card  ">
@@ -168,6 +174,7 @@
                         </div>
                     </div>
                 </div>
+                <div id="shared-notes-pagination" class="d-flex justify-content-center mt-4"></div>
             @else
                 <div class="card">
                     <div class="card-body p-4">
@@ -208,24 +215,82 @@
 
 @push('scripts')
     <script>
-        function toggleAssignToSelection() {
-            var type = $('input[name="type"]:checked').val();
+        document.addEventListener('DOMContentLoaded', function () {
+            const itemsPerPage = 3;
+            const searchInput = document.getElementById('notes-search');
 
-            if (type == 'shared') {
-                $('.assign_to_selection').show();
-            } else {
-                $('.assign_to_selection').hide();
+            function paginateNotes(notesContainerId, paginationContainerId) {
+                const notesContainer = document.getElementById(notesContainerId);
+                const notes = Array.from(notesContainer.querySelectorAll('.card'));
+                const paginationContainer = document.getElementById(paginationContainerId);
+                let filteredNotes = notes;
+                let currentPage = 1;
+
+                function displayNotes(notesToDisplay, page) {
+                    notesContainer.innerHTML = '';
+                    const start = (page - 1) * itemsPerPage;
+                    const end = start + itemsPerPage;
+
+                    const notesToShow = notesToDisplay.slice(start, end);
+
+                    if (notesToShow.length === 0) {
+                        notesContainer.innerHTML = `<p class="text-center mt-4">{{ __('No notes found') }}</p>`;
+                        paginationContainer.innerHTML = '';
+                        return;
+                    }
+
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'row';
+
+                    notesToDisplay.slice(start, end).forEach(note => {
+                        note.classList.add('col-md-4');
+                        rowDiv.appendChild(note);
+                    });
+
+                    notesContainer.appendChild(rowDiv);
+                }
+
+                function createPagination(notesToPaginate) {
+                    paginationContainer.innerHTML = '';
+
+                    const totalPages = Math.ceil(notesToPaginate.length / itemsPerPage);
+
+                    if (totalPages === 0) return;
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        const button = document.createElement('button');
+                        button.textContent = i;
+                        button.className = `btn mx-1 ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'}`;
+                        button.addEventListener('click', function () {
+                            currentPage = i;
+                            displayNotes(filteredNotes, currentPage);
+                            createPagination(filteredNotes);
+                        });
+                        paginationContainer.appendChild(button);
+                    }
+                }
+
+                function filterNotes() {
+                    const searchTerm = searchInput.value.toLowerCase();
+
+                    filteredNotes = notes.filter(note => {
+                        const noteTitle = note.querySelector('.card-header h5').textContent.toLowerCase();
+                        return noteTitle.includes(searchTerm);
+                    });
+
+                    currentPage = 1;
+                    displayNotes(filteredNotes, currentPage);
+                    createPagination(filteredNotes);
+                }
+
+                searchInput.addEventListener('input', filterNotes);
+
+                displayNotes(filteredNotes, currentPage);
+                createPagination(filteredNotes);
             }
-        }
 
-        $(document).on('click', 'input[name="type"]', function () {
-            toggleAssignToSelection();
+            paginateNotes('personal-notes-container', 'personal-notes-pagination');
+            paginateNotes('shared-notes-container', 'shared-notes-pagination');
         });
-
-        $(document).on('shown.bs.modal', function () {
-            toggleAssignToSelection();
-        });
-
-
     </script>
 @endpush
