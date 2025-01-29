@@ -71,7 +71,7 @@ class NoteController extends Controller
             'title' => 'required',
             'text' => 'required',
             'color' => 'required',
-            'file' => 'nullable|mimes:doc,docx,pdf|max:2048'
+            'file' => 'nullable|mimes:doc,docx,pdf|max:20480'
         ]);
 
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
@@ -150,7 +150,7 @@ class NoteController extends Controller
             'title' => 'required',
             'text' => 'required',
             'color' => 'required',
-            'file' => 'nullable|mimes:doc,docx,pdf|max:2048',
+            'file' => 'nullable|mimes:doc,docx,pdf|max:20480',
         ]);
 
         $objUser = Auth::user();
