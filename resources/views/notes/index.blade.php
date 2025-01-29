@@ -24,7 +24,7 @@
 
     @if($currentWorkspace)
             <div class="row justify-content-between align-items-center mb-3">
-                <div class="col-xl-12 col-lg-12 col-md-12 ps-0 pe-4">
+                <div class="col-xl-8 col-lg-8 col-md-8 ps-0 pe-1">
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="ti ti-search"></i>
@@ -32,10 +32,19 @@
                         <input type="text" id="notes-search" class="form-control" placeholder="{{ __('Search Notes...') }}">
                     </div>
                 </div>
+                <div class="col-xl-4 col-lg-4 col-md-4 ps-0 pe-4">
+                    <select class="form-control" id="project-filter">
+                        <option value="all">{{ __('All Notes') }}</option>
+                        <option value="none">{{ __('Without Project') }}</option>
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}">{{ $project->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="row justify-content-center mb-3">
                 <div class="col-auto">
-                    <button class="btn btn-primary" id="show-personal">{{ __('Personal Notes') }}</button>
+                    <button class="btn btn-primary active" id="show-personal">{{ __('Personal Notes') }}</button>
                     <button class="btn btn-outline-primary" id="show-shared">{{ __('Shared Notes') }}</button>
                 </div>
             </div>
@@ -50,6 +59,11 @@
                                          <div class="{{$note->color}} note_color_dot px-1"></div>
                                         <div class="card-header">
                                             <h5  class="">{{$note->title}}</h5>
+                                            @if($note->project)
+                                                <small class="text-muted">{{ $note->project->name }}</small>
+                                            @else
+                                                <small class="text-muted">{{ __('No Project') }}</small>
+                                            @endif
                                         <div class="card-header-right">
                                             <div class="btn-group card-option">
                                                 <button type="button" class="btn dropdown-toggle"
@@ -75,7 +89,6 @@
                                         <div class="card-body" style=" height: 240px !important;" >
                                              <div class="scrollText note-text ">
                                                 {{$note->text}}
-
                                             </div>
                                             @if($note->files && $note->files->count() > 0)
                                                 <div class="scrollFiles note-text mt-2">
@@ -136,6 +149,11 @@
                                           <div class="{{$note->color}} note_color_dot px-1"></div>
                                         <div class="card-header">
                                             <h5  class="">{{$note->title}}</h5>
+                                            @if($note->project)
+                                                <small class="text-muted">{{ $note->project->name }}</small>
+                                            @else
+                                                <small class="text-muted">{{ __('No Project') }}</small>
+                                            @endif
                                         <div class="card-header-right">
                                             <div class="btn-group card-option">
                                                 <button type="button" class="btn dropdown-toggle"
@@ -239,6 +257,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const itemsPerPage = 3;
             const searchInput = document.getElementById('notes-search');
+            const projectFilter = document.getElementById('project-filter');
 
             const personalNotesSection = document.getElementById('personal-notes-section');
             const sharedNotesSection = document.getElementById('shared-notes-section');
@@ -298,10 +317,18 @@
 
                 function filterNotes() {
                     const searchTerm = searchInput.value.toLowerCase();
+                    const selectedProject = projectFilter.value;
 
                     filteredNotes = notes.filter(note => {
                         const noteTitle = note.querySelector('.card-header h5').textContent.toLowerCase();
-                        return noteTitle.includes(searchTerm);
+                        const projectTag = note.querySelector('.card-header small') ? note.querySelector('.card-header small').textContent.trim() : 'No Project';
+
+                        let matchesSearch = noteTitle.includes(searchTerm);
+                        let matchesProject = (selectedProject === 'all') ||
+                            (selectedProject === 'none' && projectTag === 'No Project') ||
+                            (projectTag === projectFilter.options[projectFilter.selectedIndex].text);
+
+                        return matchesSearch && matchesProject;
                     });
 
                     currentPage = 1;
@@ -310,6 +337,7 @@
                 }
 
                 searchInput.addEventListener('input', filterNotes);
+                projectFilter.addEventListener('change', filterNotes);
 
                 displayNotes(filteredNotes, currentPage);
                 createPagination(filteredNotes);
