@@ -35,7 +35,7 @@
             </div>
             <div class="row justify-content-center mb-3">
                 <div class="col-auto">
-                    <button class="btn btn-primary" id="show-personal">{{ __('Personal Notes') }}</button>
+                    <button class="btn btn-primary active" id="show-personal">{{ __('Personal Notes') }}</button>
                     <button class="btn btn-outline-primary" id="show-shared">{{ __('Shared Notes') }}</button>
                 </div>
             </div>
