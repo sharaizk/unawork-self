@@ -1371,7 +1371,12 @@ span.currency-icon {
 
 .scrollText{
     overflow: auto;
-    height: 80%;
+    height: 60%;
+}
+
+.scrollFiles{
+    overflow: auto;
+    height: 40%;
 }
 
 .row_line_style{
@@ -1525,17 +1530,17 @@ span.currency-icon {
         max-width:100%;
         right: 0;
         left: 0;
-    }   
-    
+    }
+
     .ps--active-y  {
         height: 100vh !important;
     }
 }
 
 .accordion-button{
-    padding: 0px !important; 
-    padding-right: 1.25rem !important; 
-    padding-left: 1.25rem !important; 
+    padding: 0px !important;
+    padding-right: 1.25rem !important;
+    padding-left: 1.25rem !important;
 }
 
 .setting-accordion .accordion-item {
@@ -1605,14 +1610,14 @@ span.currency-icon {
     transform: scale(0);
     transition: 0.2s ease-in-out;
   }
-  
+
   .custom-tooltip[data-tooltip]:hover::after {
     transform: scale(1);
     bottom: -150%;
   }
-  
+
   /* Additional Styling */
-  
+
   .custom-tooltip {
     position: relative;
     display: inline-block;

@@ -23,24 +23,23 @@
 @section('content')
 
     @if($currentWorkspace)
-        <div class="row justify-content-between align-items-center mb-3">
-            <div class="col-xl-12 col-lg-12 col-md-12">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="ti ti-search"></i>
-                    </span>
-                    <input type="text" id="notes-search" class="form-control" placeholder="{{ __('Search Notes...') }}">
+            <div class="row justify-content-between align-items-center mb-3">
+                <div class="col-xl-12 col-lg-12 col-md-12 ps-0 pe-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="ti ti-search"></i>
+                        </span>
+                        <input type="text" id="notes-search" class="form-control" placeholder="{{ __('Search Notes...') }}">
+                    </div>
                 </div>
             </div>
-        </div>
-   <div class="row justify-content-between align-items-center mb-3">
-            <div class="col-xl-5 col-lg-4 col-md-12 d-flex align-items-center justify-content-between justify-content-md-start">
-                <div class="d-inline-block">
-                    <h5 class="h4 d-inline-block font-weight-400">{{ __('Personal Notes') }}</h5>
+            <div class="row justify-content-center mb-3">
+                <div class="col-auto">
+                    <button class="btn btn-primary" id="show-personal">{{ __('Personal Notes') }}</button>
+                    <button class="btn btn-outline-primary" id="show-shared">{{ __('Shared Notes') }}</button>
                 </div>
             </div>
-        </div>
-        <section class="section">
+        <section class="section" id="personal-notes-section">
             @if(count($personal_notes) > 0)
                 <div class="row">
                     <div class="col-lg-12">
@@ -73,24 +72,36 @@
                                             </div>
                                         </div>
                                         </div>
-                                        <div class="card-body" style=" height: 210px !important;" >
+                                        <div class="card-body" style=" height: 240px !important;" >
                                              <div class="scrollText note-text ">
                                                 {{$note->text}}
 
-                                                 @if($note->files && $note->files->count() > 0)
-                                                     <div class="mt-3">
-                                                         <h6>{{ __('Attached Files (') }}{{ $note->files->count() }}{{ __('): ') }} </h6>
-                                                         <ul class="list-group">
-                                                             @foreach($note->files as $file)
-                                                                 <li class="list-group-item d-flex justify-content-between align-items-center m-1">
-                                                                     <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank">{{ $file->file_name }}</a>
-                                                                     <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="btn btn-danger btn-sm">{{ __('Delete') }}</a>
-                                                                 </li>
-                                                             @endforeach
-                                                         </ul>
-                                                     </div>
-                                                 @endif
                                             </div>
+                                            @if($note->files && $note->files->count() > 0)
+                                                <div class="scrollFiles note-text mt-2">
+                                                    <div class="mt-2 d-flex flex-wrap align-items-center">
+                                                        @foreach($note->files->take(2) as $file)
+                                                            <div class="badge bg-light text-dark me-2 mb-2 d-flex align-items-center">
+                                                                <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank" class="text-decoration-none text-dark">
+                                                                    <i class="ti ti-file"></i> {{ $file->file_name }}
+                                                                </a>
+                                                                <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="text-danger ms-2">
+                                                                    <i class="ti ti-x"></i>
+                                                                </a>
+                                                            </div>
+                                                        @endforeach
+                                                        @if($note->files->count() > 2)
+                                                            <div class="badge bg-light text-dark me-2 mb-2 d-flex align-items-center">
+                                                                <a href="#" class="text-decoration-none text-dark" data-ajax-popup="true"
+                                                                   data-size="lg" data-title="{{ __('Edit Note') }}"
+                                                                   data-url="{{route('notes.edit',[$currentWorkspace->slug,$note->id])}}">
+                                                                    <i class="ti ti-eye"></i>{{ __(' All files') }}
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -114,14 +125,7 @@
             @endif
         </section>
 
-        <div class="row justify-content-between align-items-center mt-2 mb-3">
-            <div class="col-xl-5 col-lg-4 col-md-12 d-flex align-items-center justify-content-between justify-content-md-start">
-                <div class="d-inline-block">
-                    <h5 class="h4 d-inline-block font-weight-400">{{ __('Shared Notes') }}</h5>
-                </div>
-            </div>
-        </div>
-        <section class="section">
+        <section class="section" id="shared-notes-section">
             @if(count($shared_notes) > 0)
                 <div class="row">
                     <div class="col-lg-12">
@@ -154,24 +158,36 @@
                                             </div>
                                         </div>
                                         </div>
-                                        <div class="card-body p-4"  style=" height: 210px !important;">
-                                            <div class="note-text scrollText">
+                                        <div class="card-body" style=" height: 240px !important;" >
+                                            <div class="scrollText note-text ">
                                                 {{$note->text}}
 
-                                                @if($note->files && $note->files->count() > 0)
-                                                    <div class="mt-3">
-                                                        <h6>{{ __('Attached Files (') }}{{ $note->files->count() }}{{ __('): ') }} </h6>
-                                                        <ul class="list-group">
-                                                            @foreach($note->files as $file)
-                                                                <li class="list-group-item d-flex justify-content-between align-items-center m-1">
-                                                                    <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank">{{ $file->file_name }}</a>
-                                                                    <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="btn btn-danger btn-sm">{{ __('Delete') }}</a>
-                                                                </li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </div>
-                                                @endif
                                             </div>
+                                            @if($note->files && $note->files->count() > 0)
+                                                <div class="scrollFiles note-text mt-2">
+                                                    <div class="mt-2 d-flex flex-wrap align-items-center">
+                                                        @foreach($note->files->take(2) as $file)
+                                                            <div class="badge bg-light text-dark me-2 mb-2 d-flex align-items-center">
+                                                                <a href="{{ asset('storage/notes_files/' . $file->file_path) }}" target="_blank" class="text-decoration-none text-dark">
+                                                                    <i class="ti ti-file"></i> {{ $file->file_name }}
+                                                                </a>
+                                                                <a href="{{ route('notes.file.delete', [$currentWorkspace->slug, $file->id]) }}" class="text-danger ms-2">
+                                                                    <i class="ti ti-x"></i>
+                                                                </a>
+                                                            </div>
+                                                        @endforeach
+                                                        @if($note->files->count() > 2)
+                                                            <div class="badge bg-light text-dark me-2 mb-2 d-flex align-items-center">
+                                                                <a href="#" class="text-decoration-none text-dark" data-ajax-popup="true"
+                                                                   data-size="lg" data-title="{{ __('Edit Note') }}"
+                                                                   data-url="{{route('notes.edit',[$currentWorkspace->slug,$note->id])}}">
+                                                                    <i class="ti ti-eye"></i>{{ __(' All files') }}
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -223,6 +239,11 @@
         document.addEventListener('DOMContentLoaded', function () {
             const itemsPerPage = 3;
             const searchInput = document.getElementById('notes-search');
+
+            const personalNotesSection = document.getElementById('personal-notes-section');
+            const sharedNotesSection = document.getElementById('shared-notes-section');
+            const showPersonalBtn = document.getElementById('show-personal');
+            const showSharedBtn = document.getElementById('show-shared');
 
             function paginateNotes(notesContainerId, paginationContainerId) {
                 const notesContainer = document.getElementById(notesContainerId);
@@ -294,8 +315,40 @@
                 createPagination(filteredNotes);
             }
 
+            function toggleNotesView(showPersonal) {
+                if (showPersonal) {
+                    personalNotesSection.classList.remove('d-none');
+                    sharedNotesSection.classList.add('d-none');
+                    showPersonalBtn.classList.add('btn-primary');
+                    showPersonalBtn.classList.add('active');
+                    showPersonalBtn.classList.remove('btn-outline-primary');
+                    showSharedBtn.classList.add('btn-outline-primary');
+                    showSharedBtn.classList.remove('btn-primary');
+                    showSharedBtn.classList.remove('active');
+                } else {
+                    personalNotesSection.classList.add('d-none');
+                    sharedNotesSection.classList.remove('d-none');
+                    showSharedBtn.classList.add('btn-primary');
+                    showSharedBtn.classList.add('active');
+                    showSharedBtn.classList.remove('btn-outline-primary');
+                    showPersonalBtn.classList.add('btn-outline-primary');
+                    showPersonalBtn.classList.remove('btn-primary');
+                    showPersonalBtn.classList.remove('active');
+                }
+            }
+
+            showPersonalBtn.addEventListener('click', function () {
+                toggleNotesView(true);
+            });
+
+            showSharedBtn.addEventListener('click', function () {
+                toggleNotesView(false);
+            });
+
             paginateNotes('personal-notes-container', 'personal-notes-pagination');
             paginateNotes('shared-notes-container', 'shared-notes-pagination');
+
+            toggleNotesView(true);
         });
     </script>
 @endpush
