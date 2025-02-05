@@ -2770,7 +2770,7 @@ main {
   align-items: center;
 }
 #header .header__container .logoHeader img {
-  max-height: 60px;
+  max-height: 80px;
   width: auto;
   display: block;
 }
