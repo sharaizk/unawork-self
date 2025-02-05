@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="col-md-4 form-group d-flex align-items-end">
-                    <button type="submit" class="btn btn-xl btn-primary w-100">Find</button>
+                    <button type="submit" class="btn btn-xl btn-primary w-100 header-search-btn">Find</button>
                 </div>
                 </form>
             </div>

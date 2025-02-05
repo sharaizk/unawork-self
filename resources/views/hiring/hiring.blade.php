@@ -52,25 +52,25 @@
     }
 
     .skills-dropdown-menu {
-        min-width: 130px; 
-        width: 150px; 
-        max-height: 400px; 
-        overflow-y: auto; 
+        min-width: 130px;
+        width: 150px;
+        max-height: 400px;
+        overflow-y: auto;
     }
 
 
     .skills-dropdown-menu li {
-        padding: 10px 20px; 
+        padding: 10px 20px;
     }
 
     .skills-dropdown-menu .form-check-input {
-        width: 15px; 
-        height: 15px; 
-        margin-right: 6px; 
+        width: 15px;
+        height: 15px;
+        margin-right: 6px;
     }
 
     .skills-dropdown-menu .form-check-label {
-        font-size: 12px; 
+        font-size: 12px;
     }
 
     .search__icon {
@@ -91,10 +91,30 @@
         border: none;
     }
 
+    .dropdown-menu-xl {
+        min-width: 40vh;
+        width: 40vh;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .dropdown-menu-xl li {
+        padding: 10px 20px;
+    }
+
+    .dropdown-menu-xl .form-check-input {
+        width: 15px;
+        height: 15px;
+        margin-right: 6px;
+    }
+
+    .dropdown-menu-xl .form-check-label {
+        font-size: 12px;
+    }
 
     .btn-xl {
         font-size: 1.5rem;
-        padding: 10px 20px; 
+        padding: 10px 20px;
     }
 </style>
 <!-- filter form -->
@@ -132,7 +152,7 @@
                         <button class="btn btn-secondary dropdown-toggle skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                             Select Skills
                         </button>
-                        <ul class="dropdown-menu skills-dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-xl skills-dropdown-menu">
                             @foreach($skills as $skill)
                             <li>
                                 <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
@@ -144,7 +164,7 @@
                         </ul>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary filter-btn">Filter</button>
+                <button type="submit" class="btn btn-primary filter-btn header-search-btn">Filter</button>
             </form>
         </div>
     </div>
@@ -199,7 +219,7 @@
                 const name = document.getElementById('name');
                 const country = document.getElementById('country');
                 const jobTitle = document.getElementById('job_title_id');
-                
+
                 // Список інпутів, які потрібно очистити
                 const inputsToClear = [];
 
