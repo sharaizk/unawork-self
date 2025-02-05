@@ -4,15 +4,16 @@
 @endphp
 <header id="header">
         <div class="header__top">
-            <div class="container-master">
+{{--            <div class="container-master">--}}
                 <div class="header__container">
-                    <div class="logoHeader">
-                        <a href="/" title="UnaWork">
-                            <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
-                            <!-- <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork"> -->
-                        </a>
-                    </div>
                     <div class="header__main">
+
+                        <div class="logoHeader ms-5 me-5">
+                            <a href="/" title="UnaWork">
+                                <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
+                                <!-- <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork"> -->
+                            </a>
+                        </div>
                         <nav class="col nav__left">
                             <ul class="nav__list m-0">
                                 <li class="">
@@ -80,12 +81,11 @@
                                                         </div>
                                                     </div>
                                             </div>
-
                                 @endauth
                             </ul>
                         </nav>
                     </div>
                 </div>
-            </div>
+{{--            </div>--}}
         </div>
     </header>
