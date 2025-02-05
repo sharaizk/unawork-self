@@ -6,29 +6,29 @@
 @section('content')
 <style>
     .dropdown-menu-xl {
-        min-width: 40vh; 
-        width: 40vh; 
-        max-height: 400px; 
-        overflow-y: auto; 
+        min-width: 40vh;
+        width: 40vh;
+        max-height: 400px;
+        overflow-y: auto;
     }
 
     .dropdown-menu-xl li {
-        padding: 10px 20px; 
+        padding: 10px 20px;
     }
 
     .dropdown-menu-xl .form-check-input {
-        width: 15px; 
-        height: 15px; 
-        margin-right: 6px; 
+        width: 15px;
+        height: 15px;
+        margin-right: 6px;
     }
 
     .dropdown-menu-xl .form-check-label {
-        font-size: 12px; 
+        font-size: 12px;
     }
 
     .btn-xl {
         height: 40px;
-        padding: 10px 5px; 
+        padding: 10px 5px;
         font-size: 1.4rem;
     }
     .searchForm {
@@ -80,8 +80,9 @@
 
                 <div id="skillsField" class="col-md-2 form-group" style="display: none;">
                     <div class="dropdown">
-                        <button class="btn btn-xl btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
-                            Select Skills
+                        <button class="form-control" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                            Skills
+                            <i class="ti ti-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-xl">
                             @foreach($skills as $skill)
@@ -97,7 +98,7 @@
                 </div>
 
                 <div class="col-md-4 form-group d-flex align-items-end">
-                    <button type="submit" class="btn btn-xl btn-primary w-100">Filter</button>
+                    <button type="submit" class="btn btn-xl btn-primary w-100">Find</button>
                 </div>
                 </form>
             </div>
@@ -106,7 +107,7 @@
 
 
     <section class="section__titlepage">
-        <div class="container-master">
+        <div class="container-master ps-5">
             <h1 class="section__titlepage--headertitle"><span>Find Work</span></h1>
         </div>
     </section>
