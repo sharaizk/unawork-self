@@ -2703,7 +2703,7 @@ body {
   overflow-x: hidden !important;
   padding: 0;
   position: relative;
-  
+
 }
 body {
   opacity: 0;
@@ -2789,7 +2789,7 @@ main {
   color: #022d4d;
 }
 #header .header__container  .nav__list li a {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 }
 #header .header__container .nav__list li.active a {
   color: #cfaa40;

@@ -105,8 +105,8 @@
                         <div class="dropdown-menu dash-h-dropdown drp-search drp-search-custom">
                             <form class="form-inline mr-auto mb-0">
                                 <div class="search-element">
-                                    <input class="" type="type here" placeholder="Search here. . ."
-                                        aria-label="Search">
+                                    <input class="" type="text" placeholder="Search here. . ."
+                                           aria-label="Search">
 
                                     <div class="search-backdrop"></div>
                                 </div>
@@ -117,9 +117,9 @@
                     <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="ti ti-folder"></i>
-                        
+
                         <span class="hide-mob ms-2">
-                            {{ __('') }} 
+                            {{ __('') }}
                             @if (!$currentWorkspace->isPartOfPod())
                                 {{ $currentWorkspace->name }}
                             @elseif($currentWorkspace->isPartOfPod())
@@ -130,7 +130,7 @@
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
                 @endif
-                    
+
                     <!--all about workspaces, not for employee -->
                         {{-- @foreach (Auth::user()->workspace as $workspace)
                                 @if ($workspace->is_active)
@@ -152,7 +152,7 @@
                                         </a>
                                     @endif
                                 @else
-                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif" 
+                                    <a href="@if ($currentWorkspace->id == $workspace->id) #@else @auth('web'){{ route('change-workspace', $workspace->id) }}@elseauth{{ route('client.change-workspace', $workspace->id) }}@endauth @endif"
                                         class="dropdown-item" title="{{ __('Locked') }}">
                                         <i class="ti ti-lock"></i>
                                         @if (Auth::user()->currant_workspace == $workspace->id)
@@ -169,7 +169,7 @@
                                         @endif
                                     </a>
                                 @endif
-                            
+
                         @endforeach --}}
                         @if (Auth::user()->getGuard() != 'client')
                             @php
@@ -223,7 +223,7 @@
                                             @if (isset($workspace->pivot->permission))
                                                 @if ($workspace->pivot->permission == 'Owner')
                                                     <span
-                                                        class="badge badge-success-primary">{{ __($workspace->pivot->permission) }}</span>
+                                                        class="badge bg-primary">{{ __($workspace->pivot->permission) }}</span>
                                                 @else
                                                     <span class="badge bg-dark">{{ __('Shared') }}</span>
                                                 @endif
@@ -291,8 +291,8 @@
                         @if (isset($currentWorkspace) && $currentWorkspace)
                             @auth('web')
                                 @if (Auth::user()->id != Auth::user()->currentWorkspace->created_by)
-                                  
-                                
+
+
                                     <a href="#" class="dropdown-item bs-pass-para"
                                         data-confirm="{{ __('Are You Sure?') }}"
                                         data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
@@ -306,7 +306,7 @@
                                         @csrf
                                         @method('DELETE')
                                     </form>
-                                @else 
+                                @else
                                   <!-- <a href="#" class="dropdown-item bs-pass-para"
                                         data-confirm="{{ __('Are You Sure?') }}"
                                         data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
@@ -323,7 +323,7 @@
                                 @endif
                             @endauth
                         @endif
-                        
+
                         <!--   @if (env('CHAT_MODULE') == 'on')
                             @if (\Auth::user()->type == 'user')
                                 <a href="{{ url('chats') }}" class="dropdown-item">
@@ -332,7 +332,7 @@
                                 </a>
                             @endif
                         @endif -->
-                        
+
                     </div>
                 </li>
 
@@ -375,7 +375,7 @@
                 @endif
 
 
-                
+
 
 
                 @if (\Auth::user()->type == 'user')
@@ -551,15 +551,15 @@
                                                         }
                                                         $acceptLink = route('pods.projects.join.accept', ['record' => $data->id]);
                                                         $declineLink = route('pods.projects.join.decline', ['record' => $data->id]);
-                                                        $text = __('User : ') . ' 
+                                                        $text = __('User : ') . '
                                                             <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
-                                                            sended join request to your project:  
+                                                            sended join request to your project:
                                                             <b><a href="'. route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]) .'">'. $project->name . ' </a></b>
                                                             <br>
                                                             <br>
                                                             <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                                                                 onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
-                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
                                                                 onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
                                                         ';
                                                     @endphp
@@ -594,15 +594,15 @@
                                                         }
                                                         $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
                                                         $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
-                                                        $text = __('User : ') . ' 
+                                                        $text = __('User : ') . '
                                                             <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
-                                                            sended join request to your workspace:  
+                                                            sended join request to your workspace:
                                                             <b><a href="'. route('users.index', ['slug' => $workspace->slug]) .'">'. $workspace->name . ' </a></b>
                                                             <br>
                                                             <br>
                                                             <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                                                                 onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
-                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
                                                                 onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
                                                         ';
                                                     @endphp
@@ -619,7 +619,7 @@
                                                             <br>
                                                                 <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                                                                     onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
-                                                                <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                                                                <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
                                                                     onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
                                                         ';
                                                         $icon = 'fa fa-bug';
@@ -692,7 +692,7 @@
                                                                          <br>
                                                                          <a href="'.route('pods.projects.join', ['project' => $data->id]).'" class="button btn btn-sm btn-primary w-50">Join</a>
                                                                     ';
-                                                        
+
                                                         $icon = 'fa fa-bug';
                                                         $name = 'Proj';
                                                     @endphp
@@ -742,7 +742,7 @@
                                                     @endphp
                                                 @endif
                                                 <div class="list-group-item list-group-item-action">
-                                                    @if ($link) 
+                                                    @if ($link)
                                                     <a href="{{ $link }}">
                                                     @endif
                                                         <div class="d-flex align-items-center" data-toggle="tooltip"
@@ -755,7 +755,7 @@
                                                                 <div class="h6 text-sm mb-0">
                                                                     {{ $notification->user->name }}
                                                                     <small
-                                                                        class="float-end text-muted">{{ $date }} 
+                                                                        class="float-end text-muted">{{ $date }}
                                                                     </small>
                                                                 </div>
 
@@ -766,7 +766,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    @if ($link) 
+                                                    @if ($link)
                                                     </a>
                                                     @endif
                                                 </div>
@@ -864,7 +864,7 @@
                         </a>
                     </div>
                 </li>
-                
+
                 <li class="dropdown dash-h-item">
                     <a class="dash-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
@@ -882,7 +882,7 @@
                         @if (Auth::user()->type != "admin")
                             <!-- <a href="{{ route('pods.index') }}" class="dropdown-item">
                                 <i class="ti ti-message-circle"></i>
-                                <span>{{ __('PODS') }}</span> 
+                                <span>{{ __('PODS') }}</span>
                             </a> -->
                         @endif
                         <!--   @if (env('CHAT_MODULE') == 'on')
