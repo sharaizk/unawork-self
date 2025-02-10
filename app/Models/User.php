@@ -198,8 +198,12 @@ class User extends Authenticatable implements MustVerifyEmail
             $workspaces      = Workspace::where('created_by', '=', $this->id)->get();
             $workspacesCount = 0;
             foreach ($workspaces as $workspace) {
-                $workspacesCount++;
-                $workspace->is_active = $plan->max_workspaces == -1 ? 1 : (($workspacesCount <= $plan->max_workspaces) ? 1 : 0);
+                if (!$workspace->isPartOfPod()) {
+                    $workspacesCount++;
+                    $workspace->is_active = $plan->max_workspaces == -1 ? 1 : (($workspacesCount <= $plan->max_workspaces) ? 1 : 0);
+                } else {
+                    $workspace->is_active = 1;
+                }
                 $workspace->save();
 
                 $projectCount = 0;
