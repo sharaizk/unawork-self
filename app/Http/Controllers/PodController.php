@@ -32,7 +32,7 @@ class PodController extends Controller
     }
 
     public function destroy(int $id)
-    {   
+    {
         $pod = Pod::findOrFail($id);
         $this->authorize('delete', $pod);
 
@@ -57,11 +57,11 @@ class PodController extends Controller
 
         $user = auth()->user();
         $joinedPods = [];
-    
+
         if ($user) {
             $joinedPods = $user->pods()->pluck('pod_id')->toArray();
         }
-    
+
 
         return view('pod.list', compact('pods', 'skills', 'joinedPods', 'user'));
     }

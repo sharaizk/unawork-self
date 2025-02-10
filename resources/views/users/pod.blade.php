@@ -54,9 +54,9 @@
                                                 <i class="ti ti-toggle-off"></i> <span>{{ __('Disable Inner Circle') }}</span>
                                             </a>
                                         @endif
-                                        <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md" 
+                                        <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md"
                                             data-title="{{ __('Edit') }}"
-                                            data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i 
+                                            data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i
                                                 class="ti ti-pencil"></i> <span>{{ __('Edit') }}</span>
                                         </a>
                                         <a href="#" class="dropdown-item bs-pass-para "
@@ -73,7 +73,7 @@
                                     @endif
                                     <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Go to Pod') }}">
-                                         <i class="ti ti-align-right"></i> <span>{{ __('Go to Pod') }}</span></a> 
+                                         <i class="ti ti-align-right"></i> <span>{{ __('Go to Pod') }}</span></a>
                                 </div>
                             </div>
                         </div>
@@ -81,23 +81,34 @@
                     <div class="card-body">
                         <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
                             @if ($pod->image) src="{{ asset ('storage/'. $pod->image) }}" @else avatar="{{ $pod->title }}" @endif>
-                        
-                        <h4 class="mt-2">   
+
+                        <h4 class="mt-2">
                             <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
                                 {{ $pod->title }}
                                 <!-- <i class="ti ti-eye"></i> -->
-                            </a>    
+                            </a>
                         </h4>
                         <span>{{ $pod->description }}</span>
                         <br>
                         <small>
-                            @if (count($pod->skills) >= 1) 
-                                Skills: 
+                            @if (count($pod->skills) >= 1)
+                                Skills:
                             @endif
                             @foreach($pod->skills as $skill)
                                {{ $skill->name }} @if(!$loop->last), @endif
                             @endforeach
                         </small>
+                        <!-- Toggle Switch for Inner Circle -->
+                        @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
+                            <a href="{{ $pod->inner_enabled ? route('pods.disableInnerCircle', $pod->id) : route('pods.enableInnerCircle', $pod->id) }}"
+                               class="form-check form-switch d-flex align-items-center mt-2 text-decoration-none">
+                                <input class="form-check-input" type="checkbox" id="toggle-inner-{{ $pod->id }}"
+                                       {{ $pod->inner_enabled ? 'checked' : '' }} style="pointer-events: none;">
+                                <label class="form-check-label ms-2" for="toggle-inner-{{ $pod->id }}">
+                                    {{ __('Inner Circle') }}
+                                </label>
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -131,14 +142,14 @@
                     width: "100%",
                     placeholder_text_multiple: "Select Skills"
                 });
-                
+
                 if (form.length) {
                 form.off('submit').on('submit', async function(event) {
-                    event.preventDefault(); 
-            
-                    const formData = new FormData(this); 
+                    event.preventDefault();
+
+                    const formData = new FormData(this);
                     try {
-                        const response = await axios.post('./api/pod', formData); 
+                        const response = await axios.post('./api/pod', formData);
 
                         $("#commonModal").modal('hide');
                         showNotification('Pod successfully created', 'success');
@@ -150,7 +161,7 @@
                     } catch (error) {
                         $("#commonModal").modal('hide');
                         showNotification('Pod creation failed.', 'danger');
-                        console.error(error); 
+                        console.error(error);
                     }
                 });
                 }
@@ -171,20 +182,20 @@
 
                 if (form.length) {
                 form.off('submit').on('submit', async function(event) {
-                    event.preventDefault(); 
-            
-                    const formData = new FormData(this); 
+                    event.preventDefault();
+
+                    const formData = new FormData(this);
                     const url = this.getAttribute('data-url');
                     try {
-                        const response = await axios.post(url, formData); 
+                        const response = await axios.post(url, formData);
                         $("#commonModal").modal('hide');
                         showNotification('Pod successfully updated', 'success');
                         this.reset();
                         setTimeout(function() {
-                            location.reload(); 
+                            location.reload();
                         }, 3000);
                     } catch (error) {
-                        console.error(error); 
+                        console.error(error);
                     }
                 });
                 }

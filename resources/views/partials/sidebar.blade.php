@@ -148,12 +148,7 @@
                         @endif
                         --}}
                        @if (\Auth::user()->type != "admin")
-                            <!-- <li class="dash-item {{ Request::route()->getName() == 'pods.index' ? ' active' : '' }}">
-                                <a href="{{ route('pods.index') }}" class="dash-link"><span class="dash-micon"><i
-                                    class="ti ti-message-circle"></i></span><span
-                                    class="dash-mtext">{{ __('PODS') }}</span> </a>
-                            </li> -->
-                           <li class="dash-item dropdown {{ Route::currentRouteName() === 'pods.index' ? 'active' : '' }}">
+                           <li class="dash-item dropdown">
                                <a class="dash-link dropdown-toggle" href="#" id="podsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                    <span class="dash-micon"><i class="ti ti-message-circle"></i></span>
                                    <span class="dash-mtext">{{ __('PODs') }}</span>
@@ -535,6 +530,8 @@
 
                                         @endif -->
                             <!-- </div> -->
+                                                </li>
+                    </ul>
                </div>
            </div>
        </nav>
