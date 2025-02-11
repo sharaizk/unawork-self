@@ -1061,6 +1061,16 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('ownerable_type', '!=', 'App\Models\Pod');
     }
 
+    public function isEmployee(): bool
+    {
+        return $this->hasRole(UserRole::EMPLOYEE->value);
+    }
+
+    public function isCompany(): bool
+    {
+        return $this->hasRole(UserRole::COMPANY->value);
+    }
+
     public function updateCurrentWorkspace()
     {
         $currentWorkspace = $this->workspacesOwner()->first();

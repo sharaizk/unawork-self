@@ -26,6 +26,9 @@
                                 <li class="{{ Request::route()->getName() == 'landing.hiring' ? 'active' : '' }}">
                                     <a href="{{ route('landing.hiring') }}">Hiring</a>
                                 </li>
+                                <li class="{{ Request::route()->getName() == 'pods.list' ? 'active' : '' }}">
+                                    <a href="{{ route('pods.list') }}">PODs</a>
+                                </li>
                             </ul>
                         </nav>
                         <nav class="col nav__right">

@@ -41,28 +41,28 @@
 </section>
 <section class="section__tasksmeeting">
     <div class="container-master">
-        <div class="row-master">            
+        <div class="row-master">
             <div class="boxarchives col-12 col-xl-6">
                 @include('pod.landing.news', ['news' => $news, 'podId' => $pod->id])
-                
+
             </div>
             <div class="members col-12 col-xl-6">
-                @include('pod.landing.members', ['users' => $pod->users])
+                @include('pod.landing.members', ['users' => $pod->users->sortByDesc('created_at')])
             </div>
         </div>
     </div>
 </section>
-<!-- 
+<!--
 <section class="section__statistics__archives">
         <div class="container-master">
             <div class="row-master">
 
                 <div class="notes col-12 col-xl-6">
-                
+
                 </div>
 
                 <div class="notes col-12 col-xl-6">
-                    
+
                 </div>
 
             </div>

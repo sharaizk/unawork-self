@@ -10,23 +10,24 @@
     <div class="members__info_list">
 
         @foreach($users as $index => $user)
-                    
+
         <div class="members__info_list--item" {!! $index > 2 ? 'style="display: none;"' : '' !!}>
             <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
                 @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
-                        
+
             <div class="right">
                 <h3 class="member_name"><a href="#">{{ $user->name }}</a></h3>
                 @if (Auth::user())
                     @if (Auth::user()->id != $user->id)
                         <button class="btn btn-primary sendMessageButton" data-employee-id="{{ $user->id }}">
-                            <span> Message </span> 
+                            <span> Message </span>
                         </button>
                     @endif
                 @else
                     <a href="{{ route('login') }}"><span>Message</span></a>
                 @endif
-                
+
+                @if ($user->isEmployee())
                 <p class="content">
                     <strong>Country:</strong> {{$user->profile->country ?? 'n/a'}}
                     <strong>State:</strong> {{$user->profile->state ?? 'n/a'}}
@@ -38,12 +39,47 @@
                         n/a
                     @endforelse
                 </p>
+                @elseif ($user->isCompany())
+                    @php
+                        $company = $user->ownWorkspace();
+                        $addressParts = array_filter([
+                            $company->address,
+                            $company->city,
+                            $company->state,
+                            $company->country,
+                            $company->zip_code
+                        ]);
+                        $address = implode(', ', array_filter($addressParts));
+                    @endphp
+                    <p class="content">
+
+                        <strong>Address: </strong>{{ $address ?: 'n/a' }}
+                        @if($company->telephone)
+                                <br/>
+                                <i class="fa fa-phone"></i>
+                                <a href="tel:{{$company->telephone}}" title="Phone">
+                                    {{$company->telephone}}
+                                </a>
+                        @endif
+                        @if($company->website)
+                            <br/>
+                                <i class="fa fa-globe"></i>
+                                @php
+                                    $website = $company->website;
+                                    if (!preg_match('#^http(s)?://#', $website)) {
+                                        $website = 'http://' . $website;
+                                    }
+                                @endphp
+                                <a href="{{ $website }}" title="Website">Visit Website</a>
+                        @endif
+                    </p>
+                @endif
                 <!-- <a href="" class="learn-more">Learn more</a> -->
             </div>
         </div>
 
         @endforeach
-        
+
     </div>
 
 </div>

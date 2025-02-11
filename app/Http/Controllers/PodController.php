@@ -51,7 +51,7 @@ class PodController extends Controller
     public function list(Request $request)
     {
         $skillIds = $request->input('skill_ids');
-        $pods = $this->podService->getPods($skillIds);
+        $pods = $this->podService->getPods($skillIds, 15);
 
         $skills = Skill::all();
 
