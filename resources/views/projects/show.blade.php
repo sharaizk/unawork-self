@@ -11,13 +11,6 @@
     @else
         <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
     @endif
-    @if (\Auth::guard('client')->check())
-        <li class="breadcrumb-item"><a
-                href="{{ route('client.projects.index', $currentWorkspace->slug) }}">{{ __('Project') }}</a></li>
-    @else
-        <li class="breadcrumb-item"><a href="{{ route('projects.index', $currentWorkspace->slug) }}">{{ __('Project') }}</a>
-        </li>
-    @endif
     <li class="breadcrumb-item">{{ $project->name }}</li>
 @endsection
 @php
@@ -221,7 +214,7 @@
                                                     data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
                                                     data-toggle="popover" title="{{ __('Delete') }}"
                                                     data-confirm-yes="leave-form-{{ $project->id }}"><i class="ti ti-trash">
-                                                    </i> </i></a></button>
+                                                    </i> </a></button>
 
                                             <form id="leave-form-{{ $project->id }}"
                                                 action="{{ route('projects.leave', [$currentWorkspace->slug, $project->id]) }}"

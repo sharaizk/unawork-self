@@ -293,6 +293,7 @@ class UserController extends Controller
                 ])
                 ->role(UserRole::EMPLOYEE->value)
                 ->with('getPlan')
+                ->orderBy('created_at', 'desc')
                 ->get();
         return view('users.index', compact('currentWorkspace', 'users'));
     }
@@ -618,14 +619,14 @@ class UserController extends Controller
                 $employeeWorkspace = Workspace::where('created_by', $objUser->id)
                     ->where('ownerable_type', '!=', 'App\Models\Pod')
                     ->firstOrFail();
-        
+
                 $employeeWorkspace->name = $request->name;
                 $employeeWorkspace->save();
             } catch (\Exception $e) {
                 return response()->json(['error' => 'An error occurred while updating the workspace'], 500);
             }
         }
-        
+
         $objUser->email = $request->email;
         $dir = 'users-avatar/';
 
@@ -643,7 +644,7 @@ class UserController extends Controller
                 if ($result == 1) {
                     // Utility::changeStorageLimit($workspace_owner->id, $objUser->avatar);
                     $logoName = uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension();
-                    $path = Utility::upload_file($request, 'avatar', $logoName, $dir, [], 
+                    $path = Utility::upload_file($request, 'avatar', $logoName, $dir, [],
                         ['small', 'big']
                     );
                     if ($path['flag'] == 1) {
@@ -655,7 +656,7 @@ class UserController extends Controller
             } else {
 
                 $logoName = uniqid() . '.' . $request->file('avatar')->getClientOriginalExtension();
-                $path = Utility::upload_file($request, 'avatar', $logoName, $dir, [], 
+                $path = Utility::upload_file($request, 'avatar', $logoName, $dir, [],
                         ['small', 'big']
                     );
                 if ($path['flag'] == 1) {
@@ -1293,7 +1294,7 @@ class UserController extends Controller
                 'url' => route('users.index', $currentWorkspace->slug),
                 'message' => __('Your user limit is over, Please upgrade plan.') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''),
             ];
-        
+
                 return json_encode($response);
         }
 
@@ -1396,7 +1397,7 @@ class UserController extends Controller
 
             Utility::sendNotification('workspace_join', null, $workspace->created_by, $userWorkspace);
 
-            
+
             return redirect()->route('home')->with('success', __('Request Sended Successfully!'));
         } else {
             return response()->json(['error' => 'You are already a member of this workspace'], 404);
@@ -1426,7 +1427,7 @@ class UserController extends Controller
             }
 
             Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
-    
+
             return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to active'));
         } else {
             return response()->json(['error' => 'User not found in workspace'], 404);
@@ -1456,7 +1457,7 @@ class UserController extends Controller
             }
 
             Utility::sendNotification('workspace_request_decline_user', null, $user->id, $userWorkspace);
-    
+
             return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to declined'));
         } else {
             return response()->json(['error' => 'User not found in workspace'], 404);
@@ -1486,7 +1487,7 @@ class UserController extends Controller
 
             Utility::sendNotification('workspace_request_accept_owner', null, $workspace->created_by, $userWorkspace);
             Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
-    
+
             return redirect()->back()->with('success', __('User status updated to active'));
         } else {
             return response()->json(['error' => 'User not found in workspace'], 404);
@@ -1511,7 +1512,7 @@ class UserController extends Controller
             if ($notification) {
                 $notification->delete();
             }
-            
+
             Utility::sendNotification('workspace_request_decline_owner', null, $workspace->created_by, $userWorkspace);
 
             $workspace->users()->detach($user->id);

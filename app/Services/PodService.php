@@ -13,14 +13,14 @@ use Spatie\Permission\Models\Permission;
 
 class PodService
 {
-    public function getPods(?array $skillIds = null)
+    public function getPods(?array $skillIds = null, $perPage = 15)
     {
         if ($skillIds) {
             $pods = Pod::whereHas('skills', function($query) use ($skillIds) {
                 $query->whereIn('skills.id', $skillIds);
-            })->get();
+            })->paginate($perPage);
         } else {
-            $pods = Pod::all();
+            $pods = Pod::paginate($perPage);
         }
 
         return $pods;
@@ -32,9 +32,9 @@ class PodService
             $settings = Utility::getAdminPaymentSetting();
             $data['image'] = $this->uploadImage($data['image'], $settings);
         }
-    
+
         $pod = Pod::create($data);
-        
+
         if ($pod) {
             $this->attachOwnerToPod($data['created_by'], $pod);
             $workspace = $this->createWorkspaceForPod($pod);
@@ -44,7 +44,7 @@ class PodService
         if (isset($data['skills'])) {
             $pod->skills()->sync($data['skills']);
         }
-    
+
         return $pod;
     }
 
@@ -76,7 +76,7 @@ class PodService
     {
         $workspace = $pod->workspace;
         $users = User::where('currant_workspace', $workspace->id)->get();
-        
+
         $workspace->delete();
         $pod->delete();
 
@@ -114,9 +114,9 @@ class PodService
     protected function createWorkspaceForPod(Pod $pod): Workspace
     {
         $workspace = Workspace::create([
-            'name' => $pod->title.'-workspace', 
-            'created_by' => $pod->created_by, 
-            'currency_code' => 'USD', 
+            'name' => $pod->title.'-workspace',
+            'created_by' => $pod->created_by,
+            'currency_code' => 'USD',
             'paypal_mode' => 'sandbox',
             'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
         ]);
@@ -137,7 +137,7 @@ class PodService
     {
         $worskpace = $pod->workspace;
         $worskpace->update([
-            'name' => $title.'-workspace', 
+            'name' => $title.'-workspace',
         ]);
     }
 }

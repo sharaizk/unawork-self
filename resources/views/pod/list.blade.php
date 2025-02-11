@@ -5,29 +5,29 @@
 @section('content')
     <style>
         .dropdown-menu-xl {
-            min-width: 130px; 
-            width: 150px; 
-            max-height: 400px; 
-            overflow-y: auto; 
+            min-width: 40vh;
+            width: 40vh;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .dropdown-menu-xl li {
-            padding: 10px 20px; 
+            padding: 10px 20px;
         }
 
         .dropdown-menu-xl .form-check-input {
-            width: 15px; 
-            height: 15px; 
-            margin-right: 6px; 
+            width: 15px;
+            height: 15px;
+            margin-right: 6px;
         }
 
         .dropdown-menu-xl .form-check-label {
-            font-size: 12px; 
+            font-size: 12px;
         }
 
         .btn-xl {
             font-size: 1.5rem;
-            height: 40px; 
+            height: 40px;
         }
         .searchForm {
             display: flex;
@@ -40,6 +40,13 @@
             display: flex;
             justify-items: center;
         }
+
+        .skills-button {
+            background-color: #fff;
+            color: #022d4d;
+            height: 40px;
+            font-size: 1.4rem;
+        }
     </style>
     <main>
     <section class="header__search">
@@ -49,10 +56,10 @@
                     <div id="skillsField" class="col-md-8 form-group d-flex align-items-center">
                         <label>Select Skills</label>
                         <div class="dropdown">
-                            <button class="btn btn-xl btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                            <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
                                 {{ count(request('skill_ids', [])) > 0 ? 'Selected Skills' : 'Select Skills' }}
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-xl w-100">
+                            <ul class="dropdown-menu dropdown-menu-xl w-100 skills-dropdown-menu">
                                 @foreach($skills as $skill)
                                     <li class="px-3">
                                         <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
@@ -64,9 +71,9 @@
                             </ul>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4 form-group d-flex align-items-center">
-                        <button type="submit" class="btn btn-xl btn-primary w-100">Filter</button>
+                        <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Filter</button>
                     </div>
                 </form>
             </div>
@@ -96,6 +103,9 @@
                             @endphp
                             @include('pod.landing.pod_card', ['pod' => $pod, 'joinable' => $joinable])
                         @endforeach
+                    </div>
+                    <div class="pagination-container d-flex justify-content-center mt-4">
+                        {{ $pods->appends(request()->query())->links() }}
                     </div>
                 </div>
             </section>
