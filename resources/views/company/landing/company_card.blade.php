@@ -1,9 +1,11 @@
-<div class="col-md-3">
+<div class="col-md-3 company-box__wrap">
     <div class="company-box">
         <div class="title-box">
             <!-- <img src="http://unawork.net/images/thumbnails/card-avatar.png" alt=""> -->
-            <img alt="user-image" class="img-fluid img_users_fix_size"
-            @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
+            <div class='title-box-wrap'>
+                <img alt="user-image" class="img-fluid img_users_fix_size"
+                @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
+            </div>
 
             <h4>{{$company->name}}</h4>
         </div>
@@ -12,7 +14,7 @@
         </p>
         <div class="row align-items-center text-center">
 {{--            <div class="col lg-6">--}}
-                <a href="{{ route('landing.company.show', ['company' => $company->id]) }}" class="w-50 learn-more ms-auto me-auto">Learn more</a>
+                <a href="{{ route('landing.company.show', ['company' => $company->id]) }}" class="learn-more">Learn more</a>
 {{--            </div>--}}
 {{--            <div class="col lg-6">--}}
 {{--                    @php--}}

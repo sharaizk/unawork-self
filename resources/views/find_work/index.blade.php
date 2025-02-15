@@ -6,8 +6,8 @@
 @section('content')
 <style>
     .dropdown-menu-xl {
-        min-width: 40vh;
-        width: 40vh;
+        min-width: 29vh;
+        width: 29vh;
         max-height: 400px;
         overflow-y: auto;
     }
@@ -37,13 +37,13 @@
 </style>
 <main>
     <section class="header__search">
-        <div class="container-master">
+        <div class="container">
             <div class="search__wrap">
                 <form id="searchForm" class=" g-3 searchForm" method="GET">
-                <div class="col-md-4 form-group">
-                    <label for="type">Type</label>
+                <div class="form-group">
+                    <!-- <label for="type">Type</label> -->
                     <select id="type" class="form-control" name="type">
-                        <option value="" selected>Select Type</option>
+                        <option value="" selected>Type</option>
                         <option value="pod">Pod</option>
                         <option value="company">Company</option>
                         <!-- <option value="vacancy">Vacancy</option> -->
@@ -78,7 +78,7 @@
                     </select>
                 </div>
 
-                <div id="skillsField" class="col-md-2 form-group" style="display: none;">
+                <div id="skillsField" class="form-group form-skill">
                     <div class="dropdown">
                         <button class="form-control" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
                             Skills
@@ -97,8 +97,8 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 form-group d-flex align-items-end">
-                    <button type="submit" class="btn btn-xl btn-primary w-100 header-search-btn">Find</button>
+                <div class="form-group search-btn__wrap d-flex align-items-end">
+                    <button type="submit" class="btn btn-xl btn-primary w-100 header-search-btn">Search</button>
                 </div>
                 </form>
             </div>
@@ -107,12 +107,12 @@
 
 
     <section class="section__titlepage">
-        <div class="container-master ps-5">
+        <div class="container">
             <h1 class="section__titlepage--headertitle"><span>Find Work</span></h1>
         </div>
     </section>
 
-    <div class="container-master">
+    <div class="container">
         <section class="section__layout section_company">
             <div class="container-master pods__title">
                 <h2>Companies Hiring</h2>
@@ -125,6 +125,9 @@
                     @endforeach
                 </div>
             </div>
+            <a href="{{ route('job-vacancies.landing.list') }}" class="buttonViewAll-mobile">
+                View All <i class="fa fa-chevron-right"></i>
+            </a>
         </section>
 
         <!-- <section class="section__layout section__project">
@@ -156,6 +159,9 @@
                     @endforeach
                 </div>
             </div>
+            <a href="{{ route('pods.list') }}" class="buttonViewAll-mobile">
+                View All <i class="fa fa-chevron-right"></i>
+            </a>
         </section>
     </div>
 </main>
