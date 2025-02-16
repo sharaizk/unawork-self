@@ -12,11 +12,11 @@
     justify-content: center;
 }
 
-.tpl-find-work .form-group.search-btn__wrap {
+.form-group.search-btn__wrap {
     width: 121px;
 }
 
-.tpl-find-work .form-group.search-btn__wrap .btn {
+.form-group.search-btn__wrap .btn {
     background-color: #E8BE61!important;
 }
 

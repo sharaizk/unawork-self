@@ -31,17 +31,86 @@
         padding: 10px 5px;
         font-size: 1.4rem;
     }
-    .searchForm {
-        display: inline-flex;
-    }
 </style>
 <main>
     <section class="header__search">
         <div class="container">
             <div class="search__wrap">
                 <form id="searchForm" class=" g-3 searchForm" method="GET">
+                <div class="hidden-mobile left-wrapper">
+                    <div class="form-group">
+                        <!-- <label for="type">Type</label> -->
+                        <select id="type" class="form-control" name="type">
+                            <option value="" selected>Type</option>
+                            <option value="pod">Pod</option>
+                            <option value="company">Company</option>
+                            <!-- <option value="vacancy">Vacancy</option> -->
+                            <!-- <option value="project">Project</option> -->
+                        </select>
+                    </div>
+
+                    <div id="budgetField" class="col-md-4 form-group" style="display: none;">
+                        <label for="budget">Budget</label>
+                        <select id="budget" class="form-control" name="budget">
+                            <option value="" selected>Select Budget</option>
+                                <option value="[0,500]">$0 - $500</option>
+                                <option value="[500,1000]">$500 - $1000</option>
+                                <option value="[1000,5000]">$1000 - $5000</option>
+                                <option value="[5000,999999999]">$5000+</option>
+                        </select>
+                    </div>
+
+                    @php
+                        $industries = \App\Models\Industry::all();
+                        $currentIndustryId = $currentWorkspace->industry_id ?? null;
+                    @endphp
+                    <div id="industryField" class="col-md-4 form-group" style="display: none;">
+                        <label for="industry">Industry</label>
+                        <select id="industry" class="form-control" name="industry">
+                            <option value="">Select Industry </option>
+                            @foreach($industries as $industry)
+                                <option value="{{ $industry->id }}">
+                                        {{ $industry->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div id="skillsField" class="form-group form-skill">
+                        <div class="dropdown">
+                            <button class="form-control" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                                Skills
+                                <i class="ti ti-chevron-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-xl">
+                                @foreach($skills as $skill)
+                                    <li>
+                                        <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}">
+                                        <label class="form-check-label" for="skill_{{ $skill->id }}">
+                                            {{ $skill->name }}
+                                        </label>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group search-btn__wrap d-flex align-items-end">
+                        <button type="submit" class="btn btn-xl btn-primary w-100 header-search-btn">Search</button>
+                    </div>
+                </div>
+                <button type="button" class="filter-mobile">Filter</button>
+                </form>
+            </div>
+        </div>
+        <div class="filter-modal">
+            <form id="searchForm" class="g-3 searchForm" method="GET">
+                <div class="filter-modal__header">
+                    <p>Filters</p>
+                    <button type="button" class="close"></button>
+                </div>
                 <div class="form-group">
-                    <!-- <label for="type">Type</label> -->
+                    <label class="title-label" for="type">Type</label>
                     <select id="type" class="form-control" name="type">
                         <option value="" selected>Type</option>
                         <option value="pod">Pod</option>
@@ -50,44 +119,16 @@
                         <!-- <option value="project">Project</option> -->
                     </select>
                 </div>
-
-                <div id="budgetField" class="col-md-4 form-group" style="display: none;">
-                    <label for="budget">Budget</label>
-                    <select id="budget" class="form-control" name="budget">
-                        <option value="" selected>Select Budget</option>
-                            <option value="[0,500]">$0 - $500</option>
-                            <option value="[500,1000]">$500 - $1000</option>
-                            <option value="[1000,5000]">$1000 - $5000</option>
-                            <option value="[5000,999999999]">$5000+</option>
-                    </select>
-                </div>
-
-                @php
-                    $industries = \App\Models\Industry::all();
-                    $currentIndustryId = $currentWorkspace->industry_id ?? null;
-                @endphp
-                <div id="industryField" class="col-md-4 form-group" style="display: none;">
-                    <label for="industry">Industry</label>
-                    <select id="industry" class="form-control" name="industry">
-                        <option value="">Select Industry </option>
-                        @foreach($industries as $industry)
-                            <option value="{{ $industry->id }}">
-                                    {{ $industry->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div id="skillsField" class="form-group form-skill">
+                <div class="form-group">
+                    <label class="title-label">Skills</label>
                     <div class="dropdown">
-                        <button class="form-control" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
-                            Skills
-                            <i class="ti ti-chevron-down"></i>
+                        <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                            {{ count(request('skill_ids', [])) > 0 ? 'Selected Skills' : 'Select Skills' }}
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-xl">
+                        <ul class="dropdown-menu dropdown-menu-xl w-100 skills-dropdown-menu">
                             @foreach($skills as $skill)
-                                <li>
-                                    <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}">
+                                <li class="px-3">
+                                    <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="skill_{{ $skill->id }}">
                                         {{ $skill->name }}
                                     </label>
@@ -96,12 +137,11 @@
                         </ul>
                     </div>
                 </div>
-
-                <div class="form-group search-btn__wrap d-flex align-items-end">
-                    <button type="submit" class="btn btn-xl btn-primary w-100 header-search-btn">Search</button>
+                <div class="search-btn__wrap form-group d-flex align-items-center">
+                    <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
                 </div>
-                </form>
-            </div>
+                <a href="{{ route('landing.find-work') }}" class="clear__filters">Clear Filters</a>
+            </form>
         </div>
     </section>
 
@@ -201,6 +241,25 @@
                 });
             });
         });
+        const filterBtn = document.querySelector('.filter-mobile');
+            const filterModal = document.querySelector('.filter-modal');
+            const closeBtn = document.querySelector('.filter-modal .close');
+
+            if (filterBtn && filterModal && closeBtn) {
+                filterBtn.addEventListener('click', function () {
+                    filterModal.classList.add('active');
+                });
+
+                closeBtn.addEventListener('click', function () {
+                    filterModal.classList.remove('active');
+                });
+
+                filterModal.addEventListener('click', function (event) {
+                    if (event.target === filterModal) {
+                        filterModal.classList.remove('active');
+                    }
+                });
+            }
     });
 </script>
 <script>

@@ -29,9 +29,6 @@
             font-size: 1.5rem;
             height: 40px;
         }
-        .searchForm {
-            display: flex;
-        }
 
         .form-group {
             height: 40px;
@@ -50,52 +47,90 @@
     </style>
     <main>
     <section class="header__search">
-        <div class="container-master d-flex align-items-center">
+        <div class="container d-flex align-items-center">
             <div class="search__wrap d-flex align-items-center">
-                <form id="searchForm" class="row g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
-                    <div id="skillsField" class="col-md-8 form-group d-flex align-items-center">
-                        <label>Select Skills</label>
-                        <div class="dropdown">
-                            <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
-                                {{ count(request('skill_ids', [])) > 0 ? 'Selected Skills' : 'Select Skills' }}
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-xl w-100 skills-dropdown-menu">
-                                @foreach($skills as $skill)
-                                    <li class="px-3">
-                                        <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="skill_{{ $skill->id }}">
-                                            {{ $skill->name }}
-                                        </label>
-                                    </li>
-                                @endforeach
-                            </ul>
+                <form id="searchForm" class="g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
+                    <div class="d-flex align-items-center">
+                        <div class="form-group search-input-wrap">
+                            <input type="text" name="name" placeholder="Search by name" class="form-control search-input">
                         </div>
-                    </div>
+                        <div id="skillsField" class="form-group d-flex align-items-center me-4 ms-4">
+                            <!-- <label>Select Skills</label> -->
+                            <div class="dropdown">
+                                <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                                    {{ count(request('skill_ids', [])) > 0 ? 'Selected Skills' : 'Select Skills' }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-xl w-100 skills-dropdown-menu">
+                                    @foreach($skills as $skill)
+                                        <li class="px-3">
+                                            <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="skill_{{ $skill->id }}">
+                                                {{ $skill->name }}
+                                            </label>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
 
-                    <div class="col-md-4 form-group d-flex align-items-center">
-                        <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Filter</button>
+                        <div class="search-btn__wrap form-group d-flex align-items-center">
+                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
+                        </div>
+                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
                     </div>
+                    <button type="button" class="filter-mobile">Filter</button>
                 </form>
             </div>
+        </div>
+        <div class="filter-modal">
+            <form id="searchForm" class="g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
+                <div class="filter-modal__header">
+                    <p>Filters</p>
+                    <button type="button" class="close"></button>
+                </div>
+                <div class="form-group">
+                    <label class="title-label">Skills</label>
+                    <div class="dropdown">
+                        <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                            {{ count(request('skill_ids', [])) > 0 ? 'Selected Skills' : 'Select Skills' }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-xl w-100 skills-dropdown-menu">
+                            @foreach($skills as $skill)
+                                <li class="px-3">
+                                    <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="skill_{{ $skill->id }}">
+                                        {{ $skill->name }}
+                                    </label>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+                <div class="search-btn__wrap form-group d-flex align-items-center">
+                    <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
+                </div>
+                <a href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
+            </form>
         </div>
     </section>
 
         <section class="section__titlepage">
-            <div class="container-master">
+            <div class="container">
                 <h1 class="section__titlepage--headertitle"><span>Pods</span></h1>
-                <ul class="breadcrumb mt-1">
+                <!-- <ul class="breadcrumb mt-1">
                     <li class="breadcrumb-item"><a href="{{ route('landing.find-work') }}">Find Work</a></li>
                     <li class="breadcrumb-item"> {{ __('Pods') }}</li>
-                </ul>
+                </ul> -->
             </div>
         </section>
-        <div class="container-master">
+        <div class="container">
 
         <section class="section__layout section_pod">
-                <div class="container-master pods__title">
+                <div class=" pods__title">
                     <h2>Pods of Interest </h2>
                 </div>
-                <div class="container-master">
+                <p class="pods__subtitle">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                <div class="">
                     <div class="row-master">
                         @foreach($pods as $pod)
                             @php
@@ -147,6 +182,26 @@
                 });
             });
         });
+
+        const filterBtn = document.querySelector('.filter-mobile');
+        const filterModal = document.querySelector('.filter-modal');
+        const closeBtn = document.querySelector('.filter-modal .close');
+
+        if (filterBtn && filterModal && closeBtn) {
+            filterBtn.addEventListener('click', function () {
+                filterModal.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', function () {
+                filterModal.classList.remove('active');
+            });
+
+            filterModal.addEventListener('click', function (event) {
+                if (event.target === filterModal) {
+                    filterModal.classList.remove('active');
+                }
+            });
+        }
     });
 </script>
 @endsection

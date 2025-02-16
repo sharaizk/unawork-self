@@ -43,6 +43,10 @@
   transition: 0.3s;
 }
 
+.left-wrapper {
+  display: flex;
+}
+
 @media (max-width: 480px) {
   .header__mobile {
     display: flex;
@@ -3419,6 +3423,11 @@ font-size: 2rem;
 .footer .footer__links a {
   display: block;
   color: #FFF;
+  transition: all 0.2s ease-in-out;
+}
+
+.footer .footer__links a:hover {
+  color: #CFAA40;
 }
 
 .footer .footer__links a:not(:last-child) {
@@ -3457,6 +3466,15 @@ font-size: 2rem;
 .footer .footer__cookies {
   display: flex;
   gap: 24px;
+  transition: all 0.2s ease-in-out;
+}
+
+.footer .footer__cookies p {
+  cursor: pointer;
+}
+
+.footer .footer__cookies p:hover {
+  color: #CFAA40;
 }
 
 @media (max-width: 568px) {
