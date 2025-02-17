@@ -49,9 +49,51 @@
 
 @yield('content')
 </main>
+@php
+    $settings = \Modules\LandingPage\Entities\LandingPageSetting::settings();
+@endphp
 
+<footer class="footer">
+    <div class="container">
+        <div class="footer__content mt-[100px]">
+            <div>
+                <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
+                <div class="footer__socials">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>  
+            </div>
+            <div class='footer__links'>
+                <div>
+                    <a href="/">Home</a>
+                    <a href="{{ route('landing.find-work') }}" class="">Find Work</a>
+                    <a href="{{ route('landing.hiring') }}">Hiring</a>
+                    <a href="{{ route('pods.list') }}">PODs</a>
+                </div>
+                <div>
+                    <a href="{{ route('login') }}">About us</a>
+                    <a href="{{ route('landing.find-work') }}" class="">Contact us</a>
+                </div>
+                <div>
+                    <a href="{{ route('login') }}">Login</a>
+                    <a href="{{ route('register') }}" class="">Register</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer__copyright">
+            <p>Copyright © 2025 Taskly</p>
+            <div class="footer__cookies">
+                <p>Cookies</p>
+                <p>Privacy Policy</p>
+                <p>Terms & Conditions</p>
+            </div>
+        </div>
+    </div>
+</footer>
 
-<div class="container mt-3">
+<div class="container mt-3 hidden">
     <div id="notification-container" class="alert" style="display: none; color:#000;"></div>
 </div>
 <div class="modal fade" id="commonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"

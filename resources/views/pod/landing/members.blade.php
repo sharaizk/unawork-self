@@ -4,8 +4,10 @@
     }
 </style>
 <div class="section__general_info">
-    <h3 class="title_box">Members</h3>
-    <a href="#" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
+    <div class="d-flex align-items-center justify-content-between section__general_info-head">
+        <h3 class="title_box">Members</h3>
+        <a href="#" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
+    </div>
 
     <div class="members__info_list">
 

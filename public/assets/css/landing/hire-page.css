@@ -12,9 +12,22 @@
     justify-content: center;
 }
 
+.form-group.search-btn__wrap {
+    width: 121px;
+}
+
+.form-group.search-btn__wrap .btn {
+    background-color: #E8BE61!important;
+}
+
 .tpl-find-work .form-control {
     height: 40px;
     font-size: 1.4rem;
+    width: 121px;
+}
+
+.tpl-find-work .form-group.form-skill {
+    margin: 0 20px;
 }
 
 .hire__title {

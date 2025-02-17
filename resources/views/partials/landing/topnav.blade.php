@@ -3,9 +3,18 @@
     $logo = \App\Models\Utility::get_file('users-avatar/');
 @endphp
 <header id="header">
-        <div class="header__top">
+        <div class="header__top container">
 {{--            <div class="container-master">--}}
                 <div class="header__container">
+                    <div class="header__mobile">
+                        <div class="logoHeader ms-5 me-5">
+                            <a href="/" title="UnaWork">
+                                <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
+                                <!-- <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork"> -->
+                            </a>
+                        </div>
+                        <button id="push-hamburger"></button>
+                    </div>
                     <div class="header__main">
 
                         <div class="logoHeader ms-5 me-5">
@@ -31,7 +40,7 @@
                                 </li>
                             </ul>
                         </nav>
-                        <nav class="col nav__right">
+                        <nav class="col nav-right">
                             <ul class="nav__list m-0">
 
                                 @guest
@@ -92,3 +101,13 @@
 {{--            </div>--}}
         </div>
     </header>
+
+    <script>
+        const hamburger = document.getElementById('push-hamburger');
+        const menu = document.querySelector('.header__main');
+
+        hamburger.addEventListener("click", function () {
+            menu.classList.toggle("active");
+            hamburger.classList.toggle("active");
+        });
+    </script>
