@@ -72,7 +72,7 @@
 <header class="dash-header {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
 
     <div class="header-wrapper">
-        <div class="header-links d-none d-sm-block">
+        <div class="header-links d-none d-sm-block ">
             <div class="row">
                 <div class="col col-lg-3 p-1">
                     <a href="{{ route('login') }}">Home</a>
