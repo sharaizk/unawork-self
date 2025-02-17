@@ -1,5 +1,8 @@
 @php
     $unseenCounter = Auth::user()->unreadMessagesCount();
+    $notificationCounter = App\Models\Notification::where('user_id', Auth::user()->id)
+        ->where('is_read', 0)
+        ->count();
     $vacanciesApplicationsCounter = Auth::user()->pendingApplicationsCount();
            $logo = \App\Models\Utility::get_file('logo/');
            if (Auth::user()->type == 'admin') {
@@ -121,6 +124,23 @@
                                     @endif
                                 </a>
                             </li>
+                           <li class="dash-item {{ Request::route()->getName() == 'view_all.notifications' ? ' active' : '' }}">
+                               <a href="{{ route('view_all.notifications') }}" class="dash-link">
+                                <span class="dash-micon">
+                                    <i class="ti ti-bell"></i>
+                                </span>
+                                   <span class="dash-mtext">
+                                    {{ __('Notifications') }}
+                                </span>
+                                   @if ($notificationCounter > 0)
+                                       <span
+                                           class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $notificationCounter }}<span
+                                               class="sr-only"></span>
+                                    </span>
+                                   @endif
+                               </a>
+                           </li>
+
                         @endif
                         {{--
                             @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
