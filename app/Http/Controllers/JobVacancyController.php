@@ -41,11 +41,11 @@ class JobVacancyController extends Controller
     }
 
     public function list(Request $request)
-    {   
+    {
         $perPage = $request->get('per_page', 12);
 
         $filters = [];
-    
+
         if ($request->has('skill_ids')) {
             $filters['skills'] = $request->get('skill_ids');
         }
@@ -65,5 +65,20 @@ class JobVacancyController extends Controller
             ->get();
 
         return view('job_vacancies.landing.list', compact('vacancies', 'skills', 'usersWithVacancies'));
+    }
+
+    public function searchCompanies(Request $request)
+    {
+        $query = $request->input('query');
+
+        $companies = User::whereHas('jobVacancies')
+            ->whereHas('workspacesOwner', function ($queryBuilder) use ($request, $query) {
+                if ($query) {
+                    $queryBuilder->where('name', 'like', '%' . $query . '%');
+                }
+            })
+            ->get();
+
+        return response()->json($companies);
     }
 }
