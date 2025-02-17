@@ -104,7 +104,7 @@
                                     </a>
                                 </li>
                         @endif
-                        @if ($adminSetting['enable_chat'] == 'on')
+                        @if ($adminSetting['enable_chat'] == 'on' && Auth::user()->type != 'admin')
                             <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
                                 <a href="{{ route('chats') }}" class="dash-link">
                                     <span class="dash-micon">
