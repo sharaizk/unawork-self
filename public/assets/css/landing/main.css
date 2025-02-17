@@ -3413,6 +3413,12 @@ font-size: 2rem;
   border-bottom: 1px solid #FFFFFF;
 }
 
+.footer .footer__contetnt__logo {
+  display: block;
+  width: 100px;
+  margin: 0 auto;
+}
+
 .footer .footer__links {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
