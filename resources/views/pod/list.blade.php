@@ -7,8 +7,9 @@
         .dropdown-menu-xl {
             min-width: 40vh;
             width: 40vh;
-            max-height: 400px;
+            max-height: 380px;
             overflow-y: auto;
+            border: 2px solid #022D4D;
         }
 
         .dropdown-menu-xl li {
@@ -36,6 +37,19 @@
         .header__search{
             display: flex;
             justify-items: center;
+        }
+
+        .dropdown {
+            display: flex;
+        }
+
+        .dropdown-menu-xl .form-check-input {
+            border-color: #022D4D;
+            accent-color: #022D4D;
+        }
+
+        .dropdown-menu-xl .form-check-input:checked {
+            background-color: #E8BE61; 
         }
 
         .skills-button {
@@ -129,7 +143,8 @@
                 <div class=" pods__title">
                     <h2>Pods of Interest </h2>
                 </div>
-                <p class="pods__subtitle">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                <p class="pods__subtitle">Join the open network for skills and monetary opportunities. Pods allow you to join a group of like-minded people with the same skillset. When you join, on-demand opportunities are sent, allowing you to work on projects as companies and businesses need them.</p>
+                <p class="pods__subtitle">Request to join as many pods as you like to receive updates. If you are invited into an inner circle, you will have access to relevant projects so you can build your wealth.</p>
                 <div class="">
                     <div class="row-master">
                         @foreach($pods as $pod)

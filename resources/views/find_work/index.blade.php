@@ -8,8 +8,9 @@
     .dropdown-menu-xl {
         min-width: 29vh;
         width: 29vh;
-        max-height: 400px;
+        max-height: 380px;
         overflow-y: auto;
+        border: 2px solid #022D4D;
     }
 
     .dropdown-menu-xl li {
@@ -23,7 +24,22 @@
     }
 
     .dropdown-menu-xl .form-check-label {
-        font-size: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #022D4D;
+    }
+
+    .dropdown-menu-xl .form-check-input {
+        border-color: #022D4D;
+        accent-color: #022D4D;
+    }
+
+    .dropdown-menu-xl .form-check-input:checked {
+        background-color: #E8BE61; 
+    }
+
+    .dropdown {
+        display: flex;
     }
 
     .btn-xl {
@@ -149,16 +165,17 @@
     <section class="section__titlepage">
         <div class="container">
             <h1 class="section__titlepage--headertitle"><span>Find Work</span></h1>
+            <p class="pods__subtitle">The best opportunities for work at your fingertips. Whether you are looking for a side hustle, second income, or new career growth, UnaWork offers layers of opportunities to hire and get hired.</p>
         </div>
     </section>
 
     <div class="container">
         <section class="section__layout section_company">
-            <div class="container-master pods__title">
+            <div class="container pods__title">
                 <h2>Companies Hiring</h2>
                 <a href="{{ route('job-vacancies.landing.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
-            <div class="container-master">
+            <div class="container">
                 <div class="row-master d-flex align-items-stretch">
                     @foreach($usersWithVacancies as $userWithVacancies)
                         @include('company.landing.company_card', ['company' => $userWithVacancies->ownWorkspace()])
@@ -185,11 +202,11 @@
         </section> -->
 
         <section class="section__layout section_pod">
-            <div class="container-master pods__title">
+            <div class="container pods__title">
                 <h2>Pods of Interest </h2>
                 <a href="{{ route('pods.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
-            <div class="container-master">
+            <div class="container">
                 <div class="row-master  d-flex align-items-stretch">
                     @foreach($pods as $pod)
                             @php

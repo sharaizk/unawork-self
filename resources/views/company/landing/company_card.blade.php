@@ -1,4 +1,4 @@
-<div class="col-md-3 company-box__wrap">
+<div class="col-lg-3 col-md-6 company-box__wrap">
     <div class="company-box">
         <div class="title-box">
             <!-- <img src="http://unawork.net/images/thumbnails/card-avatar.png" alt=""> -->
