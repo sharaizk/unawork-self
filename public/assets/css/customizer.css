@@ -16,18 +16,18 @@ File: style.css
 }
 
 .chart-view-dashboard {
-    display: none; 
+    display: none;
     text-align: center;
 }
 
 .chart-view-dashboard .expense-chart {
-    width: 40%; 
+    width: 40%;
     margin: 0 auto;
 }
 
 
 .chart-view-dashboard .profit-chart {
-    width: 40%; 
+    width: 40%;
     margin: 0 auto;
 }
 
@@ -445,7 +445,7 @@ File: style.css
 .header-links {
     min-width: 20%;
 }
-.header-links .row {
+.dash-header .header-links .row {
     display: flex;
     align-items: center;
     height: 100%;
