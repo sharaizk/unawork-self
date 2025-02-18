@@ -85,8 +85,17 @@
                                 </div>
                             </div>
                             <div class="cicrle_btn">
-                                <a href="#" class="btn-accept">Accept</a>
-                                <button class="btn-reject">Reject</button>
+{{--                                <a href="#" class="btn-accept">Accept</a>--}}
+{{--                                <button class="btn-reject">Reject</button>--}}
+                                @if (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'active')->pluck('id')->toArray()))
+                                    <button class="btn-reject">Joined</button>
+                                @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'pending')->pluck('id')->toArray()))
+                                    <button class="btn-reject">Request Sent</button>
+                                @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'declined')->pluck('id')->toArray()))
+                                    <button class="btn-reject">Request Declined</button>
+                                @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
+                                        <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="btn-accept">Join</a>
+                                @endif
                             </div>
                         </div>
 

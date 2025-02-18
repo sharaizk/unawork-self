@@ -27,26 +27,28 @@ class ProjectUserController extends Controller
             $userInProject = $project->users()->where('user_projects.user_id', $user->id)->exists();
             if (!$userInProject) {
 
-                if ($userInWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value)) {
-                    $userProject = UserProject::create([
-                        'project_id' => $project->id,
-                        'user_id' => $user->id,
-                        'is_active' => 1,
-                        'status' => 'active',
-                        'permission' => json_encode(Utility::getAllPermission())
-                    ]);
-                    $responseText = 'You have been successfully joined project';
-                    Notification::where('type', 'project_new_for_inner')->where('user_id', $user->id)->whereJsonContains('data->id', $project->id)->delete();
-                } else {
+                /*
+                    if ($userInWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value)) {
+                        $userProject = UserProject::create([
+                            'project_id' => $project->id,
+                            'user_id' => $user->id,
+                            'is_active' => 1,
+                            'status' => 'active',
+                            'permission' => json_encode(Utility::getAllPermission())
+                        ]);
+                        $responseText = 'You have been successfully joined project';
+                        Notification::where('type', 'project_new_for_inner')->where('user_id', $user->id)->whereJsonContains('data->id', $project->id)->delete();
+                    } else {
+                */
                     $userProject = UserProject::create([
                         'project_id' => $project->id,
                         'user_id' => $user->id,
                         'is_active' => 0,
                         'status' => 'pending'
-                    ]);  
+                    ]);
                     Utility::sendNotification('project_request', null, $workspace->created_by, $userProject);
                     $responseText = 'You have been successfully sended join request';
-                }
+                //  }
                 return redirect()->back()->with('success', $responseText);
             } else {
                 return redirect()->back()->with('error', __('You already send Join request!'));
