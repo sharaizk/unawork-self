@@ -18044,7 +18044,7 @@ body.theme-10 .card .card-header h5:after, body.theme-10 .card .card-header .h5:
     z-index: 1026;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1025px) {
     .dash-sidebar.light-sidebar.transprent-bg {
         background: transparent;
         box-shadow: none;
