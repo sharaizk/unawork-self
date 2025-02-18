@@ -53,7 +53,7 @@ class Project extends Model
 
     public function users()
     {
-        return $this->belongsToMany('App\Models\User', 'user_projects', 'project_id', 'user_id')->withPivot('is_active', 'status')->orderBy('user_projects.id', 'ASC');
+        return $this->belongsToMany('App\Models\User', 'user_projects', 'project_id', 'user_id')->withPivot('id', 'is_active', 'status')->orderBy('user_projects.id', 'ASC');
     }
 
     public function clients()

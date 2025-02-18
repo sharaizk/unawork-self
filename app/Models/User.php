@@ -1133,7 +1133,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function projects()
     {
-        return $this->belongsToMany('App\Models\Project', 'user_projects', 'user_id', 'project_id')->withPivot('permission', 'status', 'is_active');
+        return $this->belongsToMany('App\Models\Project', 'user_projects', 'user_id', 'project_id')->withPivot('id', 'permission', 'status', 'is_active');
     }
 
     public function jobVacancies()

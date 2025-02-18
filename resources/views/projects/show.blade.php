@@ -332,7 +332,15 @@
                                                                 <h5 class="m-0">{{ $user->name }}</h5>
                                                                 <small class="text-muted">{{ $user->email }}<span
                                                                         class="text-primary "> -
-                                                                        {{ (int) count($project->user_done_tasks($user->id)) }}/{{ (int) count($project->user_tasks($user->id)) }}</span></small>
+                                                                        @if ($user->pivot->status == 'pending')
+                                                                            <b>PENDING</b>
+                                                                        @elseif ($user->pivot->status == 'declined')
+                                                                            <b>DECLINED</b>
+                                                                        @else
+                                                                            {{ (int) count($project->user_done_tasks($user->id)) }}/{{ (int) count($project->user_tasks($user->id)) }}
+                                                                        @endif
+                                                                    </span>
+                                                                </small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -344,27 +352,51 @@
                                                                 </a>
                                                             @endif
                                                             @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
-                                                                <a href="#"
-                                                                    class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center"
-                                                                    data-ajax-popup="true" data-size="lg"
-                                                                    data-toggle="popover" title="{{ __('Permission') }}"
-                                                                    data-title="{{ __('Edit Permission') }}"
-                                                                    data-url="{{ route('projects.user.permission', [$currentWorkspace->slug, $project->id, $user->id]) }}"><i
-                                                                        class="ti ti-lock"></i></a>
 
-                                                                <a href="#"
-                                                                    class="action-btn btn-danger btn btn-sm d-inline-flex align-items-center bs-pass-para"
-                                                                    data-confirm="{{ __('Are You Sure?') }}"
-                                                                    data-toggle="popover" title="{{ __('Delete') }}"
-                                                                    data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
-                                                                    data-confirm-yes="delete-user-{{ $user->id }}"><i
-                                                                        class="ti ti-trash ml-1"></i></a>
-                                                                <form id="delete-user-{{ $user->id }}"
-                                                                    action="{{ route('projects.user.delete', [$currentWorkspace->slug, $project->id, $user->id]) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
+                                                                @if ($user->pivot->status == 'pending')
+                                                                        @php
+                                                                            $acceptLink = route('pods.projects.join.accept', ['record' => $user->pivot->id]);
+                                                                            $declineLink = route('pods.projects.join.decline', ['record' => $user->pivot->id]);
+                                                                        @endphp
+                                                                        <a href="{{ $acceptLink }}"
+                                                                           class="action-btn btn-primary mx-1 btn btn-sm d-inline-flex align-items-center"
+                                                                           data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top"
+                                                                           data-bs-title="{{ __('Accept User') }}">
+                                                                            <i class="ti ti-thumb-up"></i>
+                                                                        </a>
+                                                                        <a href="{{ $declineLink }}"
+                                                                                class="action-btn btn-primary mx-1 btn btn-sm d-inline-flex align-items-center"
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-placement="top"
+                                                                                data-bs-title="{{ __('Decline User') }}">
+                                                                            <i class="ti ti-thumb-down"></i>
+                                                                        </a>
+
+                                                                @else
+                                                                    @if ($user->pivot->status != 'declined')
+                                                                        <a href="#"
+                                                                           class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center"
+                                                                           data-ajax-popup="true" data-size="lg"
+                                                                           data-toggle="popover" title="{{ __('Permission') }}"
+                                                                           data-title="{{ __('Edit Permission') }}"
+                                                                           data-url="{{ route('projects.user.permission', [$currentWorkspace->slug, $project->id, $user->id]) }}"><i
+                                                                                class="ti ti-lock"></i></a>
+                                                                    @endif
+                                                                    <a href="#"
+                                                                       class="action-btn btn-danger btn btn-sm d-inline-flex align-items-center bs-pass-para"
+                                                                       data-confirm="{{ __('Are You Sure?') }}"
+                                                                       data-toggle="popover" title="{{ __('Delete') }}"
+                                                                       data-text="{{ __('This action can not be undone. Do you want to continue?') }}"
+                                                                       data-confirm-yes="delete-user-{{ $user->id }}"><i
+                                                                            class="ti ti-trash ml-1"></i></a>
+                                                                    <form id="delete-user-{{ $user->id }}"
+                                                                          action="{{ route('projects.user.delete', [$currentWorkspace->slug, $project->id, $user->id]) }}"
+                                                                          method="POST" style="display: none;">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                    </form>
+                                                                @endif
                                                             @endif
                                                         @endauth
                                                     </div>
