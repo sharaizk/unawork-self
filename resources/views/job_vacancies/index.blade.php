@@ -10,6 +10,8 @@
 @endsection
 
 @section('action-button')
+    <a href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
+       id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> <i class="ti ti-eye"></i></a>
     <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
         data-title="{{ __('Create New Vacancy') }}" data-url="{{ route('job-vacancies.create') }}"
         data-toggle="tooltip" title="{{ __('Create New Vacancy') }}">
@@ -78,15 +80,15 @@
             $(document).on('shown.bs.modal', function (e) {
                 const modal = $(e.target);
                 const form = modal.find('.create-vacancy-form');
-                
+
                 if (form.length) {
                 form.off('submit').on('submit', async function(event) {
-                    event.preventDefault(); 
-                    
-                    const formData = new FormData(this); 
+                    event.preventDefault();
+
+                    const formData = new FormData(this);
                     let url = `{{ route('api.job_vacancies.store') }}`;
                     try {
-                        const response = await axios.post(url, formData); 
+                        const response = await axios.post(url, formData);
 
                         $("#commonModal").modal('hide');
                         showNotification('Vacancy successfully created', 'success');
@@ -97,7 +99,7 @@
                     } catch (error) {
                         $("#commonModal").modal('hide');
                         showNotification('Vacancy creation failed.', 'danger');
-                        console.error(error); 
+                        console.error(error);
                     }
                 });
                 }
@@ -114,23 +116,23 @@
 
                 if (form.length) {
                 form.off('submit').on('submit', async function(event) {
-                    event.preventDefault(); 
-            
-                    const formData = new FormData(this); 
+                    event.preventDefault();
+
+                    const formData = new FormData(this);
                     const url = this.getAttribute('data-url');
 
                     try {
-                        const response = await axios.post(url, formData); 
+                        const response = await axios.post(url, formData);
                         $("#commonModal").modal('hide');
                         showNotification('Vacancy successfully updated', 'success');
                         this.reset();
                         setTimeout(function() {
-                            location.reload(); 
+                            location.reload();
                         }, 1000);
                     } catch (error) {
                         $("#commonModal").modal('hide');
                         showNotification('Vacancy update failed.', 'danger');
-                        console.error(error); 
+                        console.error(error);
                     }
                 });
                 }
@@ -161,7 +163,7 @@
                             if (!response.ok) {
                                 throw new Error('Failed to delete vacancy');
                             }
-                            location.reload(); 
+                            location.reload();
                         })
                         .catch(error => {
                             console.error(error);
