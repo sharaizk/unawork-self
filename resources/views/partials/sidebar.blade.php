@@ -89,13 +89,13 @@
                </div>
                <div class="header-links d-block d-xl-none ">
                    <div class="row">
-                       <div class="col col-lg-12 p-1">
+                       <div class="col col-12 p-1">
                            <a href="{{ route('landing.find-work') }}">Find Work</a>
                        </div>
-                       <div class="col col-lg-12 p-1">
+                       <div class="col col-12 p-1">
                            <a href="{{ route('landing.hiring') }}">Hiring</a>
                        </div>
-                       <div class="col col-lg-12 p-1">
+                       <div class="col col-12 p-1">
                            <a href="{{ route('pods.list') }}">PODs</a>
                        </div>
                    </div>
