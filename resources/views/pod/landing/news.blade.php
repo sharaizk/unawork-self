@@ -22,3 +22,6 @@
         @endforelse
     </div>
 </div>
+<a href="{{ route('landing.pods.news.list', $pod = $pod ) }}" class="buttonViewAll-mobile">
+    View All <i class="fa fa-chevron-right"></i>
+</a>

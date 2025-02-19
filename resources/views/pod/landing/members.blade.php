@@ -18,69 +18,78 @@
                 @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
 
             <div class="right">
-                <h3 class="member_name"><a href="#">{{ $user->name }}</a></h3>
-                @if (Auth::user())
-                    @if (Auth::user()->id != $user->id)
-                        <button class="btn btn-primary sendMessageButton" data-employee-id="{{ $user->id }}">
-                            <span> Message </span>
-                        </button>
-                    @endif
-                @else
-                    <a href="{{ route('login') }}"><span>Message</span></a>
-                @endif
+                <div>
+                    <h3 class="member_name"><a href="#">{{ $user->name }}</a></h3>
 
-                @if ($user->isEmployee())
-                <p class="content">
-                    <strong>Country:</strong> {{$user->profile->country ?? 'n/a'}}
-                    <strong>State:</strong> {{$user->profile->state ?? 'n/a'}}
-                    <strong>City:</strong> {{$user->profile->city ?? 'n/a'}}
-                    <strong>Skills:</strong>
-                    @forelse ($user->skills as $skill)
-                        {{$skill->name}},
-                    @empty
-                        n/a
-                    @endforelse
-                </p>
-                @elseif ($user->isCompany())
-                    @php
-                        $company = $user->ownWorkspace();
-                        $addressParts = array_filter([
-                            $company->address,
-                            $company->city,
-                            $company->state,
-                            $company->country,
-                            $company->zip_code
-                        ]);
-                        $address = implode(', ', array_filter($addressParts));
-                    @endphp
-                    <p class="content">
+                    @if ($user->isEmployee())
+                    <div class="content">
+                        <span>Skills: </span>
+                        <!-- <strong>Country:</strong> {{$user->profile->country ?? 'n/a'}}
+                        <strong>State:</strong> {{$user->profile->state ?? 'n/a'}}
+                        <strong>City:</strong> {{$user->profile->city ?? 'n/a'}}
+                        <strong>Skills:</strong> -->
+                        @forelse ($user->skills as $skill)
+                            <div class="content__skill">{{$skill->name}}</div>
+                        @empty
+                            n/a
+                        @endforelse
+                    </div>
+                    @elseif ($user->isCompany())
+                        @php
+                            $company = $user->ownWorkspace();
+                            $addressParts = array_filter([
+                                $company->address,
+                                $company->city,
+                                $company->state,
+                                $company->country,
+                                $company->zip_code
+                            ]);
+                            $address = implode(', ', array_filter($addressParts));
+                        @endphp
+                        <p class="content">
 
-                        <strong>Address: </strong>{{ $address ?: 'n/a' }}
-                        @if($company->telephone)
+                            <strong>Address: </strong>{{ $address ?: 'n/a' }}
+                            @if($company->telephone)
+                                    <br/>
+                                    <i class="fa fa-phone"></i>
+                                    <a href="tel:{{$company->telephone}}" title="Phone">
+                                        {{$company->telephone}}
+                                    </a>
+                            @endif
+                            @if($company->website)
                                 <br/>
-                                <i class="fa fa-phone"></i>
-                                <a href="tel:{{$company->telephone}}" title="Phone">
-                                    {{$company->telephone}}
-                                </a>
+                                    <i class="fa fa-globe"></i>
+                                    @php
+                                        $website = $company->website;
+                                        if (!preg_match('#^http(s)?://#', $website)) {
+                                            $website = 'http://' . $website;
+                                        }
+                                    @endphp
+                                    <a href="{{ $website }}" title="Website">Visit Website</a>
+                            @endif
+                        </p>
+                    @endif
+                </div>
+                <div class="buttons">
+                    @if (Auth::user())
+                        @if (Auth::user()->id != $user->id)
+                            <button class="btn btn-primary sendMessageButton" data-employee-id="{{ $user->id }}">
+                                <span> Message </span>
+                            </button>
                         @endif
-                        @if($company->website)
-                            <br/>
-                                <i class="fa fa-globe"></i>
-                                @php
-                                    $website = $company->website;
-                                    if (!preg_match('#^http(s)?://#', $website)) {
-                                        $website = 'http://' . $website;
-                                    }
-                                @endphp
-                                <a href="{{ $website }}" title="Website">Visit Website</a>
-                        @endif
-                    </p>
-                @endif
+                    @else
+                        <a href="{{ route('login') }}"><span>Message</span></a>
+                    @endif
+                </div>
                 <!-- <a href="" class="learn-more">Learn more</a> -->
             </div>
         </div>
 
         @endforeach
+
+        <a href="#" class="buttonViewAll-mobile">
+            View All <i class="fa fa-chevron-right"></i>
+        </a>
 
     </div>
 
