@@ -119,7 +119,7 @@
 </style>
 <!-- filter form -->
 <section class="header__search">
-    <div class="container-master">
+    <div class="container">
         <div class="search__wrap">
             <form method="GET" action="{{ route('landing.hiring') }}" class="search__box">
                 <div class="search__field">
@@ -173,10 +173,12 @@
     <img src="{{ asset('assets/images/landing/bannerHire.jpg') }}" alt="">
 </section>
 <section class="hire__wrapper">
-    <div class="container-master">
+    <div class="container">
         <h1 class="hire__title">
-            <span>Employees</span>
+            <span>Companies</span>
         </h1>
+        <h4 class="hire__subtitle">Company’s Hiring</h4>
+        <p class="hire__descr">Find the most relevant companies hiring based on your qualifications and desired position, including full-time, part time, and contractual positions.</p>
         <div class="row-master">
             @foreach($employees as $employee)
                 <div class="col-12 col-md-6 col-xl-3">
