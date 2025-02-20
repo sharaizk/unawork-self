@@ -74,12 +74,12 @@ class MessagesController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'users' => 'required|array',
-            'users.*' => 'exists:users,id', 
+            'users.*' => 'exists:users,id',
         ]);
 
         $name = $request->input('name');
         $users = $request->input('users');
-        
+
         $message = 'Chat created';
 
         $chatService = new ChatService ;
@@ -110,9 +110,9 @@ class MessagesController extends Controller
             $invites['workspaces'] = Auth::user()->invitableWorkspaces($user->id);
             $invites['pods'] = Auth::user()->invitablePods($user->id);
         }
-        
+
         $users = $thread->users()->get();
-        
+
 
         if (($user) && !empty($user->avatar)) {
             $avatar = Utility::get_file('users-avatar/' . $user->avatar);
@@ -159,25 +159,25 @@ class MessagesController extends Controller
     public function send(Request $request)
     {
         $attachmentData = $this->handleAttachment($request);
-    
+
         if ($attachmentData['error']->status) {
             return redirect()->back()->with('error', __($attachmentData['error']->message));
         }
-    
+
         $userId = Auth::user()->id;
         $thread = Thread::find($request['id']);
-    
+
         $message = CustomMessage::create([
             'thread_id' => $thread->id,
             'user_id' => $userId,
             'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
             'attachment' => $this->formatAttachment($attachmentData),
         ]);
-    
+
         $thread->touch();
-    
+
         $messageData = $this->formatMessageData($message->id);
-    
+
         return Response::json([
             'status' => '200',
             'error' => $attachmentData['error'],
@@ -185,14 +185,14 @@ class MessagesController extends Controller
             'tempID' => $request['temporaryMsgId'],
         ]);
     }
-    
+
     public function fetch(Request $request)
     {
         $allMessages = null;
-    
+
         $userId = Auth::user()->id;
         $thread = Thread::find($request['id']);
-    
+
         if ($thread) {
             $messages = $thread->messages()->orderBy('created_at', 'asc')->get();
             if ($messages->count() > 0) {
@@ -207,7 +207,7 @@ class MessagesController extends Controller
                 ]);
             }
         }
-    
+
         return Response::json([
             'count' => 0,
             'messages' => '<p class="message-hint center-el"><span>Say \'hi\' and start messaging</span></p>',
@@ -221,7 +221,7 @@ class MessagesController extends Controller
 
         $thread = Thread::between([$userId, $request['id']])->first();
 
-        // is created thread between users 
+        // is created thread between users
         if (!$thread || !$thread->isUnread($userId)) {
                 return Response::json(
                     [
@@ -252,7 +252,7 @@ class MessagesController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug('');
         $user = Auth::user();
         $userId = $user->id;
-    
+
         // Get all threads the user is part of
         $threads = Thread::forUser($userId)->latest('updated_at')->get()->unique('id');
         // Fetch threads to contacts
@@ -264,7 +264,7 @@ class MessagesController extends Controller
                 // Get user data
                 $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
         }
-    
+
         // Get all workspaces of user
         $workspaceIds = $user->workspace->pluck('id');
 
@@ -281,7 +281,7 @@ class MessagesController extends Controller
                 'user' => $record,
             ])->render();
         }
-    
+
         return Response::json([
             'contacts' => $contacts,
             'allUsers' => $members->count() > 0 ? $getRecords : '<br><p class="message-hint"><span>' . __('Your member list is empty') . '</span></p>',
@@ -426,7 +426,6 @@ class MessagesController extends Controller
      * Search in messenger
      *
      * @param Request $request
-     * @return void
      */
     public function search(Request $request)
     {
@@ -434,24 +433,29 @@ class MessagesController extends Controller
         $input = trim(filter_var($request['input'], FILTER_SANITIZE_STRING));
         //$records = User::where('name', 'LIKE', "%{$input}%");
         $objUser          = Auth::user();
-        $currentWorkspace = Utility::getWorkspaceBySlug('');
-        if ($currentWorkspace) {
-            $users = User::select('users.*', 'user_workspaces.permission', 'user_workspaces.is_active')
-                ->join('user_workspaces', 'user_workspaces.user_id', '=', 'users.id')
-                ->where('user_workspaces.workspace_id', '=', $currentWorkspace->id)
-                ->where('users.id', '!=', $objUser->id);
-        } else {
-            // $records = $users->where('name', 'LIKE', "%{$input}%")->get();
-        }
 
-        $records = User::where('name', 'LIKE', "%{$input}%");
 
-        foreach ($records->get() as $record) {
-            $getRecords .= view('Chatify::layouts.listItem', [
-                'get' => 'search_item',
-                'type' => 'user',
-                'user' => $record,
-            ])->render();
+
+        $records = Thread::where('slug', null)
+            ->whereHas('participants', function ($query) use ($objUser) {
+                $query->where('user_id', $objUser->id);
+            })
+            ->whereHas('participants', function ($query) use ($input) {
+                $query->whereHas('user', function ($query) use ($input) {
+                    $query->where('name', 'LIKE', '%' . $input . '%');
+                });
+            })
+            ->with(['participants.user' => function ($query) use ($objUser) {
+                $query->where('id', '!=', $objUser->id);
+            }])
+            ->withCount('participants')
+            ->having('participants_count', 2)
+            ->get();
+
+        foreach ($records as $record) {
+            $interlocutor = $record->participants->where('user_id', '!=', $objUser->id)->first();
+
+            $getRecords .= self::getContactItem($request['messenger_id'], $record, Auth::user());
         }
         // send the response
         return Response::json([
