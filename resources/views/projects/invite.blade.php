@@ -5,7 +5,7 @@
         <label for="users_list" class="form-label">{{ __('Users') }}</label>
         <select class=" multi-select" required id="users_list" name="users_list[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
             @foreach($currentWorkspace->users($currentWorkspace->created_by) as $user)
-                @if($user->pivot->is_active)
+                @if($user->pivot->is_active && $user->pivot->status == 'active')
                     @php
                         $user_p = App\Models\UserProject::where('user_id','=', $user->id)->where('project_id','=', $project->id)->first();
                     @endphp
