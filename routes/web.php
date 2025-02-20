@@ -90,6 +90,7 @@ use App\Http\Controllers\MessagesController;
 |
 */
 Route::get('/pods/search', [PodController::class, 'search'])->name('pods.search');
+Route::get('/hiring/search', [HirePageController::class, 'search'])->name('hiring.search');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/employee/profile', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
