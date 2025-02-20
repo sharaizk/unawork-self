@@ -52,7 +52,7 @@
                 <form id="searchForm" class="g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
                     <div class="d-flex align-items-center">
                         <div class="form-group search-input-wrap">
-                            <input type="text" name="name" placeholder="Search by name" class="form-control search-input">
+                            <input type="text" name="name" id="pod-search" placeholder="Search by name" class="form-control search-input">
                         </div>
                         <div id="skillsField" class="form-group d-flex align-items-center me-4 ms-4">
                             <!-- <label>Select Skills</label> -->
@@ -132,12 +132,7 @@
                 <p class="pods__subtitle">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
                 <div class="">
                     <div class="row-master">
-                        @foreach($pods as $pod)
-                            @php
-                                $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
-                            @endphp
-                            @include('pod.landing.pod_card', ['pod' => $pod, 'joinable' => $joinable])
-                        @endforeach
+
                     </div>
                     <div class="pagination-container d-flex justify-content-center mt-4">
                         {{ $pods->appends(request()->query())->links() }}
@@ -150,6 +145,57 @@
 @endsection
 
 @section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('pod-search');
+            const skillsCheckboxes = document.querySelectorAll('input[name="skill_ids[]"]');
+            const container = document.querySelector('.row-master');
+            const paginationContainer = document.querySelector('.pagination-container');
+
+            function fetchPods(url) {
+                const selectedSkills = Array.from(document.querySelectorAll('input[name="skill_ids[]"]:checked'))
+                    .map(checkbox => `skill_ids[]=${checkbox.value}`)
+                    .join('&');
+                const query = searchInput.value.trim();
+                const fullUrl = `${url}${query ? '&name=' + query : ''}${selectedSkills ? '&' + selectedSkills : ''}`;
+
+                fetch(fullUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        container.innerHTML = data.pods;
+                        paginationContainer.innerHTML = data.pagination;
+                        attachPaginationListeners();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            searchInput.addEventListener('input', function () {
+                fetchPods(`{{ route('pods.search') }}?`);
+            });
+
+            skillsCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    fetchPods(`{{ route('pods.search') }}?`);
+                });
+            });
+
+            function attachPaginationListeners() {
+                document.querySelectorAll('.pagination-container a').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        fetchPods(this.href);
+                    });
+                });
+            }
+
+            fetchPods(`{{ route('pods.search') }}?`);
+        });
+    </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const forms = document.querySelectorAll('.join-form');
