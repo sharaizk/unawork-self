@@ -126,7 +126,7 @@
                     <span class="search__icon">
                         <i class="fa fa-search"></i>
                     </span>
-                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') ? request('name') : '' }}"">
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') ? request('name') : '' }}">
                 </div>
                 <div class="search__field">
                     <select name="country" id="country" class="form-control">
