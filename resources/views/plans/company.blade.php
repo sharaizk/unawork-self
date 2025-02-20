@@ -44,7 +44,7 @@
         <div class="col-md-12">
             <div class="pricing-plan">
                 <div class="tab-content mt-3">
-
+                    <h5 class="text-danger text-center">If you need more details please contact our admin directly at admin@example.com</h5>
                     <div id="monthly-biling" class="tab-pane in active">
                         <div class="row">
                             @foreach ($plans as $key => $plan)
@@ -94,13 +94,13 @@
                                                 <li>
                                                     <span class="theme-avtar">
                                                         <i class="text-primary ti ti-circle-plus"></i></span>
-                                                        
+
                                                     Inner circle in pod {{ $plan->allow_pod_project_view === 1 ? __('enabled') : __('disabled') }}
                                                 </li>
                                                 <li>
                                                     <span class="theme-avtar">
                                                         <i class="text-primary ti ti-circle-plus"></i></span>
-                                                        
+
                                                     Own projects {{ $plan->allow_workspace_project_view === 1 ? __('enabled') : __('disabled') }}
                                                 </li>
                                                 <li>
