@@ -33,7 +33,7 @@
                                     <a href="{{ route('landing.find-work') }}" class="">Find Work</a>
                                 </li>
                                 <li class="{{ Request::route()->getName() == 'landing.hiring' ? 'active' : '' }}">
-                                    <a href="{{ route('landing.hiring') }}">Hiring</a>
+                                    <a href="{{ route('landing.hiring') }}">Hire</a>
                                 </li>
                                 <li class="{{ Request::route()->getName() == 'pods.list' ? 'active' : '' }}">
                                     <a href="{{ route('pods.list') }}">PODs</a>

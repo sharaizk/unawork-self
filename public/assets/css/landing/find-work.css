@@ -2145,11 +2145,18 @@
     height: 100%;
 }
 
+@media (max-width: 991px) {
+    .section_company .company-box__wrap {
+        padding-top: 20px;
+    }
+}
+
 @media (max-width: 768px) {
     .section_company .company-box__wrap {
         max-width: 280px;
         width: 100%;
         margin: 0 auto 20px;
+        padding-top: 0;
     }
 }
 

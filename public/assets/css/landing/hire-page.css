@@ -40,6 +40,18 @@
     outline: none !important;
     text-decoration: none !important;
 }
+
+.hire__subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 15px 0;
+    color: #022D4D;
+}
+.hire__descr {
+    color: #022D4D;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
 .hire-card {
     overflow: hidden;
     flex-wrap: wrap;

@@ -57,7 +57,7 @@
     <div class="container">
         <div class="footer__content mt-[100px]">
             <div>
-                <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
+                <img class="footer__contetnt__logo" src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
                 <div class="footer__socials">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>

@@ -119,7 +119,7 @@
 </style>
 <!-- filter form -->
 <section class="header__search">
-    <div class="container-master">
+    <div class="container">
         <div class="search__wrap">
             <form id="searchForm" class="search__box">
                 <div class="search__field">
@@ -173,7 +173,7 @@
     <img src="{{ asset('assets/images/landing/bannerHire.jpg') }}" alt="">
 </section>
 <section class="hire__wrapper">
-    <div class="container-master">
+    <div class="container">
         <h1 class="hire__title">
             <span>Employees</span>
         </h1>
@@ -208,53 +208,38 @@
 @endsection
 
 @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('searchForm');
-            const employeeContainer = document.getElementById('employeeContainer');
-            const paginationContainer = document.getElementById('paginationContainer');
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.search__box');
 
-            function fetchEmployees(url) {
-                fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(response => response.json())
-                    .then(data => {
-                        employeeContainer.innerHTML = data.employees;
-                        paginationContainer.innerHTML = data.pagination;
-                        attachPaginationListeners();
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
+            form.addEventListener('submit', function(event) {
+                const name = document.getElementById('name');
+                const country = document.getElementById('country');
+                const jobTitle = document.getElementById('job_title_id');
 
-            function debounce(func, delay) {
-                let timer;
-                return function () {
-                    clearTimeout(timer);
-                    timer = setTimeout(() => func.apply(this, arguments), delay);
-                };
-            }
-            function triggerSearch() {
-                let formData = new FormData(form);
-                let params = new URLSearchParams(formData).toString();
-                fetchEmployees(`{{ route('hiring.search') }}?${params}`);
-            }
-            const debouncedSearch = debounce(triggerSearch, 300);
+                // Список інпутів, які потрібно очистити
+                const inputsToClear = [];
 
-            form.addEventListener('change', debouncedSearch);
-            form.addEventListener('input', debouncedSearch);
+                if (name.value.trim() === '') {
+                    name.setAttribute('disabled', 'disabled');
+                    inputsToClear.push(name);
+                }
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+                if (country.value.trim() === '') {
+                    country.setAttribute('disabled', 'disabled');
+                    inputsToClear.push(country);
+                }
+
+                if (jobTitle.value.trim() === '') {
+                    jobTitle.setAttribute('disabled', 'disabled');
+                    inputsToClear.push(jobTitle);
+                }
+
+                // add timeout to clear `disabled` after submitting form
+                setTimeout(() => {
+                    inputsToClear.forEach(input => input.removeAttribute('disabled'));
+                }, 0);
             });
-
-            function attachPaginationListeners() {
-                document.querySelectorAll('.pagination-container a').forEach(link => {
-                    link.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        fetchEmployees(this.href);
-                    });
-                });
-            }
-            fetchEmployees(`{{ route('hiring.search') }}`);
         });
     </script>
     <script type="text/javascript">
