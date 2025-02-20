@@ -60,10 +60,17 @@
  @section('content')
      @if ($currentWorkspace || Auth::user()->type == 'admin')
          <div class="row">
+             <div class="col-md-12 mb-3">
+                 <div class="input-group mb-3">
+                     <span class="input-group-text" id="basic-addon1"><i class="ti ti-search"></i></span>
+                     <input type="text" id="user-search" class="form-control" placeholder="Search users..." aria-label="Search users..." aria-describedby="basic-addon1">
+                 </div>
+             </div>
              {{-- @dd($users->toArray()) --}}
+             <div id="users-list" class="row">
              @foreach ($users as $user)
                  @php($workspace_id = isset($currentWorkspace) && $currentWorkspace ? $currentWorkspace->id : '')
-                 <div class="col-xl-3 col-lg-4 col-sm-6">
+                 <div class="col-xl-3 col-lg-4 col-sm-6 user-item" data-name="{{ strtolower($user->name) }}">
                      <div class="card   text-center">
                          <div class="card-header border-0 pb-0">
                              <div class="d-flex justify-content-between align-items-center">
@@ -155,20 +162,20 @@
                                                          </a>
                                                      @endif
 
-                                                   
+
                                                  @elseif(isset($currentWorkspace) &&
                                                          $currentWorkspace &&
                                                          $currentWorkspace->permission == 'Owner' &&
                                                          Auth::user()->id != $user->id)
-                                                    
-                                                        <a href="#" class="dropdown-item" 
-                                                            data-ajax-popup="true" 
-                                                        data-size="lg" 
+
+                                                        <a href="#" class="dropdown-item"
+                                                            data-ajax-popup="true"
+                                                        data-size="lg"
                                                         data-title="Edit Permissions"
                                                         data-url="{{ route('workspace.users.editPermissions', ['workspace' => $currentWorkspace, 'user' => $user]) }}">
-                                                            <i class="ti ti-flag"></i> 
+                                                            <i class="ti ti-flag"></i>
                                                             Edit Permissions
-                                                        </a>  
+                                                        </a>
                                                         <a href="#" class="dropdown-item" data-ajax-popup="true"
                                                             data-size="md" data-title="{{ __('Edit User') }}"
                                                             data-url="{{ route('users.edit', [$currentWorkspace->slug, $user->id]) }}"><i
@@ -220,7 +227,7 @@
                                                              <span class="text-success"> {{ __('Login Enable') }}</span>
                                                          </a>
                                                      @endif
-                                                     
+
                                                  @endif
 
 
@@ -244,8 +251,8 @@
                          <div class="card-body">
                              <div class="avatar">
                                  <img alt="user-image" class=" rounded-circle img_users_fix_size"
-                                     @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}" 
-                                     @else 
+                                     @if ($user->avatar) src="{{ asset($logo . $user->avatar) }}"
+                                     @else
                                        avatar="{{ $user->name }}" @endif>
                              </div>
                              <h4 class="mt-2">
@@ -323,7 +330,7 @@
                      </div>
                  </div>
              @endforeach
-
+             </div>
 
 
              <div class="col-xl-3 col-lg-4 col-sm-6">
@@ -387,6 +394,27 @@
 
  @push('scripts')
      <script>
+         document.addEventListener("DOMContentLoaded", function () {
+             const searchInput = document.getElementById("user-search");
+             const users = document.querySelectorAll(".user-item");
+
+             searchInput.addEventListener("input", function () {
+                 const query = searchInput.value.toLowerCase();
+                 console.log (query);
+                 users.forEach(user => {
+                     const name = user.getAttribute("data-name");
+
+                     if (name.includes(query)) {
+                         user.style.display = "block";
+                     } else {
+                         user.style.display = "none";
+                     }
+                 });
+             });
+         });
+     </script>
+     <script>
+
          $(document).ready(function() {
              $(document).on('change', '#password_switch', function() {
                  if ($(this).is(':checked')) {
