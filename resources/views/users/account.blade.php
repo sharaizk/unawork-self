@@ -25,11 +25,16 @@
                     <a href="#v-pills-profile"
                         class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Change Password') }} <div
                             class="float-end"><i class="ti ti-chevron-right"></i></div></a>
-                    
+
                     @if ($user->hasRole('employee'))
                         <a href="#v-pills-profiler"
                             class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Employee Profile') }} <div
                                 class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+                    @else
+                        <a href="{{ route('workspace.settings', \Auth::user()->ownWorkspace()->slug)  }}#company-settings"
+                           class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Company Settings') }} <div
+                                class="float-end"><i class="ti ti-clipboard"></i></div></a>
+
                     @endif
 
                     @auth('client')
@@ -223,12 +228,12 @@
                 <h5>{{ __('Employee Profile') }}</h5>
             </div>
             <div class="card-body">
-                @php 
+                @php
                     $profile = $user->profile;
                     $skills = \App\Models\Skill::all();
                 @endphp
                 @include('employee.edit_profile', ['user' => $user, 'profile' => $profile, 'skills' => $skills])
-            
+
             </div>
         </div>
     @endif
