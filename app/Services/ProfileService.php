@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class ProfileService
 {
     public function createProfile(User $user, array $data): Profile
-    {   
+    {
         $exist = $user->profile()->exists();
 
         if ($exist) {
@@ -20,13 +20,22 @@ class ProfileService
         if (isset($data['cv_file'])) {
             $data['cv_file'] = $this->uploadFile($data['cv_file']);
         }
-    
+
+
+        if (isset($data['skill_ids'])) {
+            try {
+                $this->linkSkills($data['skill_ids'], $user->id);
+            } catch (\Exception $e) {
+                throw new \Exception('Failed to update skills.'.$e->getMessage());
+            }
+        }
+
         try {
             return $user->profile()->create($data);
         } catch (\Exception $e) {
             throw new \Exception('Failed to create profile.'.$e->getMessage());
         }
-    
+
     }
 
     public function updateProfile(Profile $profile, array $data): Profile
