@@ -121,12 +121,12 @@
 <section class="header__search">
     <div class="container">
         <div class="search__wrap">
-            <form method="GET" action="{{ route('landing.hiring') }}" class="search__box">
+            <form id="searchForm" class="search__box">
                 <div class="search__field">
                     <span class="search__icon">
                         <i class="fa fa-search"></i>
                     </span>
-                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') ? request('name') : '' }}"">
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') ? request('name') : '' }}">
                 </div>
                 <div class="search__field">
                     <select name="country" id="country" class="form-control">
@@ -164,7 +164,7 @@
                         </ul>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary filter-btn header-search-btn">Filter</button>
+{{--                <button type="submit" class="btn btn-primary filter-btn header-search-btn">Search</button>--}}
             </form>
         </div>
     </div>
@@ -175,17 +175,12 @@
 <section class="hire__wrapper">
     <div class="container">
         <h1 class="hire__title">
-            <span>Companies</span>
+            <span>Employees</span>
         </h1>
-        <h4 class="hire__subtitle">Company’s Hiring</h4>
-        <p class="hire__descr">Find the most relevant companies hiring based on your qualifications and desired position, including full-time, part time, and contractual positions.</p>
-        <div class="row-master">
-            @foreach($employees as $employee)
-                <div class="col-12 col-md-6 col-xl-3">
-                    @include('hiring.employeecard', ['employee' => $employee])
-                </div>
-            @endforeach
+        <div class="row-master" id="employeeContainer">
+            <p class="text-center">Enter filters to find employees...</p>
         </div>
+        <div class="pagination-container d-flex justify-content-center mt-4" id="paginationContainer"></div>
     </div>
 </section>
 
@@ -214,37 +209,54 @@
 
 @section('scripts')
     <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('.search__box');
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('searchForm');
+            const employeeContainer = document.getElementById('employeeContainer');
+            const paginationContainer = document.getElementById('paginationContainer');
 
-            form.addEventListener('submit', function(event) {
-                const name = document.getElementById('name');
-                const country = document.getElementById('country');
-                const jobTitle = document.getElementById('job_title_id');
+            function fetchEmployees(url) {
+                fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(response => response.json())
+                    .then(data => {
+                        employeeContainer.innerHTML = data.employees;
+                        paginationContainer.innerHTML = data.pagination;
+                        attachPaginationListeners();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
 
-                // Список інпутів, які потрібно очистити
-                const inputsToClear = [];
+            function debounce(func, delay) {
+                let timer;
+                return function () {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(this, arguments), delay);
+                };
+            }
 
-                if (name.value.trim() === '') {
-                    name.setAttribute('disabled', 'disabled');
-                    inputsToClear.push(name);
-                }
+            function triggerSearch() {
+                let formData = new FormData(form);
+                let params = new URLSearchParams(formData).toString();
+                fetchEmployees(`{{ route('hiring.search') }}?${params}`);
+            }
 
-                if (country.value.trim() === '') {
-                    country.setAttribute('disabled', 'disabled');
-                    inputsToClear.push(country);
-                }
+            const debouncedSearch = debounce(triggerSearch, 300);
 
-                if (jobTitle.value.trim() === '') {
-                    jobTitle.setAttribute('disabled', 'disabled');
-                    inputsToClear.push(jobTitle);
-                }
-
-                // add timeout to clear `disabled` after submitting form
-                setTimeout(() => {
-                    inputsToClear.forEach(input => input.removeAttribute('disabled'));
-                }, 0);
+            form.addEventListener('input', debouncedSearch);
+            form.addEventListener('change', debouncedSearch);
+            document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                checkbox.addEventListener('click', debouncedSearch);
             });
+
+            function attachPaginationListeners() {
+                document.querySelectorAll('.pagination-container a').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        fetchEmployees(this.href);
+                    });
+                });
+            }
+
+            fetchEmployees(`{{ route('hiring.search') }}`);
         });
     </script>
     <script type="text/javascript">

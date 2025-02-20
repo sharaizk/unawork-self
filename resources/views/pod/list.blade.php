@@ -49,7 +49,7 @@
         }
 
         .dropdown-menu-xl .form-check-input:checked {
-            background-color: #E8BE61; 
+            background-color: #E8BE61;
         }
 
         .skills-button {
@@ -66,7 +66,7 @@
                 <form id="searchForm" class="g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
                     <div class="d-flex align-items-center">
                         <div class="form-group search-input-wrap">
-                            <input type="text" name="name" placeholder="Search by name" class="form-control search-input">
+                            <input type="text" name="name" id="pod-search" placeholder="Search by name" class="form-control search-input">
                         </div>
                         <div id="skillsField" class="form-group d-flex align-items-center me-4 ms-4">
                             <!-- <label>Select Skills</label> -->
@@ -88,11 +88,11 @@
                         </div>
 
                         <div class="search-btn__wrap form-group d-flex align-items-center">
-                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
+{{--                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>--}}
                         </div>
-                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
+{{--                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>--}}
                     </div>
-                    <button type="button" class="filter-mobile">Filter</button>
+{{--                    <button type="button" class="filter-mobile">Filter</button>--}}
                 </form>
             </div>
         </div>
@@ -147,12 +147,7 @@
                 <p class="pods__subtitle">Request to join as many pods as you like to receive updates. If you are invited into an inner circle, you will have access to relevant projects so you can build your wealth.</p>
                 <div class="">
                     <div class="row-master">
-                        @foreach($pods as $pod)
-                            @php
-                                $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
-                            @endphp
-                            @include('pod.landing.pod_card', ['pod' => $pod, 'joinable' => $joinable])
-                        @endforeach
+
                     </div>
                     <div class="pagination-container d-flex justify-content-md-end justify-content-center mt-4">
                         {{ $pods->appends(request()->query())->links('vendor.pagination.custom') }}
@@ -165,6 +160,57 @@
 @endsection
 
 @section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('pod-search');
+            const skillsCheckboxes = document.querySelectorAll('input[name="skill_ids[]"]');
+            const container = document.querySelector('.row-master');
+            const paginationContainer = document.querySelector('.pagination-container');
+
+            function fetchPods(url) {
+                const selectedSkills = Array.from(document.querySelectorAll('input[name="skill_ids[]"]:checked'))
+                    .map(checkbox => `skill_ids[]=${checkbox.value}`)
+                    .join('&');
+                const query = searchInput.value.trim();
+                const fullUrl = `${url}${query ? '&name=' + query : ''}${selectedSkills ? '&' + selectedSkills : ''}`;
+
+                fetch(fullUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        container.innerHTML = data.pods;
+                        paginationContainer.innerHTML = data.pagination;
+                        attachPaginationListeners();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            searchInput.addEventListener('input', function () {
+                fetchPods(`{{ route('pods.search') }}?`);
+            });
+
+            skillsCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    fetchPods(`{{ route('pods.search') }}?`);
+                });
+            });
+
+            function attachPaginationListeners() {
+                document.querySelectorAll('.pagination-container a').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        fetchPods(this.href);
+                    });
+                });
+            }
+
+            fetchPods(`{{ route('pods.search') }}?`);
+        });
+    </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const forms = document.querySelectorAll('.join-form');

@@ -29,7 +29,7 @@
     <div class="container">
         <div class="">
             <h1 class="section__titlepage--headertitle "><span>{{ $pod->title }}</span></h1>
-            <p class="pods__subtitle">The best opportunities for work at your fingertips. Whether you are looking for a side hustle, second income, or new career growth, UnaWork offers layers of opportunities to hire and get hired.</p>
+            <p class="pods__subtitle">{{ $pod->description ?? '' }}</p>
             @if (Auth::user())
                 @if (!in_array($pod->id, Auth::user()->pods()->pluck('pods.id')->toArray())  )
                     <form class="join-form col-3" data-pod-id="{{ $pod->id }}">

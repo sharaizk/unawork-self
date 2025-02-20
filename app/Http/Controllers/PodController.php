@@ -66,6 +66,35 @@ class PodController extends Controller
         return view('pod.list', compact('pods', 'skills', 'joinedPods', 'user'));
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('name');
+        $skillIds = $request->input('skill_ids', []);
+        $perPage = 15;
+
+        $podsQuery = Pod::query();
+
+        if (!empty($query)) {
+            $podsQuery->where('title', 'LIKE', "%$query%");
+        }
+
+        if (!empty($skillIds)) {
+            $podsQuery->whereHas('skills', function ($q) use ($skillIds) {
+                $q->whereIn('skills.id', $skillIds);
+            });
+        }
+
+        $pods = $podsQuery->paginate($perPage);
+
+        $user = auth()->user();
+        $joinedPods = [];
+
+        return response()->json([
+            'pods' => view('pod.landing.pod_list', compact('pods', 'user', 'joinedPods'))->render(),
+            'pagination' => (string) $pods->links()
+        ]);
+    }
+
     public function show(int $podId)
     {
         $user = Auth::user();

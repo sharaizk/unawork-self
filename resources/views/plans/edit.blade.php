@@ -202,7 +202,7 @@
                 </div>
             </div>
 
-            @if ($plan->monthly_price > 0 && $plan->annual_price > 0)
+{{--            @if ($plan->monthly_price > 0 && $plan->annual_price > 0)--}}
                 <div class="form-group col-md-6 d-flex">
                     <label for="is_trial_disable">{{ __('Trial is enable(on/off)') }}</label>
                     <div class="form-check form-switch custom-switch-v1 mx-2">
@@ -218,7 +218,7 @@
                         value="{{ isset($plan->trial_days) ? $plan->trial_days : '0' }}" />
                     <span><small>{{ __("Note: '-1' for unlimited") }}</small></span>
                 </div>
-            @endif
+{{--            @endif--}}
         </div>
     </div>
     <div class=" modal-footer">
