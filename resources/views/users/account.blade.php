@@ -30,11 +30,10 @@
                         <a href="#v-pills-profiler"
                             class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Employee Profile') }} <div
                                 class="float-end"><i class="ti ti-chevron-right"></i></div></a>
-                    @else
+                    @elseif ($user->hasRole('company'))
                         <a href="{{ route('workspace.settings', \Auth::user()->ownWorkspace()->slug)  }}#company-settings"
                            class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Company Settings') }} <div
                                 class="float-end"><i class="ti ti-clipboard"></i></div></a>
-
                     @endif
 
                     @auth('client')
