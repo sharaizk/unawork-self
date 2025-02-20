@@ -49,7 +49,7 @@
         }
 
         .dropdown-menu-xl .form-check-input:checked {
-            background-color: #E8BE61; 
+            background-color: #E8BE61;
         }
 
         .skills-button {
@@ -88,11 +88,11 @@
                         </div>
 
                         <div class="search-btn__wrap form-group d-flex align-items-center">
-                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
+{{--                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>--}}
                         </div>
-                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
+{{--                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>--}}
                     </div>
-                    <button type="button" class="filter-mobile">Filter</button>
+{{--                    <button type="button" class="filter-mobile">Filter</button>--}}
                 </form>
             </div>
         </div>
