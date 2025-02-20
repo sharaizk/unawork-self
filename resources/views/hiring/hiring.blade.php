@@ -209,37 +209,54 @@
 
 @section('scripts')
     <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('.search__box');
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('searchForm');
+            const employeeContainer = document.getElementById('employeeContainer');
+            const paginationContainer = document.getElementById('paginationContainer');
 
-            form.addEventListener('submit', function(event) {
-                const name = document.getElementById('name');
-                const country = document.getElementById('country');
-                const jobTitle = document.getElementById('job_title_id');
+            function fetchEmployees(url) {
+                fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(response => response.json())
+                    .then(data => {
+                        employeeContainer.innerHTML = data.employees;
+                        paginationContainer.innerHTML = data.pagination;
+                        attachPaginationListeners();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
 
-                // Список інпутів, які потрібно очистити
-                const inputsToClear = [];
+            function debounce(func, delay) {
+                let timer;
+                return function () {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(this, arguments), delay);
+                };
+            }
 
-                if (name.value.trim() === '') {
-                    name.setAttribute('disabled', 'disabled');
-                    inputsToClear.push(name);
-                }
+            function triggerSearch() {
+                let formData = new FormData(form);
+                let params = new URLSearchParams(formData).toString();
+                fetchEmployees(`{{ route('hiring.search') }}?${params}`);
+            }
 
-                if (country.value.trim() === '') {
-                    country.setAttribute('disabled', 'disabled');
-                    inputsToClear.push(country);
-                }
+            const debouncedSearch = debounce(triggerSearch, 300);
 
-                if (jobTitle.value.trim() === '') {
-                    jobTitle.setAttribute('disabled', 'disabled');
-                    inputsToClear.push(jobTitle);
-                }
-
-                // add timeout to clear `disabled` after submitting form
-                setTimeout(() => {
-                    inputsToClear.forEach(input => input.removeAttribute('disabled'));
-                }, 0);
+            form.addEventListener('input', debouncedSearch);
+            form.addEventListener('change', debouncedSearch);
+            document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                checkbox.addEventListener('click', debouncedSearch);
             });
+
+            function attachPaginationListeners() {
+                document.querySelectorAll('.pagination-container a').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        fetchEmployees(this.href);
+                    });
+                });
+            }
+
+            fetchEmployees(`{{ route('hiring.search') }}`);
         });
     </script>
     <script type="text/javascript">
