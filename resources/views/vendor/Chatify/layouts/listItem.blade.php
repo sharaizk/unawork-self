@@ -5,13 +5,14 @@ if ($setting['color']) {
     $color = $setting['color'];
 }
 else{
-  $color = 'theme-3';  
+  $color = 'theme-3';
 }
 @endphp
 
 @php
 $logo   = \App\Models\Utility::get_file('/');
 $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
+$user_avatar_path = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
 @endphp
 
 
@@ -59,7 +60,7 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
         {{-- Avatar side --}}
         <td style="position: relative">
                  @if(!is_null($user_avatar))
-                    <div class="avatar av-m" 
+                    <div class="avatar av-m"
                     style="background-image: url('{{$user_avatar}}');">
                     </div>
                 @else
@@ -72,9 +73,9 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
         <td>
         <p data-id="{{ $type.'_'.$thread->id }}">
             @if (is_null($user_name))
-            {{ strlen($thread->subject) > 16 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
-            @else 
-            {{ strlen($user_name) > 16 ? trim(substr($user_name,0,12)).'..' : $user_name }} 
+            {{ strlen($thread->subject) > 16 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }}
+            @else
+            {{ strlen($user_name) > 16 ? trim(substr($user_name,0,12)).'..' : $user_name }}
             @endif
             @if ($lastMessage)
             <span>{{ $lastMessage->created_at->diffForHumans() }}</span>
@@ -85,14 +86,14 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
             @if ($lastMessage)
                 {{-- Last Message user indicator --}}
                 {!!
-                    $lastMessage->from_id == Auth::user()->id 
+                    $lastMessage->from_id == Auth::user()->id
                     ? '<span class="lastMessageIndicator">You :</span>'
                     : ''
                 !!}
                 {{-- Last message body --}}
                 @if($lastMessage->attachment == null)
                 {{
-                    strlen($lastMessage->body) > 30 
+                    strlen($lastMessage->body) > 30
                     ? trim(substr($lastMessage->body, 0, 30)).'..'
                     : $lastMessage->body
                 }}
@@ -106,7 +107,7 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
         {{-- New messages counter --}}
             {!! $unseenCounter > 0 ? "<b>".$unseenCounter."</b>" : '' !!}
         </td>
-        
+
     </tr>
 </table>
 @endif
@@ -118,10 +119,10 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
         {{-- Avatar side --}}
             <td style="position: relative">
                 {{-- @dd($subject) --}}
-                 @if(!empty($thread->avatar))  
+                 @if(!empty($user->avatar))
                     <div class="avatar av-m"
-                    style="background-image:url('{{asset($avatar.$user->avatar)}}');">
-                    </div> 
+                    style="background-image:url('{{asset($user_avatar_path.$user->avatar)}}');">
+                    </div>
                 @else
                     {{-- @dd($thread->avatar)  --}}
                     <div class="avatar av-m"
@@ -131,10 +132,10 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
         </td>
         {{-- center side --}}
         <td>
-        <p data-id="{{ $type.'_'.$user->id }}">
-            {{ strlen($thread->subject) > 12 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }} 
+        <p data-id="{{ $type.'_'.$thread->id }}">
+            {{ strlen($user->name) > 20 ? trim(substr($user->name,0,20)).'..' : $user->name }}
         </td>
-        
+
     </tr>
 </table>
 @endif
@@ -151,10 +152,10 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
                 @if($user->active_status)
                     <span class="activeStatus"></span>
                 @endif
-                @if(!empty($user->avatar))   
+                @if(!empty($user->avatar))
                     <div class="avatar av-m"
                          style="background-image: url('{{asset($logo.'users-avatar/'.$user->avatar)}}');">
-                    </div> 
+                    </div>
                 @else
                     <div class="avatar av-m"
                          style="background-image: url('{{asset($logo.'logo/'.'logo-light.png')}}');">
@@ -179,5 +180,5 @@ $avatar = asset(\App\Models\Utility::get_file('/logo/')) ;
 
 
 
- 
+
 

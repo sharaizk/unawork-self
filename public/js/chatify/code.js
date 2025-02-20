@@ -380,7 +380,7 @@ function IDinfo(id, type) {
         $("#message-form").trigger("reset");
         cancelAttachment();
         messageInput.focus();
-        
+
         // Add users to the users list
         $(".users-list").html("");
         data.users.forEach(user => {
@@ -420,14 +420,14 @@ function IDinfo(id, type) {
   const inviteUserSelect = document.querySelector(".m-header-invite-user .selectItem");
   const inviteButton = document.querySelector(".messenger-infoView-btns .invite-user");
 
-  if ((data.can_invite.workspaces && data.can_invite.workspaces.length > 0) || 
+  if ((data.can_invite.workspaces && data.can_invite.workspaces.length > 0) ||
       (data.can_invite.pods && data.can_invite.pods.length > 0)) {
     inserthtml = makeSelectsForInviteUser(data.can_invite, data.basic_url);
     inviteButton.style.display = 'block';
   } else {
     inviteButton.style.display = 'none';
   }
-  
+
   inviteUserSelect.innerHTML = inserthtml;
 }
 function makeSelectsForInviteUser(data, basicUrl) {
@@ -498,7 +498,7 @@ function sendMessage() {
         messageInput.focus();
       },
       success: (data) => {
-          
+
         if (data.error > 0) {
           // message card error status
           errorMessageCard(tempID);
@@ -524,7 +524,7 @@ function sendMessage() {
       error: () => {
         // message card error status
             show_toastr('error', 'File type and size  must be match with Storage setting.');
-      
+
         errorMessageCard(tempID);
         // error log
         console.error(
@@ -788,32 +788,6 @@ function checkInternet(state, selector) {
   }
 }
 
-/**
- *-------------------------------------------------------------
- * Get contacts
- *-------------------------------------------------------------
- */
-function getContacts() {
-  $(".listOfContacts").html(listItemLoading(4));
-  $.ajax({
-    url: url + "/getContacts",
-    method: "GET",
-    data: { _token: access_token, messenger_id: messenger.split("_")[1] },
-    dataType: "JSON",
-    success: (data) => {
-      $('.listOfContacts').html('');
-            $('.listOfContacts').html(data.contacts);
-
-            $('.all_members').html('');
-            $('.all_members').html(data.allUsers);
-      // update data-action required with [responsive design]
-      cssMediaQueries();
-    },
-    error: () => {
-        console.error("Server error, check your response");
-    },
-  });
-}
 
 
 
@@ -943,6 +917,34 @@ function getSharedPhotos(user_id) {
   });
 }
 
+
+/**
+ *-------------------------------------------------------------
+ * Get contacts
+ *-------------------------------------------------------------
+ */
+function getContacts() {
+    $(".listOfContacts").html(listItemLoading(4));
+    $.ajax({
+        url: url + "/getContacts",
+        method: "GET",
+        data: { _token: access_token, messenger_id: messenger.split("_")[1] },
+        dataType: "JSON",
+        success: (data) => {
+            $('.listOfContacts').html('');
+            $('.listOfContacts').html(data.contacts);
+
+            $('.all_members').html('');
+            $('.all_members').html(data.allUsers);
+            // update data-action required with [responsive design]
+            cssMediaQueries();
+        },
+        error: () => {
+            console.error("Server error, check your response");
+        },
+    });
+}
+
 /**
  *-------------------------------------------------------------
  * Search in messenger
@@ -955,17 +957,13 @@ function messengerSearch(input) {
     data: { _token: access_token, input: input },
     dataType: "JSON",
     beforeSend: () => {
-      $(".search-records").html(listItemLoading(4));
+      // $(".search-records").html(listItemLoading(4));
     },
     success: (data) => {
-      $(".search-records")
-        .find("svg")
-        .remove();
-      data.addData == "append"
-        ? $(".search-records").append(data.records)
-        : $(".search-records").html(data.records);
-      // update data-action required with [responsive design]
-      cssMediaQueries();
+        $('.listOfContacts').html('');
+        $('.listOfContacts').html(data.records);
+        // update data-action required with [responsive design]
+        cssMediaQueries();
     },
     error: () => {
       console.error("Server error, check your response");
@@ -1238,12 +1236,12 @@ $(document).ready(function() {
             'class': 'm-body app-scroll',
             'css': {
                 'display': 'flex',
-                'align-items': 'center', 
-                'justify-content': 'center', 
+                'align-items': 'center',
+                'justify-content': 'center',
                 'height': '100%'
             }
         });
-    
+
         var startButton = $('<button/>', {
             'text': 'Start',
             'class': 'btn btn-primary',
@@ -1251,7 +1249,7 @@ $(document).ready(function() {
               createThreadOpenChat(recipient_id);
             }
         });
-    
+
         newDiv.append(startButton);
 
         $(".messenger-messagingView").append(newDiv);
@@ -1430,17 +1428,13 @@ $(document).ready(function() {
     $("#imageModalBox").hide();
   });
 
-  // Search input on focus
-  $(".messenger-search").on("focus", function() {
-    $(".messenger-tab").hide();
-    $('.messenger-tab[data-view="search"]').show();
-  });
   // Search action on keyup
   $(".messenger-search").on("keyup", function(e) {
-    $.trim($(this).val()).length > 0
-      ? $(".messenger-search").trigger("focus") + messengerSearch($(this).val())
-      : $(".messenger-tab").hide() +
-        $('.messenger-listView-tabs a[data-view="users"]').trigger("click");
+      $.trim($(this).val()).length > 0 ? messengerSearch($(this).val()) : getContacts();
+  });
+  $("#messenger-clear-search").on("click", function(e) {
+      document.getElementById('searchInput').value = '';
+      getContacts();
   });
 
   // Delete Conversation button

@@ -5,7 +5,7 @@
 
 @php
     $currentWorkspace = App\Models\Workspace::where('id', Auth::user()->currant_workspace)->first();
-    
+
     if (Auth::user()->type == 'admin') {
         $setting = App\Models\Utility::getAdminPaymentSetting();
         if ($setting['color']) {
@@ -17,12 +17,12 @@
         $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
         $color = $setting->theme_color;
     }
-    
+
     if (!isset($color) || $color == '' || $color == null) {
         $settings = App\Models\Utility::getAdminPaymentSetting();
         $color = $settings['color'];
     }
-    
+
 @endphp
 
 
@@ -59,7 +59,10 @@
                     {{-- Search input --}}
                     <div class="row w-100 d-flex justify-content-end">
                         <div class="col-lg-10 p-0">
-                            <input type="text" class="messenger-search" placeholder="{{ __('Search') }}" />
+                            <div class="input-group">
+                                <input type="text" class="form-control messenger-search me-0 ms-2" placeholder="{{ __('Search') }}" id="searchInput">
+                                <button class="btn btn-outline-secondary" type="button" id="messenger-clear-search">&times;</button>
+                            </div>
                         </div>
                         <div class="col-lg-2 p-0 d-flex justify-content-end">
                             <button class="btn btn-sm btn-primary newChatBtn"> + </button>
