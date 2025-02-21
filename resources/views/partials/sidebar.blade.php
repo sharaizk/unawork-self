@@ -80,7 +80,7 @@
            class="dash-sidebar light-sidebar {{ isset($cust_theme_bg) && $cust_theme_bg == 'on' ? 'transprent-bg' : '' }}">
            <div class="navbar-wrapper">
                <div class="m-header main-logo">
-                   <a href="{{ route('landing') }}" class="b-brand">
+                   <a href="{{ config('app.logo_url') }}" class="b-brand">
                        <!-- ========   change your logo hear   ============ -->
                        {{-- <img src="{{ asset($logo . $company_logo . '?timestamp=' . strtotime(isset($currentWorkspace) ? $currentWorkspace->updated_at : '')) }}" alt="logo" class="sidebar_logo_size " /> --}}
                        <img src="{{ asset($logo . $company_logo . '?v=' . time()) }}" alt="logo"

@@ -58,6 +58,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'logo_url' => env('LOGO_URL','http://www.unawork.net/'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -186,8 +188,8 @@ return [
         Obydul\LaraSkrill\LaraSkrillServiceProvider::class,
         Paytabscom\Laravel_paytabs\PaypageServiceProvider::class,
         Lab404\Impersonate\ImpersonateServiceProvider::class,
-       
-        
+
+
         /*
          * Package Service Providers...
          */

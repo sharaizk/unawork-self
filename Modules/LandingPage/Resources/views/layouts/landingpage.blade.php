@@ -112,7 +112,7 @@
         <div class="container">
             <nav class="navbar navbar-expand-md  default top-nav-collapse">
                 <div class="header-left">
-                    <a class="navbar-brand bg-transparent" href="#">
+                    <a class="navbar-brand bg-transparent" href="{{ config('app.logo_url') }}">
                         <img src="{{ $logo . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
                     </a>
                 </div>
@@ -146,7 +146,7 @@
                         @endif
 
                         @if (is_array(json_decode($settings['menubar_page'])) || is_object(json_decode($settings['menubar_page'])))
-                            @foreach (json_decode($settings['menubar_page']) as $key => $value) 
+                            @foreach (json_decode($settings['menubar_page']) as $key => $value)
                                 @if (isset($value->header) &&
                                         $value->header == 'on' &&
                                         (isset($value->template_name) && $value->template_name == 'page_content'))
