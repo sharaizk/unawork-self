@@ -44,7 +44,7 @@
         <div class="col-md-12">
             <div class="pricing-plan">
                 <div class="tab-content mt-3">
-                    <h5 class="text-danger text-center">If you need more details please contact our admin directly at admin@example.com</h5>
+                    <h5 class="text-danger text-center">If you need more details please contact our admin directly at info@unawork.net</h5>
                     <div id="monthly-biling" class="tab-pane in active">
                         <div class="row">
                             @foreach ($plans as $key => $plan)
