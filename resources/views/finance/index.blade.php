@@ -109,7 +109,7 @@
             <div class="col-12">
                 <canvas id="finance-chart"></canvas>
                 <div id="no-data" style="display: none; text-align: center; margin-top: 20px;">
-                    <p>{{ __('No data available for the selected period') }}</p>
+                    <p>{{ __('Add in the cost per project as you task items to your team. Then, add in your revenue or profit to the same project. When you visit this page next, we’ll show you the profit and loss margins so you can automatically keep track of your finances  - all in one platform. ') }}</p>
                 </div>
             </div>
         </div>

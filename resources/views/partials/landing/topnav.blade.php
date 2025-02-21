@@ -8,7 +8,7 @@
                 <div class="header__container">
                     <div class="header__mobile">
                         <div class="logoHeader ms-5 me-5">
-                            <a href="/" title="UnaWork">
+                            <a href="{{ config('app.logo_url') }}" title="UnaWork">
                                 <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
                                 <!-- <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork"> -->
                             </a>
@@ -18,7 +18,7 @@
                     <div class="header__main">
 
                         <div class="logoHeader ms-5 me-5">
-                            <a href="/" title="UnaWork">
+                            <a href="{{ config('app.logo_url') }}" title="UnaWork">
                                 <img src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
                                 <!-- <img src="{{ asset('assets/images/landing/logo.png') }}" alt="Logo UnaWork"> -->
                             </a>

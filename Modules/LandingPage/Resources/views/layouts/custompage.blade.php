@@ -56,7 +56,7 @@
     @if ($SITE_RTL == 'on')
         <link rel="stylesheet" href="{{ asset('assets/css/style-rtl.css') }}">
     @endif
-    
+
     @if (isset($setting['cust_darklayout']) && $setting['cust_darklayout'] == 'on')
         <link rel="stylesheet" href="{{ asset('assets/css/style-dark.css') }}">
     @else
@@ -107,7 +107,7 @@
         <div class="container">
             <nav class="navbar navbar-expand-md  default top-nav-collapse">
                 <div class="header-left">
-                    <a class="navbar-brand bg-transparent" href="#">
+                    <a class="navbar-brand bg-transparent" href="{{ config('app.logo_url') }}">
                         <img src="{{ $logo . '/' . $settings['site_logo'] }}" alt="logo">
                     </a>
                 </div>
