@@ -41,6 +41,33 @@
     text-decoration: none !important;
 }
 
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    color: #022d4d;
+    max-height: 60px;
+    overflow: hidden;
+    opacity: 0.7;
+    margin-top: 5px;
+    line-height: 17px;
+    font-size: 12px;
+}
+
+.content__skill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    background-color: #CFAA40;
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #FFFFFF;
+    border-radius: 2px;
+}
+
 .hire__subtitle {
     font-size: 20px;
     font-weight: 600;

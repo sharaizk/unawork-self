@@ -14,13 +14,18 @@
             <p><strong>City:</strong> {{$employee->profile->city ?? 'n/a'}}</p>
         </div>
         <div class="card__skills">
-            <p><strong>Skills:</strong> 
+            <div class="content">
+                <strong>Skills: </strong>
+                <!-- <strong>Country:</strong> {{$user->profile->country ?? 'n/a'}}
+                <strong>State:</strong> {{$user->profile->state ?? 'n/a'}}
+                <strong>City:</strong> {{$user->profile->city ?? 'n/a'}}
+                <strong>Skills:</strong> -->
                 @forelse ($employee->skills as $index => $skill)
-                    {{ $skill->name }}{{ $index < $employee->skills->count() - 1 ? ',' : '' }}
+                    <div class="content__skill">{{$skill->name}}</div>
                 @empty
                     n/a
                 @endforelse
-            </p>
+            </div>
         </div>
     </div>
     <div class="card__footer">

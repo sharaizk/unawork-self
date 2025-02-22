@@ -1677,7 +1677,7 @@
     margin-right: 5px;
 }
 
-.members .members__info_list--item .content .content__skill {
+.content__skill {
     display: flex;
     align-items: center;
     justify-content: center;

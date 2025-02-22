@@ -91,7 +91,7 @@ class PodController extends Controller
 
         return response()->json([
             'pods' => view('pod.landing.pod_list', compact('pods', 'user', 'joinedPods'))->render(),
-            'pagination' => (string) $pods->links()
+            'pagination' => (string) $pods->links('vendor.pagination.custom')
         ]);
     }
 

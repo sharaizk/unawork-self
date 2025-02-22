@@ -330,6 +330,7 @@
     margin-right: 30px;
     position: relative;
     align-self: start;
+    border-radius: 30px;
 
   }
   .tpl-hub-shop .cm-shop__image img {
@@ -337,7 +338,6 @@
     display: block;
     width: 100%;
     height: auto;
-    max-height: 400px;
     object-fit: cover;
   }
   

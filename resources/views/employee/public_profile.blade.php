@@ -7,10 +7,17 @@
 @endphp
 <link rel="stylesheet" href="{{ asset('assets/css/landing/hub-shop.css') }}">
 <link rel="stylesheet" href="http://unawork.net/plugins/fancybox/fancybox.min.css">
+<style>
+    .header__search{
+        background-color: #022d4d;
+        height: 60px;
+    }
+</style>
+<section class="header__search"></section>
 <main>
     <div id="successMessage" class="alert alert-success" style="display: none;"></div>
 
-    <div class="container-master main">
+    <div class="container main">
     <div class="row-master">
       <div class="col-12 col-md-12 col-xl-9">
         <section class="section__introduce">

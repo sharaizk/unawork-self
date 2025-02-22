@@ -150,7 +150,7 @@
 
                     </div>
                     <div class="pagination-container d-flex justify-content-md-end justify-content-center mt-4">
-                        {{ $pods->appends(request()->query())->links('vendor.pagination.custom') }}
+                        <!-- {{ $pods->appends(request()->query())->links('vendor.pagination.custom') }} -->
                     </div>
                 </div>
             </section>
