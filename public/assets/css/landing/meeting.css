@@ -95,6 +95,12 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0);
 }
 
+@media (max-width: 768px) {
+  .section__titlepage .filters {
+    flex-wrap: wrap;
+  }
+}
+
 .section__titlepage .filter-select,
 .filter-date,
 .filter-button {
@@ -192,7 +198,7 @@
 
 .section__titlepage span {
   font-size: 4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   border-bottom: 5px solid #88a6b5;
 }
@@ -222,7 +228,7 @@
   position: relative;
 }
 .pastmeetingnotes__content .title_box, .videobars__content .title_box, main .meetings--content .title_box {
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   font-size: 2rem;
 }
 .pastmeetingnotes__content .buttonViewAll, .videobars__content .buttonViewAll, main .meetings--content .buttonViewAll {
@@ -282,7 +288,7 @@ main .meetings__item--left {
 }
 main .meetings__item--left h3 {
   font-size: 1.7rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
 }
 main .meetings__item--left p {
   margin-bottom: 7px;
@@ -363,7 +369,7 @@ main .meetings__item--left p a {
 }
 .section__titlepage span {
   font-size: 4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   border-bottom: 5px solid #88a6b5;
 }
@@ -393,7 +399,7 @@ main .meetings__item--left p a {
   position: relative;
 }
 .pastmeetingnotes__content .title_box, .videobars__content .title_box, main .meetings--content .title_box {
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   font-size: 2rem;
 }
 .pastmeetingnotes__content .buttonViewAll, .videobars__content .buttonViewAll, main .meetings--content .buttonViewAll {
@@ -447,7 +453,7 @@ main .meetings__item--left {
 }
 main .meetings__item--left h3 {
   font-size: 1.7rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
 }
 main .meetings__item--left p {
   margin-bottom: 7px;
@@ -527,7 +533,7 @@ main .meetings__item--left p a {
 }
 .section__titlepage span {
   font-size: 4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   border-bottom: 5px solid #88a6b5;
 }
@@ -557,7 +563,7 @@ main .meetings__item--left p a {
   position: relative;
 }
 .pastmeetingnotes__content .title_box, .videobars__content .title_box, main .meetings--content .title_box {
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   font-size: 2rem;
 }
 .pastmeetingnotes__content .buttonViewAll, .videobars__content .buttonViewAll, main .meetings--content .buttonViewAll {
@@ -611,7 +617,7 @@ main .meetings__item--left {
 }
 main .meetings__item--left h3 {
   font-size: 1.7rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
 }
 main .meetings__item--left p {
   margin-bottom: 7px;
@@ -692,7 +698,7 @@ main .meetings__item--left p a {
 }
 .section__titlepage span {
   font-size: 4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   border-bottom: 5px solid #88a6b5;
 }
@@ -722,7 +728,7 @@ main .meetings__item--left p a {
   position: relative;
 }
 .pastmeetingnotes__content .title_box, .videobars__content .title_box, main .meetings--content .title_box {
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   font-size: 2rem;
 }
 .pastmeetingnotes__content .buttonViewAll, .videobars__content .buttonViewAll, main .meetings--content .buttonViewAll {
@@ -781,7 +787,7 @@ main .meetings__item--left {
 }
 main .meetings__item--left h3 {
   font-size: 1.7rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
 }
 main .meetings__item--left p {
   margin-bottom: 7px;
@@ -1039,7 +1045,7 @@ main .meetings__item--left p a {
 .pastmeetingnotes__list--meeting--item .date {
   font-size: 1.6rem;
   text-align: center;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   margin-bottom: 1.4rem;
 }
 .pastmeetingnotes__list--meeting--item .time {

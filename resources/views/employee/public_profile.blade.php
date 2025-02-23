@@ -59,7 +59,7 @@
 
               <div class="profile__skills">
                 <div class="title">
-                    <span>Skills</span>
+                    <span>Skills:</span>
                 </div>
                 <ul class="p-0">
                   @forelse ($employee->skills as $skill)
@@ -71,7 +71,7 @@
               </div>
               <div class="profile__bio">
                 <div class="title">
-                    <span>Bio</span>
+                    <span>Bio:</span>
                 </div>
                 <p>
                   @if($employee->profile->about)
@@ -81,8 +81,7 @@
                   @endif
                 </p>
                 @if($employee->profile->cv_file)
-                  <hr>
-                    <p class="mt-2">{{ __('Current CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
+                    <p class="mt-2">{{ __('CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
                 @endif
               </div>
            </section>

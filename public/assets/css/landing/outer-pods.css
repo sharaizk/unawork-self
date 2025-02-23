@@ -88,7 +88,7 @@
 
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -137,7 +137,7 @@
 .section__statistics__archives .boxstatistics__content .title_box,
 .section__tasksmeeting__contentboxmeetings .title_box,
 .section__tasksmeeting .meetings--content .title_box {
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     font-size: 2rem;
 }
 
@@ -290,7 +290,7 @@
 
 .section__tasksmeeting .meetings__item--left h3 {
     font-size: 1.7rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__tasksmeeting .meetings__item--left p {
@@ -313,7 +313,7 @@
     justify-content: center;
     background: #cfaa40;
     color: #fff;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     border-radius: 10px;
     margin: 15px 0;
 }
@@ -399,7 +399,7 @@
 
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -448,7 +448,7 @@
 .section__statistics__archives .boxstatistics__content .title_box,
 .section__tasksmeeting__contentboxmeetings .title_box,
 .section__tasksmeeting .meetings--content .title_box {
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     font-size: 2rem;
 }
 
@@ -559,7 +559,7 @@
 
 .section__tasksmeeting .meetings__item--left h3 {
     font-size: 1.7rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__tasksmeeting .meetings__item--left p {
@@ -582,7 +582,7 @@
     justify-content: center;
     background: #cfaa40;
     color: #fff;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     border-radius: 10px;
     margin: 15px 0;
 }
@@ -667,7 +667,7 @@
 
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -716,7 +716,7 @@
 .section__statistics__archives .boxstatistics__content .title_box,
 .section__tasksmeeting__contentboxmeetings .title_box,
 .section__tasksmeeting .meetings--content .title_box {
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     font-size: 2rem;
 }
 
@@ -827,7 +827,7 @@
 
 .section__tasksmeeting .meetings__item--left h3 {
     font-size: 1.7rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__tasksmeeting .meetings__item--left p {
@@ -850,7 +850,7 @@
     justify-content: center;
     background: #cfaa40;
     color: #fff;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     border-radius: 10px;
     margin: 15px 0;
 }
@@ -936,7 +936,7 @@
 
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -985,7 +985,7 @@
 .section__statistics__archives .boxstatistics__content .title_box,
 .section__tasksmeeting__contentboxmeetings .title_box,
 .section__tasksmeeting .meetings--content .title_box {
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     font-size: 2rem;
 }
 
@@ -1096,7 +1096,7 @@
 
 .section__tasksmeeting .meetings__item--left h3 {
     font-size: 1.7rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__tasksmeeting .meetings__item--left p {
@@ -1119,7 +1119,7 @@
     justify-content: center;
     background: #cfaa40;
     color: #fff;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     border-radius: 10px;
     margin: 15px 0;
 }
@@ -1298,7 +1298,7 @@
 .section__tasksmeeting .list__contenttask__item__title {
     padding: 0 0 8px 0;
     font-size: 1.7rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__tasksmeeting .list__contenttask__item:last-child {
@@ -1351,7 +1351,7 @@
 .boxarchives__content__list__item__title {
     padding-bottom: 5px;
     font-size: 16px;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #022D4D;
     font-size: 20px;
     font-weight: 700;
@@ -1366,7 +1366,7 @@
     top: 22px;
     right: 16px;
     color: #083251;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     text-decoration: underline !important;
 }
 
@@ -1397,7 +1397,7 @@
 
 .section__projects__item__name {
     font-size: 1.7rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__projects__item .select {
@@ -1462,7 +1462,7 @@
     font-size: 16px;
     color: #fff;
     opacity: 0.7;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .section__members__item .select {
