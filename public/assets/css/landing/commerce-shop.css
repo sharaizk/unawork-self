@@ -70,7 +70,6 @@
   .tpl-commerce-shop .aside__container .aside__card__title span {
     font-size: 2rem;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
   }
   .tpl-commerce-shop .aside__container .aside__card__body {
     margin: 10px 0 25px;
@@ -78,7 +77,7 @@
   .tpl-commerce-shop .aside__container .aside__card__body span {
     font-size: 1.4rem;
     color: #000;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .aside__container .aside__card__actions button {
     width: 100%;
@@ -127,7 +126,6 @@
   }
   .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
     color: #000;
     border-bottom: 5px solid #88a6b5;
   }
@@ -223,7 +221,7 @@
   .tpl-commerce-shop .aside__container .aside__card__title span {
     font-size: 2rem;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .aside__container .aside__card__body {
     margin: 10px 0 25px;
@@ -231,7 +229,7 @@
   .tpl-commerce-shop .aside__container .aside__card__body span {
     font-size: 1.4rem;
     color: #000;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .aside__container .aside__card__actions button {
     width: 100%;
@@ -280,7 +278,7 @@
   }
   .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
   }
@@ -327,17 +325,26 @@
     -ms-flex: 0 0 275px;
     flex: 0 0 275px;
     max-width: 275px;
+    width: 100%;
     margin-right: 30px;
     position: relative;
     align-self: start;
+    border-radius: 30px;
 
+  }
+  @media (max-width: 991px) {
+    .tpl-hub-shop .cm-shop__image {
+      margin-right: 0;
+      margin-bottom: 10px;
+      max-width: 320px;
+      flex: 0 0 320px;
+    }
   }
   .tpl-hub-shop .cm-shop__image img {
     border-radius: 5px;
     display: block;
     width: 100%;
     height: auto;
-    max-height: 400px;
     object-fit: cover;
   }
   
@@ -384,14 +391,13 @@
   }
   .tpl-commerce-shop .cm-shop__profile .title span {
     font-size: 1.8rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
   }
   .tpl-hub-shop .section__about .title {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
   .tpl-hub-shop .section__about .title span {
     font-size: 1.8rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    color: #022D4D;
   }
   
   .tpl-commerce-shop .cm-shop__profile .profile__name {
@@ -399,13 +405,13 @@
   }
   .tpl-commerce-shop .cm-shop__profile .profile__name h2, .tpl-commerce-shop .cm-shop__profile .profile__name h1 {
     font-size: 4.5rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .cm-shop__profile .profile__name div {
     color: #022d4d;
     opacity: 0.7;
     line-height: 29px;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
     font-size: 18px;
   }
   .tpl-commerce-shop .cm-shop__profile .profile__skills ul {
@@ -417,7 +423,7 @@
     border-radius: 3px;
     color: #fff;
     font-size: 1.4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     line-height: 16px;
     margin-right: 12px;
   }
@@ -431,7 +437,7 @@
     border-radius: 3px;
     color: #fff;
     font-size: 1.4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     line-height: 16px;
     margin-right: 12px;
   }
@@ -444,14 +450,16 @@
     opacity: 0.7;
     font-size: 16px;
     line-height: 29px;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-hub-shop  .profile__bio p, .tpl-commerce-shop .cm-shop__profile .profile__interview p {
     color: #022d4d;
-    opacity: 0.7;
     font-size: 16px;
     line-height: 29px;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+  }
+
+  .tpl-hub-shop  .profile__bio p a:hover {
+    text-decoration: underline;
   }
   
   .tpl-commerce-shop .cm-shop__profile .profile__actions {
@@ -478,7 +486,7 @@
     color: #000;
     font-size: 14px;
     line-height: 18px;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
     text-transform: uppercase;
   }
   .tpl-commerce-shop .cm-shop__profile .profile__actions .actions__btn i {
@@ -502,12 +510,12 @@
     font-size: 25px;
     line-height: 35px;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__actions a {
     font-size: 1.6rem;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__actions a:hover {
     color: #cfaa40;
@@ -560,7 +568,7 @@
     font-size: 1.6rem;
     margin-bottom: 15px;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__date span {
     font-size: 1.4rem;
@@ -572,7 +580,7 @@
     margin: 20px 0 12px;
     font-size: 1.7rem;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__content {
     border-bottom: 1px solid rgba(136, 166, 181, 0.2);
@@ -582,14 +590,14 @@
     margin: 20px 0 12px;
     font-size: 1.7rem;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     line-height: 22px;
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__description {
     font-size: 1.4rem;
     color: #022d4d;
     opacity: 0.7;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
     line-height: 22.5px;
     max-height: 45px;
     display: -webkit-box;
@@ -611,7 +619,7 @@
     border: none;
     font-size: 1.4rem;
     color: #000;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     margin-right: 6px;
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__readmore span {
@@ -656,7 +664,7 @@
     font-size: 16px;
     line-height: 22px;
     color: #000;
-    font-family: "Caros", Arial, Helvetica, sans-serif;
+    
     margin-left: 6px;
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__like span:hover, .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__dislike span:hover {

@@ -108,7 +108,7 @@
 .tpl-find-work .section__title span,
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -252,7 +252,7 @@
 .tpl-find-work .section__title span,
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -395,7 +395,7 @@
 .tpl-find-work .section__title span,
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -539,7 +539,7 @@
 .tpl-find-work .section__title span,
 .section__titlepage span {
     font-size: 4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     border-bottom: 5px solid #88a6b5;
 }
@@ -726,7 +726,7 @@
 .tpl-find-work .section__water .water__calendar .calendar__year,
 .tpl-find-work .section__chat .chat-calendar .calendar__year {
     font-size: 1.4rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
 }
 
@@ -750,7 +750,7 @@
 .tpl-find-work .section__water .water__calendar .calendar__table th,
 .tpl-find-work .section__chat .chat-calendar .calendar__table th {
     font-size: 1.2rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #022d4d;
     opacity: 0.7;
 }
@@ -889,14 +889,14 @@
 
 .tpl-find-work .section__layout .teams__title h2 {
     font-size: 2rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
 }
 
 .tpl-find-work .section__layout .teams__title a {
     font-size: 1.6rem;
     margin-bottom: 2rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
 }
 
@@ -936,7 +936,7 @@
 
 .tpl-find-work .section__project .project__header h4 {
     font-size: 1.6rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #fff;
 }
 
@@ -1261,7 +1261,7 @@
 .tpl-find-work .section__member .member__header h4 {
     color: #000;
     font-size: 1.6rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .tpl-find-work .section__member .member__status {
@@ -1291,7 +1291,7 @@
 }
 
 .tpl-find-work .section__member .member-project .member-project__viewall {
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .tpl-find-work .section__member .member-project i {
@@ -1339,7 +1339,7 @@
 
 .tpl-find-work .section__water .water-project__title h4 {
     font-size: 1.6rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
 }
 
 .tpl-find-work .section__water .water__left {
@@ -1547,7 +1547,7 @@
 
 .tpl-find-work .section__water .water-newfeed__item .newfeed-item__header .head-time {
     font-size: 1rem;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #022d4d;
     opacity: 0.7;
 }
@@ -1915,7 +1915,7 @@
 
 .tpl-find-work .hire-card .card__title {
     margin-left: 15px;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     font-size: 2rem;
     color: #000;
 }
@@ -1950,7 +1950,7 @@
 .tpl-outerPods .hire-card .card__title {
     width: calc(100% - 90px);
     margin-left: 15px;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     font-size: 2rem;
     color: #000;
 }
@@ -2062,7 +2062,7 @@
 .tpl-find-work .section_pod .pods__title .buttonViewAll {
     font-size: 16px;
     font-weight: 700;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     transition: all 0.3s ease-in-out;
 }
@@ -2089,7 +2089,7 @@
 .tpl-find-work .section_pod .pods__title h2 {
     font-size: 20px;
     font-weight: 600;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     margin-bottom: 0;
 }
@@ -2113,7 +2113,7 @@
 .tpl-find-work .section_company .pods__title h2 {
     font-size: 20px;
     font-weight: 600;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     margin-bottom: 0;
 }
@@ -2121,7 +2121,7 @@
 .tpl-find-work .section_company .pods__title .buttonViewAll {
     font-size: 16px;
     font-weight: 700;
-    font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+    
     color: #000;
     transition: all 0.3s ease-in-out;
 }
@@ -2548,5 +2548,9 @@
 
     .filter-mobile {
         display: block;
+    }
+
+    .header__search .container .wrapper {
+        display: none!important;
     }
 }

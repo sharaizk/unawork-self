@@ -24,71 +24,136 @@
         border-radius: 5px;
     }
 
+    .dropdown {
+        height: 40px;
+    }
+
+    .dropdown li {
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown .form-check-input:checked {
+        background-color: #E8BE61;
+    }
+
+    .dropdown .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+        margin-top: 0;
+    }
+
+    .dropdown .form-check-label {
+        font-size: 15px;
+    }
+
     .dropdown .btn {
+        flex-shrink: 0;
+        max-width: 192px;
         width: 100%;
+        height: 100%;
         text-align: left;
+        background-color: #FFFFFF;
+        color: #022D4D;
+        font-weight: 700;
+        font-size: 15px;
     }
 
     .dropdown ul {
+        flex-shrink: 0;
+        max-width: 192px;
         width: 100%;
+        padding: 20px;
+        min-width: 40vh;
+        width: 40vh;
+        max-height: 380px;
+        overflow-y: auto;
+        border: 2px solid #022D4D;
     }
-
-    #apply-filters {
-        margin-top: 30px;
+    .header__search{
+        background-color: #022d4d;
+        height: 60px;
+    }
+    .header__search .container .wrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        height: 100%;
+    }
+    .header__search .container{
+        height: 100%;
+    }
+    .date-input input {
         height: 40px;
+        font-weight: 700;
+        font-size: 15px;
+    }
+    #apply-filters, #apply-filters-mobile {
+        font-weight: 700;
+        font-size: 15px;
+        color: #022D4D;
+        width: 121px;
+        background-color: #E8BE61;
+        height:  40px;
+        border: none;
+        margin-top: 0;
     }
 </style>
+<section class="header__search">
+    <div class="container">
+        <div class="wrapper">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    Select Projects
+                </button>
+                <ul class="dropdown-menu skills-dropdown-menu">
+                    <li>
+                        <input class="form-check-input select-all-projects" type="checkbox" id="select_all_projects">
+                        <label class="form-check-label" for="select_all_projects">
+                            {{ __('Select All') }}
+                        </label>
+                    </li>
+                    @foreach($projects as $project)
+                        <li>
+                            <input class="form-check-input project-checkbox" type="checkbox" name="project_ids[]" id="project_{{ $project->id }}" value="{{ $project->id }}">
+                            <label class="form-check-label" for="project_{{ $project->id }}">
+                                {{ $project->name }}
+                            </label>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <div class="date-input">
+                <!-- <label for="start_date">{{ __('Start Date') }}</label> -->
+                <input type="date" id="start_date" class="form-control">
+            </div>
+            <div class="date-input">
+                <!-- <label for="end_date">{{ __('End Date') }}</label> -->
+                <input type="date" id="end_date" class="form-control">
+            </div>
+            <button id="apply-filters" class="btn btn-primary">Search</button>
+            <!-- <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
+        </div>
+        <button type="button" class="filter-mobile">Filter</button>
+    </div>
+</section>
 <main>
     <section class="topTitle">
-        <div class="container-master">
+        <div class="container">
             <h1 class="titlePage"><span>Finances</span></h1>
+            <h4 class="subTitlePage">Check your Projects’ Finances</h4>
+            <p class="descrPage">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
         </div>
 
     </section>
     <section class="section">
-        <div class="row">
+        <div class="row" style="display: none;">
 
             <button id="toggle-filters" class="btn btn-sm btn-primary mx-1" title="{{ __('Toggle Filters') }}">
                 <i class="ti ti-filter"></i> Toggle Filters
             </button>
             <div id="filters-section" style="display: none; margin-bottom: 20px;">
-                <div class="row mb-3 align-items-center">
-                    <div class="col-md-4">
-                        <label for="project_filter">{{ __('Projects') }}</label>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                Select Projects
-                            </button>
-                            <ul class="dropdown-menu skills-dropdown-menu">
-                                <li>
-                                    <input class="form-check-input select-all-projects" type="checkbox" id="select_all_projects">
-                                    <label class="form-check-label" for="select_all_projects">
-                                        {{ __('Select All') }}
-                                    </label>
-                                </li>
-                                @foreach($projects as $project)
-                                    <li>
-                                        <input class="form-check-input project-checkbox" type="checkbox" name="project_ids[]" id="project_{{ $project->id }}" value="{{ $project->id }}">
-                                        <label class="form-check-label" for="project_{{ $project->id }}">
-                                            {{ $project->name }}
-                                        </label>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="start_date">{{ __('Start Date') }}</label>
-                        <input type="date" id="start_date" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="end_date">{{ __('End Date') }}</label>
-                        <input type="date" id="end_date" class="form-control">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button id="apply-filters" class="btn btn-primary w-100">{{ __('Apply Filters') }}</button>
-                    </div>
-                </div>
                 <div class="row mb-3">
                     <div class="col-md-4 d-flex justify-content-between">
                     </div>
@@ -105,8 +170,9 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12">
+        <div class="container">
+            <div class="chart-container">
+                <h2>Profit and Loss</h2>
                 <canvas id="finance-chart"></canvas>
                 <div id="no-data" style="display: none; text-align: center; margin-top: 20px;">
                     <p>{{ __('Add in the cost per project as you task items to your team. Then, add in your revenue or profit to the same project. When you visit this page next, we’ll show you the profit and loss margins so you can automatically keep track of your finances  - all in one platform. ') }}</p>
@@ -115,11 +181,51 @@
         </div>
     </section>
 </main>
+<div class="filter-modal">
+    <div class="wrapper">
+        <div class="filter-modal__header">
+            <p>Filters</p>
+            <button type="button" class="close"></button>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                Select Projects
+            </button>
+            <ul class="dropdown-menu skills-dropdown-menu">
+                <li>
+                    <input class="form-check-input select-all-projects" type="checkbox" id="select_all_projects">
+                    <label class="form-check-label" for="select_all_projects">
+                        {{ __('Select All') }}
+                    </label>
+                </li>
+                @foreach($projects as $project)
+                    <li>
+                        <input class="form-check-input project-checkbox" type="checkbox" name="project_ids[]" id="project_{{ $project->id }}" value="{{ $project->id }}">
+                        <label class="form-check-label" for="project_{{ $project->id }}">
+                            {{ $project->name }}
+                        </label>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+        <div class="date-input">
+            <!-- <label for="start_date">{{ __('Start Date') }}</label> -->
+            <input type="date" id="start_date" class="form-control">
+        </div>
+        <div class="date-input">
+            <!-- <label for="end_date">{{ __('End Date') }}</label> -->
+            <input type="date" id="end_date" class="form-control">
+        </div>
+        <button id="apply-filters-mobile" class="btn btn-primary">Search</button>
+        <!-- <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
+    </div>
+</div>
 @endsection
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             const ctx = document.getElementById('finance-chart').getContext('2d');
             let chart;
 
@@ -154,10 +260,10 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Margin',
+                            label: 'Revenue',
                             data: data,
-                            borderColor: 'rgb(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: '#2554F4',
+                            backgroundColor: '#B3C4FB',
                             fill: true,
                         }]
                     },
@@ -165,7 +271,9 @@
                         responsive: true,
                         plugins: {
                             legend: {
-                                position: 'top',
+                                display: true,
+                                position: 'top', 
+                                align: 'end',    
                             },
                             tooltip: {
                                 callbacks: {
@@ -190,13 +298,11 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Date',
                                 },
                             },
                             y: {
                                 title: {
                                     display: true,
-                                    text: 'Margin Amount',
                                 },
                             },
                         },
@@ -341,9 +447,40 @@
                     .map(checkbox => parseInt(checkbox.value));
                 fetchFinanceData(startDate, endDate, selectedProjects);
             });
+            document.getElementById('apply-filters-mobile').addEventListener('click', function () {
+                const startDate = document.getElementById('start_date').value;
+                const endDate = document.getElementById('end_date').value;
+                const selectedProjects = Array.from(projectCheckboxes)
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => parseInt(checkbox.value));
+                fetchFinanceData(startDate, endDate, selectedProjects);
+            });
 
             // Load Default Data For All Projects
             fetchFinanceData(lastYearDate, today, []);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtn = document.querySelector('.filter-mobile');
+            const filterModal = document.querySelector('.filter-modal');
+            const closeBtn = document.querySelector('.filter-modal .close');
+
+            if (filterBtn && filterModal && closeBtn) {
+                filterBtn.addEventListener('click', function () {
+                    filterModal.classList.add('active');
+                });
+
+                closeBtn.addEventListener('click', function () {
+                    filterModal.classList.remove('active');
+                });
+
+                filterModal.addEventListener('click', function (event) {
+                    if (event.target === filterModal) {
+                        filterModal.classList.remove('active');
+                    }
+                });
+            }
         });
     </script>
 @endsection

@@ -65,7 +65,7 @@ class HirePageController extends Controller
 
         return response()->json([
             'employees' => view('hiring.employee_list', compact('employees'))->render(),
-            'pagination' => (string) $employees->appends(request()->query())->links()
+            'pagination' => (string) $employees->appends(request()->query())->links('vendor.pagination.custom')
         ]);
     }
 }

@@ -68,15 +68,14 @@
 }
 
 .tpl-hub-shop .aside__container .aside__card {
-  padding: 25px 20px 20px;
+  padding: 20px;
   border-radius: 20px;
   border: 2px solid #cfaa40;
   margin-bottom: 20px;
 }
 .tpl-hub-shop .aside__container .aside__card__title span {
-  font-size: 2rem;
-  color: #000;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  color: #022D4D;
 }
 .tpl-hub-shop .aside__container .aside__card__body {
   margin: 10px 0 25px;
@@ -84,7 +83,7 @@
 .tpl-hub-shop .aside__container .aside__card__body span {
   font-size: 1.4rem;
   color: #000;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
 }
 .tpl-hub-shop .aside__container .aside__card__actions button {
   width: 100%;
@@ -96,7 +95,7 @@
   text-transform: uppercase;
 }
 .tpl-hub-shop .aside__container .aside__card__actions button span img {
-  transform: translate(-5px, 2px);
+  margin-right: 5px;
   height: 15px;
   width: auto;
 }
@@ -133,7 +132,7 @@
 }
 .section__titlepage span {
   font-size: 4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   border-bottom: 5px solid #88a6b5;
 }
@@ -226,7 +225,7 @@
 }
 
 .tpl-hub-shop .aside__container .aside__card {
-  padding: 25px 20px 20px;
+  padding: 20px 20px 20px;
   border-radius: 20px;
   border: 2px solid #cfaa40;
   margin-bottom: 20px;
@@ -234,7 +233,7 @@
 .tpl-hub-shop .aside__container .aside__card__title span {
   font-size: 2rem;
   color: #000;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
 }
 .tpl-hub-shop .aside__container .aside__card__body {
   margin: 10px 0 25px;
@@ -242,7 +241,7 @@
 .tpl-hub-shop .aside__container .aside__card__body span {
   font-size: 1.4rem;
   color: #000;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
 }
 .tpl-hub-shop .aside__container .aside__card__actions button {
   width: 100%;
@@ -280,10 +279,18 @@
   height: 15px;
   width: auto;
 }
+@media (max-width: 991px) {
+  .tpl-hub-shop .aside__container .aside__card {
+    max-width: 320px;
+  }
+}
 @media (max-width: 768px) {
   .tpl-hub-shop .aside__container .aside__card {
     margin-top: 20px;
   }
+}
+.section__about .section__btnMore span {
+  font-size: 14px;
 }
 
 .section__titlepage {
@@ -291,7 +298,7 @@
 }
 .section__titlepage span {
   font-size: 4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   border-bottom: 5px solid #88a6b5;
 }
@@ -319,7 +326,7 @@
 }
 
 .tpl-hub-shop .section__layout {
-  margin-top: 40px;
+  margin-top: 30px;
 }
 .tpl-hub-shop .section__title {
   margin-bottom: 15px;
@@ -329,12 +336,12 @@
 .tpl-hub-shop .section__title h2 {
   color: #022d4d;
   font-size: 2.5rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  margin-bottom: 0;
 }
 .tpl-hub-shop .section__title a {
   color: #000;
   font-size: 1.6rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
 }
 .tpl-hub-shop .section__title a:hover {
   color: #cfaa40;
@@ -362,26 +369,22 @@
 }
 .tpl-hub-shop .section__introduce .col-right {
   -webkit-box-flex: 0;
-  -ms-flex: 0 0 calc(100% - 140px);
-  flex: 0 0 calc(100% - 280px);
-  max-width: calc(100% - 280px);
-  margin-left: auto;
 }
 .tpl-hub-shop .section__introduce .col-right .item__title h1 {
-  font-size: 4.5rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
-  color: #000;
+  font-weight: 500;
+  font-size: 40px;
+  color: #022D4D;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content {
   margin-top: 10px;
 }
-.tpl-hub-shop .section__introduce .col-right .item__content ul li {
+.tpl-hub-shop .section__introduce .col-right .item__content ul {
+  padding-left: 0;
+  gap: 10px;
   align-items: center;
 }
-.tpl-hub-shop .section__introduce .col-right .item__content ul li:after {
-  content: "·";
-  padding: 0 7px;
-  color: rgba(2, 45, 77, 0.7);
+.tpl-hub-shop .section__introduce .col-right .item__content ul li {
+  align-items: center;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content ul li i {
   color: #cfaa40;
@@ -392,12 +395,16 @@
 .tpl-hub-shop .section__introduce .col-right .item__content ul li span,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li address {
   color: rgba(2, 45, 77, 0.7);
-  font-size: 16px;
+  font-size: 14px;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content ul li a:hover,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li span:hover,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li address:hover {
   color: #cfaa40;
+}
+.tpl-hub-shop .section__introduce .col-right .item__content ul li a {
+  display: flex;
+  align-items: center;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content ul li:last-child:after {
   content: "";
@@ -423,7 +430,7 @@
 }
 .tpl-hub-shop .section__service .section__content .row__title {
   font-size: 1.2rem;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
   color: #022d4d;
   opacity: 0.7;
   text-align: left;
@@ -435,7 +442,7 @@
 }
 .tpl-hub-shop .section__service .section__content .row__service td {
   font-size: 1.6rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   width: 16.8rem;
 }
@@ -446,13 +453,13 @@
 }
 .tpl-hub-shop .section__service .section__content .row__price td {
   font-size: 1.4rem;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
   color: #022d4d;
   opacity: 0.7;
 }
 .tpl-hub-shop .section__service .section__content .row__price td span {
   font-size: 1.6rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
 }
 .tpl-hub-shop .section__service .section__content .row__description th,
@@ -463,7 +470,7 @@
   height: 12.2rem;
   overflow: hidden;
   font-size: 1.4rem;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
   color: #000;
   margin-bottom: 3rem;
 }
@@ -500,13 +507,6 @@
   height: 100%;
   object-fit: cover;
 }
-.tpl-hub-shop .section__courses .section__content .courses__body {
-  padding: 1.6rem 1.2rem 1.2rem;
-  border-left: 1px solid rgba(136, 166, 181, 0.4);
-  border-right: 1px solid rgba(136, 166, 181, 0.4);
-  border-bottom: 1px solid rgba(136, 166, 181, 0.4);
-  border-radius: 0 0 4px 4px;
-}
 .tpl-hub-shop .section__courses .section__content .courses__title {
   height: 4rem;
   overflow: hidden;
@@ -517,9 +517,10 @@
 }
 .tpl-hub-shop .section__courses .section__content .courses__title a {
   font-size: 1.4rem;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   color: #000;
   flex: 1;
+  text-align: center;
 }
 .tpl-hub-shop .section__courses .section__content .courses__title a:hover {
   color: #cfaa40;
@@ -529,10 +530,40 @@
 }
 .tpl-hub-shop .section__courses .section__content .courses__subtitle {
   font-size: 1.4rem;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
   color: #022d4d;
   opacity: 0.7;
   margin: 0.8rem 0 1.8rem;
+}
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title,
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title .skills__list {
+  display: flex;
+  align-items: center;
+}
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title .skills__list {
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title b {
+  margin-right: 5px;
+}
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title .skill__name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  background-color: #CFAA40;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-size: 14px;
+  color: #FFFFFF;
+  border-radius: 2px;
+}
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title {
+  margin-bottom: 10px;
+}
+.tpl-hub-shop .section__courses .section__content .courses__subtitle .title .skills__list {
+  margin-bottom: 0;
 }
 .tpl-hub-shop .section__courses .section__content .courses__dot button {
   cursor: pointer;
@@ -634,7 +665,7 @@
 .tpl-hub-shop .section__meets .section__content-2 .content-box__text h3 {
   font-size: 2.5rem;
   color: #000;
-  font-family: "Caros-Bold", Arial, Helvetica, sans-serif;
+  
   margin-bottom: 1.4rem;
 }
 .tpl-hub-shop .section__meets .section__content-2 .content-box__text div {
@@ -643,7 +674,7 @@
 .tpl-hub-shop .section__meets .section__content-2 .content-box__text div span {
   font-size: 1.4rem;
   color: #000;
-  font-family: "Caros", Arial, Helvetica, sans-serif;
+  
 }
 .tpl-hub-shop .section__meets .section__content-2 .content_meets {
   -webkit-box-flex: 0;
@@ -697,6 +728,10 @@
   border: 0px;
 }
 
+.tpl-hub-shop .row-master {
+  row-gap: 20px;
+}
+
 
 @media (max-width: 1200px) {
   .tpl-hub-shop aside.aside__container {
@@ -704,6 +739,9 @@
   }
 }
 @media (max-width: 980px) {
+  .tpl-hub-shop .section__introduce {
+    flex-direction: column;
+  }
   .tpl-hub-shop .section__introduce .col-right .item__title h1 {
     font-size: 3.5rem;
   }
@@ -725,9 +763,6 @@
     flex: 0 0 35rem;
     max-width: 35rem;
   }
-  .tpl-hub-shop .section__courses .section__content {
-    margin: 0;
-  }
   .tpl-hub-shop .section__courses .section__content .courses__card {
     width: 100%;
     margin: 0;
@@ -743,11 +778,14 @@
   .table-responsive table {
     margin-bottom: 1rem;
   }
+  .tpl-hub-shop .section__introduce .col-right {
+    width: 100%;
+  }
+  .tpl-hub-shop .section__introduce .col-right .item__content ul {
+    align-items: flex-start;
+  }
 }
 @media (max-width: 768px) {
-  .tpl-hub-shop .section__layout {
-    margin-top: 20px;
-  }
   .tpl-hub-shop .section__title h2 {
     font-size: 2rem;
   }
@@ -816,4 +854,19 @@
   }
 }
 
-/*# sourceMappingURL=hub-shop.css.map */
+@media (max-width: 768px) {
+  .tpl-hub-shop .row-master {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.tpl-hub-shop .section__courses .section__content .courses__card {
+  border: 2px solid #CFAA40;
+  border-radius: 20px;
+  height: 100%;
+}
+
+.tpl-hub-shop .section__content {
+  margin-bottom: 20px;
+}

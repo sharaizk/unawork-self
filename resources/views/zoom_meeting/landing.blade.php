@@ -9,11 +9,23 @@
 <link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
 
 <!-- Підключення JavaScript Choices.js -->
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>    
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>  
+<style>
+    .header__search{
+        background-color: #022d4d;
+        height: 60px;
+    }
+    .meetings {
+        margin-bottom: 50px;
+    }
+</style>  
+<section class="header__search">
+    <div class="container"></div>
+</section>
     <main>
         <!-- header search  -->
         <section class="section__titlepage">
-            <div class="container-master">
+            <div class="container">
                 <h1 class="section__titlepage--headertitle"><span>Meetings</span></h1>
                 <form method="GET" action="{{ route('zoom-meeting.landing', $currentWorkspace->slug) }}">
                     <div class="filters">
@@ -56,7 +68,7 @@
         <!-- end header search -->
         <!-- Meeting -->
         <section class="meetings ">
-            <div class="container-master">
+            <div class="container">
             <div class="row-master">
                 <div class="col-12 col-lg-12">
                     <div class="meetings--content">

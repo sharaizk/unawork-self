@@ -13,7 +13,14 @@
             <h1 class="section__titlepage--headertitle"><span>Job Vacancies</span></h1>
         </div>
     </section> -->
-<div class="container-master">
+<style>
+    .header__search{
+        background-color: #022d4d;
+        height: 60px;
+    }
+</style>
+<section class="header__search"></section>
+<div class="container">
     <div class="row-master">
         <div class="col-12 col-md-12 col-xl-12">
             <section class="section__titlepage">
@@ -103,23 +110,23 @@
                             </ul>
                         </div>
                     </div>
-                    <section class="section__about section__layout">
-                        <div class="section__title">
-                            <h2>About</h2>
-                        </div>
-                        <div class="section__content">
-                            {{ $company->description }}
-                            @if($company->website)
-                                <a href="{{$website}}" class="section__btnMore"><span>Visit Site</span></a>
-                            @endif
-                        </div>
-                    </section>
                 </div>
             </section>
         </div>
-        <section class="section__courses section__layout w-100">
+        <section class="section__about section__layout col-12">
             <div class="section__title">
-                <h2>Job Vacancies</h2>
+                <h2>About</h2>
+            </div>
+            <div class="section__content">
+                {{ $company->description }}
+                @if($company->website)
+                    <a href="{{$website}}" class="section__btnMore"><span>Visit Site</span></a>
+                @endif
+            </div>
+        </section>
+        <section class="section__courses section__layout w-100">
+            <div class="section__title col-12">
+                <h2>Vacancies</h2>
                 <div>
                 <!-- <a href="#">View All</a>
                 <i class="fa fa-chevron-right"></i> -->
@@ -145,22 +152,32 @@
                             <div class="courses__body">
                                 <div class="courses__title">
                                     <a href="{{$vacancy_page}}">{{ $vacancy->title }}</a>
-                                    <div class="courses__dot">
+                                    <!-- <div class="courses__dot">
                                         <a href="{{$vacancy_page}}">
                                             <i class="fa fa-circle" aria-hidden="true"></i>
                                             <i class="fa fa-circle" aria-hidden="true"></i>
                                             <i class="fa fa-circle" aria-hidden="true"></i>
                                         </a>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="courses__subtitle">
                                     <p>
-                                        <b>Salary</b>: {{ $vacancy->salary ?? '' }}
+                                        <b>Salary:</b> {{ $vacancy->salary ?? '' }}
                                     </p>
-                                    <p class="small">
+                                    <!-- <p class="small">
                                         {{ \Illuminate\Support\Str::limit($skills, 38, '...') }}
-                                    </p>
-                                    {{ \Illuminate\Support\Str::limit($vacancy->description, 30, '...') }}
+                                    </p> -->
+                                    <div class="title">
+                                        <b>Skills:</b>
+                                        <ul class="p-0 skills__list">
+                                            @forelse ($vacancy->skills->take(2) as $skill)
+                                                <li class="skill__name">{{$skill->name}}</li>
+                                            @empty
+                                                <li class="skill__name">n/a</li>
+                                            @endforelse
+                                        </ul>
+                                    </div>
+                                    {{ \Illuminate\Support\Str::limit($vacancy->description, 120, '...') }}
                                 </div>
                                 
                             </div>

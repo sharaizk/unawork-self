@@ -12,13 +12,23 @@
     .search__wrap {
         display: flex;
         align-items: center;
+        gap: 5px;
         font-size: 1.8rem;
         height: 60px;
+    }
+
+    @media (max-width: 991px) {
+        .search__wrap {
+            padding-top: 10px;
+            padding-bottom:  10px;
+            height: max-content;
+        }
     }
 
     .search__box {
         flex: 1;
         display: flex;
+        gap: 5px;
         flex-wrap: wrap;
         align-items: center;
         margin-right: 15px;
@@ -94,8 +104,13 @@
     .dropdown-menu-xl {
         min-width: 40vh;
         width: 40vh;
-        max-height: 400px;
+        max-height: 380px;
         overflow-y: auto;
+        border: 2px solid #022D4D;
+    }
+
+    .dropdown-menu-xl .form-check-input:checked {
+        background-color: #E8BE61;
     }
 
     .dropdown-menu-xl li {
@@ -115,6 +130,10 @@
     .btn-xl {
         font-size: 1.5rem;
         padding: 10px 20px;
+    }
+
+    .dropdown {
+        display: flex;
     }
 </style>
 <!-- filter form -->
@@ -169,14 +188,18 @@
         </div>
     </div>
 </section>
-<section class="hire__banner">
+<!-- <section class="hire__banner">
     <img src="{{ asset('assets/images/landing/bannerHire.jpg') }}" alt="">
-</section>
+</section> -->
 <section class="hire__wrapper">
     <div class="container">
         <h1 class="hire__title">
             <span>Employees</span>
         </h1>
+        <h4 class="hire__subtitle">
+            <span>Find Empoyees</span>
+        </h4>
+        <p class="hire__descr">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
         <div class="row-master" id="employeeContainer">
             <p class="text-center">Enter filters to find employees...</p>
         </div>
