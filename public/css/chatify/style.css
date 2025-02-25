@@ -85,6 +85,12 @@ body {
     margin-top: 120px;
 }
 
+@media (max-width: 991px) {
+    .messenger-listView .m-body { 
+        margin-top: 150px;
+    }
+}
+
 .messenger-messagingView {
     position: relative;
     overflow: hidden;
@@ -102,7 +108,8 @@ body {
 .m-header {
     padding: 20px 15px;
     font-weight: 600;
-    background: transparent;
+    background: white;
+    z-index: 22;
 }
 
 .m-header-right {
@@ -1030,7 +1037,7 @@ div.loadingPlaceholder-date {
         position: fixed;
         left: 0;
         /*top: 0;*/
-        top: 158px !important;
+        top: 187px !important;
         bottom: 0;
         max-width: 334px;
     }
@@ -1058,7 +1065,7 @@ div.loadingPlaceholder-date {
         display: none;
         /* width: 100%; */
         max-width: unset;
-        top: 174px !important;
+        top: 200px !important;
     }
 
     .listView-x {

@@ -83,6 +83,12 @@
         $('.members__info_list--item').css('display', '');
         $(this).hide();
     });
+    $('.buttonViewAll-mobile').on('click', function(e){
+        console.log('wwww')
+        e.preventDefault();
+        $('.members__info_list--item').css('display', '');
+        $(this).hide();
+    });
 });
 </script>
 <script>

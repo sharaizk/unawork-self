@@ -23,7 +23,9 @@
         }
 
         .dropdown-menu-xl .form-check-label {
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #022D4D;
         }
 
         .btn-xl {
@@ -57,6 +59,37 @@
             color: #022d4d;
             height: 40px;
             font-size: 1.4rem;
+        }
+
+        .see-more-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #2554F4;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .see-more-btn {
+                display: inline;
+            }
+
+            .pods__subtitle {
+                position: relative;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                max-height: 4.5em; 
+                transition: max-height 0.3s ease-in-out;
+            }
+
+            .pods__subtitle.expanded {
+                -webkit-line-clamp: unset;
+                max-height: none;
+            }
         }
     </style>
     <main>
@@ -143,8 +176,14 @@
                 <div class=" pods__title">
                     <h2>Pods of Interest </h2>
                 </div>
-                <p class="pods__subtitle">Join the open network for skills and monetary opportunities. Pods allow you to join a group of like-minded people with the same skillset. When you join, on-demand opportunities are sent, allowing you to work on projects as companies and businesses need them.</p>
-                <p class="pods__subtitle">Request to join as many pods as you like to receive updates. If you are invited into an inner circle, you will have access to relevant projects so you can build your wealth.</p>
+                <div class="pods__subtitle-wrap">
+                    <p class="pods__subtitle">
+                        Join the open network for skills and monetary opportunities. Pods allow you to join a group of like-minded people with the same skillset. When you join, on-demand opportunities are sent, allowing you to work on projects as companies and businesses need them.
+                        </br></br>
+                        Request to join as many pods as you like to receive updates. If you are invited into an inner circle, you will have access to relevant projects so you can build your wealth.
+                    </p>
+                    <button class="see-more-btn">See More</button>
+                </div>
                 <div class="">
                     <div class="row-master">
 
@@ -162,6 +201,14 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const subtitle = document.querySelector(".pods__subtitle");
+            const btn = document.querySelector(".see-more-btn");
+    
+            btn.addEventListener("click", function () {
+                subtitle.classList.toggle("expanded");
+                btn.innerText = subtitle.classList.contains("expanded") ? "See Less" : "See More";
+            });
+
             const searchInput = document.getElementById('pod-search');
             const skillsCheckboxes = document.querySelectorAll('input[name="skill_ids[]"]');
             const container = document.querySelector('.row-master');

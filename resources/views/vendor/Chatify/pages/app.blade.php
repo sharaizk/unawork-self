@@ -60,7 +60,7 @@
                     <div class="row w-100 d-flex justify-content-end">
                         <div class="col-lg-10 p-0">
                             <div class="input-group">
-                                <input type="text" class="form-control messenger-search me-0 ms-2" placeholder="{{ __('Search') }}" id="searchInput">
+                                <input type="text" class="form-control messenger-search me-0 ms-2" placeholder="Search users" id="searchInput">
                                 <button class="btn btn-outline-secondary" type="button" id="messenger-clear-search">&times;</button>
                             </div>
                         </div>

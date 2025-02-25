@@ -89,8 +89,8 @@
 .section__titlepage span {
     font-size: 4rem;
     
-    color: #000;
-    border-bottom: 5px solid #88a6b5;
+    color: #022D4D;
+    border-bottom: 5px solid #022D4D;
 }
 
 @media (max-width: 1200px) {
@@ -100,7 +100,7 @@
 
     .section__titlepage span {
         font-size: 3rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -111,7 +111,7 @@
 
     .section__titlepage span {
         font-size: 2.4rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -400,8 +400,8 @@
 .section__titlepage span {
     font-size: 4rem;
     
-    color: #000;
-    border-bottom: 5px solid #88a6b5;
+    color: #022D4D;
+    border-bottom: 5px solid #022D4D;
 }
 
 @media (max-width: 1200px) {
@@ -411,7 +411,7 @@
 
     .section__titlepage span {
         font-size: 3rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -422,7 +422,7 @@
 
     .section__titlepage span {
         font-size: 2.4rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -438,6 +438,10 @@
     border-radius: 10px;
     padding: 20px;
     position: relative;
+}
+
+.boxarchives__content {
+    margin-bottom: 50px;
 }
 
 .section__handoffcustomlink__customlink__content .title_box,
@@ -668,8 +672,8 @@
 .section__titlepage span {
     font-size: 4rem;
     
-    color: #000;
-    border-bottom: 5px solid #88a6b5;
+    color: #022D4D;
+    border-bottom: 5px solid #022D4D;
 }
 
 @media (max-width: 1200px) {
@@ -679,7 +683,7 @@
 
     .section__titlepage span {
         font-size: 3rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -690,7 +694,7 @@
 
     .section__titlepage span {
         font-size: 2.4rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -937,8 +941,8 @@
 .section__titlepage span {
     font-size: 4rem;
     
-    color: #000;
-    border-bottom: 5px solid #88a6b5;
+    color: #022D4D;
+    border-bottom: 5px solid #022D4D;
 }
 
 @media (max-width: 1200px) {
@@ -948,7 +952,7 @@
 
     .section__titlepage span {
         font-size: 3rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 
@@ -959,7 +963,7 @@
 
     .section__titlepage span {
         font-size: 2.4rem;
-        border-bottom: 3px solid #88a6b5;
+        border-bottom: 3px solid #022D4D;
     }
 }
 

@@ -7,13 +7,22 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('assets/css/landing/outer-pods.css') }}">
+<style>
+    .header__search{
+        background-color: #022d4d;
+        height: 60px;
+    }
+</style>  
+<section class="header__search">
+    <div class="container"></div>
+</section>
 <section class="section__titlepage">
-    <div class="container-master">
+    <div class="container">
         <h1 class="section__titlepage--headertitle"><span>{{ $pod->title }}</span></h1>
     </div>
 </section>
 <section class="section__tasksmeeting">
-    <div class="container-master">
+    <div class="container">
         <div class="row-master">  
             <div class="boxarchives col-12 col-xl-12">
                 <div class="boxarchives__content">

@@ -2788,7 +2788,7 @@ body {
   overflow-x: hidden !important;
   padding: 0;
   position: relative;
-
+  min-height: 100vh;
 }
 body {
   opacity: 0;

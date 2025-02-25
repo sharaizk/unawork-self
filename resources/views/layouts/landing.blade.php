@@ -59,8 +59,8 @@
             <div>
                 <img class="footer__contetnt__logo" src="{{ \App\Models\Utility::get_file('uploads/landing_page_image') . '/' . $settings['site_logo'] . '?v=' . time() }}" alt="logo">
                 <div class="footer__socials">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a target="_blank" href="https://www.facebook.com/virtualworkhub#"><i class="fab fa-facebook-f"></i></a>
+                    <a target="_blank" href="https://www.facebook.com/virtualworkhub#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-linkedin-in"></i></a>
                     <a href="#"><i class="fab fa-instagram"></i></a>
                 </div>  
@@ -71,10 +71,12 @@
                     <a href="{{ route('landing.find-work') }}" class="">Find Work</a>
                     <a href="{{ route('landing.hiring') }}">Hiring</a>
                     <a href="{{ route('pods.list') }}">PODs</a>
+                    <a href="{{ route('login') }}">Manage</a>
                 </div>
                 <div>
                     <a href="{{ route('login') }}">About us</a>
                     <a href="{{ route('landing.find-work') }}" class="">Contact us</a>
+                    <a href="http://www.unawork.net/faq/" class="">FAQ</a>
                 </div>
                 <div>
                     <a href="{{ route('login') }}">Login</a>
@@ -83,7 +85,7 @@
             </div>
         </div>
         <div class="footer__copyright">
-            <p>Copyright © 2025 Taskly</p>
+            <p>Copyright © 2025 Unawork</p>
             <div class="footer__cookies">
                 <p>Cookies</p>
                 <p>Privacy Policy</p>
