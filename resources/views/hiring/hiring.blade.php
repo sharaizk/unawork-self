@@ -124,7 +124,9 @@
     }
 
     .dropdown-menu-xl .form-check-label {
-        font-size: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #022D4D;
     }
 
     .btn-xl {
@@ -199,7 +201,7 @@
         <h4 class="hire__subtitle">
             <span>Find Empoyees</span>
         </h4>
-        <p class="hire__descr">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+        <p class="hire__descr">Looking for skilled support? Browse through our available profiles and speed up your time to hire. Click on any profile to view their skillset and CV. Open them to your network to find how they can support your growth. </p>
         <div class="row-master" id="employeeContainer">
             <p class="text-center">Enter filters to find employees...</p>
         </div>

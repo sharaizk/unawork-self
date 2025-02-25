@@ -31,14 +31,22 @@
 }
 
 .hire__title {
+    display: inline;
     font-size: 40px;
     margin: 40px 0;
     margin-bottom: 3rem;
     padding: 0;
     border: 0;
     box-sizing: inherit;
-    outline: none !important;
-    text-decoration: none !important;
+    border-bottom: 5px solid #022D4D;
+}
+
+.tpl-outerPods .header__search input,
+.tpl-outerPods .header__search select,
+.tpl-outerPods .header__search button {
+    font-weight: 600;
+    font-size: 15px;
+    color: #022D4D;
 }
 
 .content {
@@ -86,9 +94,14 @@
     border-radius: 20px;
     background-color: #fff;
     border: 2px solid #CFAA40;
-    margin-bottom: 30px;
+    height: 100%;
     font: inherit;
 }
+
+
+.tpl-outerPods .row-master {
+    row-gap: 20px;
+  }
 
 .hire-card .card__header {
     align-items: center;

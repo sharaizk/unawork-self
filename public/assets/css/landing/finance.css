@@ -120,7 +120,6 @@ p.descrPage {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 3rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 @media (max-width: 768px) {
@@ -129,7 +128,6 @@ p.descrPage {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 2.4rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 
@@ -214,7 +212,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 3rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 @media (max-width: 768px) {
@@ -223,7 +220,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 2.4rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 
@@ -298,8 +294,8 @@ h1.titlePage, .section__titlepage {
 h1.titlePage span, .section__titlepage span {
   font-size: 4rem;
   
-  color: #000;
-  border-bottom: 5px solid #88a6b5;
+  color: #022D4D;
+  border-bottom: 5px solid #022D4D;
 }
 @media (max-width: 1200px) {
   h1.titlePage, .section__titlepage {
@@ -307,7 +303,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 3rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 @media (max-width: 768px) {
@@ -316,7 +311,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 2.4rem;
-    border-bottom: 3px solid #88a6b5;
   }
   .tpl-finance .chart-container {
     overflow-x: auto;
@@ -398,8 +392,8 @@ h1.titlePage, .section__titlepage {
 h1.titlePage span, .section__titlepage span {
   font-size: 4rem;
   
-  color: #000;
-  border-bottom: 5px solid #88a6b5;
+  color: #022D4D;
+  border-bottom: 5px solid #022D4D;
 }
 @media (max-width: 1200px) {
   h1.titlePage, .section__titlepage {
@@ -407,7 +401,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 3rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 @media (max-width: 768px) {
@@ -416,7 +409,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 2.4rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 
@@ -595,8 +587,7 @@ h1.titlePage, .section__titlepage {
 h1.titlePage span, .section__titlepage span {
   font-size: 4rem;
   
-  color: #000;
-  border-bottom: 5px solid #88a6b5;
+  color: #022D4D;
 }
 @media (max-width: 1200px) {
   h1.titlePage, .section__titlepage {
@@ -604,7 +595,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 3rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 @media (max-width: 768px) {
@@ -613,7 +603,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 2.4rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 
@@ -689,8 +678,7 @@ h1.titlePage, .section__titlepage {
 h1.titlePage span, .section__titlepage span {
   font-size: 4rem;
   
-  color: #000;
-  border-bottom: 5px solid #88a6b5;
+  color: #022D4D;
 }
 .section__titlepage h4 {
   font-size: 20px;
@@ -739,7 +727,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 3rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 @media (max-width: 768px) {
@@ -748,7 +735,6 @@ h1.titlePage span, .section__titlepage span {
   }
   h1.titlePage span, .section__titlepage span {
     font-size: 2.4rem;
-    border-bottom: 3px solid #88a6b5;
   }
 }
 
@@ -966,7 +952,7 @@ h1.titlePage span, .section__titlepage span {
       display: none!important;
   }
 
-  #skillsField,
+  .tpl-finance #skillsField,
   #clearFilters {
       display: none!important;
   }
@@ -999,7 +985,7 @@ h1.titlePage span, .section__titlepage span {
       height: 40px;
   }
 
-  #searchForm {
+  .tpl-finance #searchForm {
     display: none!important;
   }
 

@@ -50,7 +50,9 @@
         }
 
         .dropdown-menu-xl .form-check-label {
-            font-size: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #022D4D;
         }
 
         .btn-xl {

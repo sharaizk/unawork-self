@@ -2076,9 +2076,13 @@
     margin-left: 8px;
 }
 
+.pods__subtitle-wrap {
+    margin: 2rem 0;
+}
+
 .pods__subtitle {
     font-size: 15px;
-    margin: 2rem 0;
+
     color: #022D4D;
 }
 
@@ -2513,13 +2517,16 @@
     background-color: #022D4D;
 }
 
+.tpl-pods-list .header__search input,
+.tpl-pods-list .header__search select,
+.tpl-pods-list .header__search button {
+    font-weight: 600;
+    font-size: 15px;
+    color: #022D4D;
+}
+
 @media (max-width: 768px) {
     .hidden-mobile {
-        display: none!important;
-    }
-
-    #skillsField,
-    .tpl-pods-list #clearFilters {
         display: none!important;
     }
 
