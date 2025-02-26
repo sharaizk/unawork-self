@@ -88,6 +88,9 @@
     margin-bottom: 20px;
 }
 .hire-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     overflow: hidden;
     flex-wrap: wrap;
     padding: 20px;

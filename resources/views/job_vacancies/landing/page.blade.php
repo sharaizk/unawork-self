@@ -21,9 +21,18 @@
             $sendRequestUrl = route('login');
         }
     @endphp
+    <style>
+        .header__search{
+            background-color: #022d4d;
+            height: 60px;
+        }
+    </style>  
+    <section class="header__search">
+        <div class="container"></div>
+    </section>
     <main>
     <section class="section__titlepage">
-        <div class="container-master">
+        <div class="container">
             <h1 class="section__titlepage--headertitle"><span>Job Vacancies</span></h1>
             <ul class="breadcrumb mt-1">
                 <li class="breadcrumb-item"><a href="{{ route('landing.company.show', $company_workspace) }}">{{ $company_workspace->name }}</a></li>
@@ -31,7 +40,7 @@
             </ul>
         </div>
     </section>
-        <div class="container-master">
+        <div class="container">
             <div class="row-master">
                 <div class="col-12 col-xl-9">
                     <div class="cm-shop__left">

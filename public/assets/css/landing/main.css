@@ -3015,7 +3015,7 @@ main {
     display: none;
   }
 }
-@media (max-width: 480px) {
+@media (max-width: 568px) {
   #header .logoHeaderMenu,
   #header #btn-menu-responsive {
     /*Show on Mobile*/
@@ -3070,11 +3070,15 @@ main {
     margin: 20px auto;
   }
   #header .header__container .header__main .nav__list li a {
-    display: block;
+    display: flex;
     padding: 15px 25px;
     font-size: 1.6rem;
     text-transform: uppercase;
     color: #FFFFFF;
+  }
+
+  #header .header__container .header__main .nav__list li a span {
+    white-space: break-spaces;
   }
 
   #header .header__container .header__main .nav__list .dropdown-menu a {
@@ -3504,6 +3508,11 @@ font-size: 2rem;
   display: flex;
   gap: 10px;
   margin-top: 25px;
+}
+
+.footer .footer__socials a i {
+  font-size: 16px; 
+  color: #022D4D;
 }
 
 .footer .footer__socials a{
