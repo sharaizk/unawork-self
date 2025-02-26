@@ -27,6 +27,7 @@
         <section class="section__titlepage">
             <div class="container">
                 <h1 class="section__titlepage--headertitle"><span>Meetings</span></h1>
+                <p>After Zoom is integrated, you can set up any meetings with other team members or guests. Stay connected with your team and network with other guests through our open meeting system. </p>
                 <form method="GET" action="{{ route('zoom-meeting.landing', $currentWorkspace->slug) }}">
                     <div class="filters">
                         <select class="filter-select" name="workspace">
