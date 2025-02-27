@@ -34,10 +34,10 @@
     <section class="section__titlepage">
         <div class="container">
             <h1 class="section__titlepage--headertitle"><span>Job Vacancies</span></h1>
-            <ul class="breadcrumb mt-1">
+            <!-- <ul class="breadcrumb mt-1">
                 <li class="breadcrumb-item"><a href="{{ route('landing.company.show', $company_workspace) }}">{{ $company_workspace->name }}</a></li>
                 <li class="breadcrumb-item"> {{$vacancy->title}} </li>
-            </ul>
+            </ul> -->
         </div>
     </section>
         <div class="container">

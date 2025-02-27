@@ -57,10 +57,9 @@
     color: #022d4d;
     max-height: 60px;
     overflow: hidden;
-    opacity: 0.7;
     margin-top: 5px;
     line-height: 17px;
-    font-size: 12px;
+    font-size: 1.4rem;
 }
 
 .content__skill {
@@ -123,7 +122,7 @@
     margin-left: 15px;
     
     font-size: 2rem;
-    color: #000;
+    color: #022D4D;
 }
 
 .hire-card .card__body {
@@ -209,5 +208,5 @@
     line-height: 2rem;
     height: 6rem;
     overflow: hidden;
-    color: #000;
+    color: #022D4D;
 }

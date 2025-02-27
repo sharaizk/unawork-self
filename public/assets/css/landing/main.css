@@ -47,7 +47,7 @@
   display: flex;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 568px) {
   .header__mobile {
     display: flex;
   }
@@ -352,6 +352,12 @@ html {
   margin-left: -15px;
 }
 
+@media (max-width: 568px) {
+  .row-master {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
 .no-gutters {
   margin-right: 0;
   margin-left: 0;
@@ -2984,7 +2990,6 @@ main {
     padding-left: 20px;
   }
   #header .header__container .nav__right {
-    margin: 0 -15px;
     max-width: 100%;
     flex: inherit;
     justify-content: start;
@@ -3020,10 +3025,6 @@ main {
   #header #btn-menu-responsive {
     /*Show on Mobile*/
     display: block;
-  }
-  #header .header__container {
-    margin: 0 -15px;
-    padding: 0 15px;
   }
   #header .header__container .header__main {
     display: block;
