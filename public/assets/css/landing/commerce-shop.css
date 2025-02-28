@@ -69,14 +69,14 @@
   }
   .tpl-commerce-shop .aside__container .aside__card__title span {
     font-size: 2rem;
-    color: #000;
+    color: #022D4D;
   }
   .tpl-commerce-shop .aside__container .aside__card__body {
     margin: 10px 0 25px;
   }
   .tpl-commerce-shop .aside__container .aside__card__body span {
     font-size: 1.4rem;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .aside__container .aside__card__actions button {
@@ -126,7 +126,7 @@
   }
   .section__titlepage span {
     font-size: 4rem;
-    color: #000;
+    color: #022D4D;
     border-bottom: 5px solid #88a6b5;
   }
   @media (max-width: 1200px) {
@@ -162,6 +162,12 @@
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
+  }
+
+  @media (max-width: 768px) {
+    .tpl-commerce-shop .cm-shop__information {
+      flex-direction: column;
+    }
   }
   
   .tpl-commerce-shop .aside__container .aside__card__actions button, .tpl-commerce-shop .aside__container .aside__card__actions a {
@@ -220,7 +226,7 @@
   }
   .tpl-commerce-shop .aside__container .aside__card__title span {
     font-size: 2rem;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .aside__container .aside__card__body {
@@ -228,7 +234,7 @@
   }
   .tpl-commerce-shop .aside__container .aside__card__body span {
     font-size: 1.4rem;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .aside__container .aside__card__actions button {
@@ -279,7 +285,7 @@
   .section__titlepage span {
     font-size: 4rem;
     
-    color: #000;
+    color: #022D4D;
     border-bottom: 5px solid #88a6b5;
   }
   @media (max-width: 1200px) {
@@ -301,9 +307,6 @@
     }
   }
   
-  .tpl-commerce-shop main {
-    margin: 40px 0;
-  }
   .tpl-commerce-shop .cm-shop__image {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 275px;
@@ -363,7 +366,7 @@
     cursor: pointer;
     width: 34px;
     height: 32px;
-    background-color: #0007;
+    background-color: #000;
     border-radius: 4px;
     display: flex;
     justify-content: center;
@@ -391,6 +394,7 @@
   }
   .tpl-commerce-shop .cm-shop__profile .title span {
     font-size: 1.8rem;
+    color: #022D4D;
   }
   .tpl-hub-shop .section__about .title {
     margin-bottom: 10px;
@@ -402,10 +406,11 @@
   
   .tpl-commerce-shop .cm-shop__profile .profile__name {
     margin-bottom: 28px;
+    
   }
   .tpl-commerce-shop .cm-shop__profile .profile__name h2, .tpl-commerce-shop .cm-shop__profile .profile__name h1 {
     font-size: 4.5rem;
-    
+    color: #022D4D;
   }
   .tpl-commerce-shop .cm-shop__profile .profile__name div {
     color: #022d4d;
@@ -483,7 +488,7 @@
     margin-right: 20px;
   }
   .tpl-commerce-shop .cm-shop__profile .profile__actions .actions__btn a, .tpl-commerce-shop .cm-shop__profile .profile__actions .actions__btn span {
-    color: #000;
+    color: #022D4D;
     font-size: 14px;
     line-height: 18px;
     
@@ -509,12 +514,12 @@
   .tpl-commerce-shop .cm-shop__reviews .reviews__title span {
     font-size: 25px;
     line-height: 35px;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__actions a {
     font-size: 1.6rem;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__actions a:hover {
@@ -567,7 +572,7 @@
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__name {
     font-size: 1.6rem;
     margin-bottom: 15px;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__date span {
@@ -579,7 +584,7 @@
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__title {
     margin: 20px 0 12px;
     font-size: 1.7rem;
-    color: #000;
+    color: #022D4D;
     
   }
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__content {
@@ -589,7 +594,7 @@
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__title {
     margin: 20px 0 12px;
     font-size: 1.7rem;
-    color: #000;
+    color: #022D4D;
     
     line-height: 22px;
   }
@@ -618,7 +623,7 @@
     background: transparent;
     border: none;
     font-size: 1.4rem;
-    color: #000;
+    color: #022D4D;
     
     margin-right: 6px;
   }
@@ -663,7 +668,7 @@
   .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__like span, .tpl-commerce-shop .cm-shop__reviews .reviews__card .card__dislike span {
     font-size: 16px;
     line-height: 22px;
-    color: #000;
+    color: #022D4D;
     
     margin-left: 6px;
   }

@@ -65,7 +65,7 @@
             display: none;
             background: none;
             border: none;
-            color: #2554F4;
+            color: #022D4D;
             font-weight: bold;
             cursor: pointer;
             padding: 5px 0;
