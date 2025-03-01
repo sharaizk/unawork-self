@@ -81,7 +81,7 @@
                   @endif
                 </p>
                 @if($employee->profile->cv_file)
-                    <p class="mt-2">{{ __('CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
+                    <p class="mt-2 cv-title">{{ __('CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
                 @endif
               </div>
            </section>

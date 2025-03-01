@@ -26,7 +26,8 @@
     width: 121px;
 }
 
-.tpl-find-work .form-group.form-skill {
+.tpl-find-work .form-group.form-skill,
+#industryField {
     margin: 0 20px;
 }
 
@@ -123,6 +124,10 @@
     
     font-size: 2rem;
     color: #022D4D;
+}
+
+.hire-card .card__title a:hover {
+    text-decoration: underline!important;
 }
 
 .hire-card .card__body {
