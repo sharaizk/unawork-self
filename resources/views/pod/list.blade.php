@@ -125,15 +125,21 @@
                         </div>
 {{--                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>--}}
                     </div>
-{{--                    <button type="button" class="filter-mobile">Filter</button>--}}
                 </form>
+                <button type="button" class="filter-mobile">Filter</button>
             </div>
         </div>
         <div class="filter-modal">
-            <form id="searchForm" class="g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
+            <form id="searchFormMobile" class="g-3 searchForm" method="GET" action="{{ route('pods.list') }}">
                 <div class="filter-modal__header">
                     <p>Filters</p>
                     <button type="button" class="close"></button>
+                </div>
+                <div class="form-group">
+                    <label class="title-label">Search by name</label>
+                    <div class="search-input-wrap">
+                        <input type="text" name="name" id="pod-search-mobile" placeholder="Search by name" class="form-control search-input">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="title-label">Skills</label>
@@ -153,10 +159,10 @@
                         </ul>
                     </div>
                 </div>
-                <div class="search-btn__wrap form-group d-flex align-items-center">
+                <!-- <div class="search-btn__wrap form-group d-flex align-items-center">
                     <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
                 </div>
-                <a href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
+                <a href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
             </form>
         </div>
     </section>
@@ -210,9 +216,32 @@
             });
 
             const searchInput = document.getElementById('pod-search');
+            const searchInputMobile = document.getElementById('pod-search-mobile');
             const skillsCheckboxes = document.querySelectorAll('input[name="skill_ids[]"]');
             const container = document.querySelector('.row-master');
             const paginationContainer = document.querySelector('.pagination-container');
+
+
+            function fetchPodsMobile(url) {
+                const selectedSkills = Array.from(document.querySelectorAll('input[name="skill_ids[]"]:checked'))
+                    .map(checkbox => `skill_ids[]=${checkbox.value}`)
+                    .join('&');
+                const queryMob = searchInputMobile.value.trim();
+                const fullUrlMob = `${url}${queryMob ? '&name=' + queryMob : ''}${selectedSkills ? '&' + selectedSkills : ''}`;
+                fetch(fullUrlMob, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        container.innerHTML = data.pods;
+                        paginationContainer.innerHTML = data.pagination;
+                        attachPaginationListeners();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
 
             function fetchPods(url) {
                 const selectedSkills = Array.from(document.querySelectorAll('input[name="skill_ids[]"]:checked'))
@@ -238,6 +267,10 @@
 
             searchInput.addEventListener('input', function () {
                 fetchPods(`{{ route('pods.search') }}?`);
+            });
+
+            searchInputMobile.addEventListener('input', function () {
+                fetchPodsMobile(`{{ route('pods.search') }}?`);
             });
 
             skillsCheckboxes.forEach(checkbox => {

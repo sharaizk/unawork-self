@@ -10,8 +10,10 @@
 @endsection
 
 @section('action-button')
-    <a href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
+    <a id="btnDesk" href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
        id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> <i class="ti ti-eye"></i></a>
+    <a id="btnMobile" href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
+       id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> Landing View</a>
     <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
         data-title="{{ __('Create New Vacancy') }}" data-url="{{ route('job-vacancies.create') }}"
         data-toggle="tooltip" title="{{ __('Create New Vacancy') }}">
@@ -28,6 +30,19 @@
         th {
             padding: 10px 0 !important;
             font-weight: bold;
+        }
+
+        #btnMobile {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #btnDesk {
+                display: none;
+            }
+            #btnMobile {
+                display: inline;
+            }
         }
     </style>
     <div class="table-responsive">

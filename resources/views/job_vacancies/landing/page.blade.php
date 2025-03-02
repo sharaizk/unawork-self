@@ -104,7 +104,7 @@
                                 <span>Send request</span>
                             </div>
                             <div class="aside__card__body">
-                                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                                <span>Got questions? Send information and strike up a conversation with this user.</span>
                             </div>
                             <div class="aside__card__actions">
                                 @guest

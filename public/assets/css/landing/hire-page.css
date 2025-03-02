@@ -50,6 +50,30 @@
     color: #022D4D;
 }
 
+.tpl-outerPods .header__search input,
+.tpl-outerPods .header__search select,
+.tpl-outerPods .header__search button {
+    font-weight: 600;
+    font-size: 15px;
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input::-webkit-input-placeholder {
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input::-moz-placeholder {
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input:-ms-input-placeholder {
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input::-ms-input-placeholder {
+    color: #022D4D;
+}
+
 .content {
     display: flex;
     flex-wrap: wrap;

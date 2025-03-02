@@ -2470,6 +2470,7 @@
     width: 90%;
     margin-left: auto;
     margin-right: auto;
+    height: auto;
 }
 
 .filter-modal  .skills-button {
@@ -2484,10 +2485,12 @@
 
 .filter-modal .form-control {
     width: 100%;
+    height: 40px;
 }
 
 .filter-modal .form-group .dropdown {
     width: 100%;
+    margin: 0 auto 30px;
 }
 
 .filter-modal .form-group .dropdown .btn {
@@ -2565,6 +2568,9 @@
 }
 
 @media (max-width: 768px) {
+    .tpl-pods-list #searchForm {
+        display: none;
+    }
     .hidden-mobile {
         display: none!important;
     }
