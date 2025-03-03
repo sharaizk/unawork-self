@@ -350,6 +350,7 @@ html {
   flex-wrap: wrap;
   margin-right: -15px;
   margin-left: -15px;
+  width: 100%;
 }
 
 @media (max-width: 568px) {
@@ -3044,6 +3045,7 @@ main {
     left: 0;
     z-index: 9;
     background-color: #022D4D;
+    overflow: hidden;
   }
   #header .header__container .header__main .nav__left,
   #header .header__container .header__main .nav-right {

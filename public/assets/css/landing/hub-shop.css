@@ -497,6 +497,9 @@
   transform: scale(1.1);
 }
 .tpl-hub-shop .section__courses .section__content .courses__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   border-radius: 4px 4px 0 0;
   max-height: 71px;
@@ -506,6 +509,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  max-width: 100px;
 }
 .tpl-hub-shop .section__courses .section__content .courses__title {
   height: 4rem;
@@ -524,6 +528,7 @@
 }
 .tpl-hub-shop .section__courses .section__content .courses__title a:hover {
   color: #cfaa40;
+  text-decoration: underline!important;
 }
 .tpl-hub-shop .section__courses .section__content .courses__dot {
   flex-shrink: 0;

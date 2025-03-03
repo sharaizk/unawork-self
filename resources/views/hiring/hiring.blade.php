@@ -246,6 +246,45 @@
                         employeeContainer.innerHTML = data.employees;
                         paginationContainer.innerHTML = data.pagination;
                         attachPaginationListeners();
+
+                        document.querySelectorAll(".sendMessageButton").forEach(button => {
+                            button.addEventListener("click", function() {
+                                let employeeId = this.dataset.employeeId;
+                                $("#sendMessagePopup").modal('show');
+                                document.getElementById("sendMessage").dataset.employeeId = employeeId;
+                            });
+                        });
+
+                        document.getElementById("sendMessage").addEventListener("click", function() {
+                            let message = document.getElementById("messageInput").value;
+                            let employeeId = this.dataset.employeeId;
+                            let data = {
+                                recipient_id: employeeId,
+                                type: 'user',
+                                message: message,
+                                temporaryMsgId: 'temp_1',
+                                _token: '{{ csrf_token() }}'
+                            };
+                            let url = `{{ route('api.send-message') }}`;
+
+                            fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(data),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Success:', data);
+                                showNotification('Message successfully sended', 'success');
+                                $("#sendMessagePopup").modal('hide');
+                            })
+                            .catch((error) => {
+                                showNotification('Message sending failed:'.error, 'danger');
+                                console.error('Error:', error);
+                            });
+                        });
                     })
                     .catch(error => console.error('Error:', error));
             }
@@ -282,48 +321,6 @@
             }
 
             fetchEmployees(`{{ route('hiring.search') }}`);
-        });
-    </script>
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".sendMessageButton").forEach(button => {
-                button.addEventListener("click", function() {
-                    let employeeId = this.dataset.employeeId;
-                    $("#sendMessagePopup").modal('show');
-                    document.getElementById("sendMessage").dataset.employeeId = employeeId;
-                });
-            });
-
-            document.getElementById("sendMessage").addEventListener("click", function() {
-                let message = document.getElementById("messageInput").value;
-                let employeeId = this.dataset.employeeId;
-                let data = {
-                    recipient_id: employeeId,
-                    type: 'user',
-                    message: message,
-                    temporaryMsgId: 'temp_1',
-                    _token: '{{ csrf_token() }}'
-                };
-                let url = `{{ route('api.send-message') }}`;
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    showNotification('Message successfully sended', 'success');
-                    $("#sendMessagePopup").modal('hide');
-                })
-                .catch((error) => {
-                    showNotification('Message sending failed:'.error, 'danger');
-                    console.error('Error:', error);
-                });
-            });
         });
     </script>
 

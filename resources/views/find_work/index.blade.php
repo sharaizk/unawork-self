@@ -47,6 +47,9 @@
         padding: 10px 5px;
         font-size: 1.4rem;
     }
+    .filter-modal .dropdown {
+        margin: 0;
+    }
 </style>
 <main>
     <section class="header__search">
@@ -80,8 +83,8 @@
                         $industries = \App\Models\Industry::all();
                         $currentIndustryId = $currentWorkspace->industry_id ?? null;
                     @endphp
-                    <div id="industryField" class="col-md-4 form-group" style="display: none;">
-                        <label for="industry">Industry</label>
+                    <div id="industryField" class="form-group" style="display: none;">
+                        <!-- <label for="industry">Industry</label> -->
                         <select id="industry" class="form-control" name="industry">
                             <option value="">Select Industry </option>
                             @foreach($industries as $industry)
@@ -127,7 +130,7 @@
                 </div>
                 <div class="form-group">
                     <label class="title-label" for="type">Type</label>
-                    <select id="type" class="form-control" name="type">
+                    <select id="typeMobile" class="form-control" name="type">
                         <option value="" selected>Type</option>
                         <option value="pod">Pod</option>
                         <option value="company">Company</option>
@@ -135,7 +138,22 @@
                         <!-- <option value="project">Project</option> -->
                     </select>
                 </div>
-                <div class="form-group">
+                @php
+                    $industries = \App\Models\Industry::all();
+                    $currentIndustryId = $currentWorkspace->industry_id ?? null;
+                @endphp
+                <div id="industryFieldMobile" class="form-group" style="display: none;">
+                    <label for="industry" class="title-label">Industry</label>
+                    <select id="industry" class="form-control" name="industry">
+                        <option value="">Select Industry </option>
+                        @foreach($industries as $industry)
+                            <option value="{{ $industry->id }}">
+                                    {{ $industry->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div id="skillsFieldMobile" class="form-group">
                     <label class="title-label">Skills</label>
                     <div class="dropdown">
                         <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
@@ -280,18 +298,40 @@
     });
 </script>
 <script>
+    document.getElementById('typeMobile').addEventListener('change', function () {
+        var type = this.value;
+        var skillsFieldMobile = document.getElementById('skillsFieldMobile');
+        var industryFieldMobile = document.getElementById('industryFieldMobile');
+
+        if (type === 'company') {
+            industryFieldMobile.style.display = 'flex';
+            skillsFieldMobile.style.display = 'none';
+        } else if (type === 'pod') {
+            skillsFieldMobile.style.display = 'flex';
+            industryFieldMobile.style.display = 'none';
+         } else {
+            skillsFieldMobile.style.display = 'none';
+            industryFieldMobile.style.display = 'none';
+        }
+    });
     document.getElementById('type').addEventListener('change', function () {
         var type = this.value;
         var countryField = document.getElementById('countryField');
         var skillsField = document.getElementById('skillsField');
+        var skillsFieldMobile = document.getElementById('skillsFieldMobile');
+        var industryFieldMobile = document.getElementById('industryFieldMobile');
 
         if (type === 'company') {
             industryField.style.display = 'flex';
+            industryFieldMobile.style.display = 'flex';
             skillsField.style.display = 'none';
+            skillsFieldMobile.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'pod') {
             skillsField.style.display = 'flex';
+            skillsFieldMobile.style.display = 'flex';
             industryField.style.display = 'none';
+            industryFieldMobile.style.display = 'none';
             budgetField.style.display = 'none';
         } else if (type === 'project') {
             skillsField.style.display = 'none';
@@ -301,6 +341,8 @@
             skillsField.style.display = 'none';
             industryField.style.display = 'none';
             budgetField.style.display = 'none';
+            skillsFieldMobile.style.display = 'none';
+            industryFieldMobile.style.display = 'none';
         }
     });
 

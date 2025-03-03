@@ -26,7 +26,8 @@
     width: 121px;
 }
 
-.tpl-find-work .form-group.form-skill {
+.tpl-find-work .form-group.form-skill,
+#industryField {
     margin: 0 20px;
 }
 
@@ -46,6 +47,30 @@
 .tpl-outerPods .header__search button {
     font-weight: 600;
     font-size: 15px;
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input,
+.tpl-outerPods .header__search select,
+.tpl-outerPods .header__search button {
+    font-weight: 600;
+    font-size: 15px;
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input::-webkit-input-placeholder {
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input::-moz-placeholder {
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input:-ms-input-placeholder {
+    color: #022D4D;
+}
+
+.tpl-outerPods .header__search input::-ms-input-placeholder {
     color: #022D4D;
 }
 
@@ -123,6 +148,10 @@
     
     font-size: 2rem;
     color: #022D4D;
+}
+
+.hire-card .card__title a:hover {
+    text-decoration: underline!important;
 }
 
 .hire-card .card__body {
