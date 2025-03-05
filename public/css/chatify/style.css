@@ -86,7 +86,7 @@ body {
 }
 
 @media (max-width: 991px) {
-    .messenger-listView .m-body { 
+    .messenger-listView .m-body {
         margin-top: 150px;
     }
 }
@@ -590,6 +590,7 @@ body {
 
 .messages {
     padding: 5px 0px;
+    margin-bottom: 40px;
 }
 
 .message-hint {
