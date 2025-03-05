@@ -119,7 +119,7 @@
 
     .dropdown-menu-xl .form-check-input {
         width: 15px;
-        height: 15px;
+        height: 15px!important;
         margin-right: 6px;
     }
 
@@ -219,13 +219,12 @@
       </div>
       <div class="modal-body">
         <div class="mb-3">
-            <label for="messageInput" class="form-label">Your Message:</label>
             <textarea id="messageInput" class="form-control" rows="3" placeholder="Type your message..."></textarea>
         </div>
       </div>
-      <div class="modal-footer justify-content-between">
+      <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-primary" id="sendMessage">Send Message</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="sendMessage">Send</button>
         </div>
     </div>
   </div>

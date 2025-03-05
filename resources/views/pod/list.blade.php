@@ -18,7 +18,7 @@
 
         .dropdown-menu-xl .form-check-input {
             width: 15px;
-            height: 15px;
+            height: 15px!important;
             margin-right: 6px;
         }
 
@@ -126,7 +126,7 @@
 {{--                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>--}}
                     </div>
                 </form>
-                <button type="button" class="filter-mobile">Filter</button>
+                <button type="button" class="filter-mobile">Filters</button>
             </div>
         </div>
         <div class="filter-modal">

@@ -45,7 +45,7 @@
 
         .dropdown-menu-xl .form-check-input {
             width: 20px;
-            height: 20px;
+            height: 20px!important;
             margin-right: 10px;
         }
 
@@ -95,7 +95,7 @@
                     </div>
                     <a href="{{ route('job-vacancies.landing.list') }}" class="clear__filters">Clear Filters</a>
                 </form>
-                <button type="button" class="filter-mobile">Filter</button>
+                <button type="button" class="filter-mobile">Filters</button>
             </div>
         </div>
     </section>

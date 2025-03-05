@@ -42,35 +42,32 @@
     border-bottom: 5px solid #022D4D;
 }
 
-.tpl-outerPods .header__search input,
-.tpl-outerPods .header__search select,
-.tpl-outerPods .header__search button {
+.hire__title span {
+    color: #022D4D;
+}
+
+.header__search input,
+.header__search select,
+.header__search button {
     font-weight: 600;
-    font-size: 15px;
+    font-size: 15px!important;
+    color: #022D4D;
+    height: 40px!important;
+}
+
+.header__search input::-webkit-input-placeholder {
     color: #022D4D;
 }
 
-.tpl-outerPods .header__search input,
-.tpl-outerPods .header__search select,
-.tpl-outerPods .header__search button {
-    font-weight: 600;
-    font-size: 15px;
+.header__search input::-moz-placeholder {
     color: #022D4D;
 }
 
-.tpl-outerPods .header__search input::-webkit-input-placeholder {
+.header__search input:-ms-input-placeholder {
     color: #022D4D;
 }
 
-.tpl-outerPods .header__search input::-moz-placeholder {
-    color: #022D4D;
-}
-
-.tpl-outerPods .header__search input:-ms-input-placeholder {
-    color: #022D4D;
-}
-
-.tpl-outerPods .header__search input::-ms-input-placeholder {
+.header__search input::-ms-input-placeholder {
     color: #022D4D;
 }
 

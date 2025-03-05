@@ -19,7 +19,7 @@
 
     .dropdown-menu-xl .form-check-input {
         width: 15px;
-        height: 15px;
+        height: 15px!important;
         margin-right: 6px;
     }
 
@@ -118,7 +118,7 @@
                         <button type="submit" class="btn btn-xl btn-primary w-100 header-search-btn">Search</button>
                     </div>
                 </div>
-                <button type="button" class="filter-mobile">Filter</button>
+                <button type="button" class="filter-mobile">Filters</button>
                 </form>
             </div>
         </div>

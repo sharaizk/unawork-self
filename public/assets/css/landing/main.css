@@ -56,6 +56,11 @@
     display: block;
   }
 
+  #push-hamburger.active {
+    position: fixed;
+    right: 0;
+  }
+
   #push-hamburger.active span {
     background: transparent;
   }
@@ -3090,7 +3095,8 @@ main {
 
   #header .header__container .header__main .nav__list li a.dash-head-link {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
     width: 100%;
   }
   #header .header__container .header__main .nav__list li.active a {
@@ -3117,7 +3123,8 @@ main {
   }
   #header .header__container .header__main .nav__list li a {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
     padding: 15px;
   }
   .dash-header {
@@ -3424,15 +3431,24 @@ font-size: 2rem;
 .modal-body .form-control {
   line-height: 3rem;
   font-size: 1.4rem;
+  border: 1px solid #E8BE61;
 }
 
 .modal-footer {
   padding: 1.5rem 2rem;
+  border: none!important;
 }
 
 .modal-footer button {
   line-height: 2.5rem;
   font-size: 1.2rem;
+  text-transform: uppercase;
+}
+
+.modal-footer button.btn-primary {
+  background: #022d4d;
+  border: none;
+  margin-right: 10px;
 }
 
 .btn-close {

@@ -90,6 +90,7 @@
         </section>
 
       </div>
+      @if (Auth::user()->id != $employee->id)
       <div class="col-12 col-md-12 col-xl-3">
         <aside class="aside__container">
 
@@ -149,6 +150,7 @@
 
         </aside>
       </div>
+      @endif
     </div>
   </div>
 </main>
@@ -163,7 +165,6 @@
               </div>
               <div class="modal-body">
                   <div class="mb-3">
-                      <label for="messageInput" class="form-label">Your Message:</label>
                       <textarea id="messageInput" class="form-control" rows="3" placeholder="Type your message..."></textarea>
                   </div>
               </div>
