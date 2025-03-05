@@ -124,6 +124,9 @@
         });
 
         document.getElementById("sendMessage").addEventListener("click", function() {
+            if (this.dataset.sending === "true") return;
+            this.dataset.sending = "true";
+
             let message = document.getElementById("messageInput").value;
             let employeeId = this.dataset.employeeId;
             let data = {
@@ -159,6 +162,9 @@
             .catch((error) => {
                 showNotification('Message sending failed:'.error, 'danger');
                 console.error('Error:', error);
+            })
+            .finally(() => {
+                this.dataset.sending = "false";
             });
         });
     });
