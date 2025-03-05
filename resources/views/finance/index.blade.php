@@ -135,7 +135,7 @@
             <button id="apply-filters" class="btn btn-primary">Search</button>
             <!-- <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
         </div>
-        <button type="button" class="filter-mobile">Filter</button>
+        <button type="button" class="filter-mobile">Filters</button>
     </div>
 </section>
 <main>

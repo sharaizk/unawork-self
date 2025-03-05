@@ -2023,6 +2023,8 @@
 }
 
 .tpl-find-work .buttonViewAll-mobile {
+    font-size: 16px;
+    font-weight: 700;
     display: none;
     align-items: center;
     justify-content: center;
@@ -2280,7 +2282,7 @@
 
 .section_pod .pod-list .pod-list-item__wrap .pod-join {
     position: absolute;
-    z-index: 222;
+    z-index: 1;
     background: #022D4D;
     color: #ffffff;
     padding: 5px 20px;
@@ -2460,7 +2462,7 @@
 }
 
 .filter-modal .search-btn__wrap {
-    margin: 50px auto 40px;
+    margin: 115px auto 40px;
     width: 90%;
 }
 

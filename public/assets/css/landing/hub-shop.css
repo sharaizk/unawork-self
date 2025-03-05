@@ -401,6 +401,7 @@
 .tpl-hub-shop .section__introduce .col-right .item__content ul li span:hover,
 .tpl-hub-shop .section__introduce .col-right .item__content ul li address:hover {
   color: #cfaa40;
+  text-decoration: underline!important;
 }
 .tpl-hub-shop .section__introduce .col-right .item__content ul li a {
   display: flex;
