@@ -143,7 +143,7 @@
         <div class="container">
             <h1 class="titlePage"><span>Finances</span></h1>
             <h4 class="subTitlePage">Check your Projects’ Finances</h4>
-            <p class="descrPage">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+            <p class="descrPage">Add in the cost per project as you task items to your team. Then, add in your revenue or profit to the same project. When you visit this page next, we’ll show you the profit and loss margins so you can automatically keep track of your finances  - all in one platform. </p>
         </div>
 
     </section>

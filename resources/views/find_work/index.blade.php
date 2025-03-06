@@ -57,7 +57,7 @@
             <div class="search__wrap">
                 <form id="searchForm" class=" g-3 searchForm" method="GET">
                 <div class="hidden-mobile left-wrapper">
-                    <div class="form-group">
+                    <div class="form-group select-wrapper">
                         <!-- <label for="type">Type</label> -->
                         <select id="type" class="form-control" name="type">
                             <option value="" selected>Type</option>
@@ -66,10 +66,11 @@
                             <!-- <option value="vacancy">Vacancy</option> -->
                             <!-- <option value="project">Project</option> -->
                         </select>
+                        <i class="ti ti-chevron-down"></i>
                     </div>
 
-                    <div id="budgetField" class="col-md-4 form-group" style="display: none;">
-                        <label for="budget">Budget</label>
+                    <div id="budgetField" class="col-md-4 form-group select-wrapper" style="display: none;">
+                        <!-- <label for="budget">Budget</label> -->
                         <select id="budget" class="form-control" name="budget">
                             <option value="" selected>Select Budget</option>
                                 <option value="[0,500]">$0 - $500</option>
@@ -77,13 +78,14 @@
                                 <option value="[1000,5000]">$1000 - $5000</option>
                                 <option value="[5000,999999999]">$5000+</option>
                         </select>
+                        <i class="ti ti-chevron-down"></i>
                     </div>
 
                     @php
                         $industries = \App\Models\Industry::all();
                         $currentIndustryId = $currentWorkspace->industry_id ?? null;
                     @endphp
-                    <div id="industryField" class="form-group" style="display: none;">
+                    <div id="industryField" class="form-group select-wrapper" style="display: none;">
                         <!-- <label for="industry">Industry</label> -->
                         <select id="industry" class="form-control" name="industry">
                             <option value="">Select Industry </option>
@@ -93,6 +95,7 @@
                                 </option>
                             @endforeach
                         </select>
+                        <i class="ti ti-chevron-down"></i>
                     </div>
 
                     <div id="skillsField" class="form-group form-skill">
@@ -123,7 +126,7 @@
             </div>
         </div>
         <div class="filter-modal">
-            <form id="searchForm" class="g-3 searchForm" method="GET">
+            <form id="searchFormMob" class="g-3 searchForm" method="GET">
                 <div class="filter-modal__header">
                     <p>Filters</p>
                     <button type="button" class="close"></button>
@@ -349,6 +352,38 @@
     document.getElementById('searchForm').addEventListener('submit', function (e) {
         e.preventDefault();
         var type = document.getElementById('type').value;
+        var formAction = '';
+
+        if (type === 'vacancy') {
+            var skillIds = [];
+            document.querySelectorAll('input[name="skill_ids[]"]:checked').forEach(function (checkbox) {
+                skillIds.push(checkbox.value);
+            });
+            formAction = '{{ route("job-vacancies.landing.list") }}';
+            this.action = formAction + '?skill_ids=' + JSON.stringify(skillIds);
+        } else if (type === 'pod') {
+            var skillIds = [];
+            document.querySelectorAll('input[name="skill_ids[]"]:checked').forEach(function (checkbox) {
+                skillIds.push(checkbox.value);
+            });
+            formAction = '{{ route("pods.list") }}';
+            this.action = formAction + '?skill_ids=' + JSON.stringify(skillIds);
+        } else if (type === 'project') {
+            var budget = document.getElementById('budget').value;
+            formAction = '{{ route("project.list") }}';
+            this.action = formAction + '?budget=' + encodeURIComponent(budget);
+        } else if (type === 'company') {
+            var industry = document.getElementById('industry').value;
+            formAction = '{{ route("job-vacancies.landing.list") }}';
+            this.action = formAction + '?industry=' + budget;
+        }
+
+        this.submit();
+    });
+
+    document.getElementById('searchFormMob').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var type = document.getElementById('typeMobile').value;
         var formAction = '';
 
         if (type === 'vacancy') {
