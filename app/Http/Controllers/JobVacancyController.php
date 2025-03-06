@@ -79,7 +79,7 @@ class JobVacancyController extends Controller
             })
             ->get()
             ->map(function ($company) {
-                return $company->ownWorkspace;
+                return $company->ownWorkspace() ?: null;
             })
             ->filter();
 
