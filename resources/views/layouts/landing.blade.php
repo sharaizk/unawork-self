@@ -162,9 +162,9 @@
                             </div>
                         </div>
 
-                        <div class="modal-footer justify-content-between">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <div class="modal-footer justify-content-center">
                             <button type="submit" class="btn btn-primary">Create Meeting</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </form>
                     @if (!Auth::user()->isAbleToCreateZoomMeetings()) <h1> {{ __('Your plan does not allow creating Zoom meetings.') }}</h1> @endif

@@ -193,7 +193,7 @@
     <div class="container">
         <section class="section__layout section_company">
             <div class="container pods__title">
-                <h2>Companies Hiring</h2>
+                <h2>Company’s Hiring</h2>
                 <a href="{{ route('job-vacancies.landing.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container">
@@ -224,7 +224,7 @@
 
         <section class="section__layout section_pod">
             <div class="container pods__title">
-                <h2>Pods of Interest </h2>
+                <h2>PODs of Interest </h2>
                 <a href="{{ route('pods.list') }}" class="buttonViewAll">View All <i class="fa fa-chevron-right"></i></a>
             </div>
             <div class="container">

@@ -77,7 +77,11 @@ class JobVacancyController extends Controller
                     $queryBuilder->where('name', 'like', '%' . $query . '%');
                 }
             })
-            ->get();
+            ->get()
+            ->map(function ($company) {
+                return $company->ownWorkspace() ?: null;
+            })
+            ->filter();
 
         return response()->json($companies);
     }

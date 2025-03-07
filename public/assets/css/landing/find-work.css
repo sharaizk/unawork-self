@@ -2287,7 +2287,7 @@
     font-size: 15px;
     font-weight: 900;
     text-align: center;
-    margin: 10px auto;
+    margin: 35px auto 10px;
     text-overflow: ellipsis;
     transition: all 0.2s ease-in-out;
 }
