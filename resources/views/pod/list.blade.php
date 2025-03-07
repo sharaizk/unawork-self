@@ -82,7 +82,7 @@
                 display: -webkit-box;
                 -webkit-line-clamp: 3;
                 -webkit-box-orient: vertical;
-                max-height: 4.5em; 
+                max-height: 4.5em;
                 transition: max-height 0.3s ease-in-out;
             }
 
@@ -209,7 +209,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const subtitle = document.querySelector(".pods__subtitle");
             const btn = document.querySelector(".see-more-btn");
-    
+
             btn.addEventListener("click", function () {
                 subtitle.classList.toggle("expanded");
                 btn.innerText = subtitle.classList.contains("expanded") ? "See Less" : "See More";
@@ -300,8 +300,10 @@
                 event.preventDefault();
 
                 const podId = this.getAttribute('data-pod-id');
+                let podJoinUrl = `{{ route('api.pods.join', ['id' => ':id']) }}`;
+                let requestUrl = podJoinUrl.replace(':id', podId);
 
-                fetch(`/api/pods/${podId}/requests`, {
+                fetch(requestUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

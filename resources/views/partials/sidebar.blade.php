@@ -187,7 +187,7 @@
                                    <span class="dash-mtext">{{ __('PODs') }}</span>
                                </a>
                                @php
-                                   $pods = Auth::user()->pods;
+                                   $pods = Auth::user()->pods()->wherePivot('status', '!=', App\Enums\PodUser\Status::DECLINED->value)->get();
                                @endphp
                                <ul class="dropdown-menu" aria-labelledby="podsDropdown">
                                    <li><a class="dropdown-item" href="{{ route('pods.index') }}">{{ __('All PODs') }}</a></li>

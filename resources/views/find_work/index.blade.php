@@ -35,7 +35,7 @@
     }
 
     .dropdown-menu-xl .form-check-input:checked {
-        background-color: #E8BE61; 
+        background-color: #E8BE61;
     }
 
     .dropdown {
@@ -253,8 +253,10 @@
                 event.preventDefault();
 
                 const podId = this.getAttribute('data-pod-id');
+                let podJoinUrl = `{{ route('api.pods.join', ['id' => ':id']) }}`;
+                let requestUrl = podJoinUrl.replace(':id', podId);
 
-                fetch(`/api/pods/${podId}/requests`, {
+                fetch(requestUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
