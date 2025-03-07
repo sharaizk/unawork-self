@@ -139,16 +139,16 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
                     $text = __('New invite for joining pod: ') . ' <b>' . $pod->title . '</b>
                         <br>
-                        <form id="acceptForm-' . $user->id . '" 
-                            action="' . $acceptLink . '" 
-                            method="POST" 
+                        <form id="acceptForm-' . $user->id . '"
+                            action="' . $acceptLink . '"
+                            method="POST"
                             style="display: none;">
                             ' . csrf_field() . '
                         </form>
                         <button class="btn btn-success btn-sm p-1 align-baseline accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
                             ACCEPT
                         </button>
-                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn" 
+                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn"
                             data-url="' . $declineLink . '">DECLINE</button>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
@@ -171,16 +171,16 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
                     $text = __('New request for joining pod: ') . ' <b>' . $pod->title . '</b>
                         <br>
-                        <form id="acceptForm-' . $user->id . '" 
-                            action="' . $acceptLink . '" 
-                            method="POST" 
+                        <form id="acceptForm-' . $user->id . '"
+                            action="' . $acceptLink . '"
+                            method="POST"
                             style="display: none;">
                             ' . csrf_field() . '
                         </form>
                         <button class="btn btn-success btn-sm p-1 align-baseline accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
                             ACCEPT
                         </button>
-                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn" 
+                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn"
                             data-url="' . $declineLink . '">DECLINE</button>';
                     $icon = 'fa fa-bug';
                     $name = 'POD';
@@ -244,15 +244,15 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     }
                     $acceptLink = route('pods.projects.join.accept', ['record' => $data->id]);
                     $declineLink = route('pods.projects.join.decline', ['record' => $data->id]);
-                    $text = __('User : ') . ' 
+                    $text = __('User : ') . '
                         <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
-                        sended join request to your project:  
+                        sent join request to your project:
                         <b><a href="'. route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]) .'">'. $project->name . ' </a></b>
                         <br>
                         <br>
                         <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                             onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
-                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
                             onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
                     ';
                 @endphp
@@ -290,15 +290,15 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                     }
                     $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
                     $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
-                    $text = __('User : ') . ' 
+                    $text = __('User : ') . '
                         <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
-                        sended join request to your workspace:  
+                        sent join request to your workspace:
                         <b><a href="'. route('users.index', ['slug' => $workspace->slug]) .'">'. $workspace->name . ' </a></b>
                         <br>
                         <br>
                         <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                             onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
-                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                        <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
                             onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
                     ';
                 @endphp
@@ -316,7 +316,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                         <br>
                             <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                                 onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
-                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline" 
+                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
                                 onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
                     ';
                     $icon = 'fa fa-bug';
@@ -395,7 +395,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                                         <br>
                                         <a href="'.route('pods.projects.join', ['project' => $data->id]).'" class="button btn btn-sm btn-primary w-50">Join</a>
                                 ';
-                    
+
                     $icon = 'fa fa-bug';
                     $name = 'Proj';
                 @endphp
@@ -450,7 +450,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                 @if ($notification->is_read == 0)
                     <span id="isReadStatus-{{ $notification->id }}" class="unread-dot" onclick="markAsRead({{ $notification->id }})"></span>
                 @endif
-                @if ($link) 
+                @if ($link)
                 <a href="{{ $link }}" class="flex-fill">
                 @endif
                     <div class="d-flex align-items-center flex-fill" data-toggle="tooltip" data-placement="right" data-title="{{ $date }}">
@@ -467,7 +467,7 @@ $unreadNotificationCounter = App\Models\Notification::where('user_id', Auth::use
                             </div>
                         </div>
                     </div>
-                @if ($link) 
+                @if ($link)
                 </a>
                 @endif
                 <form method="POST" action="{{ route('notification.delete', ['notification' => $notification->id]) }}" style="display:inline;">

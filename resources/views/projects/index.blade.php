@@ -24,7 +24,7 @@
             <ul class="dropdown-menu" style="max-height: 400px; overflow-y: auto;">
                 <form action="{{ route('projects.index', ['slug' => $currentWorkspace->slug]) }}" method="GET" class="d-flex m-2">
                     <select name="category_ids[]" id="category-select" class="form-select select2" multiple >
-                        <option value="" disabled>{{ __('Select categories') }}</option>    
+                        <option value="" disabled>{{ __('Select categories') }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" @if (in_array($category->id, $selectedCategoryIds)) selected @endif>
                                 {{ $category->name }}
@@ -68,7 +68,7 @@
             <div class="filters-content">
                 <div class="row grid">
                     @foreach ($projects as $project)
-                   
+
                       <div class="col-xl-3 col-lg-4 col-sm-6 All {{ $project->status }}" >
                                 <div class="card" >
                                     <div class="card-header border-0 pb-0">
@@ -102,7 +102,7 @@
                                                             aria-expanded="false">
                                                             <i class="feather icon-more-vertical"></i>
                                                         </button>
-                                                
+
                                                 <div class="dropdown-menu dropdown-menu-end">
 
 
@@ -139,11 +139,11 @@
                                                         @method('DELETE')
                                                     </form>
                                                 @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'pending')->pluck('id')->toArray()))
-                                                    <span class="dropdown-item">Join Request Sended</span>
+                                                    <span class="dropdown-item">Join Request Sent</span>
                                                 @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'declined')->pluck('id')->toArray()))
                                                     <span class="dropdown-item">Join Request Was Declined</span>
                                                 @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
-                                                    <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item"> 
+                                                    <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item">
                                                         <span><i class="fa fa-pen-to-square"></i> Join This Project </span>
                                                     </a>
                                                 @endif

@@ -553,7 +553,7 @@
                                                         $declineLink = route('pods.projects.join.decline', ['record' => $data->id]);
                                                         $text = __('User : ') . '
                                                             <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
-                                                            sended join request to your project:
+                                                            sent join request to your project:
                                                             <b><a href="'. route('projects.show',['slug' => $project->workspaceData->slug, 'id' => $project->id]) .'">'. $project->name . ' </a></b>
                                                             <br>
                                                             <br>
@@ -596,7 +596,7 @@
                                                         $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
                                                         $text = __('User : ') . '
                                                             <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
-                                                            sended join request to your workspace:
+                                                            sent join request to your workspace:
                                                             <b><a href="'. route('users.index', ['slug' => $workspace->slug]) .'">'. $workspace->name . ' </a></b>
                                                             <br>
                                                             <br>

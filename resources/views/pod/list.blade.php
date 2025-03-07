@@ -314,7 +314,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        showNotification('Request sended successfully:', 'success');
+                        showNotification('Request sent successfully:', 'success');
                         form.style.display = 'none';
                     } else {
                         showNotification('Request sending error:', 'danger');
