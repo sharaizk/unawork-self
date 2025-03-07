@@ -62,6 +62,9 @@
         }
 
         .see-more-btn {
+            font-size: 15px;
+            font-weight: 400!important;
+            text-decoration: underline!important;
             display: none;
             background: none;
             border: none;
@@ -120,10 +123,10 @@
                             </div>
                         </div>
 
-                        <div class="search-btn__wrap form-group d-flex align-items-center">
-{{--                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>--}}
-                        </div>
-{{--                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>--}}
+                        <!-- <div class="search-btn__wrap form-group d-flex align-items-center">
+                            <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
+                        </div> -->
+                        <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
                     </div>
                 </form>
                 <button type="button" class="filter-mobile">Filters</button>
@@ -161,15 +164,15 @@
                 </div>
                 <!-- <div class="search-btn__wrap form-group d-flex align-items-center">
                     <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
-                </div>
-                <a href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
+                </div> -->
+                <a href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
             </form>
         </div>
     </section>
 
         <section class="section__titlepage">
             <div class="container">
-                <h1 class="section__titlepage--headertitle"><span>Pods</span></h1>
+                <h1 class="section__titlepage--headertitle"><span>PODs</span></h1>
                 <!-- <ul class="breadcrumb mt-1">
                     <li class="breadcrumb-item"><a href="{{ route('landing.find-work') }}">Find Work</a></li>
                     <li class="breadcrumb-item"> {{ __('Pods') }}</li>
@@ -180,7 +183,7 @@
 
         <section class="section__layout section_pod">
                 <div class=" pods__title">
-                    <h2>Pods of Interest </h2>
+                    <h2>PODs of Interest </h2>
                 </div>
                 <div class="pods__subtitle-wrap">
                     <p class="pods__subtitle">
@@ -191,7 +194,7 @@
                     <button class="see-more-btn">See More</button>
                 </div>
                 <div class="">
-                    <div class="row-master">
+                    <div class="pods-wrap">
 
                     </div>
                     <div class="pagination-container d-flex justify-content-md-end justify-content-center mt-4">
@@ -218,7 +221,7 @@
             const searchInput = document.getElementById('pod-search');
             const searchInputMobile = document.getElementById('pod-search-mobile');
             const skillsCheckboxes = document.querySelectorAll('input[name="skill_ids[]"]');
-            const container = document.querySelector('.row-master');
+            const container = document.querySelector('.pods-wrap');
             const paginationContainer = document.querySelector('.pagination-container');
 
 

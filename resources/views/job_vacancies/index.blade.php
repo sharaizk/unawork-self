@@ -11,13 +11,14 @@
 
 @section('action-button')
     <a id="btnDesk" href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
-       id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> <i class="ti ti-eye"></i></a>
-    <a id="btnMobile" href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
-       id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> Landing View</a>
+       id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> {{ __('Landing View') }}</a>
+    <!-- <a id="btnMobile" href="{{ route('landing.company.show', \Auth::user()->ownWorkspace()->id) }}" class="btn btn-sm btn-primary mx-1"
+       id="" data-toggle="tooltip" title="{{ __('Landing View') }}"> Landing View</a> -->
     <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
         data-title="{{ __('Create New Vacancy') }}" data-url="{{ route('job-vacancies.create') }}"
         data-toggle="tooltip" title="{{ __('Create New Vacancy') }}">
-        <i class="ti ti-plus"></i>
+        <!-- <i class="ti ti-plus"></i> -->
+        Create Vacancy
     </a>
 @endsection
 

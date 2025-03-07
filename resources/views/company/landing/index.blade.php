@@ -119,6 +119,15 @@
             </div>
             <div class="section__content">
                 {{ $company->description }}
+            </div>
+            <div class="section__content">
+                @if (Auth::user())
+                    <button class="btn btn-primary sendMessageButton section__btnMore" data-employee-id="{{ $company->id }}">
+                        <span> Send message </span>
+                    </button>
+                @else
+                    <a class="section__btnMore" href="{{ route('login') }}"><span>Send message</span></a>
+                @endif
                 @if($company->website)
                     <a href="{{$website}}" class="section__btnMore"><span>Visit Site</span></a>
                 @endif
@@ -181,13 +190,36 @@
                                 </div>
                                 
                             </div>
+                            <a class="section__btnMore" href="{{$vacancy_page}}"><span>Learn more</span></a>
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
         </section>
+
+
     </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="sendMessagePopup">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-white">
+        <h5 class="modal-title">Send Message</h5>
+        <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+            <textarea id="messageInput" class="form-control" rows="3" placeholder="Type your message..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-primary" id="sendMessage">Send Message</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+  </div>
 </div>
     
 
@@ -195,6 +227,54 @@
 
 @push('scripts')
 @section('scripts')
+<script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll(".sendMessageButton").forEach(button => {
+                    button.addEventListener("click", function() {
+                        let employeeId = this.dataset.employeeId;
+                        $("#sendMessagePopup").modal('show');
+                        document.getElementById("sendMessage").dataset.employeeId = employeeId;
+                    });
+                });
+
+                document.getElementById("sendMessage").addEventListener("click", function() {
+                    if (this.dataset.sending === "true") return;
+                    this.dataset.sending = "true";
+
+                    let message = document.getElementById("messageInput").value;
+                    let employeeId = this.dataset.employeeId;
+                    let data = {
+                        recipient_id: employeeId,
+                        type: 'user',
+                        message: message,
+                        temporaryMsgId: 'temp_1',
+                        _token: '{{ csrf_token() }}'
+                    };
+                    let url = `{{ route('api.send-message') }}`;
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        showNotification('Message successfully sended', 'success');
+                        $("#sendMessagePopup").modal('hide');
+                    })
+                    .catch((error) => {
+                        showNotification('Message sending failed:'.error, 'danger');
+                        console.error('Error:', error);
+                    })
+                    .finally(() => {
+                        this.dataset.sending = "false";
+                    });
+                });
+            });
+</script>
 
 @endsection
 

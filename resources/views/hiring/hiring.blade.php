@@ -186,6 +186,7 @@
                     </div>
                 </div>
 {{--                <button type="submit" class="btn btn-primary filter-btn header-search-btn">Search</button>--}}
+                <a href="{{ route('landing.hiring') }}" class="clear__filters">Clear Filters</a>
             </form>
         </div>
     </div>

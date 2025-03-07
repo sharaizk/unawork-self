@@ -22,6 +22,40 @@
         border: 1px solid #022D4D;
     }
 
+    .see-more-btn {
+            font-size: 15px;
+            font-weight: 400!important;
+            text-decoration: underline!important;
+            display: none;
+            background: none;
+            border: none;
+            color: #022D4D;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+    @media (max-width: 768px) {
+        .see-more-btn {
+            display: inline;
+        }
+
+        .pods__subtitle {
+            position: relative;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            max-height: 4.5em; 
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .pods__subtitle.expanded {
+            -webkit-line-clamp: unset;
+            max-height: none;
+        }
+    }
+
 </style>
 <link rel="stylesheet" href="{{ asset('assets/css/landing/outer-pods.css') }}">
 <section class="header__search-pods"></section>
@@ -30,6 +64,7 @@
         <div class="">
             <h1 class="section__titlepage--headertitle "><span>{{ $pod->title }}</span></h1>
             <p class="pods__subtitle">{{ $pod->description ?? '' }}</p>
+            <button class="see-more-btn" style="display: none">See More</button>
             @if (Auth::user())
                 @if (!in_array($pod->id, Auth::user()->pods()->pluck('pods.id')->toArray())  )
                     <form class="join-form col-3" data-pod-id="{{ $pod->id }}">
@@ -93,6 +128,22 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const subtitle = document.querySelector(".pods__subtitle");
+        const btn = document.querySelector(".see-more-btn");
+
+        if (subtitle && btn) {
+            const lineHeight = parseFloat(getComputedStyle(subtitle).lineHeight);
+            const maxHeight = lineHeight * 3; 
+
+            if (subtitle.scrollHeight > maxHeight) {
+                btn.style.display = "inline"; 
+            }
+            btn.addEventListener("click", function () {
+                subtitle.classList.toggle("expanded");
+                btn.innerText = subtitle.classList.contains("expanded") ? "See Less" : "See More";
+            });
+        }
+
         const forms = document.querySelectorAll('.join-form');
 
         forms.forEach(form => {

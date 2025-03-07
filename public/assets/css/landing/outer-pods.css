@@ -181,6 +181,10 @@
     color: #cfaa40;
 }
 
+.buttonViewAll i {
+    color: #cfaa40;
+}
+
 .section__general_info {
     padding: 0!important;
 }
@@ -1612,9 +1616,32 @@
     padding: 15px;
     background: white;
     border: 1px solid #CFAA40;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+}
+
+.buttons.buttons-mobile {
+    display: none!important;
+    flex-direction: column;
+    margin-top: 30px;
+}
+
+.buttons.buttons-mobile a,
+.buttons.buttons-mobile button{
+    width: 100%!important;
+    margin-right: 0!important;
+}
+
+@media (max-width: 768px) {
+    .members .members__info_list--item {
+        min-height: 250px;
+    }
+
+    .buttons.buttons-desktop {
+        display: none!important;
+    }
+
+    .buttons.buttons-mobile {
+        display: flex!important;
+    }
 }
 
 .members .members__info_list--item:first-child {
@@ -1628,6 +1655,10 @@
 
 .members .members__info_list--item .member_name a {
     color: black;
+}
+
+.members .members__info_list--item .member_name a:hover {
+    text-decoration: underline!important;
 }
 
 .members .members__info_list--item .chat-btn {
