@@ -47,7 +47,7 @@ class ProjectUserController extends Controller
                         'status' => 'pending'
                     ]);
                     Utility::sendNotification('project_request', null, $workspace->created_by, $userProject);
-                    $responseText = 'You have been successfully sended join request';
+                    $responseText = 'You have been successfully sent join request';
                 //  }
                 return redirect()->back()->with('success', $responseText);
             } else {

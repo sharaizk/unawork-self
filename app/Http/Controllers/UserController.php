@@ -1398,7 +1398,7 @@ class UserController extends Controller
             Utility::sendNotification('workspace_join', null, $workspace->created_by, $userWorkspace);
 
 
-            return redirect()->route('home')->with('success', __('Request Sended Successfully!'));
+            return redirect()->route('home')->with('success', __('Request Sent Successfully!'));
         } else {
             return response()->json(['error' => 'You are already a member of this workspace'], 404);
         }

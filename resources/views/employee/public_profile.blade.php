@@ -321,7 +321,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    showNotification('Message successfully sended', 'success');
+                    showNotification('Message successfully sent', 'success');
                     console.log('Success:', data);
                     sendMessageModal.hide();
 

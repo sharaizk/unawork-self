@@ -156,7 +156,7 @@
             })
             .then(data => {
                 console.log('Success:', data);
-                showNotification('Message successfully sended', 'success');
+                showNotification('Message successfully sent', 'success');
                     $("#sendMessagePopup").modal('hide');
             })
             .catch((error) => {

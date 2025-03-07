@@ -4,7 +4,7 @@
 <div class="row">
 
     @foreach ($projects as $project)
-        @php 
+        @php
             $project = \App\Models\Project::find($project->id);
         @endphp
         <div class="col-xl-3 col-lg-4 col-sm-6 All {{ $project->status }}" >
@@ -70,12 +70,12 @@
                                                 <i class="ti ti-user-plus"></i> <span>{{ __('Send Join Request') }}</span>
                                             </a>
                                         @else
-                                            <a href="#" class="dropdown-item" title="{{__('You sended join request')}}">
-                                                <i data-feather="lock"></i> <span>{{__('You sended join request')}}</span>
+                                            <a href="#" class="dropdown-item" title="{{__('You sent join request')}}">
+                                                <i data-feather="lock"></i> <span>{{__('You sent join request')}}</span>
                                             </a>
                                         @endif
                                     @endif
-                                    
+
 
                                 @else
                                     <a href="#" class="dropdown-item" title="{{__('Locked')}}">
