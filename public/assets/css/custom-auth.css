@@ -25,6 +25,7 @@
     right: 0;
     box-shadow: none;
     min-height: auto;
+    max-width: 100%;
 }
 
 .custom-login .dash-header .dash-h-item {
