@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
@@ -261,8 +262,21 @@ class MessagesController extends Controller
             if ($thread->subject == "Saved Messages") {
                 continue;
             }
-                // Get user data
-                $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
+            if ($thread->slug && str_starts_with($thread->slug, 'project-')) {
+                preg_match('/^project-(\d+)$/', $thread->slug, $matches);
+                if (!empty($matches[1])) {
+                    $project = Project::find((int)$matches[1]);
+                    if (!$project) {
+                        continue;
+                    }
+                    $ownerPlan = $project->workspaceData->creater->getPlan;
+                    if (!$ownerPlan->allow_chat_project_management) {
+                        continue;
+                    }
+                }
+            }
+
+            $contacts .= self::getContactItem($request['messenger_id'], $thread, Auth::user());
         }
 
         // Get all workspaces of user
