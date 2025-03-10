@@ -719,7 +719,7 @@ function makeSeen(status) {
     dataType: "JSON",
     success: (data) => {
       console.log("[seen] Messages seen - " + messenger.split("_")[1]);
-      $('.custom_messanger_counter').text(data.messengerCount);
+      $('.custom_messanger_counter_messages').text(data.messengerCount);
 
 
     },
