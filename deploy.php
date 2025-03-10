@@ -40,6 +40,15 @@ host('dev')
     ->set('hostname', '92.243.26.166')
     ->set('branch', 'dev');
 
+host('prod')
+    ->setSshArguments([
+        '-o StrictHostKeyChecking=no',
+        '-o UserKnownHostsFile=/dev/null'
+    ])
+    ->set('composer_options', '--verbose --prefer-dist --no-progress --no-interaction --optimize-autoloader')
+    ->set('hostname', '46.226.104.202')
+    ->set('branch', 'main');
+
 task('deploy', [
     'deploy:prepare',
     'deploy:vendors',

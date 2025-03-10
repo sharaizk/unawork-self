@@ -8,3 +8,9 @@ pipelines:
             - composer
           script:
             - dep deploy dev
+    main:
+      - step:
+          caches:
+            - composer
+          script:
+            - dep deploy prod
