@@ -365,7 +365,7 @@
                                 <i class="ti ti-message-circle"></i>
                                 @if ($unseenCounter > 0)
                                     <span
-                                        class="bg-danger dash-h-badge message-counter custom_messanger_counter">{{ $unseenCounter }}<span
+                                        class="bg-danger dash-h-badge message-counter custom_messanger_counter custom_messanger_counter_messages">{{ $unseenCounter }}<span
                                             class="sr-only"></span>
                                     </span>
                                 @endif
