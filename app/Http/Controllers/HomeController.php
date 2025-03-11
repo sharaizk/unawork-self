@@ -33,7 +33,7 @@ class HomeController extends Controller
         // $currentWorkspace = Utility::getWorkspaceBySlug('');
         $paymentSetting = Utility::getAdminPaymentSetting();
 
-        
+
 
         if ($setting['display_landing'] == 'on' && \Schema::hasTable('landing_page_settings')) {
 
@@ -44,7 +44,7 @@ class HomeController extends Controller
         } else {
 
             return redirect('login');
-            
+
         }
     }
 
@@ -55,7 +55,7 @@ class HomeController extends Controller
         if ($user && auth()->check()) {
             $manager = app('impersonate');
             $manager->take($from, $user);
-         
+
             return redirect('dashboard');
         }
     }
@@ -117,17 +117,17 @@ class HomeController extends Controller
 
     public function index($slug = '')
     {
-        
+
         $userObj = Auth::user();
-        
+
         // $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $currentWorkspace = Workspace::find($userObj->currant_workspace);
-        
+
         if ($userObj->type == 'admin') {
             $totalUsers = User::where('type', '!=', 'admin')->count();
             $totalPaidUsers = User::where('type', '!=', 'admin')->where('plan', '!=', 1)->count();
-            $totalOrderAmount = Order::where('payment_status', '=', 'succeeded')->sum('price');
-            $totalOrders = Order::where('payment_status', '=', 'succeeded')->count();
+            $totalOrderAmount = Order::whereIn('payment_status', ['succeeded', 'success'])->sum('price');
+            $totalOrders = Order::whereIn('payment_status', ['succeeded', 'success'])->count();
             $totalPlans = Plan::count();
             $mostPlans = Plan::where('id', function ($query) {
                 $query->select('plan_id')->from('orders')->groupBy('plan_id')->orderBy(\DB::raw('COUNT(plan_id)'))->limit(1);
@@ -199,7 +199,7 @@ class HomeController extends Controller
                 $users = User::find($workspace_owner->id);
                 $plan = Plan::find($users->plan);
                 $storage_limit = $plan->storage_limit > 0 ? (($users->storage_limit / $plan->storage_limit) * 100) : 0;
-                $storage_limit = number_format( $storage_limit ,2 );                
+                $storage_limit = number_format( $storage_limit ,2 );
                 if ($currentWorkspace->permission == 'Owner') {
                     $totalBugs = UserProject::join("bug_reports", "bug_reports.project_id", "=", "user_projects.project_id")->join("projects", "projects.id", "=", "user_projects.project_id")->where("user_id", "=", $userObj->id)->where('projects.workspace', '=', $currentWorkspace->id)->count();
                     $totalTask = UserProject::join("tasks", "tasks.project_id", "=", "user_projects.project_id")->join("projects", "projects.id", "=", "user_projects.project_id")->where("user_id", "=", $userObj->id)->where('projects.workspace', '=', $currentWorkspace->id)->count();
@@ -207,7 +207,7 @@ class HomeController extends Controller
                     ->when(isset($doneStage), function ($q) use ($doneStage) {
                         return $q->where('tasks.status', '=', $doneStage->id);
                     })->count();
-                    
+
                     $tasks = Task::select([
                         'tasks.*',
                         'stages.name as status',
@@ -232,8 +232,8 @@ class HomeController extends Controller
                 $totalMembers = UserWorkspace::where('workspace_id', '=', $currentWorkspace->id)->count();
 
                 $projectProcess = UserProject::join("projects", "projects.id", "=", "user_projects.project_id")->where("user_id", "=", $userObj->id)->where('projects.workspace', '=', $currentWorkspace->id)->groupBy('projects.status')->selectRaw('count(projects.id) as count, projects.status')->pluck('count', 'projects.status');
-                
-              
+
+
                 $arrProcessPer = [];
                 $arrProcessLabel = [];
                 foreach ($projectProcess as $lable => $process) {
@@ -272,7 +272,7 @@ class HomeController extends Controller
                 ->get()
                 ->pluck('name', 'id')
                 ->toArray();
-            
+
                 return view('home', compact('currentWorkspace', 'totalProject', 'totalBugs', 'totalTask', 'totalMembers', 'arrProcessLabel', 'arrProcessPer', 'arrProcessClass', 'completeTask', 'tasks', 'chartData','storage_limit','users','plan','tasksUsers'));
             }
         } else {
