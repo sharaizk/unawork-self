@@ -245,6 +245,7 @@
                 autoApply: true,
                 autoclose: true,
                 autoUpdateInput: false,*/
+                drops: 'up',
                 locale: {
                     format: 'MMMM D, YYYY hh:mm A',
                     applyLabel: "{{ __('Apply') }}",
