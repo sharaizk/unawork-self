@@ -468,6 +468,11 @@
                                                             class="dash-micon"><i class="ti ti-brand-telegram"></i></span><span
                                                             class="dash-mtext">{{ __('Plan Request') }}</span></a>
                                                 </li>
+                                               <li class="dash-item {{ request()->is('user_plan.index') ? 'active' : '' }}">
+                                                   <a href="{{ route('user_plan.index') }}" class="dash-link "><span
+                                                           class="dash-micon"><i class="ti ti-brand-telegram"></i></span><span
+                                                           class="dash-mtext">{{ __('Plan Users') }}</span></a>
+                                               </li>
                                             @endif
                                         @endif
 

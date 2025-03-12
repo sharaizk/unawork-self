@@ -1481,8 +1481,7 @@ class UserController extends Controller
                 ->where('type', 'workspace_invite')
                 ->first();
             if ($notification) {
-                $notification->is_read = 1;
-                $notification->update();
+                $notification->delete();
             }
 
             Utility::sendNotification('workspace_request_accept_owner', null, $workspace->created_by, $userWorkspace);

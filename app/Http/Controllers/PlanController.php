@@ -271,7 +271,20 @@ class PlanController extends Controller
         }
     }
 
+    public function userPlans(Request $request)
+    {
 
+        $currentWorkspace = Utility::getWorkspaceBySlug('');
+        $paymentSetting   = Utility::getAdminPaymentSetting();
+        $userId = \Auth::id();
+        if (\Auth::user()->type == 'admin') {
+            $users = User::where('is_active', 1)->paginate(20);
+
+            return view('plans.user_plans', compact('users', 'currentWorkspace', 'paymentSetting'));
+        } else {
+            return redirect()->back()->with('error', __('You are not allowed to view this page'));
+        }
+    }
 
     public function userPlan(Request $request)
     {

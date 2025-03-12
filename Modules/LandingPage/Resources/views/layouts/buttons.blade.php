@@ -1,6 +1,13 @@
 @php
     $settings = \Modules\LandingPage\Entities\LandingPageSetting::settings();
 @endphp
+
+<li class="nav-item">
+    <a class="nav-link active" href="{{ route('landing.find-work') }}">Find Work</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ route('landing.hiring') }}">Hiring</a>
+</li>
 @if ($settings['menubar_status'] == 'on')
     @if (is_array(json_decode($settings['menubar_page'])) || is_object(json_decode($settings['menubar_page'])))
         @foreach (json_decode($settings['menubar_page']) as $key => $value)
