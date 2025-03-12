@@ -63,14 +63,14 @@ class ProjectController extends Controller
     use ApiResponser;
 
     public function index($slug, Request $request)
-    {        
+    {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
         // $this->authorize('viewProjects', $currentWorkspace);
         if (!$objUser->can('viewProjects', $currentWorkspace)) {
             // Return custom view if user cannot access this page
-            return response()->view('plan_access', [], 403);
+            return response()->view('projects.plan_access', [], 403);
         }
 
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->firstOrFail();
@@ -227,7 +227,7 @@ class ProjectController extends Controller
         $usersIdList = [];
         $objUser = Auth::user();
         $plan = Plan::find($objUser->plan);
-        $currentWorkspace = Utility::getWorkspaceBySlug($slug);        
+        $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $user = $currentWorkspace->id;
         //check if user have plan
         if ($plan) {
@@ -884,7 +884,7 @@ class ProjectController extends Controller
 
 
     public function taskCreate(Request $request, $slug, $projectID = null)
-    {   
+    {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         if ($objUser->getGuard() == 'client') {
@@ -1787,7 +1787,7 @@ class ProjectController extends Controller
         $file_path = $project->id . "_" . md5(time()) . "_" . $request->file->getClientOriginalName();
 
         //storage limit
-        // $file_path = $project->project_image;   
+        // $file_path = $project->project_image;
         $image_size = $request->file('file')->getSize();
         $result = Utility::updateStorageLimit(\Auth::user()->id, $image_size);
 
@@ -1852,9 +1852,9 @@ class ProjectController extends Controller
         if ($file) {
             try {
                 $storageSetting = Utility::getAdminPaymentSetting()['storage_setting'];
-                
+
                 $filePath = \Storage::disk($storageSetting)->path('project_files/' . $file->file_path);
-                
+
                 if (!file_exists($filePath)) {
                     return redirect()->back()->with('error', __('File does not exist.'));
                 }
@@ -1863,7 +1863,7 @@ class ProjectController extends Controller
                 $filename = $file->file_name;
 
                 return response()->download(
-                    $filePath, 
+                    $filePath,
                     $filename,
                     [
                         'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -3496,7 +3496,7 @@ class ProjectController extends Controller
             // Return custom view if user cannot access this page
             return response()->view('plan_access', [], 403);
         }
-        
+
         $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $project_id)->first();
         $profits = Profit::where('project_id', $project->id)->where('workspace_id', $currentWorkspace->id)->get();
         $permissions = Auth::user()->getPermission($project->id);
@@ -3514,9 +3514,9 @@ class ProjectController extends Controller
     {
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-            
+
         $project = Project::select('projects.*')->join('user_projects', 'user_projects.project_id', '=', 'projects.id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $project_id)->first();
-        
+
         return view('projects.profit_report_create', compact('currentWorkspace', 'project'));
     }
 
