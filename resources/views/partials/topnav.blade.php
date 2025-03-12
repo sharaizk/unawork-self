@@ -475,8 +475,26 @@
                                                     @endphp
                                                 @elseif($notification->type == 'pod_invite')
                                                     @php
-                                                        $link = route('view_all.notifications');
-                                                        $text = __('New pod invite into pod: ') . ' <b>' . $data->title . '</b>';
+                                                        $pod = \App\Models\Pod::find($data->id);
+                                                        $user = \Auth::user();
+                                                        if (!$pod || !$user) {
+                                                            continue;
+                                                        }
+                                                        $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
+                                                        $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
+                                                        $text = __('New invite for joining pod: ') . ' <b>' . $pod->title . '</b>
+                                                            <br>
+                                                            <form id="acceptForm-' . $user->id . '"
+                                                                action="' . $acceptLink . '"
+                                                                method="POST"
+                                                                style="display: none;">
+                                                                ' . csrf_field() . '
+                                                            </form>
+                                                            <button class="btn btn-success btn-sm p-1 align-baseline accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
+                                                                ACCEPT
+                                                            </button>
+                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn"
+                                                                data-url="' . $declineLink . '">DECLINE</button>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
