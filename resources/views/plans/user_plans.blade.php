@@ -25,10 +25,11 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>User ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Plan</th>
+                    <th>Plan Price</th>
                     <th>Plan purchase. date</th>
                     <th>Plan Exp. date</th>
                 </tr>
@@ -40,6 +41,7 @@
                         <td> {{ $user->name }} </td>
                         <td> {{ $user->email }} </td>
                         <td> {{ $user->getPlan?->name }} </td>
+                        <td> ${{ $user->getPlan?->monthly_price ?? '' }} </td>
                         <td> {{ $user->is_plan_purchased ? ($user->lastPurchasedPlan()?->created_at ?? '-') : '-' }} </td>
                         <td> {{ $user->plan_expire_date ?? '-' }} </td>
                     </tr>
