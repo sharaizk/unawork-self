@@ -937,6 +937,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('/{slug}/manual-invoice-payment/{invoice_id}', [InvoiceController::class, 'addManualPayment'])->name('manual.invoice.payment')->middleware(['auth', 'XSS']);
 
 
+    Route::get('user_plan', [PlanController::class, 'userPlans'])->name('user_plan.index')->middleware(['auth', 'XSS',]);
 
 
     Route::get('plan_request', [PlanRequestController::class, 'index'])->name('plan_request.index')->middleware(['auth', 'XSS',]);

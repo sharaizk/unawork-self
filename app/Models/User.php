@@ -190,6 +190,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne('App\Models\Plan', 'id', 'plan');
     }
 
+    public function lastPurchasedPlan()
+    {
+        return Order::where('user_id', $this->id)->latest('id')->first();
+    }
+
 
     public function assignPlan($planID, $frequency = '')
     {
