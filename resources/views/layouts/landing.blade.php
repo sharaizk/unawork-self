@@ -77,9 +77,9 @@
                     <a href="{{ route('login') }}">Manage</a>
                 </div>
                 <div>
-                    <a href="{{ route('login') }}">About us</a>
-                    <a href="{{ route('landing.find-work') }}" class="">Contact us</a>
-                    <a href="http://www.unawork.net/faq/" class="">FAQ</a>
+                    <a href="https://app.unawork.net/pages/about_us">About us</a>
+                    <a href="https://app.unawork.net/pages/contact_us" class="">Contact us</a>
+                    <a href="https://app.unawork.net/pages/faq" class="">FAQ</a>
                 </div>
                 <div>
                     <a href="{{ route('login') }}">Login</a>
@@ -90,9 +90,9 @@
         <div class="footer__copyright">
             <p>Copyright © 2025 Unawork</p>
             <div class="footer__cookies">
-                <p>Cookies</p>
-                <p>Privacy Policy</p>
-                <p>Terms & Conditions</p>
+                <a href="https://app.unawork.net/pages/cookies">Cookies</a>
+                <a href="https://app.unawork.net/pages/privacy_policy">Privacy Policy</a>
+                <a href="https://app.unawork.net/pages/terms_and_conditions">Terms & Conditions</a>
             </div>
         </div>
     </div>
