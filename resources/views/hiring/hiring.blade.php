@@ -137,6 +137,34 @@
     .dropdown {
         display: flex;
     }
+
+    .filter-modal .form-group {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        height: auto;
+    }
+
+    .filter-modal  .dropdown .btn {
+        width: 100%;
+    }
+
+    .filter-modal .search__field {
+        width: 90%;
+        margin: 30px auto;
+    }
+
+    .filter-modal .search__list {
+        margin-right: 0;
+    }
+
+    @media (max-width: 768px) {
+        #searchForm {
+            display: none;
+        }
+    }
 </style>
 <!-- filter form -->
 <section class="header__search">
@@ -188,6 +216,7 @@
 {{--                <button type="submit" class="btn btn-primary filter-btn header-search-btn">Search</button>--}}
                 <a href="{{ route('landing.hiring') }}" class="clear__filters">Clear Filters</a>
             </form>
+            <button type="button" class="filter-mobile">Filters</button>
         </div>
     </div>
 </section>
@@ -209,6 +238,58 @@
         <div class="pagination-container d-flex justify-content-center mt-4" id="paginationContainer"></div>
     </div>
 </section>
+
+<div class="filter-modal">
+    <div class="filter-modal__header">
+        <p>Filters</p>
+        <button type="button" class="close"></button>
+    </div>
+    <form id="searchFormMob" class="g-3 searchForm" method="GET">
+    <div class="search__field">
+        <span class="search__icon">
+            <i class="fa fa-search"></i>
+        </span>
+        <input type="text" name="name" id="name" class="form-control" placeholder="Enter name" value="{{ request('name') ? request('name') : '' }}">
+    </div>
+    <div class="search__field">
+        <select name="country" id="country" class="form-control">
+            <option value="">Select Country</option>
+            @foreach($countries as $country)
+                <option value="{{ $country }}" {{ request('country') == $country ? 'selected' : '' }}>{{ $country }}</option>
+            @endforeach
+        </select>
+    </div>
+    @php
+        $jobTitles = \App\Models\JobTitle::all();
+    @endphp
+    <div class="search__field">
+        <select name="job_title_id" id="job_title_id" class="form-control">
+            <option value="">Select Job Title</option>
+            @foreach($jobTitles as $jobTitle)
+                <option value="{{ $jobTitle->id }}" {{ request('job_title_id') == $jobTitle->id ? 'selected' : '' }}>{{ $jobTitle->title }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="search__list">
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                Select Skills
+            </button>
+            <ul class="dropdown-menu dropdown-menu-xl skills-dropdown-menu">
+                @foreach($skills as $skill)
+                <li>
+                    <input class="form-check-input" type="checkbox" name="skill_ids[]" id="skill_{{ $skill->id }}" value="{{ $skill->id }}" {{ in_array($skill->id, request('skill_ids', [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="skill_{{ $skill->id }}">
+                        {{ $skill->name }}
+                    </label>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+    <a href="{{ route('landing.hiring') }}" class="clear__filters">Clear Filters</a>
+    </form>
+</div>
 
 
 <div class="modal fade" tabindex="-1" role="dialog" id="sendMessagePopup">
@@ -235,7 +316,28 @@
 @section('scripts')
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
+            const filterBtn = document.querySelector('.filter-mobile');
+            const filterModal = document.querySelector('.filter-modal');
+            const closeBtn = document.querySelector('.filter-modal .close');
+
+            if (filterBtn && filterModal && closeBtn) {
+                filterBtn.addEventListener('click', function () {
+                    filterModal.classList.add('active');
+                });
+
+                closeBtn.addEventListener('click', function () {
+                    filterModal.classList.remove('active');
+                });
+
+                filterModal.addEventListener('click', function (event) {
+                    if (event.target === filterModal) {
+                        filterModal.classList.remove('active');
+                    }
+                });
+            }
+
             const form = document.getElementById('searchForm');
+            const formMob = document.getElementById('searchFormMob');
             const employeeContainer = document.getElementById('employeeContainer');
             const paginationContainer = document.getElementById('paginationContainer');
 
@@ -309,8 +411,17 @@
                 fetchEmployees(`{{ route('hiring.search') }}?${params}`);
             }
 
-            const debouncedSearch = debounce(triggerSearch, 300);
+            function triggerSearchMob() {
+                let formData = new FormData(formMob);
+                let params = new URLSearchParams(formData).toString();
+                fetchEmployees(`{{ route('hiring.search') }}?${params}`);
+            }
 
+            const debouncedSearch = debounce(triggerSearch, 300);
+            const debouncedSearchMob = debounce(triggerSearchMob, 300);
+
+            formMob.addEventListener('input', debouncedSearchMob);
+            formMob.addEventListener('change', debouncedSearchMob);
             form.addEventListener('input', debouncedSearch);
             form.addEventListener('change', debouncedSearch);
             document.querySelectorAll('.form-check-input').forEach(checkbox => {
