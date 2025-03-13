@@ -196,6 +196,28 @@
                     @endforeach
                 </div>
             </div>
+            <div class="section__title col-12">
+                <h2>Pods</h2>
+                <div>
+                <!-- <a href="#">View All</a>
+                <i class="fa fa-chevron-right"></i> -->
+                </div>
+            </div>
+            <div class="section__content section_pod">
+                <div class="row-master">
+                    @foreach($pods as $pod)
+                        @php
+                            $user = Auth::user();
+                            $joinedPods = [];
+                            if ($user) {    
+                                $joinedPods = $user->pods()->pluck('pod_id')->toArray();
+                            }
+                            $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
+                        @endphp
+                        @include('pod.landing.pod_card', ['pod' => $pod, 'joinable' => $joinable])
+                    @endforeach
+                </div>
+            </div>
         </section>
 
 
