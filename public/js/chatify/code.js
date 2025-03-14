@@ -1263,7 +1263,7 @@ $(document).ready(function() {
       data: { _token: access_token, id: recipient_id},
       dataType: "JSON",
       success: (data) => {
-        newId = "user_" + data.id
+        newId = "user_" + data.thread_id
         var pElement = document.querySelector('.all_members p[data-id="user_'+recipient_id+'"]');
 
         if (pElement) {
@@ -1271,7 +1271,8 @@ $(document).ready(function() {
           messenger = newId;
         }
 
-        IDinfo(data.id);
+        IDinfo(data.thread_id, 'user');
+        getContacts();
       },
       error: () => {
         threadNotExist(image, username, id);

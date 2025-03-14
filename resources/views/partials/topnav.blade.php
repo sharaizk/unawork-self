@@ -482,19 +482,21 @@
                                                         }
                                                         $acceptLink = route('pods.accept', ['pod' => $pod, 'user' => $user]);
                                                         $declineLink = route('pods.decline', ['pod' => $pod, 'user' => $user]);
-                                                        $text = __('New invite for joining pod: ') . ' <b>' . $pod->title . '</b>
-                                                            <br>
-                                                            <form id="acceptForm-' . $user->id . '"
-                                                                action="' . $acceptLink . '"
-                                                                method="POST"
-                                                                style="display: none;">
-                                                                ' . csrf_field() . '
-                                                            </form>
-                                                            <button class="btn btn-success btn-sm p-1 align-baseline notification-accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
-                                                                ACCEPT
-                                                            </button>
-                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline notification-decline-btn"
-                                                                data-url="' . $declineLink . '">DECLINE</button>';
+                                                        $link = route('view_all.notifications');
+                                                        $text = __('New invite for joining pod: ') . ' <b>' . $pod->title . '</b>';
+//                                                        $text .= '
+//                                                            <br>
+//                                                            <form id="acceptForm-' . $user->id . '"
+//                                                                action="' . $acceptLink . '"
+//                                                                method="POST"
+//                                                                style="display: none;">
+//                                                                ' . csrf_field() . '
+//                                                            </form>
+//                                                            <button class="btn btn-success btn-sm p-1 align-baseline notification-accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
+//                                                                ACCEPT
+//                                                            </button>
+//                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline notification-decline-btn"
+//                                                                data-url="' . $declineLink . '">DECLINE</button>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
                                                     @endphp
