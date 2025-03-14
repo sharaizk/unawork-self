@@ -20,7 +20,7 @@
         }
         if (!$currentWorkspace) {
             $authUser = Auth::user();
-            $currentWorkspace = $AuthUser->updateCurrentWorkspace();
+            $currentWorkspace = $authUser->updateCurrentWorkspace();
         }
         $setting = App\Models\Utility::getcompanySettings($currentWorkspace->id);
         // $plan = App\Models\Plan::find(Auth::user()->plan);
@@ -483,6 +483,71 @@
             $(".view_all_notification").show();
             $(".view_less").hide();
 
+        });
+
+
+        document.querySelectorAll(".notification-accept-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                let userId = this.dataset.userId;
+                let form = document.getElementById(`acceptForm-${userId}`);
+                let formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        showNotification('Request accepted successfully', 'success');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    })
+                    .catch(error => {
+                        showNotification('Request failed: ' + error.message, 'danger');
+                        console.error('Error:', error);
+                    });
+            });
+        });
+
+        document.querySelectorAll(".notification-decline-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                let url = this.dataset.url;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        showNotification('Request declined successfully', 'success');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    })
+                    .catch(error => {
+                        showNotification('Request failed: ' + error.message, 'danger');
+                        console.error('Error:', error);
+                    });
+            });
         });
     </script>
 
