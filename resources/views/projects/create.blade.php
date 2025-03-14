@@ -1,3 +1,4 @@
+<form id="createProjectForm" class="" method="post" action="{{ route('projects.store',$currentWorkspace->slug) }}">
     @csrf
      <div class="modal-body">
     <div class="row">
