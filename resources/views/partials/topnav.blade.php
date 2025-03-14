@@ -490,10 +490,10 @@
                                                                 style="display: none;">
                                                                 ' . csrf_field() . '
                                                             </form>
-                                                            <button class="btn btn-success btn-sm p-1 align-baseline accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
+                                                            <button class="btn btn-success btn-sm p-1 align-baseline notification-accept-btn" style="margin-right: 8px;" data-user-id="' . $user->id . '">
                                                                 ACCEPT
                                                             </button>
-                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline decline-btn"
+                                                            <button class="btn btn-danger btn-sm p-1 m-0 align-baseline notification-decline-btn"
                                                                 data-url="' . $declineLink . '">DECLINE</button>';
                                                         $icon = 'fa fa-bug';
                                                         $name = 'POD';
