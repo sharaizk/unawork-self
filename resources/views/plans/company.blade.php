@@ -52,7 +52,7 @@
                                     $userFrequency = \Auth::user()->userPlanFrequency($plan->id);
                                     $planRequest = \Auth::user()->Planrequest();
                                 @endphp
-                                <div class="col-xl-3 col-lg-4 col-md-6">
+                                <div class="col-xl-3 col-lg-4 col-md-6 price-wrapper">
                                     <div class="card price-card price-1 wow animate__fadeInUp" data-wow-delay="0.4s"
                                         style="
                                             visibility: visible;
@@ -280,7 +280,7 @@
                                                         {{-- @dd($userFrequency) --}}
                                                         <div class="row">
                                                             @if (($plan->id != 1 && \Auth::user()->plan != $plan->id) || $userFrequency != 'monthly')
-                                                                <div class="col-8">
+                                                                <div class="w-auto">
                                                                     <button
                                                                         class="btn mb-3 btn-primary d-flex justify-content-center align-items-center">
                                                                         <a href="{{ route('payment', ['monthly', \Illuminate\Support\Facades\Crypt::encrypt($plan->id)]) }}"
@@ -291,7 +291,7 @@
                                                                         </a>
                                                                     </button>
                                                                 </div>
-                                                                <div class="col-4">
+                                                                <div class="w-auto">
                                                                     @if (\Auth::user()->requested_plan != $plan->id)
                                                                         <ul class="list-unstyled">
                                                                             <li>

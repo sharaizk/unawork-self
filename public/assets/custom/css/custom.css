@@ -1626,10 +1626,16 @@ span.currency-icon {
 
   /*plan card css*/
 
+.price-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
 .price-card {
     text-align: center;
     position: relative;
     margin-top: 30px;
+    height: 100%!important;
 }
 .price-card.price-2 {
     color: #fff;

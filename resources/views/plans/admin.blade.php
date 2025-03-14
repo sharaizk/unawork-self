@@ -34,7 +34,7 @@
 @section('content')
     <div id="cardsView" class="row">
         @foreach ($plans as $key => $plan)
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-3 col-lg-4 col-md-6 price-wrapper">
                 <div class="card price-card price-1 wow animate__fadeInUp" data-wow-delay="0.2s"
                     style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
                     <div class="card-body">

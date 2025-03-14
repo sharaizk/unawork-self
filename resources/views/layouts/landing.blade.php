@@ -1,11 +1,15 @@
 <!DOCTYPE html>
+@php
+    $logo = \App\Models\Utility::get_file('logo/');
+@endphp
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="./images/header/favicon.png">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ asset($logo . 'favicon.png') }}">
     <title>@yield('title')</title>
 
     <!-- CSS -->
@@ -77,9 +81,9 @@
                     <a href="{{ route('login') }}">Manage</a>
                 </div>
                 <div>
-                    <a href="{{ route('login') }}">About us</a>
-                    <a href="{{ route('landing.find-work') }}" class="">Contact us</a>
-                    <a href="http://www.unawork.net/faq/" class="">FAQ</a>
+                    <a href="https://app.unawork.net/pages/about_us">About us</a>
+                    <a href="https://app.unawork.net/pages/contact_us" class="">Contact us</a>
+                    <a href="https://app.unawork.net/pages/faq" class="">FAQ</a>
                 </div>
                 <div>
                     <a href="{{ route('login') }}">Login</a>
@@ -90,9 +94,9 @@
         <div class="footer__copyright">
             <p>Copyright © 2025 Unawork</p>
             <div class="footer__cookies">
-                <p>Cookies</p>
-                <p>Privacy Policy</p>
-                <p>Terms & Conditions</p>
+                <a href="http://www.unawork.net/cookies-policy/">Cookies</a>
+                <a href="http://www.unawork.net/privacy-policy-2/">Privacy Policy</a>
+                <a href="http://www.unawork.net/terms-conditions/">Terms & Conditions</a>
             </div>
         </div>
     </div>
