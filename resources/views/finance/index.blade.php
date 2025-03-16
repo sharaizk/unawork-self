@@ -1,3 +1,13 @@
+@php
+    $AuthUser = Auth::user();
+    if (!is_null($AuthUser->currant_workspace)) {
+    $currentWorkspace = \App\Models\Workspace::find($AuthUser->currant_workspace);
+    }
+
+    if (!$currentWorkspace) {
+    $currentWorkspace = $AuthUser->updateCurrentWorkspace();
+    }
+@endphp
 @extends('layouts.landing')
 
 @section('body-class', 'tpl-finance')
@@ -126,14 +136,14 @@
             </div>
             <div class="date-input">
                 <!-- <label for="start_date">{{ __('Start Date') }}</label> -->
-                <input type="date" id="start_date" class="form-control">
+                <input type="date" id="start_date" class="form-control" placeholder="Start Date">
             </div>
             <div class="date-input">
                 <!-- <label for="end_date">{{ __('End Date') }}</label> -->
                 <input type="date" id="end_date" class="form-control">
             </div>
             <button id="apply-filters" class="btn btn-primary">Search</button>
-            <!-- <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
+            <a id="clearFilters" href="{{ route('finances.index', $currentWorkspace->slug) }}" class="clear__filters">Clear Filters</a>
         </div>
         <button type="button" class="filter-mobile">Filters</button>
     </div>
@@ -217,7 +227,7 @@
             <input type="date" id="end_date" class="form-control">
         </div>
         <button id="apply-filters-mobile" class="btn btn-primary">Search</button>
-        <!-- <a id="clearFilters" href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a> -->
+        <a id="clearFiltersMob" href="{{ route('finances.index', $currentWorkspace->slug) }}" class="clear__filters">Clear Filters</a>
     </div>
 </div>
 @endsection

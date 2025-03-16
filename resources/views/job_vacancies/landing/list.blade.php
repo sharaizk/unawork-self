@@ -63,6 +63,18 @@
             display: flex;
             height: 40px;
         }
+        .filter-modal .input-group,
+        .filter-modal .form-control {
+            height: 40px!important;
+        }
+        .filter-modal .clear__filters {
+            margin-top: 50px;
+        }
+        @media (max-width: 768px) {
+            #searchForm {
+                display: none!important;
+            }
+        }
     </style>
 
     <section class="header__search">
@@ -149,9 +161,9 @@
                             @endforeach
                         </select>
                     </div>
-                <div class="search-btn__wrap form-group d-flex align-items-center">
+                <!-- <div class="search-btn__wrap form-group d-flex align-items-center">
                     <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
-                </div>
+                </div> -->
                 <a href="{{ route('job-vacancies.landing.list') }}" class="clear__filters">Clear Filters</a>
             </form>
         </div>

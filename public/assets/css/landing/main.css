@@ -3563,11 +3563,12 @@ font-size: 2rem;
   transition: all 0.2s ease-in-out;
 }
 
-.footer .footer__cookies p {
+.footer .footer__cookies a {
+  color: #fff;
   cursor: pointer;
 }
 
-.footer .footer__cookies p:hover {
+.footer .footer__cookies a:hover {
   color: #CFAA40;
 }
 

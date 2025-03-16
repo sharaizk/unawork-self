@@ -11,13 +11,19 @@
 @section('content')
 
 <style>
-    .circle_content .text {
-        min-width: 45vh; /* Set a minimum height for the description */
+    .header__search .container {
+        height: 100%;
+    }
+    .section__titlepage--subtitle {
+        font-size: 20px;
+        font-weight: 600;
+        color: #022D4D;
+        margin-top: 20px;
     }
 </style>
 
 <section class="header__search">
-    <div class="container-master">
+    <div class="container">
         <div class="search__wrap">
             <form action="" class="search__box">
                 <span class="search__icon">
@@ -25,7 +31,7 @@
                 </span>
                 <input type="text" placeholder="Search">
             </form>
-            <ul class="search__list">
+            <!-- <ul class="search__list">
                 <li class="search__item">
                     <a href="#" class="search__link">Location</a>
                 </li>
@@ -33,7 +39,7 @@
                     <a href="#" class="search__link">Remote</a>
                 </li>
                 <li class="search__item ">
-                    <a href="#" class="search__link ">Search types by catagory
+                    <a href="#" class="search__link ">Search types by category
                         <svg xmlns="http://www.w3.org/2000/svg" width="10.5" height="5.535" viewBox="0 0 10.5 5.535">
                             <path id="Path" d="M9.878.113a.441.441,0,0,0-.589,0L5,4.072.711.113a.441.441,0,0,0-.589,0,.364.364,0,0,0,0,.544L4.705,4.887a.441.441,0,0,0,.589,0L9.878.657A.364.364,0,0,0,9.878.113Z" transform="translate(0.25 0.285)" fill="#022d4d" stroke="#022d4d" stroke-miterlimit="10" stroke-width="0.5"></path>
                         </svg>
@@ -54,19 +60,21 @@
                         </li>
                     </ul>
                 </li>
-            </ul>
+            </ul> -->
         </div>
     </div>
 </section>
 
 <section class="section__titlepage">
-    <div class="container-master">
+    <div class="container">
         <h1 class="section__titlepage--headertitle"><span>Inner Circle</span></h1>
+        <h2 class="section__titlepage--subtitle">Inner POD Circle</h2>
+        <p class="pods__subtitle">Ready for a new project? View available tasks and projects and take what you want to work on. If you see a project available, be the first to accept the project. This lets you own the project and no longer displays it to other available members. If you can’t take it, simply reject the project so it doesn’t show up on your board.</p>
     </div>
 </section>
 
 <section class="section__innerCircle">
-        <div class="container-master">
+        <div class="container">
             <div class="row-master">
 
             @foreach ($projects as $project)
@@ -78,8 +86,10 @@
                                 <img src="{{ asset('/assets/images/gallery.png') }}" alt="">
                             </div>
                             <div class="circle_content">
-                                <div class="title">{{ $project->name }}</div>
-                                <div class="price">$ {{ $project->budget }}</div>
+                                <div class="title">
+                                    <span>{{ $project->name }}</span>
+                                    <b>$ {{ $project->budget }}</b>
+                                </div>
                                 <div class="text">
                                     {{ \Illuminate\Support\Str::limit($project->description, 120, '...') }}
                                 </div>
