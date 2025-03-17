@@ -1,13 +1,3 @@
-@php
-    $AuthUser = Auth::user();
-    if (!is_null($AuthUser->currant_workspace)) {
-    $currentWorkspace = \App\Models\Workspace::find($AuthUser->currant_workspace);
-    }
-
-    if (!$currentWorkspace) {
-    $currentWorkspace = $AuthUser->updateCurrentWorkspace();
-    }
-@endphp
 @extends('layouts.landing')
 
 @section('body-class', 'tpl-finance')
@@ -282,8 +272,8 @@
                         plugins: {
                             legend: {
                                 display: true,
-                                position: 'top', 
-                                align: 'end',    
+                                position: 'top',
+                                align: 'end',
                             },
                             tooltip: {
                                 callbacks: {
