@@ -1,13 +1,3 @@
-@php
-    $AuthUser = Auth::user();
-    if (!is_null($AuthUser->currant_workspace)) {
-    $currentWorkspace = \App\Models\Workspace::find($AuthUser->currant_workspace);
-    }
-
-    if (!$currentWorkspace) {
-    $currentWorkspace = $AuthUser->updateCurrentWorkspace();
-    }
-@endphp
 @extends('layouts.landing')
 
 @section('body-class', 'tpl-meeting')
@@ -17,7 +7,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>  
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <style>
     .header__search{
         background-color: #022d4d;
@@ -111,7 +101,7 @@
             margin: 0 auto;
         }
     }
-</style>  
+</style>
 <section class="header__search">
     <div class="container">
     <form id="searchForm" method="GET" action="{{ route('zoom-meeting.landing', $currentWorkspace->slug) }}">
@@ -124,7 +114,7 @@
                 </option>
             @endforeach
         </select>
-        
+
         <select class="filter-select" name="project">
             @if (!empty($projects) && $projects->count() >= 1)
             <option value="" disabled selected>Choose Project</option>
@@ -137,10 +127,10 @@
                 <option value="" disabled selected>No projects in meetings</option>
             @endif
         </select>
-        
+
         <select class="filter-select choices-multiple" name="participants[]" multiple>
             @foreach ($participants as $participant)
-                <option value="{{ $participant->id }}" 
+                <option value="{{ $participant->id }}"
                     {{ is_array(request('participants')) && in_array($participant->id, request('participants')) ? 'selected' : '' }}>
                     {{ $participant->name }}
                 </option>
@@ -191,10 +181,10 @@
                                                 $workspace = $meeting->workspace;
                                                 $participants = $meeting->getMembers();
                                             @endphp
-                                            <p>Project: 
+                                            <p>Project:
                                                 @if (!empty($project))
-                                                    <a href=" {{ route('projects.show', [$currentWorkspace->slug, $project->id]) }} ">{{ $project->name }}</a> 
-                                                @else —— 
+                                                    <a href=" {{ route('projects.show', [$currentWorkspace->slug, $project->id]) }} ">{{ $project->name }}</a>
+                                                @else ——
                                                 @endif
                                             </p>
                                             <p>
@@ -217,14 +207,14 @@
                                             <p class="hour"> <b>Time:</b>  {{ \Carbon\Carbon::parse($meeting->start_date)->format('H:i:s') }}</p>
                                             <p class="duration"><b>Duration:</b>  {{ $meeting->duration }} min.</p>
                                             <!-- @if ($meeting->created_by == \Auth::user()->id && $meeting->checkDateTime())
-                                            <a href="{{ $meeting->join_url }}" target="_blank"></a><p class="duration"><b>Go to meeting:</b>  </p></a>   
+                                            <a href="{{ $meeting->join_url }}" target="_blank"></a><p class="duration"><b>Go to meeting:</b>  </p></a>
                                             @elseif($meeting->checkDateTime())
                                                 <a href="{{ $meeting->join_url }}" target="_blank"> {{ __('Join meeting') }}
                                                     <i class="fas fa-external-link-square-alt "></i></a>
                                             @else
                                                 -
                                             @endif -->
-                                            
+
                                         </div>
                                         </div>
                                     </div>
@@ -276,7 +266,7 @@
                     </option>
                 @endforeach
             </select>
-            
+
             <select class="filter-select" name="project">
                 @if (!empty($projects) && $projects->count() >= 1)
                 <option value="" disabled selected>Choose Project</option>
@@ -289,10 +279,10 @@
                     <option value="" disabled selected>No projects in meetings</option>
                 @endif
             </select>
-            
+
             <!-- <select class="filter-select choices-multiple" name="participants[]" multiple>
                 @foreach ($participants as $participant)
-                    <option value="{{ $participant->id }}" 
+                    <option value="{{ $participant->id }}"
                         {{ is_array(request('participants')) && in_array($participant->id, request('participants')) ? 'selected' : '' }}>
                         {{ $participant->name }}
                     </option>
@@ -330,7 +320,7 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const multipleChoices = new Choices('.choices-multiple', {
-                removeItemButton: true,          
+                removeItemButton: true,
                 placeholder: true,
                 placeholderValue: 'Choose Participants',
             });
