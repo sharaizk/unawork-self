@@ -806,6 +806,7 @@ class MessagesController extends Controller
             'lastMessage' => $lastMessage ?? null,
             'unseenCounter' => $unseenCounter,
             'type'=>'user',
+            'single_participant_id'=> $user->id ?? null,
             'id' => $messenger_id,
         ])->render();
     }}

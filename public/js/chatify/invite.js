@@ -1,7 +1,7 @@
 
 
 // invite button
-$(".messenger-infoView-btns .invite-user").on("click", function() {    
+$(".messenger-infoView-btns .invite-user").on("click", function() {
     app_modal({
         name: "invite",
     });
@@ -13,7 +13,7 @@ $(".messenger-infoView-btns .invite-user").on("click", function() {
 document.querySelector(".app-modal[data-name=invite] .sendInvite").addEventListener("click", function() {
     let selectedItem = document.getElementById("selectItem").selectedOptions[0];
     let url = selectedItem.getAttribute('data-url');
-    let id = messenger.split("_")[1]
+    let id = messengerSingeParticipantId;
     let data = {
         user_id: id,
         _token: '{{ csrf_token() }}'
@@ -46,4 +46,3 @@ $(".app-modal[data-name=invite]")
     name: "invite",
     });
 });
-        

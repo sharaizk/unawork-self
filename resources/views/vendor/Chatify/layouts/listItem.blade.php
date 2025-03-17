@@ -71,7 +71,7 @@ $user_avatar_path = asset(\App\Models\Utility::get_file('/users-avatar/')) ;
         </td>
         {{-- center side --}}
         <td>
-        <p data-id="{{ $type.'_'.$thread->id }}">
+        <p data-id="{{ $type.'_'.$thread->id }}" data-user-id="{{ $single_participant_id }}">
             @if (is_null($user_name))
             {{ strlen($thread->subject) > 16 ? trim(substr($thread->subject,0,12)).'..' : $thread->subject }}
             @else
