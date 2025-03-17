@@ -3,7 +3,7 @@
  * Global variables
  *-------------------------------------------------------------
  */
-var messenger,
+var messenger, messengerSingeParticipantId,
   typingTimeout,
   typingNow = 0,
   temporaryMsgId = 0,
@@ -436,13 +436,13 @@ function makeSelectsForInviteUser(data, basicUrl) {
   // Iterate over workspaces
   data.workspaces.forEach(workspace => {
       const url = `${basicUrl}${workspace.slug}/checkuserexists`;
-      htmlOptions += `<option value="${url}">Company: ${workspace.name}</option>`;
+      htmlOptions += `<option value="${url}" data-url="${url}">Company: ${workspace.name}</option>`;
   });
 
   // Iterate over pods
   data.pods.forEach(pod => {
       const url = `${basicUrl}pods/${pod.id}/checkUserExists`;
-      htmlOptions += `<option value="${url}">POD: ${pod.title}</option>`;
+      htmlOptions += `<option value="${url}" data-url="${url}">POD: ${pod.title}</option>`;
   });
 
   return htmlOptions;
@@ -1165,6 +1165,10 @@ $(document).ready(function() {
       .find("p[data-id]")
       .attr("data-id");
     IDinfo(messenger.split("_")[1], messenger.split("_")[0]);
+
+      messengerSingeParticipantId = $(this)
+          .find("p[data-user-id]")
+          .attr("data-user-id");
   });
 
   $("body").on("click", ".all_members .messenger-list-item", function() {
@@ -1178,6 +1182,9 @@ $(document).ready(function() {
     messenger = $(this)
       .find("p[data-id]")
       .attr("data-id");
+    messengerSingeParticipantId = $(this)
+      .find("p[data-user-id]")
+      .attr("data-user-id");
 
     image = $(this)
     .find("div[style]")
@@ -1295,6 +1302,11 @@ $(document).ready(function() {
       $(this)
         .find("div.avatar")
         .attr("data-id");
+
+      messengerSingeParticipantId = $(this)
+          .find("p[data-user-id]")
+          .attr("data-user-id");
+
     IDinfo(messenger.split("_")[1], messenger.split("_")[0]);
   });
 
