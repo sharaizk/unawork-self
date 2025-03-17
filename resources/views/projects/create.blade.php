@@ -7,7 +7,7 @@
             <a href="#" data-size="lg" data-ajax-popup-over="true" class="btn btn-sm btn-primary" data-url="{{ route('generate',['project']) }}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Generate with AI') }}" data-title="{{ __('Generate Project Name & Description') }}">
                 <i class="fas fa-robot px-1"></i>{{ __('Generate with AI') }}</a>
         </div>
-        @endif 
+        @endif
 
         <div class="form-group col-md-12">
             <label for="project_category" class="col-form-label">{{ __('Category') }}</label>
@@ -23,7 +23,7 @@
             <div class="input-group mb-3 mt-2" id="newCategoryInput" style="display: none;">
                 <input type="text" id="newCategoryName" class="form-control" placeholder="{{ __('Category Name') }}" aria-label="{{ __('Category Name') }}">
                 <button type="button" id="createCategoryButton" class="btn btn-primary">{{ __('Create') }}</button>
-            </div>  
+            </div>
         </div>
         <div class="form-group col-md-12">
             <label for="projectname" class="col-form-label">{{ __('Name') }}</label>
@@ -47,9 +47,11 @@
             <select class="multi-select" id="users_list" name="users_list[]" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Select Users ...') }}">
             @if ($currentWorkspace->ownerable_type == "App\Models\Pod")
                 @foreach($currentWorkspace->ownerable->users as $user)
-                    <option value="{{$user->email}}">{{$user->name}} - {{$user->email}}</option>
+                    @if ($user->pivot->status == App\Enums\PodUser\Status::ACTIVE->value)
+                        <option value="{{$user->email}}">{{$user->name}} - {{$user->email}}</option>
+                    @endif
                 @endforeach
-            @else   
+            @else
                 @foreach($currentWorkspace->users($currentWorkspace->created_by) as $user)
                     <option value="{{$user->email}}">{{$user->name}} - {{$user->email}}</option>
                 @endforeach
@@ -62,7 +64,7 @@
             <button type="button" class="btn  btn-light" data-bs-dismiss="modal">{{ __('Close')}}</button>
             <input type="submit" value="{{ __('Add New project')}}" class="btn  btn-primary">
         </div>
-    
+
 </form>
 
 <script>

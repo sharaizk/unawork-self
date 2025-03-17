@@ -264,6 +264,7 @@
                         container.innerHTML = data.pods;
                         paginationContainer.innerHTML = data.pagination;
                         attachPaginationListeners();
+                        attachJoinFormListeners();
                     })
                     .catch(error => console.error('Error:', error));
             }
@@ -287,6 +288,39 @@
                     link.addEventListener('click', function (e) {
                         e.preventDefault();
                         fetchPods(this.href);
+                    });
+                });
+            }
+
+            function attachJoinFormListeners() {
+                document.querySelectorAll('.join-form').forEach(form => {
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault();
+
+                        const podId = this.getAttribute('data-pod-id');
+                        let podJoinUrl = `{{ route('api.pods.join', ['id' => ':id']) }}`;
+                        let requestUrl = podJoinUrl.replace(':id', podId);
+
+                        fetch(requestUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            credentials: 'same-origin'
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    showNotification('Request sent successfully:', 'success');
+                                    form.style.display = 'none';
+                                } else {
+                                    showNotification('Request sending error:', 'danger');
+                                }
+                            })
+                            .catch(error => {
+                                showNotification('Request sending error:', 'danger');
+                            });
                     });
                 });
             }

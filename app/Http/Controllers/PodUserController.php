@@ -50,10 +50,10 @@ class PodUserController extends Controller
     public function checkUserExists(Request $request, $podId)
     {
         $email = $request->email;
-        $registerUsers = User::where('email', '=', $email)->first(); 
+        $registerUsers = User::where('email', '=', $email)->first();
         //$settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
         $settings = Utility::getAdminPaymentSetting();
-        
+
         if ($registerUsers) {
             try {
                 $this->podUserService->inviteExistedUser($registerUsers->id, $podId, $settings);
@@ -111,39 +111,41 @@ class PodUserController extends Controller
     }
 
     public function accept(Pod $pod, User $user)
-    {   
+    {
         $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
         $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
-    
+
         Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_accept_user', null, $user->id, $podUser);
 
         $this->deleteNotification('pod_request', $ownId, $podUser->id);
         $this->deleteNotification('pod_invite', $user->id, $pod->id);
-        
+
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 
     public function decline(Pod $pod, User $user)
-    {   
+    {
         $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
         $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value]);
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
-    
+
         Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
         Utility::sendNotification('pod_request_decline_user', null, $user->id, $podUser);
 
         $this->deleteNotification('pod_request', $ownId, $podUser->id);
         $this->deleteNotification('pod_invite', $user->id, $pod->id);
-        
+
+        $user->updateCurrentWorkspace();
+
         return response()->json(['message' => 'User status updated to active'], 200);
     }
 
     public function editPermissions(Pod $pod, User $user)
-    {   
+    {
         $workspace = $pod->workspace;
         $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
         $permissions = Permission::all();
@@ -154,7 +156,7 @@ class PodUserController extends Controller
     public function updatePermissions(Request $request, Pod $pod, User $user)
     {
         $permissions = $request->input('permissions', []);
-        
+
         try {
             $message = $this->podUserService->updatePermissions($pod, $user, $permissions);
             $message = __('Permissions updated successfully.');
