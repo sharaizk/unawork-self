@@ -213,7 +213,7 @@ Route::get('register/{ref_id?}/{lang?}', [RegisteredUserController::class, 'show
 
 Route::prefix('client')->as('client.')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'clientLogin'])->name('login')->middleware(['XSS']);
-    Route::get('home/{slug?}', [HomeController::class, 'index'])->name('home')->middleware(['auth:client', 'XSS']);
+//    Route::get('home/{slug?}', [HomeController::class, 'index'])->name('home')->middleware(['auth:client', 'XSS']);
 
     Route::get('login/{lang?}', [AuthenticatedSessionController::class, 'showClientLoginForm'])->name('login')->middleware(['XSS']);
     Route::post('logout', [ClientController::class, 'clientLogout'])->name('logout')->middleware(['auth:client', 'XSS']);
@@ -501,7 +501,7 @@ Route::group(['middleware' => ['verified']], function () {
         Route::post('/{slug}/{id}/pay-with-paypal', [PaypalController::class, 'clientPayWithPaypal'])->name('pay.with.paypal')->middleware(['auth:client', 'XSS']);
         Route::get('/{slug}/{id}/get-payment-status', [PaypalController::class, 'clientGetPaymentStatus'])->name('get.payment.status')->middleware(['auth:client', 'XSS']);
 
-        Route::get('/{slug?}', [HomeController::class, 'index'])->name('home')->middleware(['auth:client', 'XSS']);
+//        Route::get('/{slug?}', [HomeController::class, 'index'])->name('home')->middleware(['auth:client', 'XSS']);
 
 
         ////**===================================== Project Reports =======================================================////
