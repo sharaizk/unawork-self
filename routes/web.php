@@ -141,6 +141,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/account/create-chat', [MessagesController::class, 'createChat'])->name('chat.create');
 
     Route::get('/pods/{pod}/inner-circle', [PodController::class, 'showInner'])->name('landing.pods.show.inner');
+    Route::get('/pods/{pod}/projects/search', [PodController::class, 'searchProjects'])->name('pods.projects.search');
 
     Route::resource('industries', IndustryController::class)->names([
         'index' => 'industries.index',

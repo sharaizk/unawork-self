@@ -135,6 +135,28 @@ class PodController extends Controller
         return view('pod.landing.inner', compact('pod', 'projects'));
     }
 
+    public function searchProjects(Request $request, Pod $pod)
+    {
+        $this->authorize('viewInner', $pod);
+
+        $query = $request->input('query');
+        $categoryId = $request->input('category');
+
+        $projects = $pod->projects()
+            ->when($query, function ($queryBuilder) use ($query) {
+                $queryBuilder->where('projects.name', 'like', "%{$query}%");
+            })
+            ->when($categoryId, function ($queryBuilder) use ($categoryId) {
+                $queryBuilder->where('projects.project_category_id', $categoryId);
+            })
+            ->latest('created_at')
+            ->get();
+
+        return response()->json([
+            'projects' => view('pod.landing.inner_projects_list', compact('projects'))->render(),
+        ]);
+    }
+
     public function enableInnerCircle($podId)
     {
         $user = Auth::user();
