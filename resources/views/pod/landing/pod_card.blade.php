@@ -9,7 +9,16 @@
                 <button type="submit" class="pod-join btn btn-primary">Join</button>
             </form>
         @else
-            <button type="submit" class="pod-join btn btn-primary" disabled>Joined</button>
+            @php
+                $pivot = $pod->currentUserPivot()?->status;
+            @endphp
+            @if($pivot == \App\Enums\PodUser\Status::DECLINED->value)
+                <button type="submit" class="pod-join btn btn-primary" disabled>DECLINED</button>
+            @elseif($pivot == \App\Enums\PodUser\Status::POD_PENDING->value || $pivot == \App\Enums\PodUser\Status::EMPLOYEE_PENDING->value)
+                <button type="submit" class="pod-join btn btn-primary" disabled>Sent</button>
+            @elseif($pivot == \App\Enums\PodUser\Status::ACTIVE->value)
+                <button type="submit" class="pod-join btn btn-primary" disabled>Joined</button>
+            @endif
         @endif
     </div>
 </div>
