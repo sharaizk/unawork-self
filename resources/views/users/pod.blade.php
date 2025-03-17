@@ -71,9 +71,11 @@
                                             @method('DELETE')
                                         </form>
                                     @endif
+                                    @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
                                     <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Go to Pod') }}">
                                          <i class="ti ti-align-right"></i> <span>{{ __('Go to Pod') }}</span></a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -83,7 +85,10 @@
                             @if ($pod->image) src="{{ asset ('storage/'. $pod->image) }}" @else avatar="{{ $pod->title }}" @endif>
 
                         <h4 class="mt-2">
+                            @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
+
                             <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
+                                @endif
                                 {{ $pod->title }}
                                 <!-- <i class="ti ti-eye"></i> -->
                             </a>
