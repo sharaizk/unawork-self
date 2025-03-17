@@ -87,7 +87,7 @@ class PodController extends Controller
         $pods = $podsQuery->paginate($perPage);
 
         $user = auth()->user();
-        $joinedPods = [];
+        $joinedPods = $user?->pods->pluck('id')->toArray();
 
         return response()->json([
             'pods' => view('pod.landing.pod_list', compact('pods', 'user', 'joinedPods'))->render(),

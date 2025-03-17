@@ -40,10 +40,15 @@ class Pod extends Model
     {
         return $this->morphOne(Workspace::class, 'ownerable');
     }
-    
+
     public function projects()
     {
         return $this->hasManyThrough(Project::class, Workspace::class, 'ownerable_id', 'workspace')
                     ->where('workspaces.ownerable_type', Pod::class);
+    }
+
+    public function currentUserPivot()
+    {
+        return $this->users()->where('user_id', \Auth::id())->first()?->pivot;
     }
 }
