@@ -84,7 +84,6 @@ class ZoomMeetingController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function store($slug, Request $request)
     {
@@ -151,6 +150,7 @@ class ZoomMeetingController extends Controller
                 return redirect()->back()->with('error', __('Meeting not created.'));
             }
         } catch (\Exception $e) {
+            return $e->getMessage();
             return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => \Auth::user()->currentWorkspace->slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> Error on creation: ' . $e->getMessage()));
         }
     }
