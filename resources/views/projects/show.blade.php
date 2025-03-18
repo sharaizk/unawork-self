@@ -76,42 +76,32 @@
         @endif
     @endif
 
-    <div class="dropdown col-md-auto col-sm-6 pb-3">
-        <button class="btn btn-xs btn-primary btn-icon-only dropdown-toggle" type="button" id="dropdownFinanceMenu" data-bs-toggle="dropdown" aria-expanded="false">
-            {{ __('Finance Options') }}
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownFinanceMenu">
-            @if ($plan->allow_expenses_project_management)
-                @if ((isset($permissions) && in_array('show expenses', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-                    <li>
-                        <a class="dropdown-item" href="{{ route($client_keyword . 'projects.expense.report', [$currentWorkspace->slug, $project->id]) }}">
-                            {{ __('Expenses') }}
-                        </a>
-                    </li>
-                @endif
-            @endif
 
-            @if ($plan->allow_expenses_project_management)
-                @if ((isset($permissions) && in_array('show expenses', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
+    @if ($plan->allow_expenses_project_management &&
+        ((isset($permissions) && in_array('show expenses', $permissions)) ||
+         (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner')))
+        <div class="dropdown col-md-auto col-sm-6 pb-3">
+            <button class="btn btn-xs btn-primary btn-icon-only dropdown-toggle" type="button" id="dropdownFinanceMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ __('Finance Options') }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFinanceMenu">
+                @php
+                    $financeOptions = [
+                        'projects.expense.report' => __('Expenses'),
+                        'projects.profit.report' => __('Profits'),
+                        'projects.finance' => __('Margin')
+                    ];
+                @endphp
+                @foreach ($financeOptions as $route => $label)
                     <li>
-                        <a class="dropdown-item" href="{{ route($client_keyword . 'projects.profit.report', [$currentWorkspace->slug, $project->id]) }}">
-                            {{ __('Profits') }}
+                        <a class="dropdown-item" href="{{ route($client_keyword . $route, [$currentWorkspace->slug, $project->id]) }}">
+                            {{ $label }}
                         </a>
                     </li>
-                @endif
-            @endif
-
-            @if ($plan->allow_expenses_project_management)
-                @if ((isset($permissions) && in_array('show expenses', $permissions)) || (isset($currentWorkspace) && $currentWorkspace->permission == 'Owner'))
-                    <li>
-                        <a class="dropdown-item" href="{{ route($client_keyword . 'projects.finance', [$currentWorkspace->slug, $project->id]) }}">
-                            {{ __('Margin') }}
-                        </a>
-                    </li>
-                @endif
-            @endif
-        </ul>
-    </div>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- <div class="col-md-auto col-sm-6 pb-3 ">
         <a href="{{ route($client_keyword . 'projecttime.tracker', [$currentWorkspace->slug, $project->id]) }}"

@@ -39,10 +39,12 @@
                             @endif
                         <div class="card-header-right">
                             <div class="btn-group card-option">
+                                @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
                                 <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
+                                @endif
                                 <div class="dropdown-menu dropdown-menu-end">
                                     @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
                                         @if (!$pod->inner_enabled)

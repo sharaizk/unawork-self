@@ -301,6 +301,11 @@
                         let podJoinUrl = `{{ route('api.pods.join', ['id' => ':id']) }}`;
                         let requestUrl = podJoinUrl.replace(':id', podId);
 
+                        let button = this.querySelector('.pod-join');
+
+                        button.disabled = true;
+                        button.innerText = 'Sending...';
+
                         fetch(requestUrl, {
                             method: 'POST',
                             headers: {
@@ -313,13 +318,17 @@
                             .then(data => {
                                 if (data.status === 'success') {
                                     showNotification('Request sent successfully:', 'success');
-                                    form.style.display = 'none';
+                                    button.innerText = 'Sent';
                                 } else {
                                     showNotification('Request sending error:', 'danger');
+                                    button.innerText = 'Join';
+                                    button.disabled = false;
                                 }
                             })
                             .catch(error => {
                                 showNotification('Request sending error:', 'danger');
+                                button.innerText = 'Join';
+                                button.disabled = false;
                             });
                     });
                 });
