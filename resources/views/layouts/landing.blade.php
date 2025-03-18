@@ -144,7 +144,7 @@
                     <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->currentWorkspace->slug) }}" method="POST" @if (!Auth::user()->isAbleToCreateZoomMeetings()) class="d-none" @endif >
+                    <form id="createMeetingForm" action="{{ route('zoom-meeting.store', \Auth::user()->ownWorkspace()->slug) }}" method="POST" @if (!Auth::user()->isAbleToCreateZoomMeetings()) class="d-none" @endif >
                         @csrf
                         <div class="modal-body">
                             <input type="hidden" name="members[0]" id="memberIdInput" value="">
