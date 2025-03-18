@@ -95,7 +95,8 @@ class ZoomMeetingController extends Controller
             return response()->view('plan_access', [], 403);
         }
 
-        $client_ids = ClientProject::getByProjects($request->project_id);
+//        $client_ids = ClientProject::getByProjects($request->project_id);
+        $client_ids = [];
 
         $data['topic']              = $request->title;
         $data['start_time']         = date('Y-m-d\TH:i:s', strtotime($request->start_date));
@@ -124,7 +125,7 @@ class ZoomMeetingController extends Controller
                 $new->workspace_id      = $currentWorkspace->id;
                 $new->meeting_id        = $meeting_id;
                 $new->client_id         = implode(',', $client_ids);
-                $new->project_id        = $request->project_id;
+                $new->project_id        = $request->project_id ?? null;
                 $new->member_ids        = implode(',', $request->members);
                 $new->start_date        = date('y:m:d H:i:s', strtotime($request->start_date));
                 $new->duration          = $request->duration;
@@ -150,7 +151,7 @@ class ZoomMeetingController extends Controller
                 return redirect()->back()->with('error', __('Meeting not created.'));
             }
         } catch (\Exception $e) {
-            return $e->getMessage();
+//            return $e->getMessage();
             return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => \Auth::user()->currentWorkspace->slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> Error on creation: ' . $e->getMessage()));
         }
     }
