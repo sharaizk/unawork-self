@@ -1,5 +1,5 @@
 @extends('layouts.admin')
- 
+
 @section('content')
 @php
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
@@ -23,7 +23,7 @@
         @endif
 <div class="row">
     <div class="col-lg-12">
-        
+
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -73,7 +73,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if (count($user->skills) >= 1) 
+                                        @if (count($user->skills) >= 1)
                                             {{ implode(', ', $user->skills->pluck('name')->toArray()) }}
                                         @endif
                                     </td>
@@ -82,10 +82,11 @@
                                             $hasOptions = false;
                                             $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
                                             $isPendingUser = $user->pivot->status == 'pod_pending';
+                                            $isPendingEmployee = $user->pivot->status == \App\Enums\PodUser\Status::EMPLOYEE_PENDING->value;
                                             $isCurrentUser = $user->id == Auth::user()->id;
                                             $isChatEnabled = $adminSetting['enable_chat'] == 'on';
-                                            
-                                            if ($isCreatorOrHasPermission || (!$isCurrentUser && $isChatEnabled)) {
+
+                                            if ($isCreatorOrHasPermission || (!$isCurrentUser && $isChatEnabled) || $isCurrentUser) {
                                                 $hasOptions = true;
                                             }
                                         @endphp
@@ -102,12 +103,12 @@
                                                             <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline User') }}</a></li>
                                                         @else
                                                             <li>
-                                                                <a href="#" class="dropdown-item" 
-                                                                        data-ajax-popup="true" 
-                                                                        data-size="lg" 
+                                                                <a href="#" class="dropdown-item"
+                                                                        data-ajax-popup="true"
+                                                                        data-size="lg"
                                                                         data-title="Edit Permissions"
                                                                         data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
-                                                                    <i class="ti ti-flag"></i> 
+                                                                    <i class="ti ti-flag"></i>
                                                                     Edit Permissions
                                                                 </a>
                                                             </li>
@@ -116,7 +117,7 @@
                                                             @endif
                                                         @endif
                                                     @elseif ($isCurrentUser)
-                                                        @if ($isPendingUser)
+                                                        @if ($isPendingEmployee)
                                                             <li><a class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}">{{ __('Accept Invite') }}</a></li>
                                                             <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline Invite') }}</a></li>
                                                         @else
@@ -155,7 +156,7 @@
                                     <span class="badge bg-dark">{{ __('declined') }}</span>
                                 @endif
                             @endif
-                            
+
                             @php
                                 $hasOptions = false;
                                 $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
@@ -191,27 +192,27 @@
                                                 @if ($isPendingUser)
                                                     <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
                                                         data-title="{{ __('Accept user') }}">
-                                                        <i class="ti ti-pencil"></i> 
+                                                        <i class="ti ti-pencil"></i>
                                                         <span>{{ __('Accept user') }}</span>
                                                     </a>
                                                     <a href="#" class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}""
                                                         data-title="{{ __('Decline user') }}">
-                                                        <i class="ti ti-pencil"></i> 
+                                                        <i class="ti ti-pencil"></i>
                                                         <span>{{ __('Decline user') }}</span>
                                                     </a>
                                                 @else
-                                                        <a href="#" class="dropdown-item" 
-                                                                data-ajax-popup="true" 
-                                                                data-size="lg" 
+                                                        <a href="#" class="dropdown-item"
+                                                                data-ajax-popup="true"
+                                                                data-size="lg"
                                                                 data-title="Edit Permissions"
                                                                 data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
-                                                            <i class="ti ti-flag"></i> 
+                                                            <i class="ti ti-flag"></i>
                                                             Edit Permissions
                                                         </a>
                                                         @if ($pod->created_by != $user->id)
                                                         <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
                                                             data-title="{{ __('Remove user from pod') }}">
-                                                            <i class="ti ti-pencil"></i> 
+                                                            <i class="ti ti-pencil"></i>
                                                             <span>{{ __('Remove user from pod') }}</span>
                                                         </a>
                                                         @endif
@@ -220,33 +221,33 @@
                                                 @if ($isPendingUser)
                                                     <a href="#" class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}""
                                                         data-title="{{ __('Accept user') }}">
-                                                        <i class="ti ti-pencil"></i> 
+                                                        <i class="ti ti-pencil"></i>
                                                         <span>{{ __('Accept invite') }}</span>
                                                     </a>
                                                     <a href="#" class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}""
                                                         data-title="{{ __('Decline user') }}">
-                                                        <i class="ti ti-pencil"></i> 
+                                                        <i class="ti ti-pencil"></i>
                                                         <span>{{ __('Decline invite') }}</span>
                                                     </a>
                                                 @else
                                                     <a href="#" class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}""
                                                         data-title="{{ __('Remove user from pod') }}">
-                                                        <i class="ti ti-pencil"></i> 
+                                                        <i class="ti ti-pencil"></i>
                                                         <span>{{ __('Remove me from this pod') }}</span>
                                                     </a>
                                                 @endif
                                             @endif
                                             @if (!$isCurrentUser && $isChatEnabled)
                                                 <a href="#" class="dropdown-item sendMessageUser" data-employee-id="{{ $user->id }}">
-                                                    <i class="ti ti-pencil"></i> 
-                                                    <span> Message </span> 
+                                                    <i class="ti ti-pencil"></i>
+                                                    <span> Message </span>
                                                 </a>
                                             @endif
                                         </div>
                                     </div>
                                 @endif
                             </div>
-                    </div> 
+                    </div>
                      <div class="card-body">
                         <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
                             @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
@@ -263,14 +264,14 @@
                         <span>{{ $user->email }}</span>
                         <br>
                         <small>
-                            @if (count($user->skills) >= 1) 
-                                Skills: 
+                            @if (count($user->skills) >= 1)
+                                Skills:
                             @endif
                             @foreach($user->skills as $skill)
                                {{ $skill->name }} @if(!$loop->last), @endif
                             @endforeach
                         </small>
-                    </div> 
+                    </div>
                 </div>
             </div> -->
         @endforeach
@@ -371,7 +372,7 @@
                         inviteUserButton.addEventListener('click', async function(event) {
                             event.preventDefault();
                             event.stopPropagation();
-                            
+
                             if (!form) {
                                 console.error('Form not found');
                                 return;
@@ -385,7 +386,7 @@
 
                                 document.getElementById('success-message').style.display = 'block';
                                 setTimeout(function() {
-                                    location.reload(); 
+                                    location.reload();
                                 }, 3000);
                             } catch (error) {
                                 console.error(error);
@@ -418,7 +419,7 @@
                 const url = this.getAttribute('data-url');
                 try {
                     const response = await axios.delete(url);
-                    window.location.href = response.data.location; 
+                    window.location.href = response.data.location;
                 } catch (error) {
                     console.error('An error occurred:', error);
                 }
@@ -433,7 +434,7 @@
                 const url = this.getAttribute('data-url');
                 try {
                     const response = await axios.post(url);
-                    location.reload(); 
+                    location.reload();
                 } catch (error) {
                     console.error('An error occurred:', error);
                 }
@@ -448,7 +449,7 @@
                 const url = this.getAttribute('data-url');
                 try {
                     const response = await axios.post(url);
-                    location.reload(); 
+                    location.reload();
                 } catch (error) {
                     console.error('An error occurred:', error);
                 }
