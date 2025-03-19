@@ -45,7 +45,7 @@
             <div class="container-master">
                 <div class="row-master">
                     @foreach($companies as $company)
-                        @include('company.landing.company_card', ['company' => $company->ownWorkspace()])
+                        @include('company.landing.company_card', ['company' => $company])
                     @endforeach
                 </div>
             </div>
