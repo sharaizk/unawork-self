@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
 
-@section('title', 'Public Profile '. $company->name)
+@section('title', 'Public Profile '. $company->company)
 
 @section('body-class', 'tpl-hub-shop')
 
@@ -35,7 +35,7 @@
                 <div class="col-right">
                     <div class="item">
                         <div class="item__title">
-                            <h1>{{ $company->name }}</h1>
+                            <h1>{{ $company->company }}</h1>
                         </div>
                         <div class="item__content">
                             <ul>
@@ -58,7 +58,7 @@
 
                                 @if($company->telephone)
                                     <li>
-                                        <i class="fa fa-phone"></i> 
+                                        <i class="fa fa-phone"></i>
                                         <a href="tel:{{$company->telephone}}" title="Phone">
                                             {{$company->telephone}}
                                         </a>
@@ -66,7 +66,7 @@
                                 @endif
                                 @if($company->website)
                                     <li>
-                                        <i class="fa fa-globe"></i> 
+                                        <i class="fa fa-globe"></i>
                                         @php
                                             $website = $company->website;
                                             if (!preg_match('#^http(s)?://#', $website)) {
@@ -188,7 +188,7 @@
                                     </div>
                                     {{ \Illuminate\Support\Str::limit($vacancy->description, 120, '...') }}
                                 </div>
-                                
+
                             </div>
                             <a class="section__btnMore" href="{{$vacancy_page}}"><span>Learn more</span></a>
                             </div>
@@ -209,7 +209,7 @@
                         @php
                             $user = Auth::user();
                             $joinedPods = [];
-                            if ($user) {    
+                            if ($user) {
                                 $joinedPods = $user->pods()->pluck('pod_id')->toArray();
                             }
                             $joinable = ($user && !in_array($pod->id, $joinedPods)) ? 1 : 0;
@@ -243,7 +243,7 @@
     </div>
   </div>
 </div>
-    
+
 
 @endsection
 
