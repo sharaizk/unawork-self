@@ -7,7 +7,7 @@
                 @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
             </div>
 
-            <h4>{{$company->name}}</h4>
+            <h4>{{$company->company}}</h4>
         </div>
         <p>
             {{ $company->description ? \Illuminate\Support\Str::limit($company->description, 120, '...') : 'about company' }}

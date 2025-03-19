@@ -26,7 +26,7 @@
             background-color: #022d4d;
             height: 60px;
         }
-    </style>  
+    </style>
     <section class="header__search">
         <div class="container"></div>
     </section>
@@ -54,7 +54,7 @@
                                 <div class="cm-shop__profile">
                                     <div class="profile__name">
                                         <h1>{{ $vacancy->title }}</h1>
-                                        <div>For: {{ $company_workspace->name }}</div>
+                                        <div>For: {{ $company_workspace->company }}</div>
                                     </div>
                                     <!-- <div class="profile__skills">
                                         <div class="title">
@@ -93,7 +93,7 @@
                                         </button>
                                     </div> -->
                                 </div>
-                            </section>     
+                            </section>
                         </div>
                     </div>
                 </div>
