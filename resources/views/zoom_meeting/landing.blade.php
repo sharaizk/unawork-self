@@ -195,7 +195,7 @@
                                             </p>
                                             <div class="memberMeeting">
                                                 @foreach ($participants as $participant)
-                                                    <a href="" class="project-person__link" data-toggle="tooltip" data-placement="top" title="{{$participant->name}}">
+                                                    <a class="project-person__link" data-toggle="tooltip" data-placement="top" title="{{$participant->name}}">
                                                         <img alt="{{$participant->name}}" @if ($participant->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $participant->avatar, 'small') }}" @else avatar="{{ $participant->name }}" @endif>
                                                     </a>
                                                 @endforeach

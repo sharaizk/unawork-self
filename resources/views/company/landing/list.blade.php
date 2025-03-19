@@ -19,7 +19,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="col-md-4 form-group d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">Filter</button>
                     </div>

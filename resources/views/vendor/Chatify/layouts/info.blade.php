@@ -1,11 +1,11 @@
 {{-- user info and avatar --}}
 
 @php
-$logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder')); 
+$logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
 @endphp
 
 @if(!empty(\Auth::user()->avatar))
-<div class="avatar av-l "style="background-image: url('{{asset( $logo.'/'.Auth::user()->avatar)}}');"></div>   
+<div class="avatar av-l "style="background-image: url('{{asset( $logo.'/'.Auth::user()->avatar)}}');"></div>
 @else
     <div class="avatar av-l"
          style="background-image: url('{{ asset($logo.'/'.'avatar.png')}}');">
@@ -27,9 +27,9 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
 
 <div class="messenger-infoView-shared">
     <p class="messenger-title">Users in thread</p>
-    <div class="users-list"></div>
+    <div class="users-list d-flex justify-content-center"></div>
 </div>
-<!-- 
+<!--
 <style>
 
 .theme-avtar {
@@ -40,7 +40,7 @@ $logo  =\App\Models\Utility::get_file(config('chatify.user_avatar.folder'));
     background: #dcdaeb;
     color: #51459d;
     object-fit: cover;
-    
+
 }
 </style> -->
 

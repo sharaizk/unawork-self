@@ -160,6 +160,15 @@
         margin-right: 0;
     }
 
+    .filter-modal .header-search-btn {
+        height: 40px!important;
+        width: 200px;
+        margin: 50px auto 30px;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: #cfaa40!important;
+    }
+
     @media (max-width: 768px) {
         #searchForm {
             display: none;
@@ -287,6 +296,7 @@
             </ul>
         </div>
     </div>
+    <button type="button" class="btn btn-primary filter-btn header-search-btn">Search</button>
     <a href="{{ route('landing.hiring') }}" class="clear__filters">Clear Filters</a>
     </form>
 </div>
@@ -319,13 +329,19 @@
             const filterBtn = document.querySelector('.filter-mobile');
             const filterModal = document.querySelector('.filter-modal');
             const closeBtn = document.querySelector('.filter-modal .close');
+            const headerSearchBtn = document.querySelector('.header-search-btn');
 
             if (filterBtn && filterModal && closeBtn) {
                 filterBtn.addEventListener('click', function () {
                     filterModal.classList.add('active');
                 });
 
-                closeBtn.addEventListener('click', function () {
+                closeBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    filterModal.classList.remove('active');
+                });
+
+                headerSearchBtn.addEventListener('click', function () {
                     filterModal.classList.remove('active');
                 });
 
@@ -441,7 +457,15 @@
         });
     </script>
 
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#newMeetingPopup').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // button which show modal
+                var memberId = button.data('member-id'); // value data-member-id
 
-
-
+                var modal = $(this);
+                document.getElementById('memberIdInput').value = memberId; // set value to input field
+            });
+        });
+    </script>
 @endsection

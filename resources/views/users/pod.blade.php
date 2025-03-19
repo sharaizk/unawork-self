@@ -39,10 +39,12 @@
                             @endif
                         <div class="card-header-right">
                             <div class="btn-group card-option">
+                                @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
                                 <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
                                     <i class="feather icon-more-vertical"></i>
                                 </button>
+                                @endif
                                 <div class="dropdown-menu dropdown-menu-end">
                                     @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
                                         @if (!$pod->inner_enabled)
@@ -71,9 +73,11 @@
                                             @method('DELETE')
                                         </form>
                                     @endif
+                                    @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
                                     <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Go to Pod') }}">
                                          <i class="ti ti-align-right"></i> <span>{{ __('Go to Pod') }}</span></a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -83,7 +87,10 @@
                             @if ($pod->image) src="{{ asset ('storage/'. $pod->image) }}" @else avatar="{{ $pod->title }}" @endif>
 
                         <h4 class="mt-2">
+                            @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
+
                             <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
+                                @endif
                                 {{ $pod->title }}
                                 <!-- <i class="ti ti-eye"></i> -->
                             </a>

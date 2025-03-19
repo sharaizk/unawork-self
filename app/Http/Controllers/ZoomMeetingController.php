@@ -76,7 +76,7 @@ class ZoomMeetingController extends Controller
         $currentWorkspace   = Utility::getWorkspaceBySlug($slug);
         $assign_pro_ids     = UserProject::where('user_id', $objUser->id)->pluck('project_id');
         $projects           = Project::with('task')->select(['name', 'id', 'workspace'])->whereIn('id', $assign_pro_ids)->where('workspace', $currentWorkspace->id)->pluck('name', 'id');
-        
+
         return view('zoom_meeting.create', compact('projects', 'currentWorkspace'));
     }
 
@@ -84,7 +84,6 @@ class ZoomMeetingController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function store($slug, Request $request)
     {
@@ -96,7 +95,8 @@ class ZoomMeetingController extends Controller
             return response()->view('plan_access', [], 403);
         }
 
-        $client_ids = ClientProject::getByProjects($request->project_id);
+//        $client_ids = ClientProject::getByProjects($request->project_id);
+        $client_ids = [];
 
         $data['topic']              = $request->title;
         $data['start_time']         = date('Y-m-d\TH:i:s', strtotime($request->start_date));
@@ -125,7 +125,7 @@ class ZoomMeetingController extends Controller
                 $new->workspace_id      = $currentWorkspace->id;
                 $new->meeting_id        = $meeting_id;
                 $new->client_id         = implode(',', $client_ids);
-                $new->project_id        = $request->project_id;
+                $new->project_id        = $request->project_id ?? null;
                 $new->member_ids        = implode(',', $request->members);
                 $new->start_date        = date('y:m:d H:i:s', strtotime($request->start_date));
                 $new->duration          = $request->duration;
@@ -151,7 +151,8 @@ class ZoomMeetingController extends Controller
                 return redirect()->back()->with('error', __('Meeting not created.'));
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => $slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> Error on creation! '));
+//            return $e->getMessage();
+            return redirect()->back()->with('error', __('<a href="'.route('workspace.settings', ['slug' => \Auth::user()->currentWorkspace->slug]).'#zoom-meeting-settings" style="color:#ffffff;">Please set up zoom integration in workspace settings</a> Error on creation: ' . $e->getMessage()));
         }
     }
 
@@ -182,7 +183,7 @@ class ZoomMeetingController extends Controller
                 $query->where('workspace_id', $currentWorkspace->id)
                         ->orWhereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)");
             });
-            
+
         } else {
             $meetingsQuery->whereRaw("find_in_set(" . \Auth::user()->id . ",member_ids)");
         }
@@ -191,7 +192,7 @@ class ZoomMeetingController extends Controller
             $query->where('start_date', '>=', now()->subDay())
                   ->orWhere('start_date', '>=', now());
         });
-    
+
         $allMeetings = $meetingsQuery->get();
 
         $workspaces = $allMeetings->map(function ($meeting) {
@@ -219,7 +220,7 @@ class ZoomMeetingController extends Controller
 
         if ($request->filled('participants')) {
             $selectedParticipants = $request->participants;
-    
+
             $meetingsQuery->where(function ($query) use ($selectedParticipants) {
                 foreach ($selectedParticipants as $participantId) {
                     $query->whereRaw("find_in_set(" . $participantId . ",member_ids)");
@@ -313,10 +314,10 @@ class ZoomMeetingController extends Controller
             try {
                 $zoomMeeting->delete();
                 $zoomDeleted = $this->delete($zoomMeeting->meeting_id, $slug);
-    
+
                 if ($zoomDeleted['success']) {
                     return redirect()->back()->with('success', __('Meeting deleted successfully.'));
-                } 
+                }
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', __('Meeting not deleted on zoom. Set up scopes'));
             }
@@ -330,9 +331,9 @@ class ZoomMeetingController extends Controller
 
         try {
             foreach ($meetings as $meeting) {
-                
+
                 $data = $this->get($meeting, $slug);
-                   
+
                 if (isset($data['data']) && !empty($data['data'])) {
                     $meeting = ZoomMeeting::where('meeting_id', $meeting)->update(['status' => $data['data']['status']]);
                 }
@@ -374,7 +375,7 @@ class ZoomMeetingController extends Controller
         } else {
 
             $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-            
+
             if ($objUser->getGuard() == 'client') {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
             } elseif ($currentWorkspace->permission == 'Owner') {

@@ -45,6 +45,37 @@
         color: #022D4D;
         pointer-events: none;
     }
+    .filter-modal .search__list,
+    .filter-modal .search__box {
+        padding-left: 0;
+        width: 90%;
+        margin: 0 auto;
+        font-size: 15px;
+    }
+    .filter-modal .search__wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+    .filter-modal .search__box input {
+        width: 100%;
+        height: 40px;
+        border-radius: 4px;
+        padding: 0 10px;
+        font-size: 15px;
+    }
+    .filter-modal select {
+        font-size: 15px;
+    }
+    .filter-modal .header-search-btn {
+        height: 40px!important;
+        max-width: 200px;
+        margin: 0 auto;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: #cfaa40!important;
+        margin-top: 50px;
+    }
     @media (max-width: 996px) {
         #searchWrap {
             display: none!important;
@@ -90,11 +121,11 @@
             <span class="search__icon">
                 <i class="fa fa-search"></i>
             </span>
-            <input type="text" id="searchInput" placeholder="Search by name">
+            <input type="text" id="searchInputMob" placeholder="Search by name">
         </div>
         <ul class="search__list">
             <li class="search__item ">
-                <select id="categorySelect" class="form-control">
+                <select id="categorySelectMob" class="form-control">
                     <option value="">Select Category</option>
                     @foreach(\App\Models\ProjectCategory::all() as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -103,6 +134,7 @@
                 <i class="ti ti-chevron-down"></i>
             </li>
         </ul>
+        <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
         <a href="{{ route('landing.pods.show.inner', $pod->id) }}" class="clear__filters">Clear Filters</a>
     </div>
 </div>
@@ -131,6 +163,7 @@
             const filterBtn = document.querySelector('.filter-mobile');
             const filterModal = document.querySelector('.filter-modal');
             const closeBtn = document.querySelector('.filter-modal .close');
+            const headerSearchBtn = document.querySelector('.header-search-btn');
 
             if (filterBtn && filterModal && closeBtn) {
                 filterBtn.addEventListener('click', function () {
@@ -138,6 +171,10 @@
                 });
 
                 closeBtn.addEventListener('click', function () {
+                    filterModal.classList.remove('active');
+                });
+
+                headerSearchBtn.addEventListener('click', function () {
                     filterModal.classList.remove('active');
                 });
 
@@ -150,6 +187,8 @@
 
             const searchInput = document.getElementById('searchInput');
             const categorySelect = document.getElementById('categorySelect');
+            const searchInputMob = document.getElementById('searchInputMob');
+            const categorySelectMob = document.getElementById('categorySelectMob')
             const projectsContainer = document.getElementById('projectsContainer');
             const podId = `{{ $pod->id }}`;
 
@@ -171,8 +210,28 @@
                     .catch(error => console.error('Error:', error));
             }
 
+            function fetchProjectsMob() {
+                let query = searchInputMob.value.trim();
+                let category = categorySelectMob.value;
+
+                let url = `{{ route('pods.projects.search', ['pod' => ':id']) }}`
+                    .replace(':id', podId) + `?query=${query}&category=${category}`;
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        projectsContainer.innerHTML = data.projects;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
             searchInput.addEventListener('input', fetchProjects);
             categorySelect.addEventListener('change', fetchProjects);
+            searchInputMob.addEventListener('input', fetchProjectsMob);
+            categorySelectMob.addEventListener('change', fetchProjectsMob);
         });
     </script>
 
