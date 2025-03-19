@@ -19,7 +19,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="col-md-4 form-group d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">Filter</button>
                     </div>
@@ -45,7 +45,7 @@
             <div class="container-master">
                 <div class="row-master">
                     @foreach($companies as $company)
-                        @include('company.landing.company_card', ['company' => $company])
+                        @include('company.landing.company_card', ['company' => $company->ownWorkspace()])
                     @endforeach
                 </div>
             </div>
