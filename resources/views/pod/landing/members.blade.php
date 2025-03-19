@@ -24,7 +24,7 @@
                             @if ($user->isEmployee())
                                 <a href="{{ route('employee.show', ['employee' => $user->id]) }}">{{ $user->name }}</a>
                             @elseif ($user->isCompany())
-                                <a href="{{ route('landing.company.show', ['company' => $user->id]) }}">{{ $user->name }}</a>
+                                <a href="{{ route('landing.company.show', ['company' => $user->ownWorkspace()->id]) }}">{{ $user->ownWorkspace()->name }}</a>
                             @endif
                         </h3>
 
