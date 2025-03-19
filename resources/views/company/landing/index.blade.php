@@ -28,7 +28,7 @@
             <section class="section__introduce">
                 <div class="col-left">
                     <div class="cm-shop__image">
-                        <img @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
+                        <img @if ($company->creater->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $company->creater->avatar) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
                             alt="Logo Shop">
                     </div>
                 </div>
@@ -155,7 +155,7 @@
                         <div class="col-12 col-md-4 col-xl-3">
                             <div class="courses__card p-2">
                             <div class="courses__header">
-                                <img @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
+                                <img @if ($company->creater->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $company->creater->avatar) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
                                     alt="Logo Shop">
                             </div>
                             <div class="courses__body">
