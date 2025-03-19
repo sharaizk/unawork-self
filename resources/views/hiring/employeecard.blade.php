@@ -35,11 +35,11 @@
 
                 <!-- <a href="#"><span>View HubShop</span></a> -->
                 <!-- <a href="#"><span>Interview</span></a> -->
-                
+
                 @if (Auth::user())
                     @if (Auth::user()->id != $employee->id)
                         <button class="sendMessageButton" data-employee-id="{{ $employee->id }}">
-                            <span> Message </span> 
+                            <span> Message </span>
                         </button>
 
                         <a href="#" data-member-id="{{ $employee->id }}" data-bs-toggle="modal" data-bs-target="#newMeetingPopup"><span>Video</span></a>
@@ -47,22 +47,10 @@
                     @endif
                 @else
                     <a href="{{ route('login') }}"><span>Message</span></a>
-                    <a href="{{ route('login') }}" ><span>Video</span></a>
+                    <a href="{{ route('login') }}" data-member-id="{{ $employee->id }}" ><span>Video</span></a>
 
                 @endif
 
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        $('#newMeetingPopup').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // button which show modal
-            var memberId = button.data('member-id'); // value data-member-id
-
-            var modal = $(this);
-            document.getElementById('memberIdInput').value = memberId; // set value to input field
-        });
-    });
-</script>
