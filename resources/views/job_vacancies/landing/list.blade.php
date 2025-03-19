@@ -195,31 +195,7 @@
                     .then(response => response.json())
                     .then(data => {
                         const container = document.querySelector('.row-master');
-                        container.innerHTML = '';
-
-                        if (data.length === 0) {
-                            container.innerHTML = '<p class="text-center">No companies found.</p>';
-                            return;
-                        }
-
-                        data.forEach(company => {
-                            const companyHtml = `
-                                 <div class="col-lg-3 col-md-4 col-sm-6 company-box__wrap">
-                                    <div class="company-box">
-                                        <div class="title-box">
-                                            <div class="title-box-wrap">
-                                                <img alt="user-image" class="img-fluid img_users_fix_size"
-                                                    src="${company.logo ? '/storage/logo/' + company.logo : '/storage/logo/logo-light.png'}">
-                                            </div>
-                                            <h4>${company.name}</h4>
-                                        </div>
-                                        <p>${company.description ? company.description.substring(0, 120) + '...' : 'about company'}</p>
-                                        <a href="/company/${company.id}" class="learn-more">Learn more</a>
-                                    </div>
-                                </div>
-                            `;
-                            container.innerHTML += companyHtml;
-                        });
+                        container.innerHTML = data.html;
                     })
                     .catch(error => console.error('Error:', error));
             });
@@ -236,31 +212,8 @@
                     .then(response => response.json())
                     .then(data => {
                         const container = document.querySelector('.row-master');
-                        container.innerHTML = '';
+                        container.innerHTML = data.html;
 
-                        if (data.length === 0) {
-                            container.innerHTML = '<p class="text-center">No companies found.</p>';
-                            return;
-                        }
-
-                        data.forEach(company => {
-                            const companyHtml = `
-                                 <div class="col-lg-3 col-md-4 col-sm-6 company-box__wrap">
-                                    <div class="company-box">
-                                        <div class="title-box">
-                                            <div class="title-box-wrap">
-                                                <img alt="user-image" class="img-fluid img_users_fix_size"
-                                                    src="${company.logo ? '/storage/logo/' + company.logo : '/storage/logo/logo-light.png'}">
-                                            </div>
-                                            <h4>${company.name}</h4>
-                                        </div>
-                                        <p>${company.description ? company.description.substring(0, 120) + '...' : 'about company'}</p>
-                                        <a href="/company/${company.id}" class="learn-more">Learn more</a>
-                                    </div>
-                                </div>
-                            `;
-                            container.innerHTML += companyHtml;
-                        });
                     })
                     .catch(error => console.error('Error:', error));
             });

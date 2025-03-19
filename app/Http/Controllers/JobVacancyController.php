@@ -74,7 +74,7 @@ class JobVacancyController extends Controller
         $companies = User::whereHas('jobVacancies')
             ->whereHas('workspacesOwner', function ($queryBuilder) use ($request, $query) {
                 if ($query) {
-                    $queryBuilder->where('name', 'like', '%' . $query . '%');
+                    $queryBuilder->where('company', 'like', '%' . $query . '%');
                 }
             })
             ->get()
@@ -83,6 +83,10 @@ class JobVacancyController extends Controller
             })
             ->filter();
 
-        return response()->json($companies);
+        return response()->json([
+            'html' => view('job_vacancies.landing.company_list', [
+                'usersWithVacancies' => $companies
+            ])->render(),
+        ]);
     }
 }
