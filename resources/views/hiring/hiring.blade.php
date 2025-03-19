@@ -441,7 +441,15 @@
         });
     </script>
 
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#newMeetingPopup').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // button which show modal
+                var memberId = button.data('member-id'); // value data-member-id
 
-
-
+                var modal = $(this);
+                document.getElementById('memberIdInput').value = memberId; // set value to input field
+            });
+        });
+    </script>
 @endsection
