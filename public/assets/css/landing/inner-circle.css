@@ -112,11 +112,16 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
     position: relative;
+}
+
+.section__list_inner_circle {
+    position: relative;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .section__handoffcustomlink__customlink__content .title_box,
@@ -393,7 +398,6 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
@@ -665,7 +669,6 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
@@ -938,7 +941,6 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
