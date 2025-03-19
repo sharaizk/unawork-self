@@ -47,7 +47,7 @@
                         <div class="row-master">
                             <section class="col-12 cm-shop__information">
                                 <div class="cm-shop__image">
-                                <img @if ($company_workspace->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company_workspace->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
+                                <img @if ($company->creater->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $$company->creater->avatar) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
                                     alt="Logo Shop">
 
                                 </div>

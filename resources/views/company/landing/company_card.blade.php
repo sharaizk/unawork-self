@@ -4,7 +4,7 @@
             <!-- <img src="http://unawork.net/images/thumbnails/card-avatar.png" alt=""> -->
             <div class='title-box-wrap'>
                 <img alt="user-image" class="img-fluid img_users_fix_size"
-                @if ($company->logo) src="{{ App\Helpers\FileHelper::getUrl('logo/' . $company->logo) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
+                @if ($company->creater->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $company->creater->avatar) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif>
             </div>
 
             <h4>{{$company->company}}</h4>
