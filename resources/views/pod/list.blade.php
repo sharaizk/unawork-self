@@ -74,6 +74,15 @@
             padding: 5px 0;
         }
 
+        .filter-modal .header-search-btn {
+            height: 40px!important;
+            width: 200px!important;
+            margin: 50px auto 30px;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: #cfaa40!important;
+        }
+
         @media (max-width: 768px) {
             .see-more-btn {
                 display: inline;
@@ -165,6 +174,7 @@
                 <!-- <div class="search-btn__wrap form-group d-flex align-items-center">
                     <button type="submit" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
                 </div> -->
+                <button type="button" class="btn btn-xl btn-primary w-100 filter-btn header-search-btn">Search</button>
                 <a href="{{ route('pods.list') }}" class="clear__filters">Clear Filters</a>
             </form>
         </div>
@@ -375,6 +385,7 @@
         const filterBtn = document.querySelector('.filter-mobile');
         const filterModal = document.querySelector('.filter-modal');
         const closeBtn = document.querySelector('.filter-modal .close');
+        const headerSearchBtn = document.querySelector('.header-search-btn');
 
         if (filterBtn && filterModal && closeBtn) {
             filterBtn.addEventListener('click', function () {
@@ -382,6 +393,9 @@
             });
 
             closeBtn.addEventListener('click', function () {
+                filterModal.classList.remove('active');
+            });
+            headerSearchBtn.addEventListener('click', function () {
                 filterModal.classList.remove('active');
             });
 

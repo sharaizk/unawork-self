@@ -112,11 +112,16 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
     position: relative;
+}
+
+.section__list_inner_circle {
+    position: relative;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .section__handoffcustomlink__customlink__content .title_box,
@@ -393,7 +398,6 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
@@ -665,7 +669,6 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
@@ -938,7 +941,6 @@
 .boxarchives__content,
 .section__statistics__archives .boxstatistics__content,
 .section__tasksmeeting__contentboxmeetings,
-.section__list_inner_circle,
 .section__tasksmeeting .meetings--content {
     border-radius: 10px;
     padding: 10px;
@@ -1493,11 +1495,10 @@
 
 .circle .circle__info_list--item {
     border-radius: 10px;
-    overflow: hidden;
     height: auto;
     position: relative;
     margin-top: 0px;
-    padding: 0px;
+    padding: 10px;
     background: white;
     border: 1px solid #00294A;
     display: flex;
@@ -1509,6 +1510,9 @@
 
 .more-pods {
     border: 1px solid #80808040;
+}
+.section__innerCircle {
+    margin-bottom: 50px;
 }
 
 .circle__info_list--item .btn-accept {
@@ -1542,13 +1546,17 @@
     padding: 5px 10px;
     color: #022D4D !important;
     position: relative;
-    /* width: 100%; */
+    width: 100%;
     font-size: larger;
 }
 .circle__info_list--item .circle_content .title {
-    width: 85%;
-    font-weight: 600;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 20px;
+    color: #022D4D;
+    margin-bottom: 10px;
 }
 
 .circle__info_list--item .circle_content .price {
@@ -1556,14 +1564,14 @@
     display: inline-block;
 }
 .circle__info_list--item .circle_content .text {
-    font-size: 10px !important;
-    margin: 5px 0px;
+    font-size: 14px !important;
+    color: #022D4D;
     /* min-height: 100%; */
 }
 .circle .circle__info_list--item .circle_img {
-    object-fit: cover;
     height: 100%;
-    width: auto;
+    width: 100px;
+    flex-shrink: 0;
     max-width: 100%;
 }
 
