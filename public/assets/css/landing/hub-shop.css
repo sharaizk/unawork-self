@@ -304,6 +304,16 @@
   color: #fff!important;
 }
 
+.courses__card .section__btnMore {
+  max-width: 162px!important;
+  margin: 5px auto!important;
+}
+
+.section__btnMore span {
+  font-size: 14px;
+  font-weight: 400;
+}
+
 .section__titlepage {
   margin: 40px 0;
 }
