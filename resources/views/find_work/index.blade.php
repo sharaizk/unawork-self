@@ -133,13 +133,16 @@
                 </div>
                 <div class="form-group">
                     <label class="title-label" for="type">Type</label>
-                    <select id="typeMobile" class="form-control" name="type">
-                        <option value="" selected>Type</option>
-                        <option value="pod">Pod</option>
-                        <option value="company">Company</option>
-                        <!-- <option value="vacancy">Vacancy</option> -->
-                        <!-- <option value="project">Project</option> -->
-                    </select>
+                    <div class="select-wrapper">
+                        <select id="typeMobile" class="form-control" name="type">
+                            <option value="" selected>Type</option>
+                            <option value="pod">Pod</option>
+                            <option value="company">Company</option>
+                            <!-- <option value="vacancy">Vacancy</option> -->
+                            <!-- <option value="project">Project</option> -->
+                        </select>
+                        <i class="ti ti-chevron-down"></i>
+                    </div>
                 </div>
                 @php
                     $industries = \App\Models\Industry::all();
@@ -147,20 +150,24 @@
                 @endphp
                 <div id="industryFieldMobile" class="form-group" style="display: none;">
                     <label for="industry" class="title-label">Industry</label>
-                    <select id="industry" class="form-control" name="industry">
-                        <option value="">Select Industry </option>
-                        @foreach($industries as $industry)
-                            <option value="{{ $industry->id }}">
-                                    {{ $industry->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="select-wrapper">
+                        <select id="industry" class="form-control" name="industry">
+                            <option value="">Select Industry </option>
+                            @foreach($industries as $industry)
+                                <option value="{{ $industry->id }}">
+                                        {{ $industry->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <i class="ti ti-chevron-down"></i>
+                    </div>
                 </div>
                 <div id="skillsFieldMobile" class="form-group">
-                    <label class="title-label">Skills</label>
+                    <label class="title-label">Skills </label>
                     <div class="dropdown">
-                        <button class="btn btn-xl btn-secondary dropdown-toggle w-100 skills-button" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
-                            {{ count(request('skill_ids', [])) > 0 ? 'Selected Skills' : 'Select Skills' }}
+                        <button class="form-control" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
+                            Skills
+                            <i class="ti ti-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-xl w-100 skills-dropdown-menu">
                             @foreach($skills as $skill)
