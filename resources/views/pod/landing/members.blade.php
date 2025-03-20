@@ -90,7 +90,7 @@
                         @if ($user->isEmployee())
                             <a href="{{ route('employee.show', ['employee' => $user->id]) }}" class="learn-more">See profile</a>
                         @elseif ($user->isCompany())
-                            <a href="{{ route('landing.company.show', ['company' => $user->id]) }}" class="learn-more">See profile</a>
+                            <a href="{{ route('landing.company.show', ['company' => $user->ownWorkspace()->id]) }}" class="learn-more">See profile</a>
                         @endif
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                 @if ($user->isEmployee())
                     <a href="{{ route('employee.show', ['employee' => $user->id]) }}" class="learn-more">See profile</a>
                 @elseif ($user->isCompany())
-                    <a href="{{ route('landing.company.show', ['company' => $user->id]) }}" class="learn-more">See profile</a>
+                    <a href="{{ route('landing.company.show', ['company' => $user->ownWorkspace()->id]) }}" class="learn-more">See profile</a>
                 @endif
             </div>
         </div>
