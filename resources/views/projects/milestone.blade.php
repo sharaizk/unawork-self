@@ -34,7 +34,7 @@
                 <span class="currency-icon bg-primary">{{ (!empty($currentWorkspace->currency)) ? $currentWorkspace->currency : '$'}}</span>
                 <input type="number" 
                     name="milestone_cost" 
-                    class="form-control" 
+                    class="form-control currency_input form-control-light" id="milestone-title" placeholder="{{ __('Enter Cost')}}" min="0" name="cost" value="0" required 
                     maxlength="7" 
                     oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                     value="{{ old('milestone_cost') }}"
