@@ -32,7 +32,13 @@
             <label for="milestone-title" class="col-form-label">{{ __('Milestone Cost')}}</label>
             <div class="form-icon-user">
                 <span class="currency-icon bg-primary">{{ (!empty($currentWorkspace->currency)) ? $currentWorkspace->currency : '$'}}</span>
-                <input type="number" class="form-control currency_input form-control-light" id="milestone-title" placeholder="{{ __('Enter Cost')}}" min="0" name="cost" value="0" required>
+                <input type="number" 
+                    name="milestone_cost" 
+                    class="form-control" 
+                    maxlength="7" 
+                    oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    value="{{ old('milestone_cost') }}"
+                >
             </div>
         </div>
 
