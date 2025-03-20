@@ -12,7 +12,13 @@
             <div class="col-md-8">
                 <div class="form-group">
                     <label for="milestone-title" class="col-form-label">{{ __('Milestone Title')}}</label>
-                    <input type="text" class="form-control form-control-light" id="milestone-title" placeholder="{{ __('Enter Title')}}" value="{{$milestone->title}}" name="title" required>
+                    <input type="text"
+                           class="form-control form-control-light"
+                           id="milestone-title"
+                           placeholder="{{ __('Enter Title')}}"
+                           value="{{$milestone->title}}"
+                           name="title"
+                           required>
                 </div>
             </div>
 
@@ -31,15 +37,22 @@
             <label for="milestone-title" class="col-form-label">{{ __('Milestone Cost')}}</label>
             <div class="form-icon-user">
                 <span class="currency-icon bg-primary">{{ (!empty($currentWorkspace->currency)) ? $currentWorkspace->currency : '$'}}</span>
-                <input type="number" class="form-control form-control-light currency_input" id="milestone-title" placeholder="{{ __('Enter Cost')}}" value="{{$milestone->cost}}" min="0" name="cost" required>
+                <input type="number"
+                       class="form-control form-control-light currency_input"
+                       id="milestone-title"
+                       placeholder="{{ __('Enter Cost')}}" value="{{$milestone->cost}}" min="0" name="cost"
+                       max="1000000"
+                       required
+                       oninput="if (parseInt(this.value) > parseInt(this.max)) this.value = this.max;"
+                >
             </div>
         </div>
         <div class="row">
         <div class="col-md-6">
            <div class="form-group ">
                <label class="form-label">{{ __('Start Date') }}</label>
-       
-             
+
+
             <div class="input-group date ">
             <input class="form-control datepicker22" type="text" id="start_date" name="start_date" value="{{$milestone->start_date}}" autocomplete="off" required>
              <span class="input-group-text">
@@ -50,7 +63,7 @@
       </div>
          <div class="col-md-6">
               <div class="form-group">
-               <label class="form-label">{{ __('End Date') }}</label>   
+               <label class="form-label">{{ __('End Date') }}</label>
             <div class="input-group date ">
            <input class="form-control datepicker23" type="text" id="end_date" name="end_date" value="{{$milestone->end_date}}" autocomplete="off" required>
              <span class="input-group-text">
