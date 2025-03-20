@@ -122,7 +122,7 @@
             </div>
             <div class="section__content">
                 @if (Auth::user())
-                    <button class="btn btn-primary sendMessageButton section__btnMore" data-employee-id="{{ $company->id }}">
+                    <button class="btn btn-primary sendMessageButton section__btnMore" data-employee-id="{{ $company->creater->id }}">
                         <span> Send message </span>
                     </button>
                 @else
