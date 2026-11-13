@@ -21,7 +21,7 @@
         "kkomelin/laravel-translatable-string-exporter": "^1.21",
         "kreait/laravel-firebase": "^5.9",
         "lab404/laravel-impersonate": "^1.7",
-        "lahirulhr/laravel-payhere": "^0.2.1",
+        "laravel-payhere/laravel-payhere": "^3.0",
         "laravel/fortify": "^1.14",
         "laravel/framework": "^10.10",
         "laravel/jetstream": "^4.0.3",
@@ -98,7 +98,9 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "laravel-payhere/laravel-payhere"
+            ]
         }
     },
     "config": {

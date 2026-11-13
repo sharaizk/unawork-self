@@ -24,7 +24,9 @@ class VerifyCsrfToken extends Middleware
          '/cinetpay/payment',
          'plan-cinetpay-return',
          '/invoice-cinetpay-return/*',
-         '/client/invoice-cinetpay-return/*'
+         '/client/invoice-cinetpay-return/*',
+         // PayHere server-to-server notification; authenticated by md5sig in PayHereService.
+         'payhere/callback/notify',
     ];
     // $except = ['*cancel-payment*'];
 }

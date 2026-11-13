@@ -98,6 +98,7 @@ Reference implementations:
 - **Workspace:** the tenant. The current one is `Auth::user()->currant_workspace` (sic, the misspelling is real). URLs use `$currentWorkspace->slug`. A workspace's owner is `$workspace->creater` (sic).
 - **POD:** each Pod owns a Workspace through the polymorphic `workspaces.ownerable`. Member permissions use `App\Enums\PodUser\Permission`, and workspace member permissions use `App\Enums\UserWorkspace\Permission` (`*_INDEX`, `*_EDIT`).
 - **Settings and files:** `App\Models\Utility::getAdminPaymentSetting()`, `getcompanySettings($workspaceId)` and `get_file($path)`. Reuse them; don't re-implement them.
+- **PayHere** (`laravel-payhere/laravel-payhere`): the package is in composer `extra.laravel.dont-discover` and loaded by `App\Providers\PayHereServiceProvider` with config + views only, because its own provider registers unauthenticated `/payhere/api/*` routes, a single-credential webhook, and auto-run migrations. Use `App\Services\PayHereService`: plans use admin credentials, invoices use workspace credentials; payments are confirmed only by the signed `payhere.callback.notify` callback against the `payhere_checkouts` table. Return/cancel pages must never mark a payment paid.
 
 ### 4.4 Database
 
@@ -224,6 +225,8 @@ Reference implementations:
 - Very large views (`setting.blade.php` and `users/setting.blade.php`, about 4k+ lines each). Make surgical edits only.
 - Controllers reference views that don't exist (`chats.index`, `payment`, `users.rename_workspace`, `landingpage::create|edit|show`).
 - `HandleInertiaRequests` is registered twice in `app/Http/Kernel.php`. `/` is defined twice in `routes/web.php`; the later `HomeController@landingPage` route wins.
+- `php artisan route:list` crashes because `routes/api.php` references a missing `App\Http\Controllers\Api\ProjectController`. Until that is fixed, inspect routes by booting the app in a script and iterating `app('router')->getRoutes()`.
+- Composer now effectively needs PHP 8.2+ (`laravel-payhere/laravel-payhere` v3 requires `php ^8.2`), even though `composer.json` still says `^8.1`.
 
 ---
 

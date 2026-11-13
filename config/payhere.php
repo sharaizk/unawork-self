@@ -1,52 +1,34 @@
 <?php
 
 /*
- * PayHere full api guide is available here https://support.payhere.lk/api-&-mobile-sdk
+ * Configuration for laravel-payhere/laravel-payhere.
  *
- * */
+ * UnaWork does NOT rely on these global values for real payments. Credentials are
+ * stored in the database (admin payment settings for plan purchases, workspace
+ * payment settings for invoices) and applied per checkout/notification by
+ * App\Services\PayHereService. These keys only provide safe defaults for the
+ * package's form builder and must not hold production secrets in the repository.
+ */
 
 return [
 
-
-    /*
-     PayHere action url. usually,
-     for production   https://www.payhere.lk
-     for testing  https://sandbox.payhere.lk
-      remember to update api when production
-     * */
-
-    'api_endpoint' => env('PAYHERE_API'),
-
-
-    /*
-      PayHere merchant ID can be found in their dashboard
-      https://www.payhere.lk/account/settings/domain-credentials
-     * */
+    // Toggle between sandbox (https://sandbox.payhere.lk) and live (https://www.payhere.lk).
+    'sandbox' => env('PAYHERE_SANDBOX', false),
 
     'merchant_id' => env('PAYHERE_MERCHANT_ID'),
 
-    /*
-     Merchant Secret is specific to each App/Domain. it can be generated for your domain/app as follows
-     https://www.payhere.lk/account/settings/domain-credentials
-        *Click 'Add Domain/App' > Fill details > Click 'Request to Allow'
-        *Wait for the approval for your domain
-        *Copy the Merchant Secret for your domain/app to .env file
-     * */
     'merchant_secret' => env('PAYHERE_MERCHANT_SECRET'),
 
+    // Supported by PayHere: LKR, USD, EUR, GBP, AUD.
+    'currency' => env('PAYHERE_CURRENCY', 'LKR'),
 
-    /*
-     Follow PayHere official instructions to obtain 'app_id' and 'app_secret'.
-     NOTE: you dont need to generate "Authorization code". it will be automatically generate by this package
-        *Sign in to your PayHere account & go to Settings > Business Apps section
-        *Click 'Create App' button & enter an app name & comma seperated domains to whilelist
-        *Tick the permission 'Payment Retrieval API'
-        *Click 'Add Business App' button to create the app
-        *Once the app is created click 'View Credential' button in front of the created app
-        *Copy the 'App ID' & 'App Secret' values
-     * */
+    // Overridden per checkout with UnaWork's own routes (payhere.callback.*).
+    'notify_url' => env('PAYHERE_NOTIFY_URL'),
+    'return_url' => env('PAYHERE_RETURN_URL'),
+    'cancel_url' => env('PAYHERE_CANCEL_URL'),
+
+    // Only needed for PayHere's REST APIs (retrieval/refund), which UnaWork does not call.
     'app_id' => env('PAYHERE_APP_ID'),
     'app_secret' => env('PAYHERE_APP_SECRET'),
-
 
 ];

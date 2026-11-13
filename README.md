@@ -1,64 +1,293 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# UnaWork
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+UnaWork is a Laravel 10 monolith built on top of the Taskly project-management application. The live frontend is primarily Laravel Blade, Bootstrap 5, the Dash admin theme, and jQuery/vanilla JavaScript.
 
-## About Laravel
+Read [`AGENTS.md`](AGENTS.md) before changing code. It contains the repository architecture, conventions, safety requirements, and verification guidance.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Local development on macOS with XAMPP
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The recommended local setup uses:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- XAMPP for MySQL and phpMyAdmin.
+- Homebrew PHP 8.3 for Composer, Artisan, and the local Laravel server.
+- The committed frontend assets under `public/assets/`.
 
-## Learning Laravel
+Do not use XAMPP's bundled PHP for this application. The current macOS XAMPP PHP 8.2 build does not include the Sodium extension required by `lcobucci/jwt` and Firebase dependencies.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Do not run `composer update` or bypass the requirement with `--ignore-platform-req=ext-sodium`. The versions in `composer.lock` are intentional, and the application needs Sodium at runtime.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Start XAMPP services
 
-## Laravel Sponsors
+Open XAMPP Manager and start MySQL. Start Apache only if you want to use phpMyAdmin.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Open [http://localhost/phpmyadmin](http://localhost/phpmyadmin) and create a database:
 
-### Premium Partners
+```text
+Database: unawork_local
+Collation: utf8mb4_unicode_ci
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+The default XAMPP MySQL connection is normally:
 
-## Contributing
+```text
+Host: 127.0.0.1
+Port: 3306
+Username: root
+Password: empty
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Use your configured password or port if you changed the XAMPP defaults.
 
-## Code of Conduct
+### 2. Install Homebrew PHP 8.3
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+brew install php@8.3
+```
 
-## Security Vulnerabilities
+PHP 8.3 is installed as a versioned, keg-only formula, so it does not need to replace the system-wide PHP executable.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Select it explicitly for the current terminal:
 
-## License
+```bash
+cd "/Volumes/Work Drive/Knoxx Labs/brooke/unawork"
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+export UNAWORK_PHP="$(brew --prefix php@8.3)/bin/php"
+export UNAWORK_COMPOSER="$(command -v composer)"
+```
+
+Verify the PHP version and Sodium extension:
+
+```bash
+"$UNAWORK_PHP" -v
+"$UNAWORK_PHP" -r 'var_dump(extension_loaded("sodium"));'
+```
+
+The second command must print:
+
+```text
+bool(true)
+```
+
+### 3. Install PHP dependencies
+
+```bash
+"$UNAWORK_PHP" "$UNAWORK_COMPOSER" install
+```
+
+This installs the exact dependency versions recorded in `composer.lock`.
+
+If Composer reports PHP 8.4 or a missing Sodium extension, it is running under the wrong PHP binary. Run it through `$UNAWORK_PHP` as shown above.
+
+### 4. Create Laravel storage directories
+
+The `storage/` directory is ignored by Git and might not exist in a fresh checkout.
+
+```bash
+mkdir -p storage/app/public
+mkdir -p storage/framework/cache/data
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/testing
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+
+chmod -R u+rwX storage bootstrap/cache
+```
+
+### 5. Configure the environment
+
+```bash
+cp .env.example .env
+```
+
+Use the following core local settings in `.env`:
+
+```dotenv
+APP_NAME="UnaWork"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+
+LOG_CHANNEL=stack
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=unawork_local
+DB_USERNAME=root
+DB_PASSWORD=
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+SESSION_DOMAIN=null
+SESSION_SECURE_COOKIE=false
+
+SANCTUM_STATEFUL_DOMAINS=127.0.0.1:8000,localhost:8000
+
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="local@unawork.test"
+MAIL_FROM_NAME="${APP_NAME}"
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_APP_CLUSTER=mt1
+```
+
+Use `SESSION_DRIVER=file` for a fresh local environment because the repository does not include a migration that creates a `sessions` table.
+
+Leave payment, AWS, Firebase, Twilio, Pusher, and other integration credentials empty unless the feature being tested requires them. Never commit `.env` or secrets.
+
+Generate the application key and clear cached configuration:
+
+```bash
+"$UNAWORK_PHP" artisan key:generate
+"$UNAWORK_PHP" artisan optimize:clear
+```
+
+### 6. Prepare the database
+
+#### Recommended: import a sanitized development database
+
+This application contains legacy Taskly settings and reference data that are not fully represented by the main seeder. Ask the team for a sanitized development SQL dump.
+
+Import it with phpMyAdmin or the XAMPP MySQL client:
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/mysql \
+  -u root \
+  unawork_local \
+  < "/absolute/path/to/unawork-database.sql"
+```
+
+Add `-p` if the MySQL user has a password.
+
+After importing, apply any newer migrations:
+
+```bash
+"$UNAWORK_PHP" artisan migrate:status
+"$UNAWORK_PHP" artisan migrate
+```
+
+Do not run the seeders after importing a complete database dump. Some legacy seeders are not idempotent.
+
+#### Alternative: create a fresh database
+
+Only run the following commands against a new, disposable `unawork_local` database:
+
+```bash
+"$UNAWORK_PHP" artisan migrate
+
+"$UNAWORK_PHP" artisan db:seed --class=RolesAndPermissionsSeeder
+"$UNAWORK_PHP" artisan db:seed --class=PermissionsSeeder
+"$UNAWORK_PHP" artisan db:seed --class=IndustrySeeder
+"$UNAWORK_PHP" artisan db:seed --class=JobTitleSeeder
+"$UNAWORK_PHP" artisan db:seed
+```
+
+These seeders are intended for a fresh database. `RolesAndPermissionsSeeder` uses `Role::create()` and can fail when run more than once.
+
+The default administrator created by `UsersTableSeeder` is:
+
+```text
+Email: admin@example.com
+Password: 123123123
+```
+
+This credential is for local development only. Change the password if the environment is accessible to anyone else.
+
+### 7. Create the public storage link
+
+```bash
+"$UNAWORK_PHP" artisan storage:link
+```
+
+If you imported a database, obtain the matching uploaded files separately and place them under `storage/app/public`. Uploaded images and documents are not contained in the SQL dump.
+
+### 8. Start the application
+
+Keep XAMPP MySQL running, then start Laravel with Homebrew PHP:
+
+```bash
+"$UNAWORK_PHP" artisan serve --host=127.0.0.1 --port=8000
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+Use this server instead of XAMPP Apache so web requests also run under PHP 8.3 with Sodium enabled.
+
+## Frontend assets
+
+No frontend build is required for normal local development. Live pages use committed static assets under `public/assets/`.
+
+Do not run `npm run dev` or `npm run prod` unless the task explicitly requires rebuilding the vestigial Laravel Mix output. Those commands rewrite committed `public/js/app.js` and `public/css/app.css`, which most live screens do not load.
+
+## Common problems
+
+### Composer reports PHP 8.4 incompatibility
+
+Composer is running under the global PHP version. Use:
+
+```bash
+"$UNAWORK_PHP" "$UNAWORK_COMPOSER" install
+```
+
+### Composer reports that `ext-sodium` is missing
+
+Confirm the selected binary and extension:
+
+```bash
+"$UNAWORK_PHP" -v
+"$UNAWORK_PHP" --ini
+"$UNAWORK_PHP" -r 'var_dump(extension_loaded("sodium"));'
+```
+
+Do not use XAMPP PHP or `--ignore-platform-req=ext-sodium`.
+
+### MySQL connection is refused
+
+Confirm MySQL is running in XAMPP and that `.env` contains the correct port. If XAMPP is configured for a non-default port, update `DB_PORT` accordingly.
+
+### Laravel reports that the `sessions` table is missing
+
+Set:
+
+```dotenv
+SESSION_DRIVER=file
+```
+
+Then clear cached configuration:
+
+```bash
+"$UNAWORK_PHP" artisan optimize:clear
+```
+
+### Laravel cannot write logs or compiled views
+
+```bash
+chmod -R u+rwX storage bootstrap/cache
+```
+
+### Images or attachments are missing
+
+Copy the matching development uploads into `storage/app/public`, then run:
+
+```bash
+"$UNAWORK_PHP" artisan storage:link
+```
+
+## Safety notes
+
+- The `dev` branch deploys to the development server when pushed.
+- The `main` branch deploys to production when pushed.
+- Never push or merge unless explicitly authorized.
+- Deployment automatically runs migrations and caches configuration.
+- The PHPUnit configuration is not database-isolated. Do not run the test suite until `.env` is confirmed to use a disposable database.
+- Never edit an existing deployed migration; create a new additive migration.
+- Never call `env()` outside `config/*.php`.

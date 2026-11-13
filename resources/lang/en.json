@@ -1475,5 +1475,13 @@
     "Zoom Meeting ID": "Zoom Meeting ID",
     "Zoom Meeting Settings": "Zoom Meeting Settings",
     "Zoom Meeting Title": "Zoom Meeting Title",
-    "Zoom Metting Saved Successfully.": "Zoom Metting Saved Successfully."
+    "Zoom Metting Saved Successfully.": "Zoom Metting Saved Successfully.",
+    "Invoice Payment": "Invoice Payment",
+    "The payment amount is invalid.": "The payment amount is invalid.",
+    "This invoice is already paid.": "This invoice is already paid.",
+    "The payment amount cannot exceed the remaining invoice balance.": "The payment amount cannot exceed the remaining invoice balance.",
+    "PayHere is not configured.": "PayHere is not configured.",
+    "We have not received payment confirmation from PayHere yet. Please check again in a few minutes.": "We have not received payment confirmation from PayHere yet. Please check again in a few minutes.",
+    "Your payment was received but needs manual review. Please contact support.": "Your payment was received but needs manual review. Please contact support.",
+    "Payment was cancelled.": "Payment was cancelled."
 }

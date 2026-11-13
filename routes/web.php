@@ -417,8 +417,14 @@ Route::any('/{slug}/fedapay/payment/{invoice_id}', [FedapayPaymentController::cl
 Route::any('{slug}/fedapay/status/', [FedapayPaymentController::class, 'getInvoicePaymentStatus'])->name('invoice.fedapay.status');
 
  // payhere invoice routes
- Route::any('/{slug}/payhere/payment/{invoice_id}', [PayHerePaymentController::class, 'invoicePayWithPayhere'])->name('invoice.pay.with.payhere');
- Route::any('invoice-payhere-status/{id}/{amt?}/{slug}',  [PayHerePaymentController::class, 'invoiceGetPayHereStatus'])->name('invoice.payhere.status');
+ Route::post('/{slug}/payhere/payment/{invoice_id}', [PayHerePaymentController::class, 'invoicePayWithPayhere'])->name('invoice.pay.with.payhere')->middleware(['XSS']);
+ Route::get('invoice-payhere-status/{id}/{amt?}/{slug}',  [PayHerePaymentController::class, 'legacyStatus'])->name('invoice.payhere.status');
+
+ // payhere callbacks (plans and invoices). notify is server-to-server, verified by md5sig and CSRF-exempt;
+ // return/cancel are browser redirects that only display the stored status.
+ Route::post('payhere/callback/notify', [PayHerePaymentController::class, 'notify'])->name('payhere.callback.notify');
+ Route::get('payhere/callback/return/{order}', [PayHerePaymentController::class, 'paymentReturn'])->name('payhere.callback.return');
+ Route::get('payhere/callback/cancel/{order}', [PayHerePaymentController::class, 'paymentCancel'])->name('payhere.callback.cancel');
 //================================= End Invoice Payment Gateways  ====================================//
 
 
@@ -625,8 +631,8 @@ Route::group(['middleware' => ['verified']], function () {
         Route::any('{slug}/fedapay/status/', [FedapayPaymentController::class, 'getInvoicePaymentStatus'])->name('invoice.fedapay.status')->middleware(['auth:client']);
 
         // payhere routes
-        Route::any('/{slug}/payhere/payment/{invoice_id}', [PayHerePaymentController::class, 'invoicePayWithPayhere'])->name('invoice.pay.with.payhere')->middleware(['auth:client']);
-        Route::any('invoice-payhere-status/{id}/{amt?}/{slug}',  [PayHerePaymentController::class, 'invoiceGetPayHereStatus'])->name('invoice.payhere.status')->middleware(['auth:client']);
+        Route::post('/{slug}/payhere/payment/{invoice_id}', [PayHerePaymentController::class, 'invoicePayWithPayhere'])->name('invoice.pay.with.payhere')->middleware(['auth:client', 'XSS']);
+        Route::get('invoice-payhere-status/{id}/{amt?}/{slug}',  [PayHerePaymentController::class, 'legacyStatus'])->name('invoice.payhere.status')->middleware(['auth:client']);
 
 
 
@@ -1078,8 +1084,8 @@ Route::group(['middleware' => ['verified']], function () {
 
 
     // payhere Routes
-    Route::any('/payhere/payment', [PayHerePaymentController::class, 'planPayWithPayhere'])->name('plan.pay.with.payhere');
-    Route::any('plan-payhere-status',  [PayHerePaymentController::class, 'planGetPayHereStatus'])->name('plan.payhere.status');
+    Route::post('/payhere/payment', [PayHerePaymentController::class, 'planPayWithPayhere'])->name('plan.pay.with.payhere')->middleware(['auth', 'XSS']);
+    Route::get('plan-payhere-status',  [PayHerePaymentController::class, 'legacyStatus'])->name('plan.payhere.status')->middleware(['auth']);
 
     //================================= End Plan Payment Gateways Route ====================================//
 
