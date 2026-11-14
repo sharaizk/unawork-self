@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\UsesInMemorySqlite;
 use Tests\TestCase;
 
@@ -34,10 +33,10 @@ class AccountIdentityTest extends TestCase
         $this->assertUsingInMemorySqlite();
         $this->createIdentitySchema();
 
-        Role::create(['name' => UserRole::COMPANY->value, 'guard_name' => 'web']);
-        Role::create(['name' => UserRole::EMPLOYEE->value, 'guard_name' => 'web']);
+        // Production seeders (UNA-003): registration and invitations run against exactly what a
+        // fresh installation seeds.
+        $this->runSeeders(\Database\Seeders\DatabaseSeeder::FOUNDATION_SEEDERS);
         DB::table('plans')->insert(['id' => 1, 'name' => 'Free Plan']);
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         Mail::fake();
         Bus::fake();

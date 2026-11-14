@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 class UserWorkspace extends Model
 {
     use HasRoles;
 
-    protected $guard_name = 'web';
+    protected $guard_name = WorkspacePermission::GUARD;
 
     protected $fillable = [
         'user_id','workspace_id','permission','is_active','status','is_enable_login'
@@ -26,9 +26,13 @@ class UserWorkspace extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Grant the workspace owner every workspace permission (and only those): the
+     * WorkspacePermission enum values under this model's guard. Unrelated Spatie permissions
+     * or other guards are never granted. Requires PermissionsSeeder to have run.
+     */
     public function assignAllPermissionsToCreator()
     {
-        $allPermissions = Permission::all();
-        $this->givePermissionTo($allPermissions);
+        $this->givePermissionTo(WorkspacePermission::values());
     }
 }

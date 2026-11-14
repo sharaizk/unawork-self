@@ -259,6 +259,14 @@ trait UsesInMemorySqlite
         $this->createPermissionSchema();
     }
 
+    /** Run seeders in-process (no Artisan), e.g. $this->runSeeders([RolesAndPermissionsSeeder::class]). */
+    protected function runSeeders(array $seeders): void
+    {
+        foreach ($seeders as $seeder) {
+            $this->app->make($seeder)->setContainer($this->app)->__invoke();
+        }
+    }
+
     protected function createPermissionSchema(): void
     {
         Schema::create('permissions', function (Blueprint $t) {
@@ -266,12 +274,14 @@ trait UsesInMemorySqlite
             $t->string('name');
             $t->string('guard_name');
             $t->timestamps();
+            $t->unique(['name', 'guard_name']); // as in Spatie's create_permission_tables migration
         });
         Schema::create('roles', function (Blueprint $t) {
             $t->id();
             $t->string('name');
             $t->string('guard_name');
             $t->timestamps();
+            $t->unique(['name', 'guard_name']); // as in Spatie's create_permission_tables migration
         });
         Schema::create('model_has_permissions', function (Blueprint $t) {
             $t->unsignedBigInteger('permission_id');

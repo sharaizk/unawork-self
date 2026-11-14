@@ -10,12 +10,23 @@ use App\Models\User;
 class DatabaseSeeder extends Seeder
 {
     /**
+     * Seeded first, on every path (CLI, installer, updater): the account roles and workspace
+     * permissions that registration and workspace ownership rely on. Both are idempotent.
+     */
+    public const FOUNDATION_SEEDERS = [
+        RolesAndPermissionsSeeder::class, // account roles (App\Enums\User\UserRole)
+        PermissionsSeeder::class,         // workspace permissions (App\Enums\UserWorkspace\Permission)
+    ];
+
+    /**
      * Seed the application's database.
      *
      * @return void
      */
     public function run()
     {
+        $this->call(self::FOUNDATION_SEEDERS);
+
         Artisan::call('module:migrate LandingPage');  
         Artisan::call('module:seed LandingPage');
         $this->call(NotificationSeeder::class);

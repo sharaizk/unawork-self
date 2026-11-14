@@ -110,6 +110,7 @@ Reference implementations:
 
 - Migrations live in `database/migrations` (118 so far). Name new ones in Laravel's timestamped style, keep them reversible, and add nullable columns or defaults for existing rows.
 - New models: put `$fillable` and relationships on the model, and add a Policy if it is user-owned.
+- Roles and permissions are seeded from their enums. `DatabaseSeeder::FOUNDATION_SEEDERS` runs `RolesAndPermissionsSeeder` (every `UserRole` case) and then `PermissionsSeeder` (every `UserWorkspace\Permission` case) first, on every path. Both use the `web` guard and look records up by `name` + `guard_name`, so they are safe to rerun. To add a role or workspace permission, add an enum case and rerun `db:seed`; don't hand-write seeder lists. Workspace permissions belong to `UserWorkspace` records, never to the company/employee roles.
 
 ### 4.5 Translations
 
