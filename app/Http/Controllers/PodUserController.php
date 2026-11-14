@@ -10,10 +10,6 @@ use App\Models\User;
 use App\Services\PodUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
-use App\Models\Notification;
-use App\Models\PodUser;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
@@ -110,56 +106,38 @@ class PodUserController extends Controller
         $member = User::findOrFail($userId);
         $this->authorize('removeMember', [$pod, $member]);
 
-        try {
-            $this->podUserService->remove($userId, $podId);
-            $location = $this->podUserService->getBackUrl(Auth::id(), $userId, $podId);
-            return response()->json([
-                'message' => 'User removed from pod successfully',
-                'location' => $location
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed:'.$e], 404);
+        // One transaction in the service; unexpected failures surface as 500 with nothing changed.
+        $result = $this->podUserService->remove($member->id, $pod->id);
+        if (!$result->applied) {
+            return response()->json(['message' => __('User not found in pod')], 404);
         }
+
+        return response()->json([
+            'message' => 'User removed from pod successfully',
+            'location' => $this->podUserService->getBackUrl(Auth::id(), $member->id, $pod->id),
+        ], 200);
     }
 
     public function accept(Pod $pod, User $user)
     {
         $this->authorize('acceptMember', [$pod, $user]);
 
-        $ownId = Auth::user()->id;
-        if (!$this->resolvePendingMembership($pod, $user, Status::ACTIVE, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value])) {
-            return $this->alreadyHandledResponse();
-        }
-        $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
+        $result = $this->podUserService->respondToMembership($pod, $user, Status::ACTIVE);
 
-        Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
-        Utility::sendNotification('pod_request_accept_user', null, $user->id, $podUser);
-
-        $this->deleteNotification('pod_request', $ownId, $podUser->id);
-        $this->deleteNotification('pod_invite', $user->id, $pod->id);
-
-        return response()->json(['message' => 'User status updated to active'], 200);
+        return $result->applied
+            ? response()->json(['message' => 'User status updated to active'], 200)
+            : $this->alreadyHandledResponse();
     }
 
     public function decline(Pod $pod, User $user)
     {
         $this->authorize('declineMember', [$pod, $user]);
 
-        $ownId = Auth::user()->id;
-        if (!$this->resolvePendingMembership($pod, $user, Status::DECLINED, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value])) {
-            return $this->alreadyHandledResponse();
-        }
-        $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
+        $result = $this->podUserService->respondToMembership($pod, $user, Status::DECLINED);
 
-        Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
-        Utility::sendNotification('pod_request_decline_user', null, $user->id, $podUser);
-
-        $this->deleteNotification('pod_request', $ownId, $podUser->id);
-        $this->deleteNotification('pod_invite', $user->id, $pod->id);
-
-        $user->updateCurrentWorkspace();
-
-        return response()->json(['message' => 'User status updated to active'], 200);
+        return $result->applied
+            ? response()->json(['message' => 'User status updated to declined'], 200)
+            : $this->alreadyHandledResponse();
     }
 
     public function editPermissions(Pod $pod, User $user)
@@ -177,51 +155,26 @@ class PodUserController extends Controller
     {
         $this->authorize('updateMemberPermissions', [$pod, $user]);
 
-        $permissions = $request->input('permissions', []);
+        $permissions = (array) $request->input('permissions', []);
 
         try {
-            $message = $this->podUserService->updatePermissions($pod, $user, $permissions);
-            $message = __('Permissions updated successfully.');
+            // Promotion/demotion: one transaction in the service, notification after commit.
+            $this->podUserService->updatePermissions($pod, $user, $permissions);
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
+            // Business outcomes (not a member, not active); the transaction has rolled back.
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                throw $e;
+            }
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', $message);
-    }
-
-    /**
-     * Move a pending invitation/request to $to exactly once. The conditional update is the
-     * concurrency boundary: a second (or racing) accept/decline changes nothing, creates no
-     * row and sends no notifications. Never inserts a membership.
-     */
-    private function resolvePendingMembership(Pod $pod, User $user, Status $to, array $workspaceAttributes): bool
-    {
-        return DB::transaction(function () use ($pod, $user, $to, $workspaceAttributes) {
-            $changed = PodUser::where('pod_id', $pod->id)
-                ->where('user_id', $user->id)
-                ->whereIn('status', [Status::POD_PENDING->value, Status::EMPLOYEE_PENDING->value])
-                ->update(['status' => $to->value]);
-
-            if ($changed !== 1) {
-                return false;
-            }
-
-            $pod->workspace->users()->updateExistingPivot($user->id, $workspaceAttributes);
-
-            return true;
-        });
+        return redirect()->back()->with('success', __('Permissions updated successfully.'));
     }
 
     private function alreadyHandledResponse()
     {
         return response()->json(['message' => __('This membership request has already been handled.')], 409);
-    }
-
-    private function deleteNotification($type, $userId, $podUserId)
-    {
-        Notification::where('type', $type)
-            ->where('user_id', $userId)
-            ->whereJsonContains('data->id', $podUserId)
-            ->delete();
     }
 }

@@ -365,58 +365,10 @@ class ProjectController extends Controller
 
     public function inviteUser(User $user, Project $project, $permission)
     {
-        // assign workspace first
-        $authuser = Auth::user();
-        $authusername = User::where('id', '=', $authuser->id)->first();
-        $setting = Utility::fetchAdminPaymentSetting();
-
-        // Atomic: an existing workspace membership is kept as is; mail only for a new one.
-        $workspaceMembership = UserWorkspace::findOrCreateMembership($user->id, (int) $project->workspace, ['permission' => $permission]);
-
-        if ($workspaceMembership->wasRecentlyCreated) {
-
-            try {
-                Mail::to($user->email)->send(new SendWorkspaceInvication($user, $project->workspaceData));
-            } catch (\Exception $e) {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-            }
-        }
-
-        // assign project
-        // Atomic: chat invite, notification and email happen only for a new project membership.
-        $projectMembership = UserProject::findOrCreateMembership($user->id, $project->id, [
-            'permission' => json_encode(Utility::getAllPermission()),
-        ]);
-        if ($projectMembership->wasRecentlyCreated) {
-
-            //invite user to project chat via slug
-            $slug = "project-".$project->id;
-            $chatService = new ChatService;
-            $chatService->inviteUserBySlug($slug, $user->id);
-
-            if ($permission != 'Owner') {
-
-                try {
-
-                    $uArr = [
-                        'user_name' => $user->name,
-                        // 'app_name' => env('APP_NAME'),
-                        'app_name' => $setting['app_name'],
-                        'owner_name' => $authusername->name,
-                        'project_name' => $project->name,
-                        'project_status' => $project->status,
-                        'app_url' => env('APP_URL'),
-                    ];
-                    //send notification
-                    Utility::sendNotification('project_assign', $project->workspaceData, $user->id, $project);
-                    // Send Email
-                    $resp = Utility::sendEmailTemplate('Project Assigned', $user->id, $uArr);
-                    // Mail::to($user->email)->send(new SendInvication($user, $project));
-                } catch (\Exception $e) {
-                    $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-                }
-            }
-        }
+        // Workspace + project membership in one transaction; chat invite, notification and
+        // emails run after commit and only for memberships this call created (UNA-005).
+        return app(\App\Services\Membership\ProjectMembershipService::class)
+            ->invite($user, $project, (string) $permission, Auth::user());
     }
 
     public function invite(Request $request, $slug, $projectID)

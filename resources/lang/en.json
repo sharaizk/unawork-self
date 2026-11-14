@@ -1488,5 +1488,9 @@
     "This user is not a member of this pod workspace.": "This user is not a member of this pod workspace.",
     "Row :row: invalid account type \":type\". Use \"company\" or \"employee\".": "Row :row: invalid account type \":type\". Use \"company\" or \"employee\".",
     "Row :row: administrator accounts cannot be changed by import.": "Row :row: administrator accounts cannot be changed by import.",
-    "This membership request has already been handled.": "This membership request has already been handled."
+    "This membership request has already been handled.": "This membership request has already been handled.",
+    "User not found in pod": "User not found in pod",
+    "Invalid permission selected.": "Invalid permission selected.",
+    "Only active POD members can join the Inner Circle.": "Only active POD members can join the Inner Circle.",
+    "User status updated to declined": "User status updated to declined"
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Membership\MembershipResult;
+use App\Services\Membership\WorkspaceMembershipService;
 use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Status;
 use App\Models\ActivityLog;
@@ -1395,120 +1397,57 @@ class UserController extends Controller
 
     public function acceptRequest(UserWorkspace $userWorkspace)
     {
-        $user = $userWorkspace->user;
-        $workspace = $userWorkspace->workspace;
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+        // Only the workspace owner or a users_edit manager, never the requester (UserWorkspacePolicy).
+        $this->authorize('acceptJoinRequest', $userWorkspace);
 
-        if ($isUserInWorkspace) {
-            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
-
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', Auth::user()->id)
-                ->where('type', 'workspace_join')
-                ->first();
-            if ($notification) {
-                $notification->is_read = 1;
-                $notification->update();
-            }
-
-            Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
-
-            return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to active'));
-        } else {
-            return response()->json(['error' => 'User not found in workspace'], 404);
+        // Status, notification state and access change together; resolved exactly once (UNA-005).
+        $result = app(WorkspaceMembershipService::class)->acceptJoinRequest($userWorkspace);
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
         }
+
+        return redirect()->route('users.index', ['slug' => $userWorkspace->workspace->slug])->with('success', __('User status updated to active'));
     }
 
     public function declineRequest(UserWorkspace $userWorkspace)
     {
-        $user = $userWorkspace->user;
-        $workspace = $userWorkspace->workspace;
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+        $this->authorize('declineJoinRequest', $userWorkspace);
 
-        if ($isUserInWorkspace) {
-            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::DECLINED->value]);
-
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', Auth::user()->id)
-                ->where('type', 'workspace_join')
-                ->first();
-            if ($notification) {
-                $notification->is_read = 1;
-                $notification->update();
-            }
-
-            Utility::sendNotification('workspace_request_decline_user', null, $user->id, $userWorkspace);
-
-            return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to declined'));
-        } else {
-            return response()->json(['error' => 'User not found in workspace'], 404);
+        $result = app(WorkspaceMembershipService::class)->declineJoinRequest($userWorkspace);
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
         }
+
+        return redirect()->route('users.index', ['slug' => $userWorkspace->workspace->slug])->with('success', __('User status updated to declined'));
     }
 
     public function acceptInvite(Request $request, Workspace $workspace)
     {
-        $user = Auth::user();
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
-
-        if ($isUserInWorkspace) {
-            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
-
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', $user->id)
-                ->where('type', 'workspace_invite')
-                ->first();
-            if ($notification) {
-                $notification->delete();
-            }
-
-            Utility::sendNotification('workspace_request_accept_owner', null, $workspace->created_by, $userWorkspace);
-            Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
-
-            return redirect()->back()->with('success', __('User status updated to active'));
-        } else {
-            return response()->json(['error' => 'User not found in workspace'], 404);
+        $result = app(WorkspaceMembershipService::class)->acceptInvitation($workspace, Auth::user());
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
         }
+
+        return redirect()->back()->with('success', __('User status updated to active'));
     }
 
     public function declineInvite(Request $request, Workspace $workspace)
     {
-        $user = Auth::user();
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+        $result = app(WorkspaceMembershipService::class)->declineInvitation($workspace, Auth::user());
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
+        }
 
-        if ($isUserInWorkspace) {
+        return redirect()->back()->with('success', __('You declined workspace invite successfully'));
+    }
 
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', $user->id)
-                ->where('type', 'workspace_invite')
-                ->first();
-            if ($notification) {
-                $notification->delete();
-            }
-
-            Utility::sendNotification('workspace_request_decline_owner', null, $workspace->created_by, $userWorkspace);
-
-            $workspace->users()->detach($user->id);
-
-            return redirect()->back()->with('success', __('You declined workspace invite successfully'));
-        } else {
+    private function workspaceMembershipNotApplied(MembershipResult $result)
+    {
+        if ($result->reason === 'not_member') {
             return response()->json(['error' => 'User not found in workspace'], 404);
         }
+
+        return redirect()->back()->with('error', __('This membership request has already been handled.'));
     }
 
     public function manuallyActivatePlan(Request $request, $user_id, $plan_id, $duration)

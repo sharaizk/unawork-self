@@ -114,6 +114,11 @@ Reference implementations:
   - Create a membership only through `PodUser|UserWorkspace|UserProject::findOrCreateMembership($userId, $parentId, $values)`. Never use `attach()`, `create()`, `syncWithoutDetaching()` or `exists()` + `create()`.
   - The helper returns an existing row untouched and survives a concurrent duplicate insert. Run notifications, emails and grants only when `->wasRecentlyCreated` is true.
   - Change a pending membership's status with a conditional update (`where('status', <pending>)->update(...)`) and act only if exactly 1 row changed.
+- **Membership operations are transactional** (UNA-005). Multi-record membership changes live in services, never controllers: `PodUserService`, `App\Services\Membership\WorkspaceMembershipService` and `ProjectMembershipService`.
+  - Each operation runs in one `DB::transaction(..., 3)`, locks the rows it decides on, and returns a `MembershipResult` (`applied`, `state`, `reason`, named effects).
+  - Notifications, emails and chat invitations are effects. `AfterCommit` runs them after the commit, and only for the attempt that committed. Never call `Utility::sendNotification()`, `Mail` or `SendEmail::dispatch()` inside a membership transaction.
+  - Remove a `UserWorkspace` with `->delete()` so Spatie's hooks clean up its permissions and roles; never `detach()`.
+  - Use `CurrentWorkspace::reassignIfLost()` whenever access to a workspace is removed.
 - Roles and permissions are seeded from their enums. `DatabaseSeeder::FOUNDATION_SEEDERS` runs `RolesAndPermissionsSeeder` (every `UserRole` case) and then `PermissionsSeeder` (every `UserWorkspace\Permission` case) first, on every path. Both use the `web` guard and look records up by `name` + `guard_name`, so they are safe to rerun. To add a role or workspace permission, add an enum case and rerun `db:seed`; don't hand-write seeder lists. Workspace permissions belong to `UserWorkspace` records, never to the company/employee roles.
 
 ### 4.5 Translations

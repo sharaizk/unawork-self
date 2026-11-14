@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PodUser\InviteNewUserRequest;
 use App\Http\Requests\PodUser\UpdateRequest;
 use App\Models\Pod;
+use App\Models\PodUser;
 use App\Models\Utility;
 use App\Services\PodUserService;
 use Illuminate\Http\JsonResponse;
@@ -123,13 +124,23 @@ class PodUserController extends Controller
         $data = $request->validated();
 
         try {
-            $this->podUserService->moderateJoinRequest($requestId, $data['action'], $data['reason'] ?? null);
+            $result = $this->podUserService->moderateJoinRequest(PodUser::findOrFail($requestId), $data['action'], $data['reason'] ?? null);
+
+            if (!$result->applied) {
+                return response()->json([
+                    'code' => 409,
+                    'status' => 'error',
+                    'message' => __('This membership request has already been handled.'),
+                ], 409);
+            }
 
             return response()->json([
                 'code' => 200,
                 'status' => 'success',
                 'message' => 'Join request moderated successfully'
             ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            throw $e; // unexpected database failure: 500, transaction already rolled back
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,

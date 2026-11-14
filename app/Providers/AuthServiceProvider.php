@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Models\Pod;
 use App\Models\Skill;
 use App\Models\UserProject;
+use App\Models\UserWorkspace;
 use App\Models\Workspace;
 use App\Models\ZoomMeeting;
 use App\Policies\IndustryPolicy;
@@ -25,6 +26,7 @@ use App\Policies\PodPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\SkillPolicy;
 use App\Policies\UserProjectPolicy;
+use App\Policies\UserWorkspacePolicy;
 use App\Policies\ZoomMeetingPolicy;
 
 class AuthServiceProvider extends ServiceProvider
@@ -48,6 +50,8 @@ class AuthServiceProvider extends ServiceProvider
         Workspace::class => ProjectPolicy::class,
         // Project join/claim requests (user_projects rows).
         UserProject::class => UserProjectPolicy::class,
+        // Company-workspace join requests (user_workspaces rows).
+        UserWorkspace::class => UserWorkspacePolicy::class,
         ZoomMeeting::class => ZoomMeetingPolicy::class,
     ];
 

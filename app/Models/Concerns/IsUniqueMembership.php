@@ -7,6 +7,9 @@ use Illuminate\Database\UniqueConstraintViolationException;
 /**
  * A membership row that is unique per (user_id, parent key), enforced by the UNA-004 unique
  * indexes. Use findOrCreateMembership() for every insert instead of exists() + create().
+ *
+ * This makes a single row insert uniqueness-safe. Operations spanning several membership
+ * records are made atomic by the services in App\Services\Membership and PodUserService (UNA-005).
  */
 trait IsUniqueMembership
 {

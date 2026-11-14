@@ -612,19 +612,25 @@
                                                         if (!$workspace || !$user) {
                                                             continue;
                                                         }
+                                                        // Buttons only for whoever UserWorkspacePolicy lets decide (the routes enforce it too).
+                                                        $joinRequest = \App\Models\UserWorkspace::find($data->id);
+                                                        $canModerate = $joinRequest && \Auth::user()->can('acceptJoinRequest', $joinRequest);
                                                         $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
                                                         $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
                                                         $text = __('User : ') . '
                                                             <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
                                                             sent join request to your workspace:
                                                             <b><a href="'. route('users.index', ['slug' => $workspace->slug]) .'">'. $workspace->name . ' </a></b>
+                                                        ';
+                                                        if ($canModerate) {
+                                                            $text .= '
                                                             <br>
                                                             <br>
                                                             <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                                                                 onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
                                                             <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
-                                                                onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
-                                                        ';
+                                                                onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>';
+                                                        }
                                                     @endphp
                                                 @elseif($notification->type == 'workspace_invite')
                                                     @php
