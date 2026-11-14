@@ -13,7 +13,7 @@ class CouponController extends Controller
 
     public function index()
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $coupons = Coupon::get();
 
             return view('coupon.index', compact('coupons'));
@@ -24,7 +24,7 @@ class CouponController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             return view('coupon.create');
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -33,7 +33,7 @@ class CouponController extends Controller
 
     public function store(Request $request)
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $validator = \Validator::make(
                 $request->all(),
                 [
@@ -74,7 +74,7 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             return view('coupon.edit', compact('coupon'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -83,7 +83,7 @@ class CouponController extends Controller
 
     public function update(Request $request, Coupon $coupon)
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $validator = \Validator::make(
                 $request->all(),
                 [
@@ -113,7 +113,7 @@ class CouponController extends Controller
 
     public function destroy(Coupon $coupon)
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $coupon->delete();
 
             return redirect()->route('coupons.index')->with('success', __('Coupon successfully deleted.'));

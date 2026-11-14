@@ -12,7 +12,7 @@ class IndustryPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -20,7 +20,7 @@ class IndustryPolicy
      */
     public function create(User $user)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -28,7 +28,7 @@ class IndustryPolicy
      */
     public function update(User $user, Industry $industry)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -36,6 +36,6 @@ class IndustryPolicy
      */
     public function delete(User $user, Industry $industry)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 }

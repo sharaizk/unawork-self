@@ -284,7 +284,7 @@ class PaytrController extends Controller
         $paytr_merchant_salt = $payment_setting['paytr_merchant_salt'];
 
         $user_auth = \Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
         if(\Auth::check())
         {
@@ -427,7 +427,7 @@ class PaytrController extends Controller
         $slug = $request->slug;
         $currentWorkspace = Utility::getWorkspaceBySlug_copylink('invoice' , $invoice_id);
         $user_auth = \Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
 
         if (!empty($invoice_id)) {

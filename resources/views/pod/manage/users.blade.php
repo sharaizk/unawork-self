@@ -44,7 +44,7 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        @if ($user->hasRole('employee'))
+                                        @if ($user->isEmployee())
                                             <a href="{{ route('employee.show', ['employee' => $user]) }}">
                                                 {{ $user->name }} <i class="ti ti-eye"></i>
                                             </a>
@@ -251,7 +251,7 @@
                         <img alt="user-image" class="img-fluid rounded-circle img_users_fix_size"
                             @if ($user->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $user->avatar, 'small') }}" @else avatar="{{ $user->name }}" @endif>
                             <h4 class="mt-2">
-                                @if ($user->hasRole('employee'))
+                                @if ($user->isEmployee())
                                     <a href="{{ route('employee.show', ['employee' => $user]) }}">
                                         {{ $user->name }}
                                         <i class="ti ti-eye"></i>

@@ -335,7 +335,7 @@ class PaytmPaymentController extends Controller
         // $this->setPaymentDetail();
         $this->setPaymentDetail_client($invoice_id);
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $validatorArray = [
             'amount' => 'required',
             'mobile' => 'required',

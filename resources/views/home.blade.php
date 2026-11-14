@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @php
-    if (Auth::user()->type != 'admin') {
+    if (!Auth::user()->isAdministrator()) {
         $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
         if (!$userWorkspace) {
             return redirect()->back()->with('error', 'permission denied!');
@@ -9,7 +9,7 @@
     }
 @endphp
 @section('page-title')
-    @if (Auth::user()->type != 'admin')
+    @if (!Auth::user()->isAdministrator())
         @if ($currentWorkspace->isPartOfPod())
             POD "{{ $currentWorkspace->ownerable->title  }}"
         @endif
@@ -27,12 +27,12 @@
 @endsection
 @php
     use App\Models\Utility;
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
     $setting = Utility::getAdminPaymentSetting();
 @endphp
 @section('content')
     <section class="section">
-        @if (Auth::user()->type == 'admin')
+        @if (Auth::user()->isAdministrator())
             <div class="row">
                 <div class="col-12">
                     @if (empty($setting['pusher_app_id']) ||
@@ -242,7 +242,7 @@
                                                     <div class="font-14 mt-1 font-weight-normal">
                                                         {{ $task->project->name }}</div>
                                                 </td>
-                                                @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                                                @if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient())
                                                     <td>
                                                         <span class="text-muted font-13">{{ __('Assigned to') }}</span>
                                                         <div class="font-14 mt-1 font-weight-normal">
@@ -261,7 +261,7 @@
                         </div>
                     </div>
 
-                    @if (Auth::user()->getGuard() != 'client')
+                    @if (!Auth::user()->isClient())
                         <div class="card">
                             <div class="card-header">
                                 <div class="float-end">
@@ -332,7 +332,7 @@
                     </div>
 
 
-                    @if (Auth::user()->getGuard() != 'client')
+                    @if (!Auth::user()->isClient())
                         <!-- <div class="card ">
                             <div class="card-header">
                                 <h5>{{ __('Storage Status') }} <small>({{ $users->storage_limit . 'MB' }} /
@@ -344,7 +344,7 @@
                         </div> -->
                     @endif
 
-                    @if (Auth::user()->getGuard() == 'client')
+                    @if (Auth::user()->isClient())
                         <div class="card">
                             <div class="card-header">
                                 <div class="float-end">
@@ -421,7 +421,7 @@
 @push('scripts')
     <script src="{{ asset('assets/custom/js/apexcharts.min.js') }}"></script>
 
-    @if (Auth::user()->type == 'admin')
+    @if (Auth::user()->isAdministrator())
     @elseif(isset($currentWorkspace) && $currentWorkspace)
         <script>
             (function() {
@@ -465,7 +465,7 @@
 
 
     <script src="{{ asset('assets/js/plugins/apexcharts.min.js') }}"></script>
-    @if (Auth::user()->type == 'admin')
+    @if (Auth::user()->isAdministrator())
         <script>
             (function() {
                 var options = {
@@ -578,7 +578,7 @@
             })();
         </script>
 
-        @if (Auth::user()->getGuard() != 'client')
+        @if (!Auth::user()->isClient())
             <script>
                 (function() {
                     var options = {

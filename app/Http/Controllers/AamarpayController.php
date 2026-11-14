@@ -284,7 +284,7 @@ class AamarpayController extends Controller
 
             $invoice = Invoice::find($invoice_id);
             $user_auth = Auth::user();
-            $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+            $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
 
             if (Auth::check()) {
@@ -366,7 +366,7 @@ class AamarpayController extends Controller
         $invoice_id = $data['invoice_id'];
         $currentWorkspace = Utility::getWorkspaceBySlug_copylink('invoice', $invoice_id);
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
 
         if (!empty($invoice_id)) {

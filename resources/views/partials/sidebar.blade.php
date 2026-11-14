@@ -5,7 +5,7 @@
         ->count();
     $vacanciesApplicationsCounter = Auth::user()->pendingApplicationsCount();
            $logo = \App\Models\Utility::get_file('logo/');
-           if (Auth::user()->type == 'admin') {
+           if (Auth::user()->isAdministrator()) {
                $setting = App\Models\Utility::getAdminPaymentSetting();
                $company_logo = App\Models\Utility::get_logo();
                if ($setting['color']) {
@@ -104,7 +104,7 @@
                     <ul class="dash-navbar">
 
 
-                       @if (\Auth::user()->hasRole('company'))
+                       @if (\Auth::user()->isCompany())
                                 <li class="dash-item dash-hasmenu">
                                     <a href="{{ route('job-vacancies.index') }}"
                                         class="dash-link  {{ Request::route()->getName() == 'job-vacancies.index' ? ' active' : '' }}">
@@ -120,7 +120,7 @@
                                     </a>
                                 </li>
                         @endif
-                        @if ($adminSetting['enable_chat'] == 'on' && Auth::user()->type != 'admin')
+                        @if ($adminSetting['enable_chat'] == 'on' && !Auth::user()->isAdministrator())
                             <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
                                 <a href="{{ route('chats') }}" class="dash-link">
                                     <span class="dash-micon">
@@ -158,7 +158,7 @@
                         {{--
                             @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::ZOOM_MEETING_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
                             --}}
-                            @if (Auth::user()->type != 'admin')
+                            @if (!Auth::user()->isAdministrator())
                                 <li class="dash-item  {{ Request::route()->getName() == 'finances.index' ? ' active' : '' }}">
                                     <a href="{{ route('finances.index', $currentWorkspace->slug) }}"
                                         class="dash-link ">
@@ -180,7 +180,7 @@
                         {{--
                         @endif
                         --}}
-                       @if (\Auth::user()->type != "admin")
+                       @if (!\Auth::user()->isAdministrator())
                            <li class="dash-item dropdown">
                                <a class="dash-link dropdown-toggle" href="#" id="podsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                    <span class="dash-micon"><i class="ti ti-message-circle"></i></span>
@@ -285,7 +285,7 @@
                                                         class="dash-link "><span class="dash-micon"><i data-feather="clock"></i></span><span
                                                             class="dash-mtext">{{ __('Timesheet') }}</span></a>
                                                 </li> -->
-                                                @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                                @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id)
                                                     <!-- <li
                                                         class="dash-item {{ \Request::route()->getName() == 'time.tracker' ? 'active' : '' }}">
                                                         <a href="{{ route('time.tracker', $currentWorkspace->slug) }}"
@@ -431,7 +431,7 @@
                                             @endauth
                                         @endif
 
-                                        @if (Auth::user()->type == 'admin')
+                                        @if (Auth::user()->isAdministrator())
                                             <li class="dash-item {{ Request::route()->getName() == 'users.index' ? ' active' : '' }}">
                                                 <a href="{{ route('users.index', '') }}" class="dash-link "><span class="dash-micon">
                                                         <i data-feather="user"></i></span><span
@@ -449,9 +449,9 @@
                                             </li>
                                         @endif
                                         @if (
-                                            (Auth::user()->type == 'admin' ||
+                                            (Auth::user()->isAdministrator() ||
                                                 (isset($currentWorkspace) && $currentWorkspace && $currentWorkspace->creater->id == Auth::user()->id)) &&
-                                                Auth::user()->getGuard() != 'client')
+                                                !Auth::user()->isClient())
 
 
 
@@ -462,7 +462,7 @@
                                                             data-feather="credit-card"></i></span><span
                                                         class="dash-mtext">{{ __('Orders') }}</span></a>
                                             </li> -->
-                                            @if (Auth::user()->type == 'admin')
+                                            @if (Auth::user()->isAdministrator())
                                                 <li class="dash-item {{ request()->is('plan_request*') ? 'active' : '' }}">
                                                     <a href="{{ route('plan_request.index') }}" class="dash-link "><span
                                                             class="dash-micon"><i class="ti ti-brand-telegram"></i></span><span
@@ -477,7 +477,7 @@
                                         @endif
 
 
-                                        @if (Auth::user()->type == 'admin')
+                                        @if (Auth::user()->isAdministrator())
                                             <li
                                                 class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">
                                                 <a href="{{ route('industries.index') }}" class="dash-link "><span
@@ -525,7 +525,8 @@
                                         @if (isset($currentWorkspace) &&
                                                 $currentWorkspace &&
                                                 $currentWorkspace->creater->id == Auth::user()->id &&
-                                                Auth::user()->getGuard() != 'client' && Auth::user()->role('company'))
+                                                !Auth::user()->isClient())
+                                            {{-- UNA-002: a former "Auth::user()->role('company')" clause here returned a query builder (always truthy), so it never restricted anything and was removed to keep behaviour. --}}
 
                                                 @if($isPartOfPod)
                                                     <hr>
@@ -556,7 +557,7 @@
 
                                         @endif
 
-                                        <!-- @if (Auth::user()->hasRole('employee'))
+                                        <!-- @if (Auth::user()->isEmployee())
                                                 @if ($adminSetting['enable_chat'] == 'on')
                                                     <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
                                                         <a href="{{ route('chats') }}" class="dash-link"><span class="dash-micon"><i

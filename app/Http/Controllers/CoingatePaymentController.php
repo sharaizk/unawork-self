@@ -31,7 +31,7 @@ class CoingatePaymentController extends Controller
     public function setPaymentDetail()
     {
         $user = Auth::user();
-        if ($user->getGuard() == 'client') {
+        if ($user->isClient()) {
             $payment_setting = Utility::getPaymentSetting($user->currentWorkspace->id);
             $this->currancy = (isset($user->currentWorkspace->currency_code)) ? $user->currentWorkspace->currency_code : 'USD';
         } else {
@@ -274,7 +274,7 @@ class CoingatePaymentController extends Controller
     public function invoicePayWithCoingate(Request $request, $slug, $invoice_id)
     {
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         // dd($client_keyword);
         $validatorArray = [
             'amount' => 'required',

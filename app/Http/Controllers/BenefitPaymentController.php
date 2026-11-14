@@ -251,7 +251,7 @@ class BenefitPaymentController extends Controller
         $company_payment_setting = Utility::getPaymentSetting($currentWorkspace->id);
         $secret_key = $company_payment_setting['benefit_secret_key'];
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
         if (Auth::check()) {
             $user = Auth::user();
@@ -311,7 +311,7 @@ class BenefitPaymentController extends Controller
         $invoice_id = $request->invoice_id;
         $currentWorkspace = Utility::getWorkspaceBySlug_copylink('invoice', $invoice_id);
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $company_payment_setting = Utility::getPaymentSetting($currentWorkspace->id);
         $secret_key = $company_payment_setting['benefit_secret_key'];
         $slug  = $request->slug;

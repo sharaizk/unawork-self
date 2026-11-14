@@ -12,7 +12,7 @@ class JobTitlePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -20,7 +20,7 @@ class JobTitlePolicy
      */
     public function create(User $user)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -28,7 +28,7 @@ class JobTitlePolicy
      */
     public function update(User $user, JobTitle $jobTitle)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -36,6 +36,6 @@ class JobTitlePolicy
      */
     public function delete(User $user, JobTitle $jobTitle)
     {
-        return $user->type == 'admin';
+        return $user->isAdministrator();
     }
 }

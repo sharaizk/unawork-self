@@ -118,7 +118,7 @@
                                     <th> {{ __('Workspace') }} </th>
                                     <th> {{ __('Project') }} </th>
                                     <th> {{ __('Members') }} </th>
-                                    @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                    @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id)
                                         <th> {{ __('Client') }} </th>
                                     @endif
                                     <th> {{ __('Meeting Time') }} </th>
@@ -126,7 +126,7 @@
                                     <th> {{ __('Notes') }} </th>
                                     <th> {{ __('Join URL') }} </th>
                                     <th> {{ __('Status') }} </th>
-                                    @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
+                                    @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
                                         <th class="text-right"> {{ __('Action') }}</th>
                                     @endif
                                 </tr>
@@ -149,7 +149,7 @@
                                                 @endforeach
                                             </div>
                                         </td>
-                                        @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                        @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id)
                                             <td>
                                                 <div class="avatar-group hover-avatar-ungroup mb-3">
                                                     @foreach ($item->getClients() as $user)
@@ -198,7 +198,7 @@
                                                     class="badge badge-danger p-2 px-3 rounded">{{ __('End') }}</span>
                                             @endif
                                         </td>
-                                        @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
+                                        @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id || $userWorkspace->hasPermissionTo('zoom_meeting_edit'))
                                             <td class="text-right">
 
                                                 <a href="#"

@@ -119,7 +119,7 @@ class Una001AuthorizationDemoSeeder extends Seeder
             $code = rand(100000, 999999);
         } while (DB::table('users')->where('referral_code', $code)->exists());
 
-        $user = User::create([
+        $user = User::createWithAccountRole([
             'name' => $name,
             'email' => "una001.{$key}@" . self::EMAIL_DOMAIN,
             'password' => Hash::make(self::PASSWORD),
@@ -127,7 +127,7 @@ class Una001AuthorizationDemoSeeder extends Seeder
             'lang' => 'en',
             'referral_code' => $code,
             'referral_used' => '0',
-        ]);
+        ], $role);
         $user->forceFill(['email_verified_at' => now(), 'is_enable_login' => 1])->save();
 
         $workspace = Workspace::create([
@@ -149,7 +149,6 @@ class Una001AuthorizationDemoSeeder extends Seeder
 
         $user->currant_workspace = $workspace->id;
         $user->save();
-        $user->assignRole($role->value);
 
         User::userDefaultDataRegister($user);
 

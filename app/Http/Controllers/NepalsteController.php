@@ -236,7 +236,7 @@ class NepalsteController extends Controller
                 $get_amount = $request->amount;
 
                 $orderId = strtoupper(str_replace('.', '', uniqid('', true)));
-                $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+                $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
                 $paiementproMerchantId = $this->api_key;
 
                 $response = ['amount' => $get_amount, 'invoice_id' => $invoice->id, 'slug' => $slug, 'orderId' => $orderId];
@@ -294,7 +294,7 @@ class NepalsteController extends Controller
         $this->setPaymentDetail_client($invoiceId);
         $amount = $request->amount;
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         if (!empty($invoiceId)) {
             $invoice = Invoice::find($invoiceId);
             if (!empty($invoice)) {
@@ -406,7 +406,7 @@ class NepalsteController extends Controller
     public function invoiceGetNepalsteCancel(Request $request, $slug)
     {
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         if (Auth::check()) {
             return redirect()->route(
                 $client_keyword . 'invoices.show',

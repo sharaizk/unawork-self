@@ -12,7 +12,7 @@ class CompanyService
     {
         $query = Workspace::where('ownerable_type', '!=', 'App\Models\Pod')
         ->whereHas('creater', function ($query) use ($country) {
-            $query->role(UserRole::COMPANY->value);
+            $query->companies();
 
             if ($country) {
                 $query->where('country', $country);

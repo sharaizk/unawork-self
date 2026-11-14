@@ -230,7 +230,7 @@ class PaiementproController extends Controller
                 $user_auth = Auth::user();
                 $get_amount = $request->amount;
                 $orderID = strtoupper(str_replace('.', '', uniqid('', true)));
-                $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+                $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
                 $paiementproMerchantId = $this->paiementpro_merchant_id;
                 try {
                     $call_back = route($client_keyword . 'invoice.paiementpro.status', $slug);
@@ -289,7 +289,7 @@ class PaiementproController extends Controller
         $this->setPaymentDetail_client($invoiceId);
         $amount = $request->amount;
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         if (!empty($invoiceId)) {
             $invoice = Invoice::find($invoiceId);
             if (!empty($invoice)) {

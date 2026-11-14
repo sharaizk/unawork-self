@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\User\UserRole;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\Skill;
@@ -18,7 +17,7 @@ class HirePageController extends Controller
         $skills = Skill::all();
 
         $data = $request->all();
-        $employees = User::role(UserRole::EMPLOYEE->value);
+        $employees = User::employees();
 
         $filter = new EmployeeFilter($data);
         $employees = $filter->apply($employees->with(['profile', 'skills']));
@@ -36,7 +35,7 @@ class HirePageController extends Controller
         $skillIds = $request->input('skill_ids', []);
         $perPage = 12;
 
-        $employeesQuery = User::role(UserRole::EMPLOYEE->value)
+        $employeesQuery = User::employees()
             ->with(['profile', 'skills']);
 
         if (!empty($query)) {

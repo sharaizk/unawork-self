@@ -23,7 +23,7 @@ class PlanRequestController extends Controller
 
         $currentWorkspace = Utility::getWorkspaceBySlug('');
         $paymentSetting   = Utility::getAdminPaymentSetting();
-        if (Auth::user()->type == 'admin') {
+        if (Auth::user()->isAdministrator()) {
             $plan_requests = PlanRequest::all();
 
 
@@ -79,7 +79,7 @@ class PlanRequestController extends Controller
     public function acceptRequest($id, $response)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug('');
-        if (Auth::user()->type == 'admin') {
+        if (Auth::user()->isAdministrator()) {
             $plan_request = PlanRequest::find($id);
 
             if (!empty($plan_request)) {

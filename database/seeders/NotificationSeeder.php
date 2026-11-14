@@ -264,7 +264,7 @@ class NotificationSeeder extends Seeder
       ];
 
 
-        $user = User::where('type','admin')->first();
+        $user = User::administrators()->first();
 
         foreach($notifications as $k => $n)
         {

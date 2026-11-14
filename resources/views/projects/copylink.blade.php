@@ -49,7 +49,7 @@
         $objUser = \App\Models\User::where('id', $project->created_by)->first();
     }
     $permissions = $objUser->getPermission($project->id);
-    $client_keyword = $objUser->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = $objUser->isClient() ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
 @endphp
@@ -872,7 +872,7 @@
                                                 <p class="text-muted mt-3">
                                                     {{ __("Sorry we can't find any timesheet records on this week.") }}
                                                     <br>
-                                                    @if ($project->id != '-1' && $objUser->getGuard() != 'client')
+                                                    @if ($project->id != '-1' && !$objUser->isClient())
                                                         {{ __('To add record go to ') }}
                                                         <b>{{ __('Add Task on Timesheet.') }}</b>
                                                     @else

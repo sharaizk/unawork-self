@@ -49,7 +49,7 @@ class InvoiceController extends Controller
         $objUser = Auth::user();
 
         if ($currentWorkspace && $objUser) {
-            if ($currentWorkspace->creater->id == \Auth::user()->id || $objUser->getGuard() == 'client') {
+            if ($currentWorkspace->creater->id == \Auth::user()->id || $objUser->isClient()) {
                 $objUser = Auth::user();
                 //$currentWorkspace = Utility::getWorkspaceBySlug($slug);
                 $invoices = $objUser->getInvoices($currentWorkspace->id);

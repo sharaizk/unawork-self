@@ -70,7 +70,7 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->type != 'admin') {
+        if (!$user->isAdministrator()) {
             $workspace = Workspace::find($user->currant_workspace);
             if ($workspace->created_by == $user->id) {
                 if ($user->is_trial_done < 2 && !empty($user->plan_expire_date)) {
@@ -123,9 +123,9 @@ class HomeController extends Controller
         // $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $currentWorkspace = Workspace::find($userObj->currant_workspace);
 
-        if ($userObj->type == 'admin') {
-            $totalUsers = User::where('type', '!=', 'admin')->count();
-            $totalPaidUsers = User::where('type', '!=', 'admin')->where('plan', '!=', 1)->count();
+        if ($userObj->isAdministrator()) {
+            $totalUsers = User::nonAdministrators()->count();
+            $totalPaidUsers = User::nonAdministrators()->where('plan', '!=', 1)->count();
             $totalOrderAmount = Order::whereIn('payment_status', ['succeeded', 'success'])->sum('price');
             $totalOrders = Order::whereIn('payment_status', ['succeeded', 'success'])->count();
             $totalPlans = Plan::count();
@@ -139,7 +139,7 @@ class HomeController extends Controller
             return view('home', compact('totalUsers', 'totalPaidUsers', 'totalOrders', 'totalOrderAmount', 'totalPlans', 'mostPlans', 'chartData'));
         } elseif ($currentWorkspace) {
             $doneStage = Stage::where('workspace_id', '=', $currentWorkspace->id)->where('complete', '=', '1')->first();
-            if ($userObj->getGuard() == 'client') {
+            if ($userObj->isClient()) {
 
                 $totalProject = ClientProject::join("projects", "projects.id", "=", "client_projects.project_id")->where("client_id", "=", $userObj->id)->where('projects.workspace', '=', $currentWorkspace->id)->count();
                 $totalBugs = ClientProject::join("bug_reports", "bug_reports.project_id", "=", "client_projects.project_id")->join("projects", "projects.id", "=", "client_projects.project_id")->where('projects.workspace', '=', $currentWorkspace->id)->count();

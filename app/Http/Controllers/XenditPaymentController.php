@@ -218,7 +218,7 @@ class XenditPaymentController extends Controller
         $get_amount = $request->amount;
         $orderID = strtoupper(str_replace('.', '', uniqid('', true)));
         $invoice = Invoice::find($invoice_id);
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
 
         try {
@@ -260,7 +260,7 @@ class XenditPaymentController extends Controller
         $invoiceId = $request->invoice;
         $this->setPaymentDetail_client($invoiceId);
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $amount = $request->get_amount;
     //    dd($session,$request->all(),$this->user,$slug);
 

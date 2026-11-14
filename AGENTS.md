@@ -95,6 +95,12 @@ Reference implementations:
 ### 4.3 Domain concepts to respect
 
 - **Users:** `users.type` is `admin` (super admin) or `user`. A separate **client** guard handles client logins. Spatie roles from `App\Enums\User\UserRole` are `company` and `employee`.
+- **Account identity (UNA-002):** never read `users.type`, call `hasRole('company'|'employee')` or compare `getGuard()` to decide who someone is. Use the `App\Contracts\HasAccountType` API that both `User` and `Client` implement:
+  - methods: `accountType()`, `isAdministrator()`, `isRegularUser()` (a non-admin web user), `isCompany()`, `isEmployee()`, `isClient()`
+  - query scopes: `User::administrators()`, `nonAdministrators()`, `companies()`, `employees()`
+  - precedence: administrator, then company, then employee
+  - write path: create accounts with `User::createWithAccountRole($attrs, UserRole::X)` and change them with `$user->assignAccountRole(UserRole::X)`. Both set `type = user` and keep exactly one persona role, leaving other roles alone. Invited or generated members are employees; admin "Create Company" and CSV import create companies.
+  - workspace and POD permissions (`Owner`, `users_edit`, ...) are a separate concept, not account identity.
 - **Workspace:** the tenant. The current one is `Auth::user()->currant_workspace` (sic, the misspelling is real). URLs use `$currentWorkspace->slug`. A workspace's owner is `$workspace->creater` (sic).
 - **POD:** each Pod owns a Workspace through the polymorphic `workspaces.ownerable`. Member permissions use `App\Enums\PodUser\Permission`, and workspace member permissions use `App\Enums\UserWorkspace\Permission` (`*_INDEX`, `*_EDIT`).
 - **Settings and files:** `App\Models\Utility::getAdminPaymentSetting()`, `getcompanySettings($workspaceId)` and `get_file($path)`. Reuse them; don't re-implement them.

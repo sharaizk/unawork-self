@@ -16,7 +16,7 @@
 @php
     $adminSetting = App\Models\Utility::getAdminPaymentSetting();
     $permissions = Auth::user()->getPermission($project->id);
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
@@ -753,7 +753,7 @@
                                     <div class="col-md-12 dropzone browse-file" id="dropzonewidget">
                                         <div class="dz-message" data-dz-message>
                                             <span>
-                                                @if (Auth::user()->getGuard() == 'client')
+                                                @if (Auth::user()->isClient())
                                                     {{ __('No files available') }}
                                                 @else
                                                     {{ __('Drop files here to upload') }}

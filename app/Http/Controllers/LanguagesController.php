@@ -15,7 +15,7 @@ class LanguagesController extends Controller
 {
     public function disableLang(Request $request){
 
-        if(\Auth::user()->type == 'admin'){
+        if(\Auth::user()->isAdministrator()){
             $settings = Utility::getAdminPaymentSetting();
             $disablelang  = '';
             $created_at = date('Y-m-d H:i:s');

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 @php
     $logo = \App\Models\Utility::get_file('logo/');
-    if (Auth::user()->type == 'admin') {
+    if (Auth::user()->isAdministrator()) {
         $setting = App\Models\Utility::getAdminPaymentSetting();
         //  dd($setting);
         if ($setting['color']) {
@@ -67,7 +67,7 @@
 
 
     <title>
-        @if (trim($__env->yieldContent('page-title')) && Auth::user()->type == 'admin')
+        @if (trim($__env->yieldContent('page-title')) && Auth::user()->isAdministrator())
             {{ config('app.name', 'Taskly') }} -@yield('page-title')
         @else
             {{ isset($currentWorkspace->company) && $currentWorkspace->company != '' ? $currentWorkspace->company : config('app.name', 'Taskly') }}
@@ -92,7 +92,7 @@
     <meta property="twitter:description" content="{{ $meta_setting['meta_description'] }}">
     <meta property="twitter:image" content="{{ asset($meta_images . $meta_setting['meta_image']) }}">
 
-    @if (Auth::user()->type == 'admin')
+    @if (Auth::user()->isAdministrator())
         <link rel="shortcut icon" href="{{ asset($logo . 'favicon.png') . '?' . time() }}">
     @else
         <link rel="shortcut icon"
@@ -218,7 +218,7 @@
         }
     </style>
 @php
-    if (Auth::user()->type == 'admin') {
+    if (Auth::user()->isAdministrator()) {
         $color = !empty($setting['color']) ? $setting['color'] : 'theme-3';
 
         if (isset($setting['color_flag']) && $setting['color_flag'] == 'true') {
@@ -249,7 +249,7 @@
         </div>
     </div>
     {{-- <input type="hidden" id="path_admin" value="{{url('/')}}"> --}}
-    @if (Auth::user()->getGuard() == 'client')
+    @if (Auth::user()->isClient())
         <input type="hidden" id="path_admin"
             value="{{ url(isset($currentWorkspace) ? 'client/' . $currentWorkspace->slug : '') }}">
     @else
@@ -326,7 +326,7 @@
 
         </div>
     </div>
-    @if (Auth::user()->type != 'admin')
+    @if (!Auth::user()->isAdministrator())
         <div class="modal fade" id="modelCreateWorkspace" tabindex="-1" role="dialog"
             aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog " role="document">

@@ -306,7 +306,7 @@ class ToyyibpayController extends Controller
         $invoice = Invoice::find($invoice_id);
         $get_amount = $request->amount;
         $user1 = Auth::user();
-        $client_keyword = isset($user1) ? (($user1->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user1) ? (($user1->isClient()) ? 'client.' : '') : '';
 
         if ($invoice)
         {

@@ -26,11 +26,11 @@
                         class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Change Password') }} <div
                             class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
-                    @if ($user->hasRole('employee'))
+                    @if ($user->isEmployee())
                         <a href="#v-pills-profiler"
                             class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Employee Profile') }} <div
                                 class="float-end"><i class="ti ti-chevron-right"></i></div></a>
-                    @elseif ($user->hasRole('company'))
+                    @elseif ($user->isCompany())
                         <a href="{{ route('workspace.settings', \Auth::user()->ownWorkspace()->slug)  }}#company-settings"
                            class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Company Settings') }} <div
                                 class="float-end"><i class="ti ti-clipboard"></i></div></a>
@@ -221,7 +221,7 @@
             </form>
         </div>
     </div>
-    @if ($user->hasRole('employee'))
+    @if ($user->isEmployee())
         <div class="card" id="v-pills-profiler">
             <div class="card-header">
                 <h5>{{ __('Employee Profile') }}</h5>

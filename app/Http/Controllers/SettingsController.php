@@ -17,7 +17,7 @@ class SettingsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $workspace = new Workspace();
             $payment_detail = Utility::getAdminPaymentSetting();
             $setting = DB::table('admin_payment_settings')->pluck('value', 'name')->toArray();
@@ -30,7 +30,7 @@ class SettingsController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $dir = 'logo/';
 
             if ($request->favicon) {
@@ -343,7 +343,7 @@ class SettingsController extends Controller
     public function emailSettingStore(Request $request)
     {
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $rules = [
                 'mail_driver' => 'required|string|max:50',
                 'mail_host' => 'required|string|max:50',
@@ -407,7 +407,7 @@ class SettingsController extends Controller
     public function paymentSettingStore(Request $request)
     {
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $validate = [
                 'currency' => 'required|string|max:50',
                 'currency_symbol' => 'required|string|max:50',
@@ -904,7 +904,7 @@ class SettingsController extends Controller
     {
 
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $rules = [];
 
             if ($request->enable_chat == 'on') {
@@ -1001,7 +1001,7 @@ class SettingsController extends Controller
         //     return response()->json(['error' => __('Permission Denied.')], 401);
         // }
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $settings = Utility::getAdminPaymentSetting();
             $data                      = [];
             $data['mail_driver']       = $settings['mail_driver'] ? $settings['mail_driver'] : $request->mail_driver;
@@ -1013,7 +1013,7 @@ class SettingsController extends Controller
             $data['mail_from_address'] = $settings['mail_from_address'] ? $settings['mail_from_address'] : $request->mail_from_address;
             $data['mail_from_name']    = $settings['mail_from_name'] ? $settings['mail_from_name'] : $request->mail_from_name;
             return view('users.test_email', compact('data'));
-        } else if ($user->type == 'user') {
+        } else if ($user->isRegularUser()) {
             $user = Auth::user();
             $settings = Utility::getPaymentSetting($user->currant_workspace);
             $data                      = [];
@@ -1227,7 +1227,7 @@ class SettingsController extends Controller
 
     public function chatgptkey(Request $request)
     {
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $user = \Auth::user();
             $validator = \Validator::make(
                 $request->all(),

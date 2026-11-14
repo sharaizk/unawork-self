@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @php
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 @section('page-title') {{__('Contracts')}} @endsection
 @section('links')
@@ -98,7 +98,7 @@
                                 <thead>
                                     <tr>
                                         <th>{{__('Contracts')}}</th>
-                                        @if(Auth::user()->getGuard() != 'client')
+                                        @if(!Auth::user()->isClient())
                                         <th>{{__('Client')}}</th>
                                         @endif
                                         <th>{{__('Project')}}</th>
@@ -118,7 +118,7 @@
                                             <td class="Id">
                                                 <a href="@auth('web'){{ route('contracts.show',[$currentWorkspace->slug,$contract->id]) }}@elseauth{{ route('client.contracts.show',[$currentWorkspace->slug,$contract->id]) }}@endauth" class="btn btn-outline-primary">{{ App\Models\Utility::contractNumberFormat($contract->id) }}</a>
                                             </td>
-                                             @if(Auth::user()->getGuard() != 'client')
+                                             @if(!Auth::user()->isClient())
                                             <td>{{!empty($contract->clients)?$contract->clients->name:'' }}</td>
                                             @endif
                                             <td>{{!empty( $contract->projects ) ?  $contract->projects->name  : ''}}</td>
@@ -140,7 +140,7 @@
                                             <td class="Action">
                                                 <span>
 
-                                                     @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                                                     @if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient())
                                                     <div class="action-btn bg-warning ms-2">
                                                         <a href="@auth('web'){{ route('contracts.show',[$currentWorkspace->slug,$contract->id]) }}@elseauth{{ route('client.contracts.show',[$currentWorkspace->slug,$contract->id]) }}@endauth" class="mx-3 btn btn-sm d-inline-flex align-items-center" title="" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Detail" aria-label="Detail"><span class="text-white"><i class="ti ti-eye"></i></span></a>
 

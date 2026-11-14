@@ -9,7 +9,7 @@
     }
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_tasks = \App\Models\Utility::get_file('tasks/');
-    $client_keyword = $objUser->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = $objUser->isClient() ? 'client.' : '';
 @endphp
 <div class="modal-body">
     @if ($currentWorkspace && $task)

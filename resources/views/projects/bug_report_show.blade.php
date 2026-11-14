@@ -1,7 +1,7 @@
 @php
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_tasks = \App\Models\Utility::get_file('tasks/');
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 @if ($currentWorkspace && $bug)
 

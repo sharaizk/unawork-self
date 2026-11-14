@@ -7,7 +7,7 @@
         <div class="row">
             <input type="hidden" name="contract_id" value="{{$contract->id}}">
             <label for="" class="col-form-label">{{__('Sign')}}</label>
-            @if(\Auth::user()->getGuard() == 'client')
+            @if(\Auth::user()->isClient())
             <div class="form-control" >
                 <canvas id="signature-pad" class="signature-pad" height=200 ></canvas>
                 <input type="hidden" name="client_signature" id="SignupImage1">
@@ -31,7 +31,7 @@
 </form>
 
 @php
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 <script src="{{asset('assets/js/plugins/signature_pad/signature_pad.min.js')}}"></script>
 <script>

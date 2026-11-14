@@ -2,7 +2,7 @@
 @php
     $languages = \App\Models\Utility::languages();
     $logo = \App\Models\Utility::get_file('logo/');
-    if (Auth::user()->type == 'admin') {
+    if (Auth::user()->isAdministrator()) {
         $setting = App\Models\Utility::getAdminPaymentSetting();
         if ($setting['color']) {
             $color = $setting['color'];
@@ -116,7 +116,7 @@
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            @if (Auth::user()->type == 'user')
+                            @if (Auth::user()->isRegularUser())
                                 <a href="#slack-settings"
                                     class="list-group-item list-group-item-action border-0">{{ __('Slack Settings') }}<div
                                         class="float-end"><i class="ti ti-chevron-right"></i></div></a>
@@ -3526,7 +3526,7 @@
                         </div>
                     </div>
 
-                    @if (Auth::user()->type == 'user')
+                    @if (Auth::user()->isRegularUser())
                         <div class="" id="slack-settings">
                             {{ Form::open(['route' => ['workspace.settings.Slack', $currentWorkspace->slug], 'method' => 'post', 'class' => 'd-contents']) }}
                             <div class="row justify-content-center">
@@ -3669,7 +3669,7 @@
                         </div>
                     @endif
 
-                    @if (Auth::user()->type == 'user')
+                    @if (Auth::user()->isRegularUser())
                         <div class="" id="telegram-settings">
                             {{ Form::open(['route' => ['workspace.settings.telegram', $currentWorkspace->slug], 'method' => 'post', 'class' => 'd-contents']) }}
                             <div class="row justify-content-center">
@@ -3815,7 +3815,7 @@
                         </div>
                     @endif
 
-                    @if (Auth::user()->type == 'user')
+                    @if (Auth::user()->isRegularUser())
                         <div class="" id="google-calender">
                             {{ Form::open(['route' => ['google.calender.settings', $currentWorkspace->slug], 'method' => 'post', 'enctype' => 'multipart/form-data']) }}
                             <div class="row justify-content-center">

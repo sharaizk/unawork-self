@@ -360,7 +360,7 @@ class MercadoPaymentController extends Controller
             $item->unit_price = (float)$request->amount;
             $item->currency_id = $this->currancy;
             $preference->items = array($item);
-            $client_keyword = isset($user) ? (($user->getGuard() == 'client') ? 'client.' : '') : '';
+            $client_keyword = isset($user) ? (($user->isClient()) ? 'client.' : '') : '';
 
             $success_url = route($client_keyword . 'invoice.mercado', [$currentWorkspace->slug, encrypt($invoice->id), 'amount' => (float)$request->amount, 'flag' => 'success']);
 
