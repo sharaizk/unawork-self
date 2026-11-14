@@ -125,6 +125,7 @@ trait UsesInMemorySqlite
             $t->string('status')->default('active');
             $t->integer('is_enable_login')->default(1);
             $t->timestamps();
+            $t->unique(['user_id', 'workspace_id'], 'user_workspaces_user_id_workspace_id_unique'); // UNA-004, as in production
         });
         Schema::create('client_workspaces', function (Blueprint $t) {
             $t->id();
@@ -146,7 +147,10 @@ trait UsesInMemorySqlite
             $t->unsignedBigInteger('user_id');
             $t->unsignedBigInteger('project_id');
             $t->integer('is_active')->default(1);
+            $t->string('status')->default('active');
+            $t->text('permission')->nullable();
             $t->timestamps();
+            $t->unique(['user_id', 'project_id'], 'user_projects_user_id_project_id_unique'); // UNA-004, as in production
         });
         Schema::create('client_projects', function (Blueprint $t) {
             $t->id();
@@ -158,6 +162,8 @@ trait UsesInMemorySqlite
         Schema::create('pods', function (Blueprint $t) {
             $t->id();
             $t->string('title');
+            $t->string('image')->nullable();
+            $t->text('description')->nullable();
             $t->unsignedBigInteger('created_by');
             $t->boolean('inner_enabled')->default(false);
             $t->timestamps();
@@ -170,6 +176,7 @@ trait UsesInMemorySqlite
             $t->string('status');
             $t->text('reason')->nullable();
             $t->timestamps();
+            $t->unique(['user_id', 'pod_id'], 'pod_users_user_id_pod_id_unique'); // UNA-004, as in production
         });
         Schema::create('plans', function (Blueprint $t) {
             $t->id();

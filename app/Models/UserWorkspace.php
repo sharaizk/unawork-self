@@ -3,12 +3,19 @@
 namespace App\Models;
 
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
+use App\Models\Concerns\IsUniqueMembership;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
 
 class UserWorkspace extends Model
 {
     use HasRoles;
+    use IsUniqueMembership;
+
+    public static function membershipParentKey(): string
+    {
+        return 'workspace_id';
+    }
 
     protected $guard_name = WorkspacePermission::GUARD;
 

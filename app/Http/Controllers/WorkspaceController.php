@@ -68,13 +68,7 @@ class WorkspaceController extends Controller
                     ]
                 );
 
-                UserWorkspace::create(
-                    [
-                        'user_id' => $objUser->id,
-                        'workspace_id' => $objWorkspace->id,
-                        'permission' => 'Owner',
-                    ]
-                );
+                UserWorkspace::findOrCreateMembership($objUser->id, $objWorkspace->id, ['permission' => 'Owner']);
 
                 $objUser->currant_workspace = $objWorkspace->id;
                 $objUser->save();

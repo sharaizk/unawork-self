@@ -17,6 +17,7 @@ use App\Models\Utility;
 use App\Models\Workspace;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -74,10 +75,23 @@ class PodUserService
             throw new \Exception(__('This user is already a member of this pod.'));
         }
 
-        $this->attachUserToPod($user, $podId);
+        // Membership rows are written together; a concurrent duplicate invitation loses on the
+        // unique index and gets the same "already a member" outcome, without side effects.
+        $podUser = DB::transaction(function () use ($user, $pod, $podId) {
+            $podUser = $this->attachUserToPod($user, $podId);
+            if ($podUser->wasRecentlyCreated) {
+                $this->attachUserToPodWorkspaces($user, $pod);
+            }
+
+            return $podUser;
+        });
+
+        if (!$podUser->wasRecentlyCreated) {
+            throw new \Exception(__('This user is already a member of this pod.'));
+        }
+
         $this->sendInvitationalNotify($userId, $pod);
-        $this->attachUserToPodWorkspaces($user, $pod);
-    
+
         try {
             $this->sendInvitationEmail($user, $pod, $settings);
         } catch (\Exception $e) {
@@ -88,7 +102,7 @@ class PodUserService
     public function inviteNewUser(array $data, int $podId, array $settings): void
     {
         $user = $this->createNewUser($data);
-        $this->attachUserToPod($user, $podId);
+        $this->attachUserToPod($user, $podId); // a brand-new user: the membership is always new
         $pod = Pod::find($podId);
         
         try {
@@ -101,24 +115,25 @@ class PodUserService
 
     public function requestJoinPod(int $userId, int $podId): void
     {
-        $exists = PodUser::where('user_id', $userId)
-            ->where('pod_id', $podId)
-            ->exists();
-
-        if ($exists) {
-            throw new \Exception('You have already submitted a join request for this pod.');
-        }
-
-        $podUser = PodUser::create([
-            'user_id' => $userId,
-            'pod_id' => $podId,
-            'permission' => Permission::MEMBER->value,
-            'status' => Status::POD_PENDING->value
-        ]);
-        
         $pod = Pod::find($podId);
         $user = User::find($userId);
-        $this->attachUserToPodWorkspaces($user, $pod);
+
+        // Atomic: an existing membership (any status) is returned untouched, never overwritten.
+        $podUser = DB::transaction(function () use ($user, $pod, $userId, $podId) {
+            $podUser = PodUser::findOrCreateMembership($userId, $podId, [
+                'permission' => Permission::MEMBER->value,
+                'status' => Status::POD_PENDING->value,
+            ]);
+            if ($podUser->wasRecentlyCreated) {
+                $this->attachUserToPodWorkspaces($user, $pod);
+            }
+
+            return $podUser;
+        });
+
+        if (!$podUser->wasRecentlyCreated) {
+            throw new \Exception('You have already submitted a join request for this pod.');
+        }
 
         $this->sendRequestNotify($podUser, $pod->created_by);
     }
@@ -207,11 +222,12 @@ class PodUserService
             ->exists();
     }
 
-    private function attachUserToPod(User $user, int $podId): void
+    /** Invitation membership; an existing membership is returned unchanged (check wasRecentlyCreated). */
+    private function attachUserToPod(User $user, int $podId): PodUser
     {
-        $user->pods()->attach($podId, [
+        return PodUser::findOrCreateMembership($user->id, $podId, [
             'permission' => Permission::MEMBER->value,
-            'status' => Status::EMPLOYEE_PENDING->value
+            'status' => Status::EMPLOYEE_PENDING->value,
         ]);
     }
 
@@ -219,11 +235,12 @@ class PodUserService
     {
         $workspace = $pod->workspace;
 
-        if (!$workspace->users()->where('user_id', $user->id)->exists()) {
-            $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::EMPLOYEE_PENDING->value]);
-        }
-
-        $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $user->id)->first();
+        // Existing workspace memberships keep their status; only a new one starts pending.
+        $userWorkspace = UserWorkspace::findOrCreateMembership($user->id, $workspace->id, [
+            'permission' => 'Member',
+            'is_active' => 1,
+            'status' => UserWorkspaceStatus::EMPLOYEE_PENDING->value,
+        ]);
         $userWorkspace->givePermissionTo('users_index');
         $userWorkspace->givePermissionTo('news_index');
     }

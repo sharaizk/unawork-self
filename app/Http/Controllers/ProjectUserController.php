@@ -27,8 +27,13 @@ class ProjectUserController extends Controller
                 ->where('status', Status::ACTIVE->value)
                 ->first();
         if ($userInWorkspace) {
-            $userInProject = $project->users()->where('user_projects.user_id', $user->id)->exists();
-            if (!$userInProject) {
+            // Atomic, constraint-backed: an existing claim/membership (any status) is returned
+            // untouched, so a repeated or racing request is "already sent", never a 500.
+            $userProject = UserProject::findOrCreateMembership($user->id, $project->id, [
+                'is_active' => 0,
+                'status' => 'pending',
+            ]);
+            if ($userProject->wasRecentlyCreated) {
 
                 /*
                     if ($userInWorkspace->hasPermissionTo(UserWorkspacePermission::PROJECTS_INDEX->value)) {
@@ -43,12 +48,6 @@ class ProjectUserController extends Controller
                         Notification::where('type', 'project_new_for_inner')->where('user_id', $user->id)->whereJsonContains('data->id', $project->id)->delete();
                     } else {
                 */
-                    $userProject = UserProject::create([
-                        'project_id' => $project->id,
-                        'user_id' => $user->id,
-                        'is_active' => 0,
-                        'status' => 'pending'
-                    ]);
                     Utility::sendNotification('project_request', null, $workspace->created_by, $userProject);
                     $responseText = 'You have been successfully sent join request';
                 //  }
@@ -68,11 +67,14 @@ class ProjectUserController extends Controller
 
         $user = $record->user;
         $project = $record->project;
-        $record->update([
+        // Only a pending claim can be accepted, exactly once (no duplicate notifications).
+        if (!$this->resolvePendingClaim($record, [
             'is_active' => 1,
             'status' => 'active',
-            'permission' => json_encode(Utility::getAllPermission())
-        ]);
+            'permission' => json_encode(Utility::getAllPermission()),
+        ])) {
+            return redirect()->back()->with('error', __('This membership request has already been handled.'));
+        }
 
         $notification = Notification::where('type', 'project_request')
             ->where('user_id', $project->workspaceData->created_by)
@@ -95,10 +97,13 @@ class ProjectUserController extends Controller
 
         $user = $record->user;
         $project = $record->project;
-        $record->update([
+        // Only a pending claim can be declined: an accepted member is never downgraded here.
+        if (!$this->resolvePendingClaim($record, [
             'is_active' => 0,
-            'status' => 'declined'
-        ]);
+            'status' => 'declined',
+        ])) {
+            return redirect()->back()->with('error', __('This membership request has already been handled.'));
+        }
 
         $notification = Notification::where('type', 'project_request')
             ->where('user_id', $project->workspaceData->created_by)
@@ -113,5 +118,16 @@ class ProjectUserController extends Controller
 
 
         return redirect()->back()->with('success', __('You have been successfully decline join request'));
+    }
+
+    /** Conditional pending -> $attributes transition; false when another request already resolved it. */
+    private function resolvePendingClaim(UserProject $record, array $attributes): bool
+    {
+        $changed = UserProject::whereKey($record->id)->where('status', 'pending')->update($attributes);
+        if ($changed === 1) {
+            $record->refresh();
+        }
+
+        return $changed === 1;
     }
 }

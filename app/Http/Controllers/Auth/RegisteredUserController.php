@@ -206,16 +206,7 @@ class RegisteredUserController extends Controller
             $objWorkspace->save();
 
 
-            $userWorkspace               =   new UserWorkspace();
-            $userWorkspace->user_id      =     $user->id;
-            $userWorkspace->workspace_id =    $objWorkspace->id;
-            $userWorkspace->permission  = 'Owner';
-
-            if (empty($userWorkspace)) {
-                $errorArray[] = $userWorkspace;
-            } else {
-                $userWorkspace->save();
-            }
+            $userWorkspace = UserWorkspace::findOrCreateMembership($user->id, $objWorkspace->id, ['permission' => 'Owner']);
 
             $userWorkspace->assignAllPermissionsToCreator();
 

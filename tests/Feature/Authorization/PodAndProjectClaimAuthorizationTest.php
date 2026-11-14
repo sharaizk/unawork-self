@@ -567,6 +567,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             $t->string('status');
             $t->text('reason')->nullable();
             $t->timestamps();
+            $t->unique(['user_id', 'pod_id'], 'pod_users_user_id_pod_id_unique'); // UNA-004, as in production
         });
         Schema::create('workspaces', function (Blueprint $t) {
             $t->id();
@@ -588,6 +589,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             $t->string('status')->default('active');
             $t->integer('is_enable_login')->default(1);
             $t->timestamps();
+            $t->unique(['user_id', 'workspace_id'], 'user_workspaces_user_id_workspace_id_unique'); // UNA-004, as in production
         });
         Schema::create('projects', function (Blueprint $t) {
             $t->id();
@@ -607,6 +609,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             $t->text('permission')->nullable();
             $t->string('status')->default('active');
             $t->timestamps();
+            $t->unique(['user_id', 'project_id'], 'user_projects_user_id_project_id_unique'); // UNA-004, as in production
         });
         Schema::create('notifications', function (Blueprint $t) {
             $t->id();

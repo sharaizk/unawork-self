@@ -3,10 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\IsUniqueMembership;
 use Illuminate\Database\Eloquent\Model;
 
 class PodUser extends Model
 {
+    use IsUniqueMembership;
+
+    public static function membershipParentKey(): string
+    {
+        return 'pod_id';
+    }
+
     use HasFactory;
 
     protected $fillable = [

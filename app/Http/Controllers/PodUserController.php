@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\PodUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
 use App\Models\Notification;
 use App\Models\PodUser;
@@ -126,8 +127,9 @@ class PodUserController extends Controller
         $this->authorize('acceptMember', [$pod, $user]);
 
         $ownId = Auth::user()->id;
-        $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
-        $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
+        if (!$this->resolvePendingMembership($pod, $user, Status::ACTIVE, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value])) {
+            return $this->alreadyHandledResponse();
+        }
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
 
         Utility::sendNotification('pod_request_accept_owner', null, $pod->created_by, $podUser);
@@ -144,8 +146,9 @@ class PodUserController extends Controller
         $this->authorize('declineMember', [$pod, $user]);
 
         $ownId = Auth::user()->id;
-        $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
-        $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value]);
+        if (!$this->resolvePendingMembership($pod, $user, Status::DECLINED, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value])) {
+            return $this->alreadyHandledResponse();
+        }
         $podUser = PodUser::where('user_id', $user->id)->where('pod_id', $pod->id)->first();
 
         Utility::sendNotification('pod_request_decline_owner', null, $pod->created_by, $podUser);
@@ -184,6 +187,34 @@ class PodUserController extends Controller
         }
 
         return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Move a pending invitation/request to $to exactly once. The conditional update is the
+     * concurrency boundary: a second (or racing) accept/decline changes nothing, creates no
+     * row and sends no notifications. Never inserts a membership.
+     */
+    private function resolvePendingMembership(Pod $pod, User $user, Status $to, array $workspaceAttributes): bool
+    {
+        return DB::transaction(function () use ($pod, $user, $to, $workspaceAttributes) {
+            $changed = PodUser::where('pod_id', $pod->id)
+                ->where('user_id', $user->id)
+                ->whereIn('status', [Status::POD_PENDING->value, Status::EMPLOYEE_PENDING->value])
+                ->update(['status' => $to->value]);
+
+            if ($changed !== 1) {
+                return false;
+            }
+
+            $pod->workspace->users()->updateExistingPivot($user->id, $workspaceAttributes);
+
+            return true;
+        });
+    }
+
+    private function alreadyHandledResponse()
+    {
+        return response()->json(['message' => __('This membership request has already been handled.')], 409);
     }
 
     private function deleteNotification($type, $userId, $podUserId)

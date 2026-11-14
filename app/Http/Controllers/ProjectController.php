@@ -187,17 +187,7 @@ class ProjectController extends Controller
                 $customerData->save();
             }
 
-            $Data = new UserProject();
-
-            $Data->user_id = $objUser->id;
-            $Data->project_id = $customerData->id;
-            $Data->is_active = "1";
-
-            if (empty($Data)) {
-                $errorArray[] = $Data;
-            } else {
-                $Data->save();
-            }
+            UserProject::findOrCreateMembership($objUser->id, $customerData->id, ['is_active' => 1]);
         }
         $errorRecord = [];
         if (empty($errorArray)) {
@@ -378,23 +368,12 @@ class ProjectController extends Controller
         // assign workspace first
         $authuser = Auth::user();
         $authusername = User::where('id', '=', $authuser->id)->first();
-        $is_assigned = false;
         $setting = Utility::fetchAdminPaymentSetting();
-        foreach ($user->workspace as $workspace) {
-            if ($workspace->id == $project->workspace) {
-                $is_assigned = true;
-            }
-        }
 
-        if (!$is_assigned) {
-            UserWorkspace::create(
-                [
-                    'user_id' => $user->id,
-                    'workspace_id' => $project->workspace,
-                    'permission' => $permission,
-                ]
-            );
+        // Atomic: an existing workspace membership is kept as is; mail only for a new one.
+        $workspaceMembership = UserWorkspace::findOrCreateMembership($user->id, (int) $project->workspace, ['permission' => $permission]);
 
+        if ($workspaceMembership->wasRecentlyCreated) {
 
             try {
                 Mail::to($user->email)->send(new SendWorkspaceInvication($user, $project->workspaceData));
@@ -404,13 +383,11 @@ class ProjectController extends Controller
         }
 
         // assign project
-        $arrData = [];
-        $arrData['user_id'] = $user->id;
-        $arrData['project_id'] = $project->id;
-        $is_invited = UserProject::where($arrData)->first();
-        if (!$is_invited) {
-            $arrData['permission'] = json_encode(Utility::getAllPermission());
-            UserProject::create($arrData);
+        // Atomic: chat invite, notification and email happen only for a new project membership.
+        $projectMembership = UserProject::findOrCreateMembership($user->id, $project->id, [
+            'permission' => json_encode(Utility::getAllPermission()),
+        ]);
+        if ($projectMembership->wasRecentlyCreated) {
 
             //invite user to project chat via slug
             $slug = "project-".$project->id;
@@ -3075,19 +3052,14 @@ class ProjectController extends Controller
         if (isset($request->user) && in_array("user", $request->user)) {
             $users = UserProject::where('project_id', $project->id)->get();
             foreach ($users as $user) {
-                $users = new UserProject();
-                $users['user_id'] = $user->user_id;
-                $users['project_id'] = $duplicate->id;
-                $users['is_active'] = $user->is_active;
-                $users['permission'] = $user->permission;
-                $users->save();
+                UserProject::findOrCreateMembership($user->user_id, $duplicate->id, [
+                    'is_active' => $user->is_active,
+                    'permission' => $user->permission,
+                ]);
             }
         } else {
             $objUser = Auth::user();
-            $users = new UserProject();
-            $users['user_id'] = $objUser->id;
-            $users['project_id'] = $duplicate->id;
-            $users->save();
+            UserProject::findOrCreateMembership($objUser->id, $duplicate->id);
         }
 
         if (isset($request->client) && in_array("client", $request->client)) {

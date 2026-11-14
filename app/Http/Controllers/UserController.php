@@ -404,16 +404,7 @@ class UserController extends Controller
             $userData->currant_workspace = $objWorkspace->id;
             $userData->save();
 
-            $userWorkspace = new UserWorkspace();
-            $userWorkspace->user_id = $userData->id;
-            $userWorkspace->workspace_id = $objWorkspace->id;
-            $userWorkspace->permission = 'Owner';
-
-            if (empty($userWorkspace)) {
-                $errorArray[] = $userWorkspace;
-            } else {
-                $userWorkspace->save();
-            }
+            UserWorkspace::findOrCreateMembership($userData->id, $objWorkspace->id, ['permission' => 'Owner']);
 
             User::userDefaultDataRegister($userData);
         }
@@ -543,13 +534,7 @@ class UserController extends Controller
             $objWorkspace->ownerable()->associate($objUser);
             $objUser->save();
 
-            UserWorkspace::create(
-                [
-                    'user_id' => $objUser->id,
-                    'workspace_id' => $objWorkspace->id,
-                    'permission' => 'Owner',
-                ]
-            );
+            UserWorkspace::findOrCreateMembership($objUser->id, $objWorkspace->id, ['permission' => 'Owner']);
 
             $emailTemplate = EmailTemplate::all();
 
@@ -1007,23 +992,10 @@ class UserController extends Controller
             }
         }
 
-        // assign workspace first
-        $is_assigned = false;
-        foreach ($registerUsers->workspace as $workspace) {
-            if ($workspace->id == $currentWorkspace->id) {
-                $is_assigned = true;
-            }
-        }
+        // assign workspace first (atomic; the invitation mail goes out only for a new membership)
+        $membership = UserWorkspace::findOrCreateMembership($registerUsers->id, $currentWorkspace->id, ['permission' => 'Member']);
 
-        if (!$is_assigned) {
-            UserWorkspace::create(
-                [
-                    'user_id' => $registerUsers->id,
-                    'workspace_id' => $currentWorkspace->id,
-                    'permission' => 'Member',
-                ]
-            );
-
+        if ($membership->wasRecentlyCreated) {
             try {
                 Mail::to($registerUsers->email)->send(new SendWorkspaceInvication($registerUsers, $currentWorkspace));
             } catch (\Exception $e) {
@@ -1348,18 +1320,14 @@ class UserController extends Controller
         ];
 
         if (!empty($registerUsers)) {
-            // Check if the user is already assigned to the current workspace
-            $is_assigned = UserWorkspace::where('user_id', $registerUsers->id)
-                ->where('workspace_id', $currentWorkspace->id)
-                ->exists();
+            // Atomic: an existing membership (any status) is never reset; repeats and racing
+            // invitations get the "already a member" response and no duplicate side effects.
+            $userWorkspace = UserWorkspace::findOrCreateMembership($registerUsers->id, $currentWorkspace->id, [
+                'permission' => 'Member',
+                'status' => Status::EMPLOYEE_PENDING->value,
+            ]);
 
-            if (!$is_assigned) {
-                $userWorkspace = UserWorkspace::create([
-                    'user_id' => $registerUsers->id,
-                    'workspace_id' => $currentWorkspace->id,
-                    'permission' => 'Member',
-                    'status' => Status::EMPLOYEE_PENDING->value,
-                ]);
+            if ($userWorkspace->wasRecentlyCreated) {
                 $userWorkspace->refresh();
                 $userWorkspace->syncPermissions(['users_index', 'projects_index']);
 
@@ -1405,18 +1373,13 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        // Check if the user is already assigned to the current workspace
-        $is_assigned = UserWorkspace::where('user_id', $user->id)
-            ->where('workspace_id', $workspace->id)
-            ->exists();
+        // Atomic: one request per user and workspace; repeats get the existing-member response.
+        $userWorkspace = UserWorkspace::findOrCreateMembership($user->id, $workspace->id, [
+            'permission' => 'Member',
+            'status' => Status::WORKSPACE_PENDING->value,
+        ]);
 
-        if (!$is_assigned) {
-            $userWorkspace = UserWorkspace::create([
-                'user_id' => $user->id,
-                'workspace_id' => $workspace->id,
-                'permission' => 'Member',
-                'status' => Status::WORKSPACE_PENDING->value,
-            ]);
+        if ($userWorkspace->wasRecentlyCreated) {
             $userWorkspace->refresh();
 
             $workspace_name = Workspace::where('id', $user->currant_workspace)->first();

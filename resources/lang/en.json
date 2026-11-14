@@ -1487,5 +1487,6 @@
     "Edit Permissions": "Edit Permissions",
     "This user is not a member of this pod workspace.": "This user is not a member of this pod workspace.",
     "Row :row: invalid account type \":type\". Use \"company\" or \"employee\".": "Row :row: invalid account type \":type\". Use \"company\" or \"employee\".",
-    "Row :row: administrator accounts cannot be changed by import.": "Row :row: administrator accounts cannot be changed by import."
+    "Row :row: administrator accounts cannot be changed by import.": "Row :row: administrator accounts cannot be changed by import.",
+    "This membership request has already been handled.": "This membership request has already been handled."
 }
