@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Membership;
 
+use App\Enums\PodUser\State;
 use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use App\Jobs\SendEmail;
@@ -95,10 +96,10 @@ class TransactionalMembershipTest extends TestCase
         $this->assertSame(0, Notification::count(), 'no owner notification for a rolled-back request');
     }
 
-    public function test_invitation_failing_on_the_permission_grant_rolls_back_both_rows(): void // 2, 4, 6
+    public function test_invitation_failing_after_both_rows_rolls_back_both(): void // 2, 6
     {
         $invitee = $this->registered('invitee', UserRole::EMPLOYEE);
-        $this->failOn('BEFORE INSERT', 'model_has_permissions');
+        $this->failOn('BEFORE INSERT', 'pod_user_state_histories'); // after pod_users + user_workspaces
         $before = $this->snapshot();
 
         $this->assertFails(fn () => app(PodUserService::class)->inviteExistedUser($invitee->id, $this->pod->id, []));
@@ -110,7 +111,7 @@ class TransactionalMembershipTest extends TestCase
 
     public function test_failed_new_user_invitation_leaves_no_orphan_user_or_role(): void // 3
     {
-        $this->failOn('BEFORE INSERT', 'model_has_permissions');
+        $this->failOn('BEFORE INSERT', 'pod_user_state_histories'); // after user, role and both memberships
         $before = $this->snapshot();
 
         $this->assertFails(fn () => app(PodUserService::class)->inviteNewUser(['name' => 'New', 'email' => 'new@example.test', 'password' => 'secret123'], $this->pod->id, []));
@@ -126,8 +127,8 @@ class TransactionalMembershipTest extends TestCase
 
         $user = User::where('email', 'new@example.test')->sole();
         $this->assertTrue($user->isEmployee());
-        $this->assertSame('employee_pending', $this->podMembership($user)->status);
-        $this->assertEqualsCanonicalizing(['users_index', 'news_index'], $this->workspaceMembership($user)->getPermissionNames()->all());
+        $this->assertSame(State::MATCHED, $this->podMembership($user)->state);
+        $this->assertSame([], $this->workspaceMembership($user)->getPermissionNames()->all(), 'invitees have no workspace access yet');
         Bus::assertDispatchedTimes(SendEmail::class, 2);
     }
 
@@ -139,9 +140,9 @@ class TransactionalMembershipTest extends TestCase
 
         $this->assertTrue($result->applied);
         $this->assertSame(['notify_owner'], $result->effectNames());
-        $this->assertSame('pod_pending', $this->podMembership($requester)->status);
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $this->podMembership($requester)->state);
         $this->assertSame('employee_pending', $this->workspaceMembership($requester)->status);
-        $this->assertEqualsCanonicalizing(['users_index', 'news_index'], $this->workspaceMembership($requester)->getPermissionNames()->all());
+        $this->assertSame([], $this->workspaceMembership($requester)->getPermissionNames()->all(), 'applicants have no workspace access yet');
         $this->assertSame(1, $this->notifications('pod_request'));
         $this->assertSame([0], $this->notificationLevels, 'the notification was written after the commit');
     }
@@ -157,21 +158,33 @@ class TransactionalMembershipTest extends TestCase
         $this->actingAs($this->owner)->postJson(route('pods.accept', ['pod' => $this->pod, 'user' => $applicant]))->assertStatus(500);
 
         $this->assertEquals($before, $this->snapshot());
-        $this->assertSame('pod_pending', $this->podMembership($applicant)->status);
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $this->podMembership($applicant)->state);
         $this->assertSame(1, $this->notifications('pod_request'), 'the request stays actionable');
         $this->assertSame(0, $this->notifications('pod_request_accept_user'));
+    }
+
+    public function test_approval_failing_on_the_default_permission_grant_rolls_back_everything(): void // 4
+    {
+        $applicant = $this->applicant('applicant');
+        $this->failOn('BEFORE INSERT', 'model_has_permissions'); // the outer-circle baseline on approval
+        $before = $this->snapshot();
+
+        $this->assertFails(fn () => app(PodUserService::class)->respondToMembership($this->pod, $applicant, State::OUTER_CIRCLE, $this->owner));
+
+        $this->assertEquals($before, $this->snapshot());
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $this->podMembership($applicant)->state);
     }
 
     public function test_rejection_failing_after_the_workspace_change_rolls_back_the_pod_status(): void // 8, 12
     {
         $applicant = $this->applicant('applicant');
-        $this->failOn('BEFORE DELETE', 'notifications'); // runs after both status updates and the permission revoke
+        $this->failOn('BEFORE INSERT', 'pod_user_state_histories'); // runs after the state, workspace and notification changes
         $before = $this->snapshot();
 
-        $this->assertFails(fn () => app(PodUserService::class)->respondToMembership($this->pod, $applicant, \App\Enums\PodUser\Status::DECLINED));
+        $this->assertFails(fn () => app(PodUserService::class)->respondToMembership($this->pod, $applicant, State::REJECTED, $this->owner));
 
         $this->assertEquals($before, $this->snapshot());
-        $this->assertEqualsCanonicalizing(['users_index', 'news_index'], $this->workspaceMembership($applicant)->getPermissionNames()->all());
+        $this->assertSame('employee_pending', $this->workspaceMembership($applicant)->status);
         $this->assertSame(0, $this->notifications('pod_request_decline_user'));
     }
 
@@ -184,11 +197,11 @@ class TransactionalMembershipTest extends TestCase
         $this->actingAs($this->owner)->postJson(route('pods.accept', ['pod' => $this->pod, 'user' => $accepted]))->assertOk();
         $this->actingAs($this->owner)->postJson(route('pods.decline', ['pod' => $this->pod, 'user' => $declined]))->assertOk();
 
-        $this->assertSame('active', $this->podMembership($accepted)->status);
+        $this->assertSame(State::OUTER_CIRCLE, $this->podMembership($accepted)->state);
         $this->assertSame(['active', 1], [$this->workspaceMembership($accepted)->status, (int) $this->workspaceMembership($accepted)->is_active]);
         $this->assertEqualsCanonicalizing(['users_index', 'news_index'], $this->workspaceMembership($accepted)->getPermissionNames()->all());
 
-        $this->assertSame('declined', $this->podMembership($declined)->status);
+        $this->assertSame(State::REJECTED, $this->podMembership($declined)->state);
         $this->assertSame(['declined', 0], [$this->workspaceMembership($declined)->status, (int) $this->workspaceMembership($declined)->is_active]);
         $this->assertSame([], $this->workspaceMembership($declined)->getPermissionNames()->all(), 'no access left on a declined membership');
         $this->assertSame($this->ownWorkspaceId($declined), (int) $declined->fresh()->currant_workspace, 'current workspace moved to an accessible one');
@@ -206,7 +219,7 @@ class TransactionalMembershipTest extends TestCase
         Gate::before(fn () => true); // a decision that passed authorization before the first one committed
         $this->actingAs($this->owner)->postJson(route('pods.decline', ['pod' => $this->pod, 'user' => $applicant]))->assertStatus(409);
 
-        $this->assertSame('active', $this->podMembership($applicant)->status);
+        $this->assertSame(State::OUTER_CIRCLE, $this->podMembership($applicant)->state);
         $this->assertSame('active', $this->workspaceMembership($applicant)->status);
         $this->assertSame(0, $this->notifications('pod_request_decline_user'));
     }
@@ -219,7 +232,7 @@ class TransactionalMembershipTest extends TestCase
         $this->failOn('BEFORE INSERT', 'model_has_permissions');
         $before = $this->snapshot();
 
-        $this->assertFails(fn () => app(PodUserService::class)->updatePermissions($this->pod, $member, ['users_index', 'news_index', 'projects_index']));
+        $this->assertFails(fn () => app(PodUserService::class)->updatePermissions($this->pod, $member, ['users_index', 'news_index'], State::INNER_CIRCLE, $this->owner));
 
         $this->assertEquals($before, $this->snapshot());
         $this->assertSame(0, $this->notifications('pod_inner_circle_invite'));
@@ -229,7 +242,7 @@ class TransactionalMembershipTest extends TestCase
     {
         $member = $this->activeMember('member');
 
-        $result = app(PodUserService::class)->updatePermissions($this->pod, $member, ['projects_index']);
+        $result = app(PodUserService::class)->updatePermissions($this->pod, $member, [], State::INNER_CIRCLE, $this->owner);
 
         $this->assertSame(['notify_inner_circle'], $result->effectNames());
         $this->assertEqualsCanonicalizing(['users_index', 'news_index', 'projects_index'], $this->workspaceMembership($member)->getPermissionNames()->all(), 'outer-circle access is kept');
@@ -239,7 +252,7 @@ class TransactionalMembershipTest extends TestCase
 
         // A pending member cannot be promoted.
         $pending = $this->applicant('pending');
-        $this->assertFails(fn () => app(PodUserService::class)->updatePermissions($this->pod, $pending, ['projects_index']), 'Only active POD members can join the Inner Circle.');
+        $this->assertFails(fn () => app(PodUserService::class)->updatePermissions($this->pod, $pending, [], State::INNER_CIRCLE, $this->owner)); // not in the transition graph
         $this->assertFalse($this->workspaceMembership($pending)->hasPermissionTo('projects_index'));
     }
 
@@ -248,7 +261,7 @@ class TransactionalMembershipTest extends TestCase
         $member = $this->activeMember('member', ['projects_index', 'projects_edit', 'users_edit']);
         [$project, $task] = $this->projectWithTaskFor($member);
 
-        $result = app(PodUserService::class)->updatePermissions($this->pod, $member, ['users_edit', 'projects_edit']);
+        $result = app(PodUserService::class)->updatePermissions($this->pod, $member, ['users_edit', 'projects_edit'], State::OUTER_CIRCLE, $this->owner, 'Back to the Outer Circle');
 
         $this->assertSame([], $result->effectNames());
         // projects_edit cannot exist without projects_index; outer-circle permissions stay.
@@ -266,7 +279,7 @@ class TransactionalMembershipTest extends TestCase
         $this->failOn('BEFORE INSERT', 'model_has_permissions'); // sync: detach succeeds, re-attach fails
         $before = $this->snapshot();
 
-        $this->assertFails(fn () => app(PodUserService::class)->updatePermissions($this->pod, $member, ['users_index']));
+        $this->assertFails(fn () => app(PodUserService::class)->updatePermissions($this->pod, $member, ['users_index'], State::OUTER_CIRCLE, $this->owner, 'Back to the Outer Circle'));
 
         $this->assertEquals($before, $this->snapshot());
         $this->assertTrue($this->workspaceMembership($member)->hasPermissionTo('projects_index'));
@@ -279,7 +292,7 @@ class TransactionalMembershipTest extends TestCase
         return [
             'after task assignments changed (18)' => ['BEFORE DELETE', 'user_projects'],
             'after project membership removed (19)' => ['BEFORE DELETE', 'user_workspaces'],
-            'after workspace membership removed (20)' => ['BEFORE DELETE', 'pod_users'],
+            'after workspace membership removed (20)' => ['BEFORE INSERT', 'pod_user_state_histories'],
         ];
     }
 
@@ -318,7 +331,8 @@ class TransactionalMembershipTest extends TestCase
         $this->actingAs($member)->deleteJson(route('pods.remove', ['podId' => $this->pod->id, 'userId' => $member->id]))
             ->assertOk()->assertJsonPath('location', route('change-workspace', ['id' => $this->ownWorkspaceId($member)]));
 
-        $this->assertNull($this->podMembership($member));
+        $this->assertSame(State::REMOVED, $this->podMembership($member)->state, 'the audit row is kept');
+        $this->assertSame(1, $this->podMembership($member)->stateHistory()->where('to_state', State::REMOVED->value)->count());
         $this->assertNull($this->workspaceMembership($member));
         $this->assertSame(0, DB::table('model_has_permissions')->where('model_type', UserWorkspace::class)->where('model_id', $membershipId)->count(), 'no orphaned permissions');
         $this->assertSame(0, DB::table('model_has_roles')->where('model_type', UserWorkspace::class)->where('model_id', $membershipId)->count(), 'no orphaned roles');
@@ -335,7 +349,7 @@ class TransactionalMembershipTest extends TestCase
     public function test_removal_of_a_user_without_any_other_workspace_is_safe(): void // 24
     {
         $member = User::createWithAccountRole(['name' => 'Lonely', 'email' => 'lonely@example.test', 'email_verified_at' => now()], UserRole::EMPLOYEE);
-        PodUser::create(['user_id' => $member->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'status' => 'active']);
+        PodUser::forceCreate(['user_id' => $member->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'state' => State::OUTER_CIRCLE->value]);
         UserWorkspace::create(['user_id' => $member->id, 'workspace_id' => $this->podWorkspace->id, 'permission' => 'Member', 'status' => 'active']);
         $member->forceFill(['currant_workspace' => $this->podWorkspace->id])->save();
 
@@ -343,7 +357,7 @@ class TransactionalMembershipTest extends TestCase
             ->assertOk()->assertJsonPath('location', route('home'));
 
         $this->assertNull($member->fresh()->currant_workspace);
-        $this->assertNull($this->podMembership($member));
+        $this->assertSame(State::REMOVED, $this->podMembership($member)->state);
     }
 
     // ================================================================ workspace requests / invitations
@@ -520,7 +534,7 @@ class TransactionalMembershipTest extends TestCase
 
         $this->assertTrue($result->applied);
         $this->assertArrayHasKey('notify_owner', $result->failedEffects);
-        $this->assertSame('pod_pending', $this->podMembership($requester)->status);
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $this->podMembership($requester)->state);
     }
 
     // ================================================================ helpers
@@ -555,10 +569,12 @@ class TransactionalMembershipTest extends TestCase
         return $user;
     }
 
+    /** Active member; with projects_index they are explicitly Inner Circle (state and access agree). */
     private function activeMember(string $name, array $extraPermissions = []): User
     {
         $user = $this->registered($name, UserRole::EMPLOYEE);
-        PodUser::create(['user_id' => $user->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'status' => 'active']);
+        $state = in_array('projects_index', $extraPermissions, true) ? State::INNER_CIRCLE : State::OUTER_CIRCLE;
+        PodUser::forceCreate(['user_id' => $user->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'state' => $state->value]);
         UserWorkspace::create(['user_id' => $user->id, 'workspace_id' => $this->podWorkspace->id, 'permission' => 'Member', 'status' => 'active'])
             ->givePermissionTo(array_merge(['users_index', 'news_index'], $extraPermissions));
 
@@ -631,7 +647,7 @@ class TransactionalMembershipTest extends TestCase
     /** Every table an operation could touch, compared row by row. */
     private function snapshot(): array
     {
-        $tables = ['users', 'pod_users', 'user_workspaces', 'user_projects', 'tasks', 'model_has_permissions', 'model_has_roles', 'notifications', 'roles'];
+        $tables = ['users', 'pod_users', 'pod_user_state_histories', 'user_workspaces', 'user_projects', 'tasks', 'model_has_permissions', 'model_has_roles', 'notifications', 'roles'];
 
         return collect($tables)->mapWithKeys(fn ($table) => [
             $table => DB::table($table)->get()->map(fn ($row) => (array) $row)->sortBy(fn ($row) => json_encode($row))->values()->all(),

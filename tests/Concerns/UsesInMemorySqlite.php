@@ -173,10 +173,23 @@ trait UsesInMemorySqlite
             $t->unsignedBigInteger('user_id');
             $t->unsignedBigInteger('pod_id');
             $t->string('permission');
-            $t->string('status');
+            $t->string('state', 40); // UNA-006
             $t->text('reason')->nullable();
             $t->timestamps();
             $t->unique(['user_id', 'pod_id'], 'pod_users_user_id_pod_id_unique'); // UNA-004, as in production
+            $t->index(['pod_id', 'state'], 'pod_users_pod_id_state_index');
+            $t->index(['user_id', 'state'], 'pod_users_user_id_state_index');
+        });
+        Schema::create('pod_user_state_histories', function (Blueprint $t) { // UNA-006
+            $t->id();
+            $t->unsignedBigInteger('pod_user_id');
+            $t->string('from_state', 40)->nullable();
+            $t->string('to_state', 40);
+            $t->unsignedBigInteger('actor_id')->nullable();
+            $t->text('reason')->nullable();
+            $t->timestamp('created_at')->nullable();
+            $t->foreign('pod_user_id')->references('id')->on('pod_users')->cascadeOnDelete();
+            $t->index(['pod_user_id', 'id']);
         });
         Schema::create('plans', function (Blueprint $t) {
             $t->id();

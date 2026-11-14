@@ -125,6 +125,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pod/{pod}/users/{user}/edit-permissions', [PodUserController::class, 'editPermissions'])->name('pod.users.editPermissions');
     Route::put('/pod/{pod}/users/{user}', [PodUserController::class, 'updatePermissions'])->name('pod.users.updatePermissions');
+    Route::post('/pod/{pod}/users/{user}/state', [PodUserController::class, 'changeState'])->name('pod.users.changeState')->middleware('XSS');
 
     Route::get('/account/finances', [FinanceController::class, 'index'])->name('finances.index');
     Route::get('/account/finances/report', [FinanceController::class, 'financeReport'])->name('finances.report');

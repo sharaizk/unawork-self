@@ -110,10 +110,17 @@ class PodService
 
     protected function attachOwnerToPod(int $userId, Pod $pod): void
     {
-        PodUser::findOrCreateMembership($userId, $pod->id, [
+        // The owner starts (and stays) in the Inner Circle; this is the membership's first state.
+        $owner = PodUser::findOrCreateMembership($userId, $pod->id, [
             'permission' => 'Owner',
-            'status' => 'active',
+            'state' => \App\Enums\PodUser\State::INNER_CIRCLE->value,
         ]);
+        if ($owner->wasRecentlyCreated) {
+            \App\Models\PodUserStateHistory::query()->forceCreate([
+                'pod_user_id' => $owner->id, 'from_state' => null,
+                'to_state' => \App\Enums\PodUser\State::INNER_CIRCLE->value, 'actor_id' => $userId, 'reason' => 'POD created',
+            ]);
+        }
     }
 
     protected function createWorkspaceForPod(Pod $pod): Workspace

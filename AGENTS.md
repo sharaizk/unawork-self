@@ -119,6 +119,12 @@ Reference implementations:
   - Notifications, emails and chat invitations are effects. `AfterCommit` runs them after the commit, and only for the attempt that committed. Never call `Utility::sendNotification()`, `Mail` or `SendEmail::dispatch()` inside a membership transaction.
   - Remove a `UserWorkspace` with `->delete()` so Spatie's hooks clean up its permissions and roles; never `detach()`.
   - Use `CurrentWorkspace::reassignIfLost()` whenever access to a workspace is removed.
+- **POD membership state is explicit** (UNA-006).
+  - `pod_users.state` (`App\Enums\PodUser\State`) is the single workflow and circle source. The legacy `status` column and `PodUser\Status` enum are gone.
+  - Change it only through `App\Services\Membership\PodStateTransitionService`. It owns the graph (`State::transitions()`), the reason rules and access syncing, and appends one `pod_user_state_histories` row per change. The actor is passed explicitly.
+  - Workspace permissions follow the state (`State::accessProfile()`) and are never read to decide it. Inner Circle pages need both the `inner_circle` state and `projects_index`.
+  - Use the `PodUser` scopes (`current`, `applicants`, `activeMembers`, `outerCircle`, `innerCircle`) and `State` sets instead of string lists.
+  - Removal sets `removed` and keeps the row. `Pod::users()` and `User::pods()` hide removed memberships.
 - Roles and permissions are seeded from their enums. `DatabaseSeeder::FOUNDATION_SEEDERS` runs `RolesAndPermissionsSeeder` (every `UserRole` case) and then `PermissionsSeeder` (every `UserWorkspace\Permission` case) first, on every path. Both use the `web` guard and look records up by `name` + `guard_name`, so they are safe to rerun. To add a role or workspace permission, add an enum case and rerun `db:seed`; don't hand-write seeder lists. Workspace permissions belong to `UserWorkspace` records, never to the company/employee roles.
 
 ### 4.5 Translations

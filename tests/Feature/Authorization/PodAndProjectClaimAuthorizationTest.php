@@ -3,7 +3,7 @@
 namespace Tests\Feature\Authorization;
 
 use App\Enums\PodUser\Permission as PodUserPermission;
-use App\Enums\PodUser\Status as PodUserStatus;
+use App\Enums\PodUser\State;
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use App\Enums\UserWorkspace\Status as WorkspaceStatus;
 use App\Models\Pod;
@@ -103,16 +103,16 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
         $this->outsider = $this->makeUser('outsider');
 
         $this->pod = $this->makePod($this->owner);
-        $this->addMember($this->pod, $this->manager, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, [
+        $this->addMember($this->pod, $this->manager, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE, [
             WorkspacePermission::USERS_INDEX, WorkspacePermission::USERS_EDIT,
         ]);
-        $this->addMember($this->pod, $this->member, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, [
+        $this->addMember($this->pod, $this->member, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE, [
             WorkspacePermission::USERS_INDEX, WorkspacePermission::NEWS_INDEX,
         ]);
-        $this->addMember($this->pod, $this->applicant, PodUserStatus::POD_PENDING, WorkspaceStatus::EMPLOYEE_PENDING, [
+        $this->addMember($this->pod, $this->applicant, State::PENDING_BUSINESS_APPROVAL, WorkspaceStatus::EMPLOYEE_PENDING, [
             WorkspacePermission::USERS_INDEX,
         ]);
-        $this->addMember($this->pod, $this->invitee, PodUserStatus::EMPLOYEE_PENDING, WorkspaceStatus::EMPLOYEE_PENDING, [
+        $this->addMember($this->pod, $this->invitee, State::MATCHED, WorkspaceStatus::EMPLOYEE_PENDING, [
             WorkspacePermission::USERS_INDEX,
         ]);
     }
@@ -187,7 +187,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             ->postJson("/api/pods/{$this->pod->id}/requests/{$request->id}", ['action' => 'accept'])
             ->assertOk();
 
-        $this->assertSame(PodUserStatus::ACTIVE->value, $request->fresh()->status);
+        $this->assertSame(State::OUTER_CIRCLE, $request->fresh()->state);
     }
 
     public function test_manager_without_active_workspace_membership_is_not_a_manager(): void
@@ -236,7 +236,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
 
         // Answering someone else's invitation/request is denied and changes nothing.
         $other = $this->makeUser('other-invitee');
-        $this->addMember($this->pod, $other, PodUserStatus::EMPLOYEE_PENDING, WorkspaceStatus::EMPLOYEE_PENDING);
+        $this->addMember($this->pod, $other, State::MATCHED, WorkspaceStatus::EMPLOYEE_PENDING);
 
         $this->actingAs($this->invitee)
             ->postJson(route('pods.accept', ['pod' => $this->pod, 'user' => $other]))
@@ -245,8 +245,8 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             ->postJson(route('pods.accept', ['pod' => $this->pod, 'user' => $this->applicant]))
             ->assertForbidden();
 
-        $this->assertSame(PodUserStatus::EMPLOYEE_PENDING->value, $this->podUser($this->pod, $other)->status);
-        $this->assertSame(PodUserStatus::POD_PENDING->value, $this->podUser($this->pod, $this->applicant)->status);
+        $this->assertSame(State::MATCHED, $this->podUser($this->pod, $other)->state);
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $this->podUser($this->pod, $this->applicant)->state);
 
         // An invitee is not a manager.
         $this->assertFalse(Gate::forUser($this->invitee)->allows('manageMembers', $this->pod));
@@ -278,15 +278,15 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
         $otherPod = $this->makePod($otherOwner);
         $otherApplicant = $this->makeUser('other-applicant');
         $otherMember = $this->makeUser('other-member');
-        $this->addMember($otherPod, $otherApplicant, PodUserStatus::POD_PENDING, WorkspaceStatus::EMPLOYEE_PENDING);
-        $this->addMember($otherPod, $otherMember, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE);
+        $this->addMember($otherPod, $otherApplicant, State::PENDING_BUSINESS_APPROVAL, WorkspaceStatus::EMPLOYEE_PENDING);
+        $this->addMember($otherPod, $otherMember, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE);
         $otherRequest = $this->podUser($otherPod, $otherApplicant);
 
         // API: our POD id + another POD's request id.
         $this->actingAs($this->manager, 'sanctum')
             ->postJson("/api/pods/{$this->pod->id}/requests/{$otherRequest->id}", ['action' => 'accept'])
             ->assertForbidden();
-        $this->assertSame(PodUserStatus::POD_PENDING->value, $otherRequest->fresh()->status);
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $otherRequest->fresh()->state);
 
         // Web: accept a user who has no membership in this POD (previously created a row).
         $this->actingAs($this->owner)
@@ -315,7 +315,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
         [$project, $claim] = $this->makeProjectClaim($this->member);
 
         $projectManager = $this->makeUser('project-manager');
-        $this->addMember($this->pod, $projectManager, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, [
+        $this->addMember($this->pod, $projectManager, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE, [
             WorkspacePermission::PROJECTS_INDEX, WorkspacePermission::PROJECTS_EDIT,
         ]);
 
@@ -387,7 +387,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
         // An admin who owns a POD keeps full owner rights there.
         $adminPod = $this->makePod($admin);
         $adminMember = $this->makeUser('admin-pod-member');
-        $this->addMember($adminPod, $adminMember, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE);
+        $this->addMember($adminPod, $adminMember, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE);
         $this->assertTrue(Gate::forUser($admin)->allows('manageMembers', $adminPod));
         $this->assertTrue(Gate::forUser($admin)->allows('removeMember', [$adminPod, $adminMember]));
 
@@ -431,7 +431,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
         $api->postJson("/api/pods/{$pod->id}/requests/{$applicantRequest->id}", ['action' => 'accept'])->assertForbidden();
 
         // Nothing changed.
-        $this->assertSame(PodUserStatus::POD_PENDING->value, $applicantRequest->fresh()->status);
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, $applicantRequest->fresh()->state);
         $this->assertNotNull($this->podUser($pod, $this->manager));
         $this->assertNull($this->podUser($pod, $this->outsider));
         $this->assertSame($memberPermissions, $this->permissionsOf($pod, $this->member));
@@ -465,7 +465,7 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
 
         DB::table('pod_users')->insert([
             'user_id' => $owner->id, 'pod_id' => $pod->id,
-            'permission' => PodUserPermission::OWNER->value, 'status' => PodUserStatus::ACTIVE->value,
+            'permission' => PodUserPermission::OWNER->value, 'state' => State::INNER_CIRCLE->value,
         ]);
         $userWorkspaceId = DB::table('user_workspaces')->insertGetId([
             'user_id' => $owner->id, 'workspace_id' => $workspaceId,
@@ -476,11 +476,11 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
         return $pod;
     }
 
-    private function addMember(Pod $pod, User $user, PodUserStatus $podStatus, WorkspaceStatus $workspaceStatus, array $permissions = []): void
+    private function addMember(Pod $pod, User $user, State $podStatus, WorkspaceStatus $workspaceStatus, array $permissions = []): void
     {
         DB::table('pod_users')->insert([
             'user_id' => $user->id, 'pod_id' => $pod->id,
-            'permission' => PodUserPermission::MEMBER->value, 'status' => $podStatus->value,
+            'permission' => PodUserPermission::MEMBER->value, 'state' => $podStatus->value,
         ]);
         $userWorkspaceId = DB::table('user_workspaces')->insertGetId([
             'user_id' => $user->id, 'workspace_id' => $pod->workspace->id,
@@ -564,10 +564,23 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             $t->unsignedBigInteger('user_id');
             $t->unsignedBigInteger('pod_id');
             $t->string('permission');
-            $t->string('status');
+            $t->string('state', 40); // UNA-006
             $t->text('reason')->nullable();
             $t->timestamps();
             $t->unique(['user_id', 'pod_id'], 'pod_users_user_id_pod_id_unique'); // UNA-004, as in production
+            $t->index(['pod_id', 'state'], 'pod_users_pod_id_state_index');
+            $t->index(['user_id', 'state'], 'pod_users_user_id_state_index');
+        });
+        Schema::create('pod_user_state_histories', function (Blueprint $t) { // UNA-006
+            $t->id();
+            $t->unsignedBigInteger('pod_user_id');
+            $t->string('from_state', 40)->nullable();
+            $t->string('to_state', 40);
+            $t->unsignedBigInteger('actor_id')->nullable();
+            $t->text('reason')->nullable();
+            $t->timestamp('created_at')->nullable();
+            $t->foreign('pod_user_id')->references('id')->on('pod_users')->cascadeOnDelete();
+            $t->index(['pod_user_id', 'id']);
         });
         Schema::create('workspaces', function (Blueprint $t) {
             $t->id();

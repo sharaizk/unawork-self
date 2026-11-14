@@ -43,7 +43,8 @@ trait IsUniqueMembership
         $query = static::query();
 
         try {
-            return $query->withSavepointIfNeeded(fn () => static::query()->create($key + $values));
+            // forceCreate: $values come from internal callers only (e.g. PodUser::state is not mass assignable).
+            return $query->withSavepointIfNeeded(fn () => static::query()->forceCreate($key + $values));
         } catch (UniqueConstraintViolationException $e) {
             return static::query()->useWritePdo()->where($key)->sharedLock()->first() ?? throw $e;
         }

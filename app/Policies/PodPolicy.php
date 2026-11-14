@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Enums\PodUser\Status as PodUserStatus;
+use App\Enums\PodUser\State;
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use App\Enums\UserWorkspace\Status as WorkspaceStatus;
 use App\Models\Pod;
@@ -69,12 +69,19 @@ class PodPolicy
     //     //
     // }
 
+    /**
+     * Inner Circle pages: the explicit inner_circle state (workflow) AND project visibility
+     * (access). Neither alone is enough (UNA-006).
+     */
     public function viewInner(User $user, Pod $pod): bool
     {
-        $workspace = $pod->workspace;
-        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        $membership = $this->podMembership($pod, $user);
+        $userWorkspace = $this->workspaceMembership($user, $pod);
 
-        return $userWorkspace && $userWorkspace->hasPermissionTo('projects_index');
+        return $membership !== null
+            && $membership->state === State::INNER_CIRCLE
+            && $userWorkspace !== null
+            && $userWorkspace->checkPermissionTo(WorkspacePermission::PROJECTS_INDEX->value);
     }
 
     /*
@@ -98,9 +105,13 @@ class PodPolicy
             return true;
         }
 
-        $userWorkspace = $this->workspaceMembership($user, $pod);
+        // Applicants (to answer their own invitation) and active members; never rejected,
+        // suspended or removed members.
+        $membership = $this->podMembership($pod, $user);
 
-        return $userWorkspace !== null && $userWorkspace->status !== WorkspaceStatus::DECLINED->value;
+        return $membership !== null
+            && in_array($membership->state, [...State::applicants(), ...State::activeMembers()], true)
+            && $this->workspaceMembership($user, $pod) !== null;
     }
 
     /**
@@ -109,6 +120,21 @@ class PodPolicy
     public function manageMembers(User $user, Pod $pod): bool
     {
         return $this->hasWorkspacePermission($user, $pod, WorkspacePermission::USERS_EDIT);
+    }
+
+    /**
+     * Apply a validated state transition (screening, suspension, resumption, circle moves) to
+     * $member. Managers only; never the owner or oneself. The graph is enforced by
+     * PodStateTransitionService.
+     */
+    public function changeMemberState(User $user, Pod $pod, User $member): bool
+    {
+        if ($this->isOwner($member, $pod) || (int) $user->id === (int) $member->id) {
+            return false;
+        }
+        $membership = $this->podMembership($pod, $member);
+
+        return $membership !== null && $membership->state !== State::REMOVED && $this->manageMembers($user, $pod);
     }
 
     /**
@@ -132,7 +158,8 @@ class PodPolicy
      */
     public function removeMember(User $user, Pod $pod, User $member): bool
     {
-        if ($this->isOwner($member, $pod) || $this->podMembership($pod, $member) === null) {
+        $membership = $this->podMembership($pod, $member);
+        if ($this->isOwner($member, $pod) || $membership === null || $membership->state === State::REMOVED) {
             return false;
         }
 
@@ -144,12 +171,13 @@ class PodPolicy
     }
 
     /**
-     * View/update $member's workspace permissions, including Inner Circle
-     * promotion/demotion (projects_index). The owner's permissions are fixed.
+     * View/update $member's workspace permissions and their circle (an explicit circle_state
+     * target handled by PodStateTransitionService). The owner's membership is fixed.
      */
     public function updateMemberPermissions(User $user, Pod $pod, User $member): bool
     {
-        if ($this->isOwner($member, $pod) || $this->podMembership($pod, $member) === null) {
+        $membership = $this->podMembership($pod, $member);
+        if ($this->isOwner($member, $pod) || $membership === null || $membership->state === State::REMOVED) {
             return false;
         }
 
@@ -189,11 +217,12 @@ class PodPolicy
             return false;
         }
 
-        if ($membership->status === PodUserStatus::POD_PENDING->value) {
+        // An application is decided by a manager; an invitation only by the invited user.
+        if ($membership->state === State::PENDING_BUSINESS_APPROVAL) {
             return (int) $user->id !== (int) $member->id && $this->manageMembers($user, $pod);
         }
 
-        if ($membership->status === PodUserStatus::EMPLOYEE_PENDING->value) {
+        if ($membership->state === State::MATCHED) {
             return (int) $user->id === (int) $member->id;
         }
 
@@ -229,7 +258,12 @@ class PodPolicy
         $userWorkspace = $this->workspaceMembership($user, $pod);
 
         // checkPermissionTo() returns false (instead of throwing) for unknown permissions.
-        return $userWorkspace !== null
+        // Workflow: an active POD member. Access: an active workspace membership with the permission.
+        $membership = $this->podMembership($pod, $user);
+
+        return $membership !== null
+            && in_array($membership->state, State::activeMembers(), true)
+            && $userWorkspace !== null
             && $userWorkspace->status === WorkspaceStatus::ACTIVE->value
             && $userWorkspace->checkPermissionTo($permission->value);
     }

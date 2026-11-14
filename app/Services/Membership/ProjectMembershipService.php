@@ -79,6 +79,11 @@ class ProjectMembershipService
             $workspace = $project->workspaceData;
             $eligible = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $user->id)
                 ->where('status', WorkspaceStatus::ACTIVE->value)->lockForUpdate()->exists();
+            if ($eligible && $workspace->isPartOfPod()) {
+                // Workflow eligibility for POD projects: an Outer/Inner Circle member (UNA-006).
+                $eligible = \App\Models\PodUser::where('pod_id', $workspace->ownerable_id)->where('user_id', $user->id)
+                    ->activeMembers()->lockForUpdate()->exists();
+            }
             if (!$eligible) {
                 return MembershipResult::unchanged(null, 'not_workspace_member');
             }

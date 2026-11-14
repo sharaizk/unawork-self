@@ -84,7 +84,7 @@
 
             </div>
             <div class="members">
-                @include('pod.landing.members', ['users' => $pod->users->sortByDesc('created_at')])
+                @include('pod.landing.members', ['users' => $pod->activeUsers->sortByDesc('created_at')])
             </div>
         </div>
     </div>

@@ -54,21 +54,12 @@
                                     </td>
                                     <td>{{ $user->email }}</td>
                                     <td>
-                                        @if (isset($user->pivot->permission))
+                                        {{-- The label comes from the explicit membership state (UNA-006), never from permissions. --}}
+                                        @if (isset($user->pivot->state))
                                             @if ($user->pivot->permission == 'Owner')
                                                 <span class="badge bg-primary">{{ __($user->pivot->permission) }}</span>
-                                            @elseif ($user->pivot->status == 'active')
-                                                @if ($tUserWorkspace->hasPermissionTo('projects_index'))
-                                                    <span class="badge bg-dark">{{ __('Member Inner Circle') }}</span>
-                                                @else
-                                                    <span class="badge bg-dark">{{ __('Member Outer Circle') }}</span>
-                                                @endif
-                                            @elseif ($user->pivot->status == 'pod_pending')
-                                                <span class="badge bg-dark">{{ __('Pending Pod') }}</span>
-                                            @elseif ($user->pivot->status == 'employee_pending')
-                                                <span class="badge bg-dark">{{ __('Pending Employee') }}</span>
                                             @else
-                                                <span class="badge bg-dark">{{ __('Declined') }}</span>
+                                                <span class="badge bg-dark">{{ \App\Enums\PodUser\State::from($user->pivot->state)->label() }}</span>
                                             @endif
                                         @endif
                                     </td>
@@ -145,11 +136,11 @@
                                 @if ($user->pivot->permission == 'Owner')
                                     <span
                                         class="badge bg-primary">{{ __($user->pivot->permission) }}</span>
-                                @elseif ($user->pivot->status == 'active')
+                                @elseif ($user->pivot->state == 'outer_circle')
                                     <span class="badge bg-dark">{{ __('Member') }}</span>
-                                @elseif ($user->pivot->status == 'pod_pending')
+                                @elseif ($user->pivot->state == 'pending_business_approval')
                                     <span class="badge bg-dark">{{ __('pending pod') }}</span>
-                                @elseif ($user->pivot->status == 'employee_pending')
+                                @elseif ($user->pivot->state == 'matched')
                                     <span class="badge bg-dark">{{ __('pending employee') }}</span>
                                 @else
                                     <span class="badge bg-dark">{{ __('declined') }}</span>
@@ -159,17 +150,17 @@
                             @php
                                 $hasOptions = false;
                                 $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
-                                $isPendingUser = $user->pivot->status == 'pod_pending';
+                                $isPendingUser = $user->pivot->state == 'pending_business_approval';
                                 $isCurrentUser = $user->id == Auth::user()->id;
                                 $isChatEnabled = $adminSetting['enable_chat'] == 'on';
 
                                 // Check if there are any options to show
                                 if ($isCreatorOrHasPermission) {
-                                    if ($isPendingUser || $user->pivot->status != 'pod_pending') {
+                                    if ($isPendingUser || $user->pivot->state != 'pending_business_approval') {
                                         $hasOptions = true;
                                     }
                                 } elseif ($isCurrentUser) {
-                                    if ($isPendingUser || $user->pivot->status != 'employee_pending') {
+                                    if ($isPendingUser || $user->pivot->state != 'matched') {
                                         $hasOptions = true;
                                     }
                                 }

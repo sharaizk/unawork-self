@@ -33,7 +33,7 @@ class PodUserController extends Controller
         $settings = Utility::getAdminPaymentSetting();
         
         try {
-            $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings);
+            $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings, $request->user());
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -56,7 +56,7 @@ class PodUserController extends Controller
         $settings = Utility::getAdminPaymentSetting();
 
         try {
-            $this->podUserService->inviteNewUser($data, $podId, $settings);
+            $this->podUserService->inviteNewUser($data, $podId, $settings, $request->user());
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -124,7 +124,7 @@ class PodUserController extends Controller
         $data = $request->validated();
 
         try {
-            $result = $this->podUserService->moderateJoinRequest(PodUser::findOrFail($requestId), $data['action'], $data['reason'] ?? null);
+            $result = $this->podUserService->moderateJoinRequest(PodUser::findOrFail($requestId), $data['action'], $data['reason'] ?? null, $request->user());
 
             if (!$result->applied) {
                 return response()->json([

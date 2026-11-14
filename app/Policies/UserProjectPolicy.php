@@ -28,7 +28,9 @@ class UserProjectPolicy
     {
         $workspace = $project->workspaceData;
 
-        return $workspace !== null && $this->activeMembership($user, $workspace) !== null;
+        return $workspace !== null
+            && $this->activeMembership($user, $workspace) !== null      // access
+            && $this->activePodMemberIfPodWorkspace($user, $workspace); // workflow (UNA-006)
     }
 
     public function accept(User $user, UserProject $record): bool
@@ -61,6 +63,16 @@ class UserProjectPolicy
 
         return $membership !== null
             && $membership->checkPermissionTo(WorkspacePermission::PROJECTS_EDIT->value);
+    }
+
+    /** For a POD workspace: the user must be an Outer/Inner Circle member (explicit state). */
+    private function activePodMemberIfPodWorkspace(User $user, Workspace $workspace): bool
+    {
+        if (!$workspace->isPartOfPod()) {
+            return true;
+        }
+
+        return \App\Models\PodUser::where('pod_id', $workspace->ownerable_id)->where('user_id', $user->id)->activeMembers()->exists();
     }
 
     private function activeMembership(User $user, Workspace $workspace): ?UserWorkspace

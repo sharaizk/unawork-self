@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Membership;
 
+use App\Enums\PodUser\State;
 use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use App\Http\Controllers\ProjectController;
@@ -94,7 +95,7 @@ class MembershipWritePathsTest extends TestCase
         $this->assertBusinessError('You have already submitted a join request for this pod.', fn () => $service->requestJoinPod($requester->id, $this->pod->id));
 
         $this->assertSame(1, PodUser::where('pod_id', $this->pod->id)->where('user_id', $requester->id)->count());
-        $this->assertSame('pod_pending', PodUser::where('user_id', $requester->id)->value('status'));
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $requester->id)->value('state'));
         $this->assertSame(1, $this->notifications('pod_request', $this->owner->id));
     }
 
@@ -102,7 +103,7 @@ class MembershipWritePathsTest extends TestCase
     {
         $requester = $this->user('requester', UserRole::EMPLOYEE);
         $this->competingInsertAfterLookup('pod_users', [
-            'user_id' => $requester->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'status' => 'pod_pending',
+            'user_id' => $requester->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'state' => State::PENDING_BUSINESS_APPROVAL->value,
         ]);
 
         $this->assertBusinessError('You have already submitted a join request for this pod.', fn () => app(PodUserService::class)->requestJoinPod($requester->id, $this->pod->id));
@@ -115,15 +116,19 @@ class MembershipWritePathsTest extends TestCase
     public function test_declined_pod_membership_is_not_reactivated_and_owner_is_not_downgraded(): void
     {
         $declined = $this->user('declined', UserRole::EMPLOYEE);
-        PodUser::create(['user_id' => $declined->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'status' => 'declined', 'reason' => 'No']);
+        PodUser::forceCreate(['user_id' => $declined->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'state' => State::REJECTED->value, 'reason' => 'No']);
         $service = app(PodUserService::class);
 
+        // UNA-006 re-entry rule: a rejected member may re-apply. The SAME row moves to
+        // pending_business_approval (no duplicate, never straight back to active membership).
+        $service->requestJoinPod($declined->id, $this->pod->id);
+        $this->assertSame(1, PodUser::where('pod_id', $this->pod->id)->where('user_id', $declined->id)->count());
+        $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $declined->id)->value('state'));
         $this->assertBusinessError('You have already submitted a join request for this pod.', fn () => $service->requestJoinPod($declined->id, $this->pod->id));
-        $this->assertSame('declined', PodUser::where('user_id', $declined->id)->value('status'));
 
         $this->assertBusinessError('This user is already a member of this pod.', fn () => $service->inviteExistedUser($this->owner->id, $this->pod->id, []));
         $ownerRow = PodUser::where('pod_id', $this->pod->id)->where('user_id', $this->owner->id)->sole();
-        $this->assertSame(['Owner', 'active'], [$ownerRow->permission, $ownerRow->status]);
+        $this->assertSame(['Owner', State::INNER_CIRCLE], [$ownerRow->permission, $ownerRow->state]);
     }
 
     public function test_accepting_twice_or_concurrently_changes_and_notifies_once(): void
@@ -140,7 +145,7 @@ class MembershipWritePathsTest extends TestCase
         $this->actingAs($this->owner)->postJson(route('pods.accept', ['pod' => $this->pod, 'user' => $applicant]))->assertStatus(409);
         $this->actingAs($this->owner)->postJson(route('pods.decline', ['pod' => $this->pod, 'user' => $applicant]))->assertStatus(409);
 
-        $this->assertSame('active', PodUser::where('user_id', $applicant->id)->value('status'));
+        $this->assertSame(State::OUTER_CIRCLE, PodUser::where('user_id', $applicant->id)->value('state'));
         $this->assertSame(1, $this->notifications('pod_request_accept_user', $applicant->id));
         $this->assertSame(0, $this->notifications('pod_request_decline_user', $applicant->id));
     }
@@ -238,14 +243,14 @@ class MembershipWritePathsTest extends TestCase
     public function test_atomic_writer_returns_existing_rows_and_never_swallows_other_errors(): void
     {
         $user = $this->user('member', UserRole::EMPLOYEE);
-        $created = PodUser::findOrCreateMembership($user->id, $this->pod->id, ['permission' => 'Member', 'status' => 'pod_pending']);
+        $created = PodUser::findOrCreateMembership($user->id, $this->pod->id, ['permission' => 'Member', 'state' => State::PENDING_BUSINESS_APPROVAL->value]);
         $this->assertTrue($created->wasRecentlyCreated);
 
         // The race path: insert first, collide on the unique index, return the winner untouched.
-        $existing = PodUser::createMembershipOrReturnExisting($user->id, $this->pod->id, ['permission' => 'Owner', 'status' => 'active']);
+        $existing = PodUser::createMembershipOrReturnExisting($user->id, $this->pod->id, ['permission' => 'Owner', 'state' => State::INNER_CIRCLE->value]);
         $this->assertFalse($existing->wasRecentlyCreated);
         $this->assertSame($created->id, $existing->id);
-        $this->assertSame(['Member', 'pod_pending'], [$existing->permission, $existing->status]);
+        $this->assertSame(['Member', State::PENDING_BUSINESS_APPROVAL], [$existing->permission, $existing->state]);
 
         // Any other database error still surfaces (here: NOT NULL columns left out).
         try {
@@ -290,7 +295,7 @@ class MembershipWritePathsTest extends TestCase
     private function activePodMember(string $name): User
     {
         $user = $this->user($name, UserRole::EMPLOYEE);
-        PodUser::create(['user_id' => $user->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'status' => 'active']);
+        PodUser::forceCreate(['user_id' => $user->id, 'pod_id' => $this->pod->id, 'permission' => 'Member', 'state' => State::OUTER_CIRCLE->value]);
         UserWorkspace::create(['user_id' => $user->id, 'workspace_id' => $this->podWorkspace->id, 'permission' => 'Member', 'status' => 'active']);
 
         return $user;

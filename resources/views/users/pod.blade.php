@@ -23,23 +23,22 @@
             <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="card   text-center">
                     <div class="card-header border-0 pb-0">
+                            @php
+                                $podState = \App\Enums\PodUser\State::from($pod->pivot->state);
+                                // Rejected/suspended memberships get no actions (no workspace access).
+                                $podActionable = !in_array($podState, [\App\Enums\PodUser\State::REJECTED, \App\Enums\PodUser\State::SUSPENDED], true);
+                            @endphp
                             @if (isset($pod->pivot->permission))
                                 @if ($pod->pivot->permission == 'Owner')
                                     <span
                                         class="badge bg-primary">{{ __($pod->pivot->permission) }}</span>
-                                @elseif ($pod->pivot->status == 'active')
-                                    <span class="badge bg-dark">{{ __('Member') }}</span>
-                                @elseif ($pod->pivot->status == 'pod_pending')
-                                    <span class="badge bg-dark">{{ __('pending pod') }}</span>
-                                @elseif ($pod->pivot->status == 'employee_pending')
-                                    <span class="badge bg-dark">{{ __('pending employee') }}</span>
                                 @else
-                                    <span class="badge bg-dark">{{ __('declined') }}</span>
+                                    <span class="badge bg-dark">{{ $podState->label() }}</span>
                                 @endif
                             @endif
                         <div class="card-header-right">
                             <div class="btn-group card-option">
-                                @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
+                                @if ($podActionable)
                                 <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
                                     <i class="feather icon-more-vertical"></i>
@@ -75,7 +74,7 @@
                                             @method('DELETE')
                                         </form>
                                     @endif
-                                    @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
+                                    @if ($podActionable)
                                     <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}" class="dropdown-item" data-size="md"
                                          data-title="{{ __('Go to Pod') }}">
                                          <i class="ti ti-align-right"></i> <span>{{ __('Go to Pod') }}</span></a>
@@ -89,7 +88,7 @@
                             @if ($pod->image) src="{{ asset ('storage/'. $pod->image) }}" @else avatar="{{ $pod->title }}" @endif>
 
                         <h4 class="mt-2">
-                            @if ($pod->pivot->status != App\Enums\PodUser\Status::DECLINED->value)
+                            @if ($podActionable)
 
                             <a href="{{ route('change-workspace', ($pod->workspace) ? $pod->workspace->id : '#') }}">
                                 @endif

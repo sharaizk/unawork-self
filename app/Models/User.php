@@ -1049,10 +1049,12 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
         return $this->belongsToMany(Skill::class, 'user_skills');
     }
 
+    /** Current POD memberships (every state except removed); the pivot carries `state`. */
     public function pods()
     {
         return $this->belongsToMany(Pod::class, 'pod_users')
-                    ->withPivot('permission', 'status', 'reason')
+                    ->withPivot('id', 'permission', 'state', 'reason')
+                    ->wherePivot('state', '!=', \App\Enums\PodUser\State::REMOVED->value)
                     ->withTimestamps();
     }
 
@@ -1246,7 +1248,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
             $user = User::find($userId);
             if ($user && $user->isEmployee()) {
                 return $this->belongsToMany('App\Models\Pod', 'pod_users')
-                    ->withPivot('permission', 'status', 'reason')
+                    ->withPivot('id', 'permission', 'state', 'reason')
                     ->wherePivot('permission', 'Owner')
                     ->whereDoesntHave('users', function($query) use ($userId) {
                         $query->where('user_id', $userId);
@@ -1258,7 +1260,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
             }
         } else {
             return $this->belongsToMany('App\Models\Pod', 'pod_users')
-                ->withPivot('permission', 'status', 'reason')
+                ->withPivot('id', 'permission', 'state', 'reason')
                 ->wherePivot('permission', 'Owner')
                 ->withTimestamps()
                 ->get();

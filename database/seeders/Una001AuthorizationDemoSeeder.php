@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\PodUser\Permission as PodUserPermission;
-use App\Enums\PodUser\Status as PodUserStatus;
+use App\Enums\PodUser\State;
 use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use App\Enums\UserWorkspace\Status as WorkspaceStatus;
@@ -70,17 +70,17 @@ class Una001AuthorizationDemoSeeder extends Seeder
             $outerCircle = [WorkspacePermission::USERS_INDEX, WorkspacePermission::NEWS_INDEX];
             $innerCircle = [...$outerCircle, WorkspacePermission::PROJECTS_INDEX, WorkspacePermission::ZOOM_MEETING_INDEX];
 
-            $this->addMember($pod, $manager, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, [...$outerCircle, WorkspacePermission::USERS_EDIT]);
-            $this->addMember($pod, $projectManager, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, [...$innerCircle, WorkspacePermission::PROJECTS_EDIT]);
-            $this->addMember($pod, $member, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, $outerCircle);
-            $this->addMember($pod, $claimant, PodUserStatus::ACTIVE, WorkspaceStatus::ACTIVE, $innerCircle);
+            $this->addMember($pod, $manager, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE, [...$outerCircle, WorkspacePermission::USERS_EDIT]);
+            $this->addMember($pod, $projectManager, State::INNER_CIRCLE, WorkspaceStatus::ACTIVE, [...$innerCircle, WorkspacePermission::PROJECTS_EDIT]);
+            $this->addMember($pod, $member, State::OUTER_CIRCLE, WorkspaceStatus::ACTIVE, $outerCircle);
+            $this->addMember($pod, $claimant, State::INNER_CIRCLE, WorkspaceStatus::ACTIVE, $innerCircle);
 
             // Join request awaiting the POD (same shape as PodUserService::requestJoinPod).
-            $request = $this->addMember($pod, $applicant, PodUserStatus::POD_PENDING, WorkspaceStatus::EMPLOYEE_PENDING, $outerCircle);
+            $request = $this->addMember($pod, $applicant, State::PENDING_BUSINESS_APPROVAL, WorkspaceStatus::EMPLOYEE_PENDING, $outerCircle);
             $this->notify('pod_request', $owner->id, $request);
 
             // Invitation awaiting the employee (same shape as PodUserService::inviteExistedUser).
-            $this->addMember($pod, $invitee, PodUserStatus::EMPLOYEE_PENDING, WorkspaceStatus::EMPLOYEE_PENDING, $outerCircle);
+            $this->addMember($pod, $invitee, State::MATCHED, WorkspaceStatus::EMPLOYEE_PENDING, $outerCircle);
             $this->notify('pod_invite', $invitee->id, $pod);
 
             // Projects in the POD workspace.
@@ -102,7 +102,7 @@ class Una001AuthorizationDemoSeeder extends Seeder
                 'description' => 'Second POD for cross-POD ID substitution checks.',
                 'created_by' => $outsider->id,
             ]);
-            $otherRequest = $this->addMember($otherPod, $member, PodUserStatus::POD_PENDING, WorkspaceStatus::EMPLOYEE_PENDING, $outerCircle);
+            $otherRequest = $this->addMember($otherPod, $member, State::PENDING_BUSINESS_APPROVAL, WorkspaceStatus::EMPLOYEE_PENDING, $outerCircle);
             $this->notify('pod_request', $outsider->id, $otherRequest);
 
             $this->command?->info(sprintf(
@@ -155,14 +155,17 @@ class Una001AuthorizationDemoSeeder extends Seeder
         return $user;
     }
 
-    /** Mirrors PodUserService::attachUserToPod/attachUserToPodWorkspaces. */
-    private function addMember(Pod $pod, User $user, PodUserStatus $podStatus, WorkspaceStatus $workspaceStatus, array $permissions): PodUser
+    /** Demo membership in an explicit state (UNA-006), with its initial history row. */
+    private function addMember(Pod $pod, User $user, State $state, WorkspaceStatus $workspaceStatus, array $permissions): PodUser
     {
-        $podUser = PodUser::create([
+        $podUser = PodUser::forceCreate([
             'user_id' => $user->id,
             'pod_id' => $pod->id,
             'permission' => PodUserPermission::MEMBER->value,
-            'status' => $podStatus->value,
+            'state' => $state->value,
+        ]);
+        \App\Models\PodUserStateHistory::query()->forceCreate([
+            'pod_user_id' => $podUser->id, 'from_state' => null, 'to_state' => $state->value, 'actor_id' => null, 'reason' => 'UNA-001 demo seed',
         ]);
 
         $workspace = $pod->workspace;

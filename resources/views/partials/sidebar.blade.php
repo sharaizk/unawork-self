@@ -187,7 +187,7 @@
                                    <span class="dash-mtext">{{ __('PODs') }}</span>
                                </a>
                                @php
-                                   $pods = Auth::user()->pods()->wherePivot('status', '!=', App\Enums\PodUser\Status::DECLINED->value)->get();
+                                   $pods = Auth::user()->pods()->wherePivotNotIn('state', \App\Enums\PodUser\State::values([\App\Enums\PodUser\State::REJECTED, \App\Enums\PodUser\State::SUSPENDED]))->get();
                                @endphp
                                <ul class="dropdown-menu" aria-labelledby="podsDropdown">
                                    <li><a class="dropdown-item" href="{{ route('pods.index') }}">{{ __('All PODs') }}</a></li>
@@ -341,7 +341,8 @@
                                                 </li>
 
                                                 @if ($userWorkspace->hasPermissionTo(\App\Enums\UserWorkspace\Permission::PROJECTS_INDEX->value) || $currentWorkspace->creater->id == Auth::user()->id)
-                                                    @if($isPartOfPod)
+                                                    {{-- Circle link: explicit inner_circle state + access (PodPolicy::viewInner). --}}
+                                                    @if($isPartOfPod && Auth::user()->can('viewInner', $currentPod))
                                                         <hr>
                                                         <div class="row d-flex justify-content-center align-items-center text-center">
                                                             <a href="{{ route('landing.pods.show.inner', $pod = $currentPod->id) }}">
