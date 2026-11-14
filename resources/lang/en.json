@@ -1483,5 +1483,7 @@
     "PayHere is not configured.": "PayHere is not configured.",
     "We have not received payment confirmation from PayHere yet. Please check again in a few minutes.": "We have not received payment confirmation from PayHere yet. Please check again in a few minutes.",
     "Your payment was received but needs manual review. Please contact support.": "Your payment was received but needs manual review. Please contact support.",
-    "Payment was cancelled.": "Payment was cancelled."
+    "Payment was cancelled.": "Payment was cancelled.",
+    "Edit Permissions": "Edit Permissions",
+    "This user is not a member of this pod workspace.": "This user is not a member of this pod workspace."
 }

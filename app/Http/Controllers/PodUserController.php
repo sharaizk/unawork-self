@@ -29,8 +29,10 @@ class PodUserController extends Controller
 
     public function index(int $podId)
     {
+        $pod = Pod::findOrFail($podId);
+        $this->authorize('viewMembers', $pod);
+
         try {
-            $pod = Pod::findOrFail($podId);
             $currentWorkspace = $pod->workspace;
 
             $users = $this->podUserService->list($pod, Auth::id(), $currentWorkspace->id);
@@ -43,12 +45,17 @@ class PodUserController extends Controller
 
     public function create(int $podId)
     {
-        $pod = Pod::find($podId);
+        $pod = Pod::findOrFail($podId);
+        $this->authorize('manageMembers', $pod);
+
         return view('pod.manage.invite_form', compact('pod'));
     }
 
     public function checkUserExists(Request $request, $podId)
     {
+        $pod = Pod::findOrFail($podId);
+        $this->authorize('manageMembers', $pod);
+
         $email = $request->email;
         $registerUsers = User::where('email', '=', $email)->first();
         //$settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
@@ -98,6 +105,10 @@ class PodUserController extends Controller
 
     public function remove($podId, $userId)
     {
+        $pod = Pod::findOrFail($podId);
+        $member = User::findOrFail($userId);
+        $this->authorize('removeMember', [$pod, $member]);
+
         try {
             $this->podUserService->remove($userId, $podId);
             $location = $this->podUserService->getBackUrl(Auth::id(), $userId, $podId);
@@ -112,6 +123,8 @@ class PodUserController extends Controller
 
     public function accept(Pod $pod, User $user)
     {
+        $this->authorize('acceptMember', [$pod, $user]);
+
         $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::ACTIVE->value]]);
         $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::ACTIVE->value]);
@@ -128,6 +141,8 @@ class PodUserController extends Controller
 
     public function decline(Pod $pod, User $user)
     {
+        $this->authorize('declineMember', [$pod, $user]);
+
         $ownId = Auth::user()->id;
         $pod->users()->syncWithoutDetaching([$user->id => ['status' => Status::DECLINED->value]]);
         $pod->workspace->users()->updateExistingPivot($user->id, ['permission' => 'Member', 'is_active' => 0, 'status' => UserWorkspaceStatus::DECLINED->value]);
@@ -146,6 +161,8 @@ class PodUserController extends Controller
 
     public function editPermissions(Pod $pod, User $user)
     {
+        $this->authorize('updateMemberPermissions', [$pod, $user]);
+
         $workspace = $pod->workspace;
         $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
         $permissions = Permission::all();
@@ -155,6 +172,8 @@ class PodUserController extends Controller
 
     public function updatePermissions(Request $request, Pod $pod, User $user)
     {
+        $this->authorize('updateMemberPermissions', [$pod, $user]);
+
         $permissions = $request->input('permissions', []);
 
         try {

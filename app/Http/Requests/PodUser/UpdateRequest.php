@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\PodUser;
 
+use App\Models\Pod;
+use App\Models\PodUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -11,7 +13,10 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $pod = Pod::findOrFail($this->route('id'));
+        $joinRequest = PodUser::findOrFail($this->route('requestId'));
+
+        return $this->user()->can('moderateJoinRequest', [$pod, $joinRequest]);
     }
 
     /**

@@ -16,6 +16,9 @@ class ProjectUserController extends Controller
 {
     public function store(Project $project)
     {
+        // Only active members of the project's workspace may submit a claim (UserProjectPolicy::create).
+        $this->authorize('create', [UserProject::class, $project]);
+
         $user = Auth::user();
         $workspace = $project->workspaceData;
 
@@ -61,6 +64,8 @@ class ProjectUserController extends Controller
 
     public function accept(UserProject $record)
     {
+        $this->authorize('accept', $record);
+
         $user = $record->user;
         $project = $record->project;
         $record->update([
@@ -86,6 +91,8 @@ class ProjectUserController extends Controller
 
     public function decline(UserProject $record)
     {
+        $this->authorize('decline', $record);
+
         $user = $record->user;
         $project = $record->project;
         $record->update([

@@ -149,7 +149,7 @@
                                                     <span class="dropdown-item">Join Request Sent</span>
                                                 @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'declined')->pluck('id')->toArray()))
                                                     <span class="dropdown-item">Join Request Was Declined</span>
-                                                @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
+                                                @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()) && \Auth::user()->can('create', [\App\Models\UserProject::class, $project]))
                                                     <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item">
                                                         <span><i class="fa fa-pen-to-square"></i> Join This Project </span>
                                                     </a>

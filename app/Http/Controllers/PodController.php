@@ -161,10 +161,7 @@ class PodController extends Controller
     {
         $user = Auth::user();
         $pod = Pod::findOrFail($podId);
-
-        if ($pod->created_by !== $user->id) {
-            return redirect()->back()->with('error', __('You do not have permission to enable inner circle for this pod.'));
-        }
+        $this->authorize('toggleInnerCircle', $pod);
 
         $plan = $user->getPlan;
 
@@ -183,10 +180,7 @@ class PodController extends Controller
     public function disableInnerCircle($podId)
     {
         $pod = Pod::findOrFail($podId);
-
-        if (Auth::id() !== $pod->created_by) {
-            return redirect()->back()->with('error', __('You do not have permission to perform this action.'));
-        }
+        $this->authorize('toggleInnerCircle', $pod);
 
         $pod->inner_enabled = false;
         $pod->save();

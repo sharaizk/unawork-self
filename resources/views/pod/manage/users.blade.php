@@ -8,7 +8,7 @@
     }
     $adminSetting = App\Models\Utility::getAdminPaymentSetting();
 @endphp
-        @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
+        @can('manageMembers', $pod)
             <div class="row d-flex align-items-end">
                 <div class="col-lg-11">
                 </div>
@@ -20,7 +20,7 @@
                     </a>
                 </div>
             </div>
-        @endif
+        @endcan
 <div class="row">
     <div class="col-lg-12">
 
@@ -79,16 +79,13 @@
                                     </td>
                                     <td>
                                         @php
-                                            $hasOptions = false;
-                                            $isCreatorOrHasPermission = $pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit');
-                                            $isPendingUser = $user->pivot->status == 'pod_pending';
-                                            $isPendingEmployee = $user->pivot->status == \App\Enums\PodUser\Status::EMPLOYEE_PENDING->value;
+                                            // Visibility mirrors PodPolicy; every endpoint authorizes again server-side.
                                             $isCurrentUser = $user->id == Auth::user()->id;
                                             $isChatEnabled = $adminSetting['enable_chat'] == 'on';
-
-                                            if ($isCreatorOrHasPermission || (!$isCurrentUser && $isChatEnabled) || $isCurrentUser) {
-                                                $hasOptions = true;
-                                            }
+                                            $canRespond = Auth::user()->can('acceptMember', [$pod, $user]);
+                                            $canEditPermissions = Auth::user()->can('updateMemberPermissions', [$pod, $user]);
+                                            $canRemove = Auth::user()->can('removeMember', [$pod, $user]);
+                                            $hasOptions = $canRespond || $canEditPermissions || $canRemove || (!$isCurrentUser && $isChatEnabled);
                                         @endphp
 
                                         @if ($hasOptions)
@@ -97,31 +94,33 @@
                                                     {{ __('Actions') }}
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    @if ($isCreatorOrHasPermission)
-                                                        @if ($isPendingUser)
+                                                    @if ($canRespond)
+                                                        @if ($isCurrentUser)
+                                                            <li><a class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}">{{ __('Accept Invite') }}</a></li>
+                                                            <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline Invite') }}</a></li>
+                                                        @else
                                                             <li><a class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}">{{ __('Accept User') }}</a></li>
                                                             <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline User') }}</a></li>
-                                                        @else
+                                                        @endif
+                                                    @else
+                                                        @if ($canEditPermissions)
                                                             <li>
                                                                 <a href="#" class="dropdown-item"
                                                                         data-ajax-popup="true"
                                                                         data-size="lg"
-                                                                        data-title="Edit Permissions"
+                                                                        data-title="{{ __('Edit Permissions') }}"
                                                                         data-url="{{ route('pod.users.editPermissions', ['pod' => $pod, 'user' => $user]) }}">
                                                                     <i class="ti ti-flag"></i>
-                                                                    Edit Permissions
+                                                                    {{ __('Edit Permissions') }}
                                                                 </a>
                                                             </li>
-                                                            @if ($pod->created_by != $user->id)
+                                                        @endif
+                                                        @if ($canRemove)
+                                                            @if ($isCurrentUser)
+                                                                <li><a class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}">{{ __('Remove me from this Pod') }}</a></li>
+                                                            @else
                                                                 <li><a class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}">{{ __('Remove from Pod') }}</a></li>
                                                             @endif
-                                                        @endif
-                                                    @elseif ($isCurrentUser)
-                                                        @if ($isPendingEmployee)
-                                                            <li><a class="dropdown-item accept-user" data-url="{{ route('pods.accept', ['pod' => $pod, 'user' => $user]) }}">{{ __('Accept Invite') }}</a></li>
-                                                            <li><a class="dropdown-item decline-user" data-url="{{ route('pods.decline', ['pod' => $pod, 'user' => $user]) }}">{{ __('Decline Invite') }}</a></li>
-                                                        @else
-                                                            <li><a class="dropdown-item remove-user" data-url="{{ route('pods.remove', ['podId' => $pod->id, 'userId' => $user->id]) }}">{{ __('Remove me from this Pod') }}</a></li>
                                                         @endif
                                                     @endif
                                                     @if (!$isCurrentUser && $isChatEnabled)
@@ -276,7 +275,7 @@
             </div> -->
         @endforeach
 
-        @if ($pod->created_by == Auth::user()->id || $userWorkspace->hasPermissionTo('users_edit'))
+        @can('manageMembers', $pod)
         <!-- <div class="col-xl-3 col-lg-4 col-sm-6">
             <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
                 data-title="{{ __('Invite New User') }}" data-url="{{ route('pods.invite', $podId=$pod->id) }}"
@@ -288,7 +287,7 @@
                 <p class="text-muted text-center">{{__('Click here to invite New User')}}</p>
             </a>
         </div> -->
-        @endif
+        @endcan
 
     <div class="modal" tabindex="-1" role="dialog" id="sendMessagePopup">
         <div class="modal-dialog modal-dialog-centered" role="document">

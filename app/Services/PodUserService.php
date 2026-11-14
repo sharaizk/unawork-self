@@ -23,17 +23,13 @@ class PodUserService
 {
     public function updatePermissions(Pod $pod, User $user, array $permissions): bool
     {
+        // Authorization is enforced by PodPolicy::updateMemberPermissions in the controller.
         $workspace = $pod->workspace;
 
-        // policies 
-        $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
-        $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
-
-        if (!$userWorkspaceEditor->hasPermissionTo(UserWorkspacePermission::USERS_EDIT->value) && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value) {
-            throw new \Exception(__('You do not have permission for this!'));
-        }
-
         $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
+        if (!$userWorkspace) {
+            throw new \Exception(__('This user is not a member of this pod workspace.'));
+        }
         $oldPermissions = $userWorkspace->getPermissionNames()->toArray();
 
         $userWorkspace->syncPermissions($permissions);

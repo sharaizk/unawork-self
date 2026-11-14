@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\PodUser;
 
+use App\Models\Pod;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InviteNewUserRequest extends FormRequest
@@ -11,7 +12,9 @@ class InviteNewUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $pod = Pod::findOrFail($this->route('id'));
+
+        return $this->user()->can('manageMembers', $pod);
     }
 
     /**

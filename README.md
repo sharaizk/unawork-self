@@ -49,8 +49,6 @@ PHP 8.3 is installed as a versioned, keg-only formula, so it does not need to re
 Select it explicitly for the current terminal:
 
 ```bash
-cd "/Volumes/Work Drive/Knoxx Labs/brooke/unawork"
-
 export UNAWORK_PHP="$(brew --prefix php@8.3)/bin/php"
 export UNAWORK_COMPOSER="$(command -v composer)"
 ```

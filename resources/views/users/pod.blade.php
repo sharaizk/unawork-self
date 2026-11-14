@@ -47,6 +47,7 @@
                                 @endif
                                 <div class="dropdown-menu dropdown-menu-end">
                                     @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
+                                        @can('toggleInnerCircle', $pod)
                                         @if (!$pod->inner_enabled)
                                             <a href="{{ route('pods.enableInnerCircle', $pod->id) }}" class="dropdown-item">
                                                 <i class="ti ti-toggle-on"></i> <span>{{ __('Enable Inner Circle') }}</span>
@@ -56,6 +57,7 @@
                                                 <i class="ti ti-toggle-off"></i> <span>{{ __('Disable Inner Circle') }}</span>
                                             </a>
                                         @endif
+                                        @endcan
                                         <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md"
                                             data-title="{{ __('Edit') }}"
                                             data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i
@@ -106,7 +108,7 @@
                             @endforeach
                         </small>
                         <!-- Toggle Switch for Inner Circle -->
-                        @if (isset($pod->pivot->permission) && $pod->pivot->permission == 'Owner')
+                        @can('toggleInnerCircle', $pod)
                             <a href="{{ $pod->inner_enabled ? route('pods.disableInnerCircle', $pod->id) : route('pods.enableInnerCircle', $pod->id) }}"
                                class="form-check form-switch d-flex align-items-center mt-2 text-decoration-none">
                                 <input class="form-check-input" type="checkbox" id="toggle-inner-{{ $pod->id }}"
@@ -115,7 +117,7 @@
                                     {{ __('Inner Circle') }}
                                 </label>
                             </a>
-                        @endif
+                        @endcan
                     </div>
                 </div>
             </div>

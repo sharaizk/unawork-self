@@ -242,6 +242,9 @@ There is no frontend test suite, and backend tests are not DB-isolated (see sect
    - test both an owner and a non-owner/permissioned member, and the client guard if relevant
    - check RTL and dark mode if you changed layout CSS
 4. For migrations, run them only against a local or disposable database.
+   - The migrations are MySQL-specific and fail on SQLite (`create_zoom_meetings_table`). For DB-backed tests, copy `tests/Feature/Authorization/PodAndProjectClaimAuthorizationTest.php`: it forces in-memory SQLite before boot, refuses to run otherwise, and builds only the tables it needs. Run it with `DB_CONNECTION=sqlite DB_DATABASE=:memory: vendor/bin/phpunit <path>`.
+   - POD membership and project-claim authorization lives in `PodPolicy` (`viewMembers`, `manageMembers`, `acceptMember`, `declineMember`, `removeMember`, `updateMemberPermissions`, `toggleInnerCircle`, `requestToJoin`, `moderateJoinRequest`) and `UserProjectPolicy` (`create`, `accept`, `decline`). Reuse these abilities rather than re-checking `created_by` / `users_edit` inline.
+   - For manual testing of those abilities, `database/seeders/Una001AuthorizationDemoSeeder.php` creates `una001.*@example.test` users, a demo POD in every membership state, a pending project request and a second POD. It is local-only (refuses unless `APP_ENV=local`) and is not called by `DatabaseSeeder`.
 5. In your summary, state what you verified and what you could not.
 
 ---
