@@ -68,13 +68,7 @@ class WorkspaceController extends Controller
                     ]
                 );
 
-                UserWorkspace::create(
-                    [
-                        'user_id' => $objUser->id,
-                        'workspace_id' => $objWorkspace->id,
-                        'permission' => 'Owner',
-                    ]
-                );
+                UserWorkspace::findOrCreateMembership($objUser->id, $objWorkspace->id, ['permission' => 'Owner']);
 
                 $objUser->currant_workspace = $objWorkspace->id;
                 $objUser->save();
@@ -256,7 +250,7 @@ class WorkspaceController extends Controller
             $objUser->currant_workspace = $workspaceID;
             $objUser->save();
 
-            if (Auth::user()->getGuard() == 'client') {
+            if (Auth::user()->isClient()) {
 
                 return redirect()->route('client.home')->with('success', __('Workspace Changed Successfully!'));
             } else {
@@ -317,7 +311,7 @@ class WorkspaceController extends Controller
     public function langWorkspace($currantLang = '')
     {
         $objUser = Auth::user();
-        if ($objUser->type == 'admin') {
+        if ($objUser->isAdministrator()) {
 
             $languages = \App\Models\Languages::pluck('lang_fullname', 'lang_code');
             $settings = \App\Models\Utility::getAdminPaymentSetting();
@@ -366,7 +360,7 @@ class WorkspaceController extends Controller
     public function storeLangDataWorkspace($currantLang, Request $request)
     {
         $objUser = Auth::user();
-        if ($objUser->type == 'admin') {
+        if ($objUser->isAdministrator()) {
             $dir = base_path() . '/resources/lang';
             $jsonFile = $dir . "/" . $currantLang . ".json";
 
@@ -406,7 +400,7 @@ class WorkspaceController extends Controller
     public function createLangWorkspace()
     {
         $objUser = Auth::user();
-        if ($objUser->type == 'admin') {
+        if ($objUser->isAdministrator()) {
             return view('lang.create');
         } else {
             redirect()->route('home');
@@ -434,7 +428,7 @@ class WorkspaceController extends Controller
         $newlang->save();
 
         $objUser = Auth::user();
-        if ($objUser->type == 'admin') {
+        if ($objUser->isAdministrator()) {
 
             $Filesystem = new Filesystem();
             $langCode = strtolower($request->lang_code);
@@ -1552,7 +1546,7 @@ class WorkspaceController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $created_by = $currentWorkspace->id;
 
-        if ($user->type == 'user') {
+        if ($user->isRegularUser()) {
             $rules = [
                 'mail_driver' => 'required|string|max:50',
                 'mail_host' => 'required|string|max:50',

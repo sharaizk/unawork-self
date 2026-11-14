@@ -41,7 +41,7 @@
 @endsection
 
 @php
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 @section('content')
     <div class="row">
@@ -362,7 +362,7 @@
 
                 <div class="col-sm-12 mt-3 mb-1 row d-sm-flex align-items-center justify-content-end" id="show_filter">
                     <div class="row m-0">
-                        @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                        @if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient())
                             <div class="col-sm-6 col-md-2 p-0">
                                 <select class="select form-select" name="all_users" id="all_users">
                                     <option value="">{{ __('All Users') }}</option>
@@ -424,7 +424,7 @@
                                                 <th>{{ __('Milestone') }}</th>
                                                 <th>{{ __('Start Date') }}</th>
                                                 <th>{{ __('Due Date') }}</th>
-                                                @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                                                @if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient())
                                                     <th>{{ __('Assigned to') }}</th>
                                                 @endif
                                                 <th> {{ __('Total Logged Hours') }}</th>

@@ -18,7 +18,7 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-@if (Auth::user()->type !== 'admin')
+@if (!Auth::user()->isAdministrator())
 <script src="{{ asset('js/chatify/code.js') }}"></script>
 <script src="{{ asset('js/chatify/invite.js') }}"></script>
 <script src="{{ asset('js/chatify/create-chat.js') }}"></script>

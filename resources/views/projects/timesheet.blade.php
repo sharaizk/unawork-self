@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @php
   
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 @section('page-title') {{__('Timesheet')}} @endsection
 @section('links')
@@ -28,7 +28,7 @@
 @section('action-button')
 <div class="d-flex justify-content-end row1">
         @if(isset($currentWorkspace) && $currentWorkspace)
-        @if($project_id != '-1' && Auth::user()->getGuard() != 'client')
+        @if($project_id != '-1' && !Auth::user()->isClient())
             <div class="form-group col-sm-auto mx-2">
                 {{-- <button class="btn btn-success w-100"> <i data-feather="plus-circle" class="me-2"></i> Add Task on Timesheet</button> --}}
                 {{-- <select class="btn btn-success w-100" id="project_tasks"> --}}
@@ -83,7 +83,7 @@
                                         <p class="text-muted mt-3">
                                             {{ __("Sorry we can't find any timesheet records on this week.") }}
                                             <br>
-                                            @if($project_id != '-1' && Auth::user()->getGuard() != 'client')
+                                            @if($project_id != '-1' && !Auth::user()->isClient())
                                                 {{ __('To add record go to ') }} <b>{{ __('Add Task on Timesheet.') }}</b>
                                             @else
                                                 {{ __('To add timesheet record go to ') }}
@@ -120,7 +120,7 @@
             };
 
             $.ajax({
-                @if(Auth::user()->getGuard() == 'client')
+                @if(Auth::user()->isClient())
                 url: '{{ route('client.filter.timesheet.table.view', '__slug') }}'.replace('__slug', '{{ $currentWorkspace->slug }}'),
                 @else
                 url: '{{ route('filter.timesheet.table.view', '__slug') }}'.replace('__slug', '{{ $currentWorkspace->slug }}'),

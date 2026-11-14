@@ -10,14 +10,16 @@
             </form>
         @else
             @php
-                $pivot = $pod->currentUserPivot()?->status;
+                $podState = \App\Enums\PodUser\State::tryFrom((string) $pod->currentUserPivot()?->state);
             @endphp
-            @if($pivot == \App\Enums\PodUser\Status::DECLINED->value)
+            @if($podState === \App\Enums\PodUser\State::REJECTED)
                 <button type="submit" class="pod-join btn btn-primary" disabled>DECLINED</button>
-            @elseif($pivot == \App\Enums\PodUser\Status::POD_PENDING->value || $pivot == \App\Enums\PodUser\Status::EMPLOYEE_PENDING->value)
+            @elseif(in_array($podState, \App\Enums\PodUser\State::applicants(), true))
                 <button type="submit" class="pod-join btn btn-primary" disabled>Sent</button>
-            @elseif($pivot == \App\Enums\PodUser\Status::ACTIVE->value)
+            @elseif(in_array($podState, \App\Enums\PodUser\State::activeMembers(), true))
                 <button type="submit" class="pod-join btn btn-primary" disabled>Joined</button>
+            @elseif($podState === \App\Enums\PodUser\State::SUSPENDED)
+                <button type="submit" class="pod-join btn btn-primary" disabled>{{ $podState->label() }}</button>
             @endif
         @endif
     </div>

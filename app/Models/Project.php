@@ -139,7 +139,7 @@ class Project extends Model
             $objUser         = User::where('id', $currentWorkspace->created_by)->first();
         }
 
-        if ($objUser->getGuard() != 'client') {
+        if (!$objUser->isClient()) {
 
             $permission =  UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $objUser->currant_workspace)->first()->permission;
 
@@ -159,7 +159,7 @@ class Project extends Model
         if ($project_id == '-1') {
             $allProjects = true;
 
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $project_timesheets = Timesheet::select('timesheets.*')->join('projects', 'projects.id', '=', 'timesheets.project_id')->join('tasks', 'tasks.id', '=', 'timesheets.task_id')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('client_projects.permission', 'LIKE', '%show timesheet%');
             } elseif ($currentWorkspace->permission == 'Owner') {
                 $project_timesheets = Timesheet::select('timesheets.*')->join('projects', 'projects.id', '=', 'timesheets.project_id')->join('tasks', 'tasks.id', '=', 'timesheets.task_id')->where('projects.workspace', '=', $currentWorkspace->id);
@@ -309,7 +309,7 @@ class Project extends Model
         foreach ($days['datePeriod'] as $key => $date) {
             $dateperioddate = $date->format('Y-m-d');
 
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $new_projects_timesheet = Timesheet::select('timesheets.*')->join('projects', 'projects.id', '=', 'timesheets.project_id')->join('tasks', 'tasks.id', '=', 'timesheets.task_id')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('client_projects.permission', 'LIKE', '%show timesheet%');
             } elseif ($currentWorkspace->permission == 'Owner') {
                 $new_projects_timesheet = Timesheet::select('timesheets.*')->join('projects', 'projects.id', '=', 'timesheets.project_id')->join('tasks', 'tasks.id', '=', 'timesheets.task_id')->where('projects.workspace', '=', $currentWorkspace->id);

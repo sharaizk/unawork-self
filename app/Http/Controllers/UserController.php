@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Membership\MembershipResult;
+use App\Services\Membership\WorkspaceMembershipService;
 use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Status;
 use App\Models\ActivityLog;
@@ -269,13 +271,9 @@ class UserController extends Controller
             $users = $users->get();
         } else {
             // $users = User::where('type', '!=', 'admin')->with('getPlan')->get();
-            $users = User::where('type', '!=', 'admin')
-                ->where([
-                    ['type', '=', 'user'],
-                    ['plan', '!=', 'NULL'],
-
-                ])
-                ->role(UserRole::COMPANY->value)
+            // Identity comes from the canonical scope; the plan clause is the existing list filter.
+            $users = User::companies()
+                ->where('plan', '!=', 'NULL')
                 ->with('getPlan')
                 ->get();
         }
@@ -285,13 +283,9 @@ class UserController extends Controller
     public function employeeList($slug = null)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        $users = User::where('type', '!=', 'admin')
-                ->where([
-                    ['type', '=', 'user'],
-                    ['plan', '!=', 'NULL'],
-
-                ])
-                ->role(UserRole::EMPLOYEE->value)
+        // Identity comes from the canonical scope; the plan clause is the existing list filter.
+        $users = User::employees()
+                ->where('plan', '!=', 'NULL')
                 ->with('getPlan')
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -316,6 +310,9 @@ class UserController extends Controller
 
     public function import(Request $request)
     {
+        // "Import Companies" is an administrator tool (the button only renders for admins).
+        abort_unless(Auth::user() && Auth::user()->isAdministrator(), 403);
+
         $rules = [
             'file' => 'required|mimes:csv,txt',
         ];
@@ -334,8 +331,24 @@ class UserController extends Controller
 
 
 
+        // Validate every row before writing anything. Column 4 is the account type: only the
+        // company/employee personas can be imported; blank or the legacy value "user" means
+        // company (this is the "Import Companies" tool). Administrators are never modified.
+        $accountRoles = [];
+        for ($i = 1; $i <= count($Users) - 1; $i++) {
+            $accountRole = self::importAccountRole($Users[$i][3] ?? null);
+            if (!$accountRole) {
+                return redirect()->back()->with('error', __('Row :row: invalid account type ":type". Use "company" or "employee".', ['row' => $i + 1, 'type' => (string) ($Users[$i][3] ?? '')]));
+            }
+            if (User::administrators()->where('email', $Users[$i][1] ?? null)->exists()) {
+                return redirect()->back()->with('error', __('Row :row: administrator accounts cannot be changed by import.', ['row' => $i + 1]));
+            }
+            $accountRoles[$i] = $accountRole;
+        }
+
         for ($i = 1; $i <= count($Users) - 1; $i++) {
             $user = $Users[$i];
+            $accountRole = $accountRoles[$i];
             $userByEmail = User::where('email', $user[1])->first();
 
 
@@ -349,11 +362,10 @@ class UserController extends Controller
             $userData->name = $user[0];
             $userData->email = $user[1];
             $userData->password = Hash::make($user[2]);
-            $userData->type = $user[3];
             $userData->email_verified_at = date('Y-m-d H:i:s');
 
 
-            if ((Auth::user()->type == 'admin')) {
+            if (Auth::user()->isAdministrator()) {
 
                 $userData->assignPlan(1, 'monthly');
             }
@@ -361,7 +373,8 @@ class UserController extends Controller
             if (empty($userData)) {
                 $errorArray[] = $userData;
             } else {
-                $userData->save();
+                // Saves the row with users.type = user and exactly the imported persona role.
+                $userData->assignAccountRole($accountRole);
             }
 
             // $objWorkspace = new Workspace();
@@ -393,16 +406,7 @@ class UserController extends Controller
             $userData->currant_workspace = $objWorkspace->id;
             $userData->save();
 
-            $userWorkspace = new UserWorkspace();
-            $userWorkspace->user_id = $userData->id;
-            $userWorkspace->workspace_id = $objWorkspace->id;
-            $userWorkspace->permission = 'Owner';
-
-            if (empty($userWorkspace)) {
-                $errorArray[] = $userWorkspace;
-            } else {
-                $userWorkspace->save();
-            }
+            UserWorkspace::findOrCreateMembership($userData->id, $objWorkspace->id, ['permission' => 'Owner']);
 
             User::userDefaultDataRegister($userData);
         }
@@ -427,9 +431,21 @@ class UserController extends Controller
         return redirect()->back()->with($data['status'], $data['msg']);
     }
 
+    /** Normalize the CSV account-type column; null means invalid/ambiguous. */
+    private static function importAccountRole($value): ?UserRole
+    {
+        $value = strtolower(trim((string) $value));
+
+        return match ($value) {
+            '', 'user', UserRole::COMPANY->value => UserRole::COMPANY,
+            UserRole::EMPLOYEE->value => UserRole::EMPLOYEE,
+            default => null,
+        };
+    }
+
     public function create(Request $request)
     {
-        if (Auth::user()->type == 'admin') {
+        if (Auth::user()->isAdministrator()) {
             return view('users.create');
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -438,7 +454,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        if (Auth::user()->type == 'admin') {
+        if (Auth::user()->isAdministrator()) {
             $validation = [
                 'name' => [
                     'required',
@@ -481,7 +497,8 @@ class UserController extends Controller
             do {
                 $code = rand(100000, 999999);
             } while (DB::table('users')->where('referral_code', $code)->exists());
-            $objUser = User::create(
+            // Administrator "Create Company": always a company account.
+            $objUser = User::createWithAccountRole(
                 [
                     'name' => $request->name,
                     'email' => $request->email,
@@ -490,7 +507,8 @@ class UserController extends Controller
                     'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
                     'is_enable_login' => $passwordSwitch,
                     'referral_code' => $code
-                ]
+                ],
+                UserRole::COMPANY
             );
             // dd($objUser);
             $assignPlan = $objUser->assignPlan(1);
@@ -518,13 +536,7 @@ class UserController extends Controller
             $objWorkspace->ownerable()->associate($objUser);
             $objUser->save();
 
-            UserWorkspace::create(
-                [
-                    'user_id' => $objUser->id,
-                    'workspace_id' => $objWorkspace->id,
-                    'permission' => 'Owner',
-                ]
-            );
+            UserWorkspace::findOrCreateMembership($objUser->id, $objWorkspace->id, ['permission' => 'Owner']);
 
             $emailTemplate = EmailTemplate::all();
 
@@ -614,7 +626,7 @@ class UserController extends Controller
         }
 
         $objUser->name = $request->name;
-        if ($objUser->hasRole('employee')) {
+        if ($objUser->isEmployee()) {
             try {
                 $employeeWorkspace = Workspace::where('created_by', $objUser->id)
                     ->where('ownerable_type', '!=', 'App\Models\Pod')
@@ -636,7 +648,7 @@ class UserController extends Controller
             // {
             //  \File::delete($logo.$objUser->avatar);
             // }
-            if ($objUser->type != 'admin') {
+            if (!$objUser->isAdministrator()) {
 
                 $image_size = $request->file('avatar')->getSize();
                 $result = 1;
@@ -734,7 +746,7 @@ class UserController extends Controller
     public function changePlan($user_id)
     {
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $plans = Plan::where('is_plan_enable', 1)->get();
             $user = User::find($user_id);
 
@@ -747,7 +759,7 @@ class UserController extends Controller
     public function updatePlan(Request $request, $user_id)
     {
         $user = Auth::user();
-        if ($user->type == 'admin') {
+        if ($user->isAdministrator()) {
             $objUser = User::find($user_id);
             $plan = Plan::find($request->plan);
 
@@ -787,7 +799,7 @@ class UserController extends Controller
     public function resetPassword($user_id)
     {
         $user = Auth::user();
-        if ($user->type == 'admin' || $user->type == 'user') {
+        if ($user->isAdministrator() || $user->isRegularUser()) {
             return view('users.reset_password', compact('user_id'));
         } else {
             return redirect()->back()->with('error', __('Some Thing Is Wrong!'));
@@ -797,7 +809,7 @@ class UserController extends Controller
     public function changePassword($id, Request $request)
     {
         $user = Auth::user();
-        if ($user->type == 'admin' || $user->type == 'user') {
+        if ($user->isAdministrator() || $user->isRegularUser()) {
             // $request->validate(
             //     [
             //         'password' => 'required|same:password_confirmation',
@@ -942,7 +954,8 @@ class UserController extends Controller
                     $arrUser['email_verified_at'] = $verify;
                     $arrUser['lang'] = $currentWorkspace->lang;
                     $arrUser['is_enable_login'] = $passwordSwitch;
-                    $registerUsers = User::create($arrUser);
+                    // Accounts generated by a workspace invitation are employees.
+                    $registerUsers = User::createWithAccountRole($arrUser, UserRole::EMPLOYEE);
                     $registerUsers->password = $request->userpassword;
                     // $assignPlan = $registerUsers->assignPlan(1);
 
@@ -981,23 +994,10 @@ class UserController extends Controller
             }
         }
 
-        // assign workspace first
-        $is_assigned = false;
-        foreach ($registerUsers->workspace as $workspace) {
-            if ($workspace->id == $currentWorkspace->id) {
-                $is_assigned = true;
-            }
-        }
+        // assign workspace first (atomic; the invitation mail goes out only for a new membership)
+        $membership = UserWorkspace::findOrCreateMembership($registerUsers->id, $currentWorkspace->id, ['permission' => 'Member']);
 
-        if (!$is_assigned) {
-            UserWorkspace::create(
-                [
-                    'user_id' => $registerUsers->id,
-                    'workspace_id' => $currentWorkspace->id,
-                    'permission' => 'Member',
-                ]
-            );
-
+        if ($membership->wasRecentlyCreated) {
             try {
                 Mail::to($registerUsers->email)->send(new SendWorkspaceInvication($registerUsers, $currentWorkspace));
             } catch (\Exception $e) {
@@ -1077,7 +1077,7 @@ class UserController extends Controller
                 $users->where('user_workspaces.workspace_id', '=', $currentWorkspace->id)->where('users.id', '!=', $objUser->id);
                 $users = $users->get();
             } else {
-                $users = User::where('type', '!=', 'admin')->get();
+                $users = User::nonAdministrators()->get();
             }
 
             return view('chats.index', compact('currentWorkspace', 'users'));
@@ -1282,7 +1282,7 @@ class UserController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $authuser = Auth::user();
         $authusername = User::where('id', '=', $authuser->id)->first();
-        $superAdminEmails = User::where('type', '=', 'admin')->pluck('email')->toArray();
+        $superAdminEmails = User::administrators()->pluck('email')->toArray();
         $setting = Utility::fetchAdminPaymentSetting();
 
         $plan = $authuser->getPlan;
@@ -1322,18 +1322,14 @@ class UserController extends Controller
         ];
 
         if (!empty($registerUsers)) {
-            // Check if the user is already assigned to the current workspace
-            $is_assigned = UserWorkspace::where('user_id', $registerUsers->id)
-                ->where('workspace_id', $currentWorkspace->id)
-                ->exists();
+            // Atomic: an existing membership (any status) is never reset; repeats and racing
+            // invitations get the "already a member" response and no duplicate side effects.
+            $userWorkspace = UserWorkspace::findOrCreateMembership($registerUsers->id, $currentWorkspace->id, [
+                'permission' => 'Member',
+                'status' => Status::EMPLOYEE_PENDING->value,
+            ]);
 
-            if (!$is_assigned) {
-                $userWorkspace = UserWorkspace::create([
-                    'user_id' => $registerUsers->id,
-                    'workspace_id' => $currentWorkspace->id,
-                    'permission' => 'Member',
-                    'status' => Status::EMPLOYEE_PENDING->value,
-                ]);
+            if ($userWorkspace->wasRecentlyCreated) {
                 $userWorkspace->refresh();
                 $userWorkspace->syncPermissions(['users_index', 'projects_index']);
 
@@ -1379,18 +1375,13 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        // Check if the user is already assigned to the current workspace
-        $is_assigned = UserWorkspace::where('user_id', $user->id)
-            ->where('workspace_id', $workspace->id)
-            ->exists();
+        // Atomic: one request per user and workspace; repeats get the existing-member response.
+        $userWorkspace = UserWorkspace::findOrCreateMembership($user->id, $workspace->id, [
+            'permission' => 'Member',
+            'status' => Status::WORKSPACE_PENDING->value,
+        ]);
 
-        if (!$is_assigned) {
-            $userWorkspace = UserWorkspace::create([
-                'user_id' => $user->id,
-                'workspace_id' => $workspace->id,
-                'permission' => 'Member',
-                'status' => Status::WORKSPACE_PENDING->value,
-            ]);
+        if ($userWorkspace->wasRecentlyCreated) {
             $userWorkspace->refresh();
 
             $workspace_name = Workspace::where('id', $user->currant_workspace)->first();
@@ -1406,120 +1397,57 @@ class UserController extends Controller
 
     public function acceptRequest(UserWorkspace $userWorkspace)
     {
-        $user = $userWorkspace->user;
-        $workspace = $userWorkspace->workspace;
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+        // Only the workspace owner or a users_edit manager, never the requester (UserWorkspacePolicy).
+        $this->authorize('acceptJoinRequest', $userWorkspace);
 
-        if ($isUserInWorkspace) {
-            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
-
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', Auth::user()->id)
-                ->where('type', 'workspace_join')
-                ->first();
-            if ($notification) {
-                $notification->is_read = 1;
-                $notification->update();
-            }
-
-            Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
-
-            return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to active'));
-        } else {
-            return response()->json(['error' => 'User not found in workspace'], 404);
+        // Status, notification state and access change together; resolved exactly once (UNA-005).
+        $result = app(WorkspaceMembershipService::class)->acceptJoinRequest($userWorkspace);
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
         }
+
+        return redirect()->route('users.index', ['slug' => $userWorkspace->workspace->slug])->with('success', __('User status updated to active'));
     }
 
     public function declineRequest(UserWorkspace $userWorkspace)
     {
-        $user = $userWorkspace->user;
-        $workspace = $userWorkspace->workspace;
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+        $this->authorize('declineJoinRequest', $userWorkspace);
 
-        if ($isUserInWorkspace) {
-            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::DECLINED->value]);
-
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', Auth::user()->id)
-                ->where('type', 'workspace_join')
-                ->first();
-            if ($notification) {
-                $notification->is_read = 1;
-                $notification->update();
-            }
-
-            Utility::sendNotification('workspace_request_decline_user', null, $user->id, $userWorkspace);
-
-            return redirect()->route('users.index', ['slug' => $workspace->slug ])->with('success', __('User status updated to declined'));
-        } else {
-            return response()->json(['error' => 'User not found in workspace'], 404);
+        $result = app(WorkspaceMembershipService::class)->declineJoinRequest($userWorkspace);
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
         }
+
+        return redirect()->route('users.index', ['slug' => $userWorkspace->workspace->slug])->with('success', __('User status updated to declined'));
     }
 
     public function acceptInvite(Request $request, Workspace $workspace)
     {
-        $user = Auth::user();
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
-
-        if ($isUserInWorkspace) {
-            $workspace->users()->updateExistingPivot($user->id, ['status' => Status::ACTIVE->value]);
-
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', $user->id)
-                ->where('type', 'workspace_invite')
-                ->first();
-            if ($notification) {
-                $notification->delete();
-            }
-
-            Utility::sendNotification('workspace_request_accept_owner', null, $workspace->created_by, $userWorkspace);
-            Utility::sendNotification('workspace_request_accept_user', null, $user->id, $userWorkspace);
-
-            return redirect()->back()->with('success', __('User status updated to active'));
-        } else {
-            return response()->json(['error' => 'User not found in workspace'], 404);
+        $result = app(WorkspaceMembershipService::class)->acceptInvitation($workspace, Auth::user());
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
         }
+
+        return redirect()->back()->with('success', __('User status updated to active'));
     }
 
     public function declineInvite(Request $request, Workspace $workspace)
     {
-        $user = Auth::user();
-        $isUserInWorkspace = $workspace->users()->where('user_id', $user->id)->exists();
+        $result = app(WorkspaceMembershipService::class)->declineInvitation($workspace, Auth::user());
+        if (!$result->applied) {
+            return $this->workspaceMembershipNotApplied($result);
+        }
 
-        if ($isUserInWorkspace) {
+        return redirect()->back()->with('success', __('You declined workspace invite successfully'));
+    }
 
-            $userWorkspace = DB::table('user_workspaces')
-                ->where('workspace_id', $workspace->id)
-                ->where('user_id', $user->id)
-                ->first();
-            $notification = Notification::where('related_id', $userWorkspace->id)
-                ->where('user_id', $user->id)
-                ->where('type', 'workspace_invite')
-                ->first();
-            if ($notification) {
-                $notification->delete();
-            }
-
-            Utility::sendNotification('workspace_request_decline_owner', null, $workspace->created_by, $userWorkspace);
-
-            $workspace->users()->detach($user->id);
-
-            return redirect()->back()->with('success', __('You declined workspace invite successfully'));
-        } else {
+    private function workspaceMembershipNotApplied(MembershipResult $result)
+    {
+        if ($result->reason === 'not_member') {
             return response()->json(['error' => 'User not found in workspace'], 404);
         }
+
+        return redirect()->back()->with('error', __('This membership request has already been handled.'));
     }
 
     public function manuallyActivatePlan(Request $request, $user_id, $plan_id, $duration)

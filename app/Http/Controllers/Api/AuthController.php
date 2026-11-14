@@ -24,13 +24,12 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user = User::create([
+        // API sign-up always creates employees.
+        $user = User::createWithAccountRole([
             'name'      => $request->name,
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
-        ]);
-
-        $user->assignRole(UserRole::EMPLOYEE->value);
+        ], UserRole::EMPLOYEE);
         
         return $this->success([
             'token' => $user->createToken('API Token')->plainTextToken,

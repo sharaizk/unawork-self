@@ -36,7 +36,7 @@ class ProjectReportController extends Controller
         }
 
         if ($objUser && $currentWorkspace) {
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
             } else {
                 $projects = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
@@ -68,7 +68,7 @@ class ProjectReportController extends Controller
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         if ($objUser && $currentWorkspace) {
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $project = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $id)->with('users')->first();
             } else {
                 $project = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->where('projects.id', '=', $id)->with('users')->first();
@@ -192,7 +192,7 @@ class ProjectReportController extends Controller
 
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id);
         } else {
             $projects = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id);
@@ -217,7 +217,7 @@ class ProjectReportController extends Controller
             $projects->where('end_date', '=', $request->end_date);
         }
 
-        $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+        $client_keyword = Auth::user()->isClient() ? 'client.' : '';
         $projects = $projects->get();
         $data = [];
         foreach ($projects as $project) {
@@ -274,7 +274,7 @@ class ProjectReportController extends Controller
                 $tmp['status'] = '<span class="badge rounded-pill p-2 px-3  bg-warning">' . 'OnHold' . '</span>';
             }
 
-            if (Auth::user()->getGuard() != 'client') {
+            if (!Auth::user()->isClient()) {
 
                 $tmp['action'] = '
                 <a  class="action-btn btn-warning  btn btn-sm d-inline-flex align-items-center" data-toggle="popover"  title="' . __('view Project Report') . '" data-size="lg" data-title="' . __('show') . '" href="' . route(
@@ -407,7 +407,7 @@ class ProjectReportController extends Controller
     public function ajax_tasks_report(Request $request, $slug, $id)
     {
         $userObj = Auth::user();
-        $client_keyword = $userObj->getGuard() == 'client' ? 'client.' : '';
+        $client_keyword = $userObj->isClient() ? 'client.' : '';
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
         $tasks = Task::select(
@@ -478,7 +478,7 @@ class ProjectReportController extends Controller
             $tmp['start_date'] = $start_date;
             $tmp['due_date'] = $due_date;
 
-            if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client') {
+            if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient()) {
                 $tmp['user_name'] = "";
                 foreach ($task->users() as $user) {
                     if (isset($user) && $user) {

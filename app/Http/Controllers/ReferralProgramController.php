@@ -17,7 +17,7 @@ class ReferralProgramController extends Controller
 
     public function index()
     {
-        if (Auth::user()->type == 'admin') {
+        if (Auth::user()->isAdministrator()) {
             $setting = ReferralSetting::where('created_by', Auth::user()->id)->first();
             $transactions = ReferralTransaction::get();
             $payRequests = ReferralTransactionOrder::where('status', 1)->get();

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PodUser\InviteNewUserRequest;
 use App\Http\Requests\PodUser\UpdateRequest;
+use App\Models\Pod;
+use App\Models\PodUser;
 use App\Models\Utility;
 use App\Services\PodUserService;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +23,9 @@ class PodUserController extends Controller
 
     public function inviteExistedUser(Request $request, $podId): JsonResponse
     {
+        $pod = Pod::findOrFail($podId);
+        $this->authorize('manageMembers', $pod);
+
         $data = $request->validate([
             'user_id' => 'required|integer|exists:users,id'
         ]);
@@ -28,7 +33,7 @@ class PodUserController extends Controller
         $settings = Utility::getAdminPaymentSetting();
         
         try {
-            $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings);
+            $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings, $request->user());
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -44,13 +49,14 @@ class PodUserController extends Controller
     }
 
     public function inviteNewUser(InviteNewUserRequest $request, $podId): JsonResponse
-    {   
+    {
+        // Authorized in InviteNewUserRequest::authorize() (PodPolicy::manageMembers), before validation.
         $data = $request->validated();
         // $settings = Utility::getPaymentSetting(Auth::user()->currant_workspace);
         $settings = Utility::getAdminPaymentSetting();
 
         try {
-            $this->podUserService->inviteNewUser($data, $podId, $settings);
+            $this->podUserService->inviteNewUser($data, $podId, $settings, $request->user());
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -68,8 +74,11 @@ class PodUserController extends Controller
 
     public function join(Request $request, $podId): JsonResponse
     {
+        $pod = Pod::findOrFail($podId);
+        $this->authorize('requestToJoin', $pod);
+
         try {
-            $userId = auth('sanctum')->user()->id; 
+            $userId = $request->user()->id;
             $this->podUserService->requestJoinPod($userId, $podId);
 
             return response()->json([
@@ -88,6 +97,9 @@ class PodUserController extends Controller
 
     public function listing($podId): JsonResponse
     {
+        $pod = Pod::findOrFail($podId);
+        $this->authorize('manageMembers', $pod);
+
         try {
             $requests = $this->podUserService->getAllJoinRequests($podId);
 
@@ -107,16 +119,28 @@ class PodUserController extends Controller
 
     public function update(UpdateRequest $request, $podId, $requestId): JsonResponse
     {
+        // Authorized in UpdateRequest::authorize() (PodPolicy::moderateJoinRequest), which also
+        // verifies that $requestId belongs to $podId, before validation.
         $data = $request->validated();
 
         try {
-            $this->podUserService->moderateJoinRequest($requestId, $data['action'], $data['reason'] ?? null);
+            $result = $this->podUserService->moderateJoinRequest(PodUser::findOrFail($requestId), $data['action'], $data['reason'] ?? null, $request->user());
+
+            if (!$result->applied) {
+                return response()->json([
+                    'code' => 409,
+                    'status' => 'error',
+                    'message' => __('This membership request has already been handled.'),
+                ], 409);
+            }
 
             return response()->json([
                 'code' => 200,
                 'status' => 'success',
                 'message' => 'Join request moderated successfully'
             ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            throw $e; // unexpected database failure: 500, transaction already rolled back
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,

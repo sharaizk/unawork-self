@@ -2,7 +2,7 @@
 
 @php
     $permissions = Auth::user()->getPermission($project->id);
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $attachment = \App\Models\Utility::get_file('profit/');
 @endphp

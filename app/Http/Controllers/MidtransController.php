@@ -266,7 +266,7 @@ class MidtransController extends Controller
         $this->setPaymentDetail_client($invoice_id);
         $user_auth = Auth::user();
         $get_amount = $request->amount;
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $orderID = strtoupper(str_replace('.', '', uniqid('', true)));
         $invoice = Invoice::find($invoice_id);
         $validatorArray = [
@@ -349,7 +349,7 @@ class MidtransController extends Controller
         $this->setPaymentDetail_client($invoice_id);
 
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         if (!empty($invoice_id)) {
             $invoice = Invoice::find($invoice_id);
 

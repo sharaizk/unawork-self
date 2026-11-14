@@ -2,69 +2,54 @@
 
 namespace App\Services;
 
+use App\Enums\PodUser\State;
+use App\Enums\User\UserRole;
+use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
+use App\Jobs\SendEmail;
 use App\Models\Pod;
 use App\Models\PodUser;
 use App\Models\User;
-use App\Enums\PodUser\Permission;
-use App\Enums\PodUser\Status;
-use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
-use App\Enums\UserWorkspace\Status as UserWorkspaceStatus;
-use App\Jobs\SendEmail;
-use App\Models\Project;
 use App\Models\UserWorkspace;
-use App\Models\Utility;
-use App\Models\Workspace;
+use App\Services\Membership\AfterCommit;
+use App\Services\Membership\InvalidStateTransition;
+use App\Services\Membership\MembershipResult;
+use App\Services\Membership\PodStateTransitionService;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 
+/**
+ * POD membership workflows (UNA-005 transactions, UNA-006 explicit states).
+ *
+ * Every workflow owns one DB::transaction() (retried on deadlock) and changes pod_users.state only
+ * through PodStateTransitionService, which also synchronizes workspace access and writes history.
+ * Authorization happens in the controllers (UNA-001 policies); state is re-checked under locks.
+ * External effects (notifications, emails) run after commit via AfterCommit.
+ */
 class PodUserService
 {
-    public function updatePermissions(Pod $pod, User $user, array $permissions): bool
-    {
-        $workspace = $pod->workspace;
+    public const ATTEMPTS = 3;
 
-        // policies 
-        $userWorkspaceEditor = UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $workspace->id)->first();
-        $podUserEditor = $pod->users()->where('user_id', Auth::id())->first();
+    /** Permissions an editor may set directly; projects_index follows the circle state instead. */
+    public const EDITABLE_PERMISSIONS = [
+        UserWorkspacePermission::USERS_INDEX, UserWorkspacePermission::USERS_EDIT,
+        UserWorkspacePermission::NEWS_INDEX, UserWorkspacePermission::NEWS_EDIT,
+        UserWorkspacePermission::PROJECTS_EDIT,
+        UserWorkspacePermission::ZOOM_MEETING_INDEX, UserWorkspacePermission::ZOOM_MEETING_EDIT,
+    ];
 
-        if (!$userWorkspaceEditor->hasPermissionTo(UserWorkspacePermission::USERS_EDIT->value) && $podUserEditor->pivot->permission != PodUserPermission::OWNER->value) {
-            throw new \Exception(__('You do not have permission for this!'));
-        }
-
-        $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $workspace->id)->first();
-        $oldPermissions = $userWorkspace->getPermissionNames()->toArray();
-
-        $userWorkspace->syncPermissions($permissions);
-
-        if (!in_array('projects_index', $oldPermissions) && in_array('projects_index', $permissions)) {
-            $this->sendNotificationJoinedInnerToUser($user, $pod);
-        }
-        
-        return true;
+    public function __construct(
+        private ?AfterCommit $afterCommit = null,
+        private ?PodStateTransitionService $states = null,
+    ) {
+        $this->afterCommit ??= new AfterCommit();
+        $this->states ??= new PodStateTransitionService($this->afterCommit);
     }
 
-    protected function sendNotificationJoinedInnerToUser(User $user, Pod $pod)
-    {
-        Utility::sendNotification('pod_inner_circle_invite', null, $user->id, $pod);
+    // ------------------------------------------------------------------ invitations / applications
 
-        // $message = "You have been invited to join the pods inner circle: ".$pod->title." !";
-        // $subject = 'Inner Circle Invitation';
-        // $settings = Utility::getAdminPaymentSetting();
-
-        // SendEmail::dispatch($user->email, $message, $subject, $settings);
-    }
-
-    public function remove(int $userId, int $podId): void
-    {
-        $pod = Pod::find($podId);
-        $this->detachUserFromWorkspace($pod, $userId);
-        $pod->users()->detach($userId);
-        Utility::sendNotification('pod_remove', null, $userId, $pod);
-    }
-
-    public function inviteExistedUser(int $userId = null, int $podId, array $settings): void
+    /** Invite an existing user: matched (or re-entry from rejected/removed). */
+    public function inviteExistedUser(int $userId = null, int $podId, array $settings, ?User $actor = null): MembershipResult
     {
         $user = User::find($userId);
         $pod = Pod::find($podId);
@@ -73,161 +58,204 @@ class PodUserService
             throw new \Exception(__('This User is not connected with our system. Please fill out the below details to invite.'));
         }
 
-        if ($this->isUserAssignedToPod($user, $podId)) {
+        $result = $this->run(fn () => $this->states->start($pod, $user, State::MATCHED, $actor, 'Invited to the POD', [
+            'invitation_email' => fn () => $this->sendInvitationEmail($user, $pod, $settings),
+        ]));
+
+        if (!$result->applied) {
             throw new \Exception(__('This user is already a member of this pod.'));
         }
 
-        $this->attachUserToPod($user, $podId);
-        $this->sendInvitationalNotify($userId, $pod);
-        $this->attachUserToPodWorkspaces($user, $pod);
-    
-        try {
-            $this->sendInvitationEmail($user, $pod, $settings);
-        } catch (\Exception $e) {
-            throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'.$e));
-        }
+        return $result;
     }
 
-    public function inviteNewUser(array $data, int $podId, array $settings): void
+    /** New employee account + matched POD membership + workspace membership, together or not at all. */
+    public function inviteNewUser(array $data, int $podId, array $settings, ?User $actor = null): MembershipResult
     {
-        $user = $this->createNewUser($data);
-        $this->attachUserToPod($user, $podId);
-        $pod = Pod::find($podId);
-        
-        try {
-            $this->sendInvitationEmail($user, $pod, $settings);
-            $this->sendRegistrationEmail($user, $settings);
-        } catch (\Exception $e) {
-            throw new \Exception(__('E-Mails has not been sent due to SMTP configuration'));
-        }
+        $pod = Pod::findOrFail($podId);
+
+        return $this->run(function () use ($data, $pod, $settings, $actor) {
+            $user = $this->createNewUser($data);
+
+            return $this->states->start($pod, $user, State::MATCHED, $actor, 'Invited to the POD (new account)', [
+                'invitation_email' => fn () => $this->sendInvitationEmail($user, $pod, $settings),
+                'registration_email' => fn () => $this->sendRegistrationEmail($user, $settings),
+            ]);
+        });
     }
 
-    public function requestJoinPod(int $userId, int $podId): void
+    /** The applicant asks to join: pending_business_approval (or re-entry from rejected/removed). */
+    public function requestJoinPod(int $userId, int $podId): MembershipResult
     {
-        $exists = PodUser::where('user_id', $userId)
-            ->where('pod_id', $podId)
-            ->exists();
+        $pod = Pod::findOrFail($podId);
+        $user = User::findOrFail($userId);
 
-        if ($exists) {
+        $result = $this->run(fn () => $this->states->start($pod, $user, State::PENDING_BUSINESS_APPROVAL, $user, 'Applied to join the POD'));
+
+        if (!$result->applied) {
             throw new \Exception('You have already submitted a join request for this pod.');
         }
 
-        $podUser = PodUser::create([
-            'user_id' => $userId,
-            'pod_id' => $podId,
-            'permission' => Permission::MEMBER->value,
-            'status' => Status::POD_PENDING->value
-        ]);
-        
-        $pod = Pod::find($podId);
-        $user = User::find($userId);
-        $this->attachUserToPodWorkspaces($user, $pod);
-
-        $this->sendRequestNotify($podUser, $pod->created_by);
+        return $result;
     }
 
     public function getAllJoinRequests(int $podId)
     {
-        return PodUser::where('pod_id', $podId)->where('status', Status::POD_PENDING->value)->get();
+        return PodUser::where('pod_id', $podId)->where('state', State::PENDING_BUSINESS_APPROVAL->value)->get();
     }
 
-    public function moderateJoinRequest(int $requestId, string $action, ?string $reason = null): void
-    {
-        $request = PodUser::findOrFail($requestId);
+    // ------------------------------------------------------------------ decisions
 
-        if ($request->status != Status::POD_PENDING->value) {
-            throw new \Exception('You can moderate only pod pending requests');
+    /**
+     * Accept (-> outer_circle) or decline (-> rejected) an invitation (matched) or application
+     * (pending_business_approval) exactly once. A second or racing decision is 'already_handled'.
+     *
+     * @param State[]|null $allowedFrom restrict the source state (API moderation: applications only)
+     */
+    public function respondToMembership(Pod $pod, User $member, State $to, ?User $actor = null, ?array $allowedFrom = null, ?string $reason = null): MembershipResult
+    {
+        $membership = PodUser::where('pod_id', $pod->id)->where('user_id', $member->id)->first();
+        if (!$membership) {
+            return MembershipResult::unchanged(null, 'already_handled');
         }
 
-        if ($action === 'accept') {
-            $request->status = Status::ACTIVE->value;
-            $this->attachUserToPodWorkspaces($request->user, $request->pod);
-            $request->pod->workspace->status = UserWorkspaceStatus::ACTIVE->value;
-        } elseif ($action === 'decline') {
-            if (is_null($reason)) {
-                throw new \Exception('Reason is required for declining a request');
-            }
-            $request->status = Status::DECLINED->value;
-            $request->reason = $reason;
-        } else {
+        $reason ??= $to === State::REJECTED
+            ? ($membership->state === State::MATCHED ? 'Invitation declined' : 'Application declined by the POD')
+            : null;
+
+        return $this->run(fn () => $this->states->apply($membership, $to, $actor, $reason, $allowedFrom ?? State::applicants()));
+    }
+
+    /** API moderation of an application; a reason is required to decline. */
+    public function moderateJoinRequest(PodUser $request, string $action, ?string $reason = null, ?User $actor = null): MembershipResult
+    {
+        if ($action === 'decline' && is_null($reason)) {
+            throw new \Exception('Reason is required for declining a request');
+        }
+        if (!in_array($action, ['accept', 'decline'], true)) {
             throw new \Exception('Invalid action');
         }
 
-        $request->save();
+        return $this->respondToMembership(
+            $request->pod,
+            $request->user,
+            $action === 'accept' ? State::OUTER_CIRCLE : State::REJECTED,
+            $actor,
+            [State::PENDING_BUSINESS_APPROVAL],
+            $reason
+        );
     }
 
-    private function detachUserFromWorkspace(Pod $pod, int $userId): void
+    /** Generic validated transition (screening, suspension, resumption, ...). */
+    public function changeState(Pod $pod, User $member, State $target, ?User $actor, ?string $reason = null): MembershipResult
     {
-        $workspace = $pod->workspace;
+        $membership = PodUser::where('pod_id', $pod->id)->where('user_id', $member->id)->firstOrFail();
 
-        self::detachUserFromWorkspaceProjects($workspace, $userId);
-
-        $user = User::find($userId);
-        if ($user->currant_workspace == $workspace->id) {
-            $user->updateCurrentWorkspace();
-        }
-
-        $workspace->users()->detach($userId);
+        return $this->run(fn () => $this->states->apply($membership, $target, $actor, $reason));
     }
 
-    private function detachUserFromWorkspaceProjects(Workspace $workspace, int $userId): void
+    // ------------------------------------------------------------------ circle + permissions
+
+    /**
+     * Edit a member's workspace permissions and, optionally, move them between the Outer and Inner
+     * Circle through an explicit $circle target. The circle is never inferred from the submitted
+     * permissions: projects_index follows the state, the baseline is always kept for active
+     * members, and projects_edit only exists with project visibility.
+     */
+    public function updatePermissions(Pod $pod, User $user, array $permissions, ?State $circle = null, ?User $actor = null, ?string $reason = null): MembershipResult
     {
-        $projects = $workspace->projects;
-        foreach ($projects as $project) {
-                self::detachUserFromPodWorkspaceTasks($project, $userId);
-                $project->users()->detach($userId);
+        $editable = array_map(fn ($p) => $p->value, self::EDITABLE_PERMISSIONS);
+        if (array_diff($permissions, array_merge($editable, [UserWorkspacePermission::PROJECTS_INDEX->value]))) {
+            throw new \InvalidArgumentException(__('Invalid permission selected.'));
         }
+        if ($circle !== null && !in_array($circle, [State::OUTER_CIRCLE, State::INNER_CIRCLE], true)) {
+            throw new \InvalidArgumentException(__('Invalid circle selected.'));
+        }
+
+        return $this->run(function () use ($pod, $user, $permissions, $circle, $actor, $reason, $editable) {
+            $membership = PodUser::where('pod_id', $pod->id)->where('user_id', $user->id)->lockForUpdate()->first()
+                ?? throw new \Exception(__('This user is not a member of this pod workspace.'));
+
+            $effects = [];
+            if ($circle !== null && $circle !== $membership->state) {
+                $reason ??= $circle === State::OUTER_CIRCLE ? 'Moved to the Outer Circle' : null;
+                $effects = $this->states->apply($membership, $circle, $actor, $reason)->effects();
+                $membership->refresh();
+            }
+
+            $profile = $membership->state->accessProfile();
+            if ($profile === 'none') {
+                throw new InvalidStateTransition(__('Permissions can only be edited for active members.'));
+            }
+
+            $userWorkspace = UserWorkspace::where('user_id', $user->id)->where('workspace_id', $pod->workspace->id)->lockForUpdate()->firstOrFail();
+            $userWorkspace->syncPermissions($this->states->permissionsFor($profile, array_intersect($permissions, $editable)));
+
+            return MembershipResult::applied($membership, $membership->state->value, $effects);
+        });
     }
 
-    private function detachUserFromPodWorkspaceTasks(Project $project, int $userId): void
+    // ------------------------------------------------------------------ removal / leave
+
+    /** Manager removal or voluntary leave: -> removed. The row and its history are kept. */
+    public function remove(int $userId, int $podId, ?User $actor = null, ?string $reason = null): MembershipResult
     {
-        $tasks = $project->user_tasks($userId);
-        foreach ($tasks as $task) {
-            $taskUsers = explode(',', $task->assign_to);
-            $taskUsers = array_diff($taskUsers, [$userId]);
-            $task->assign_to = implode(',', $taskUsers);
-            $task->save();
+        $pod = Pod::findOrFail($podId);
+        $user = User::findOrFail($userId);
+        $membership = PodUser::where('pod_id', $pod->id)->where('user_id', $user->id)->first();
+        if (!$membership || $membership->state === State::REMOVED) {
+            return MembershipResult::unchanged($membership, 'not_member');
         }
+
+        $reason ??= ($actor && (int) $actor->id === (int) $user->id) ? 'Left the POD' : 'Removed by a POD manager';
+
+        return $this->run(fn () => $this->states->apply($membership, State::REMOVED, $actor, $reason));
+    }
+
+    public function getBackUrl($ownId, $userId, $podId): string
+    {
+        if ($ownId != $userId) {
+            return route('pods.users', ['podId' => $podId]);
+        }
+
+        // The leaving user's current workspace was reassigned in the removal transaction.
+        $current = User::find($userId)?->currant_workspace;
+
+        return $current ? route('change-workspace', ['id' => $current]) : route('home');
+    }
+
+    public function list(Pod $pod, int $ownId, $workspaceId): Collection
+    {
+        $userWorkspace = UserWorkspace::where('user_id', $ownId)->where('workspace_id', $workspaceId)->firstOrFail();
+
+        if ($userWorkspace->hasPermissionTo(UserWorkspacePermission::USERS_INDEX->value) || $pod->created_by == $ownId) {
+            $users = $pod->users;
+        } else {
+            $users = $pod->users->where('id', $ownId);
+        }
+
+        return $users;
+    }
+
+    // ------------------------------------------------------------------ internals
+
+    /** One transaction (retried on deadlock), then the committed attempt's effects. */
+    private function run(\Closure $operation): MembershipResult
+    {
+        return $this->afterCommit->run(DB::transaction($operation, self::ATTEMPTS));
     }
 
     private function createNewUser(array $data): User
     {
-        return User::create([
+        // Accounts generated by a POD invitation are employees.
+        return User::createWithAccountRole([
             'name' => $data['name'],
             'email' => $data['email'],
             'plan' => NULL,
             'password' => Hash::make($data['password']), // should use bcrypt for hashing password
             'email_verified_at' => date('Y-m-d i:h:s'),
             'is_enable_login' => 1,
-        ]);
-    }
-    
-    private function isUserAssignedToPod(User $user, int $podId): bool
-    {
-        return $user->pods()
-            ->where('pods.id', $podId)
-            ->exists();
-    }
-
-    private function attachUserToPod(User $user, int $podId): void
-    {
-        $user->pods()->attach($podId, [
-            'permission' => Permission::MEMBER->value,
-            'status' => Status::EMPLOYEE_PENDING->value
-        ]);
-    }
-
-    private function attachUserToPodWorkspaces(User $user, Pod $pod): void
-    {
-        $workspace = $pod->workspace;
-
-        if (!$workspace->users()->where('user_id', $user->id)->exists()) {
-            $workspace->users()->attach($user->id, ['permission' => 'Member', 'is_active' => 1, 'status' => UserWorkspaceStatus::EMPLOYEE_PENDING->value]);
-        }
-
-        $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $user->id)->first();
-        $userWorkspace->givePermissionTo('users_index');
-        $userWorkspace->givePermissionTo('news_index');
+        ], UserRole::EMPLOYEE);
     }
 
     private function sendInvitationEmail(User $user, Pod $pod, array $settings): void
@@ -242,39 +270,5 @@ class PodUserService
         $message = "You have been succesfully registered!";
         $subject = 'Pod Invitation';
         SendEmail::dispatch($user->email, $message, $subject, $settings);
-    }
-
-    private function sendInvitationalNotify(int $userId, Pod $pod): void
-    {
-        Utility::sendNotification('pod_invite', null, $userId, $pod);
-    }
-
-    private function sendRequestNotify(PodUser $podUser, int $podCreator): void
-    {
-        Utility::sendNotification('pod_request', null, $podCreator, $podUser);
-    }
-
-    public function getBackUrl($ownId, $userId, $podId): string
-    {
-        if ($ownId != $userId) {
-            $location = route('pods.users', ['podId' => $podId]);
-        } else {
-            $workspace = Workspace::where('created_by', $userId)->first();
-            $location = route('change-workspace', ['id' => $workspace->id]);
-        }
-        return $location;
-    }
-
-    public function list(Pod $pod, int $ownId, $workspaceId): Collection
-    {
-        $userWorkspace = UserWorkspace::where('user_id', $ownId)->where('workspace_id', $workspaceId)->firstOrFail();
-        
-        if ($userWorkspace->hasPermissionTo(UserWorkspacePermission::USERS_INDEX->value) || $pod->created_by == $ownId) {
-            $users = $pod->users;
-        } else {
-            $users = $pod->users->where('id', $ownId);
-        }
-
-        return $users;
     }
 }

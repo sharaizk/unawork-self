@@ -22,7 +22,7 @@ class ContractController extends Controller
     {
         $objUser = \Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
 
             $contracts = Contract::where('workspace_id', '=', $currentWorkspace->id)->where('client_id', $objUser->id)->with('projects', 'contract_type')->get();
 
@@ -82,7 +82,7 @@ class ContractController extends Controller
             ]
         )->join('client_workspaces', 'client_workspaces.client_id', '=', 'clients.id')->where('client_workspaces.workspace_id', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
 
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
         } else {
             $projects = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
@@ -164,7 +164,7 @@ class ContractController extends Controller
 
         $contractType = ContractsType::where('workspace_id', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
 
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
         } else {
             $projects = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
@@ -250,7 +250,7 @@ class ContractController extends Controller
 
         $contractType = ContractsType::where('workspace_id', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
 
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
         } else {
             $projects = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get()->pluck('name', 'id');
@@ -341,7 +341,7 @@ class ContractController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
         $contract = Contract::find($id);
         $request->validate(['file' => 'required']);
-        $client_keyword = \Auth::user()->getGuard() == 'client' ? 'client.' : '';
+        $client_keyword = \Auth::user()->isClient() ? 'client.' : '';
         $image_size = $request->file('file')->getSize();
         
         // New Added 
@@ -366,7 +366,7 @@ class ContractController extends Controller
 
 
         }
-        if (\Auth::user()->getGuard() == 'client') {
+        if (\Auth::user()->isClient()) {
 
             $file = ContractsAttachment::create(
                 [
@@ -487,7 +487,7 @@ class ContractController extends Controller
         $contract = new ContractsComment();
         $contract->comment = $request->comment;
         $contract->contract_id = $id;
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $contract->client_id = \Auth::user()->id;
         } else {
             $contract->user_id = \Auth::user()->id;
@@ -533,7 +533,7 @@ class ContractController extends Controller
         $notes = new ContractsNote();
         $notes->contract_id = $id;
         $notes->notes = $request->notes;
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $notes->client_id = \Auth::user()->id;
         } else {
             $notes->user_id = \Auth::user()->id;
@@ -574,7 +574,7 @@ class ContractController extends Controller
         if ($currentWorkspace->permission == 'Owner') {
             $contract->company_signature = $request->company_signature;
         }
-        if (\Auth::user()->getGuard() == 'client') {
+        if (\Auth::user()->isClient()) {
             $contract->client_signature = $request->client_signature;
         }
 

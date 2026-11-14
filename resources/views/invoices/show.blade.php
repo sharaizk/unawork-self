@@ -406,7 +406,7 @@
                                             <th>{{ __('Payment Type') }}</th>
                                             <th>{{ __('Date') }}</th>
                                             <th>{{ __('Receipt') }}</th>
-                                            @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                            @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id)
                                                 <th>{{ __('Action') }}</th>
                                             @endif
                                         </tr>
@@ -441,7 +441,7 @@
                                                         @endif
                                                     @endif
                                                 </td>
-                                                @if (Auth::user()->type == 'user' && $currentWorkspace->creater->id == Auth::user()->id)
+                                                @if (Auth::user()->isRegularUser() && $currentWorkspace->creater->id == Auth::user()->id)
                                                     <td>
                                                         @if ($payment->payment_type == 'Bank Transfer' && $payment->payment_status == 'pending')
                                                             <a href="#"

@@ -66,9 +66,11 @@
                                         </form>
                                     @else
                                         @if (!$project->users->contains(\Auth::user()->id))
+                                            @if (\Auth::user()->can('create', [\App\Models\UserProject::class, $project]))
                                             <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="dropdown-item">
                                                 <i class="ti ti-user-plus"></i> <span>{{ __('Send Join Request') }}</span>
                                             </a>
+                                            @endif
                                         @else
                                             <a href="#" class="dropdown-item" title="{{__('You sent join request')}}">
                                                 <i data-feather="lock"></i> <span>{{__('You sent join request')}}</span>

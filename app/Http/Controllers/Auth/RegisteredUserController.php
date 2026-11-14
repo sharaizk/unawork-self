@@ -16,9 +16,9 @@ use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Mail\SendLoginDetail;
-use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
 use App\Enums\User\UserRole;
+use Illuminate\Validation\Rules\Enum;
 
 
 class RegisteredUserController extends Controller
@@ -178,54 +178,47 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
+            // Only the account personas offered on the form; anything else is rejected.
+            'role' => ['required', new Enum(UserRole::class)],
         ]);
+        $accountRole = UserRole::from($request->role);
 
         do {
             $code = rand(100000, 999999);
         } while (DB::table('users')->where('referral_code', $code)->exists());
 
-        $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'workspace' => $request->name,
-            'password'  => Hash::make($request->password),
-            'plan'      => 1,
-            'lang'      => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en',
-            'referral_code' => $code,
-            'referral_used' => !empty($request->ref_code) ? $request->ref_code : '0',
-        ]);
+        // User, own workspace and account role are created together or not at all.
+        $user = DB::transaction(function () use ($request, $setting, $code, $accountRole) {
+            $user = User::createWithAccountRole([
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'workspace' => $request->name,
+                'password'  => Hash::make($request->password),
+                'plan'      => 1,
+                'lang'      => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en',
+                'referral_code' => $code,
+                'referral_used' => !empty($request->ref_code) ? $request->ref_code : '0',
+            ], $accountRole);
 
-        $objWorkspace = Workspace::create(['lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 'created_by' => $user->id, 'name' => $request->name, 'currency_code' => 'USD', 'paypal_mode' => 'sandbox']);
+            $objWorkspace = Workspace::create(['lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 'created_by' => $user->id, 'name' => $request->name, 'currency_code' => 'USD', 'paypal_mode' => 'sandbox']);
         
-        $objWorkspace->ownerable()->associate($user);
-        $objWorkspace->save();
+            $objWorkspace->ownerable()->associate($user);
+            $objWorkspace->save();
+
+
+            $userWorkspace = UserWorkspace::findOrCreateMembership($user->id, $objWorkspace->id, ['permission' => 'Owner']);
+
+            $userWorkspace->assignAllPermissionsToCreator();
+
+            $user->currant_workspace = $objWorkspace->id;
+            $user->save();
+
+            User::userDefaultDataRegister($user);
+
+            return $user;
+        });
 
         $setting = Utility::getAdminPaymentSetting();
-
-        $userWorkspace               =   new UserWorkspace();
-        $userWorkspace->user_id      =     $user->id;
-        $userWorkspace->workspace_id =    $objWorkspace->id;
-        $userWorkspace->permission  = 'Owner';
-
-        if (empty($userWorkspace)) {
-            $errorArray[] = $userWorkspace;
-        } else {
-            $userWorkspace->save();
-        }
-
-        $userWorkspace->assignAllPermissionsToCreator();
-
-        $user->currant_workspace = $objWorkspace->id;
-        $user->save();
-
-        if ($request->role == "employee") {
-            $employeeService = new EmployeeService;
-            $employeeService->makeEmployee($user);
-        } elseif ($request->role == "company") {
-            $user->assignRole(UserRole::COMPANY->value);
-        }
-
-        User::userDefaultDataRegister($user);
         // dd($user,$setting,$setting['email_verification']);
         if ($setting['email_verification'] == 'on') {
 

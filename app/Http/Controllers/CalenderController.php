@@ -19,11 +19,11 @@ class CalenderController extends Controller
 
     public function index($slug, $project_id = NULL)
     {
-        if (Auth::user()->type != 'admin') {
+        if (!Auth::user()->isAdministrator()) {
             $objUser          = Auth::user();
             $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $tasks    = Task::select('tasks.*')->join('projects', 'projects.id', '=', 'tasks.project_id')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('client_projects.permission', 'LIKE', '%show task%')->where('projects.workspace', '=', $currentWorkspace->id);
                 $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
             } elseif ($currentWorkspace && $currentWorkspace->permission == 'Owner') {
@@ -35,7 +35,7 @@ class CalenderController extends Controller
             }
 
 
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $events    = Task::select('tasks.*')->join('projects', 'projects.id', '=', 'tasks.project_id')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('client_projects.permission', 'LIKE', '%show task%')->where('projects.workspace', '=', $currentWorkspace->id)->limit(8);
             } elseif ($currentWorkspace->permission == 'Owner') {
                 $events    = Task::select('tasks.*')->join('projects', 'projects.id', '=', 'tasks.project_id')->where('projects.workspace', '=', $currentWorkspace->id)->limit(8);
@@ -57,7 +57,7 @@ class CalenderController extends Controller
                     "title" => $task->title,
                     "start" => $task->start_date,
                     "end" => $task->due_date,
-                    "url" => (($objUser->getGuard() != 'client') ? route(
+                    "url" => ((!$objUser->isClient()) ? route(
                         'tasks.show',
                         [
                             $currentWorkspace->slug,
@@ -73,7 +73,7 @@ class CalenderController extends Controller
                         ]
                     )),
                     "task_id" => $task->id,
-                    "task_url" => (($objUser->getGuard() != 'client') ? route(
+                    "task_url" => ((!$objUser->isClient()) ? route(
                         'tasks.drag.event',
                         [
                             $currentWorkspace->slug,
@@ -97,7 +97,7 @@ class CalenderController extends Controller
 
     public function calendar(Request $request, $slug, $project_id = NULL)
     {
-        if (Auth::user()->type != 'admin') {
+        if (!Auth::user()->isAdministrator()) {
             $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
             if (($request->get('calender_type') == 'google_calendar') && ($request->get('project_id') == null)) {
@@ -112,7 +112,7 @@ class CalenderController extends Controller
                 $objUser          = Auth::user();
                 //$currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
-                if ($objUser->getGuard() == 'client') {
+                if ($objUser->isClient()) {
                     $tasks    = Task::select('tasks.*')->join('projects', 'projects.id', '=', 'tasks.project_id')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('client_projects.permission', 'LIKE', '%show task%')->where('projects.workspace', '=', $currentWorkspace->id);
                     $projects = Project::select('projects.*')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
                 } elseif ($currentWorkspace && $currentWorkspace->permission == 'Owner') {
@@ -123,7 +123,7 @@ class CalenderController extends Controller
                     $projects = Project::select('projects.*')->join('user_projects', 'projects.id', '=', 'user_projects.project_id')->where('user_projects.user_id', '=', $objUser->id)->where('projects.workspace', '=', $currentWorkspace->id)->get();
                 }
 
-                if ($objUser->getGuard() == 'client') {
+                if ($objUser->isClient()) {
                     $events    = Task::select('tasks.*')->join('projects', 'projects.id', '=', 'tasks.project_id')->join('client_projects', 'projects.id', '=', 'client_projects.project_id')->where('client_projects.client_id', '=', $objUser->id)->where('client_projects.permission', 'LIKE', '%show task%')->where('projects.workspace', '=', $currentWorkspace->id)->limit(8);
                 } elseif ($currentWorkspace->permission == 'Owner') {
                     $events    = Task::select('tasks.*')->join('projects', 'projects.id', '=', 'tasks.project_id')->where('projects.workspace', '=', $currentWorkspace->id)->limit(8);
@@ -146,7 +146,7 @@ class CalenderController extends Controller
                         "title" => $task->title,
                         "start" => $task->start_date,
                         "end" => $task->due_date,
-                        "url" => (($objUser->getGuard() != 'client') ? route(
+                        "url" => ((!$objUser->isClient()) ? route(
                             'tasks.show',
                             [
                                 $currentWorkspace->slug,
@@ -162,7 +162,7 @@ class CalenderController extends Controller
                             ]
                         )),
                         "task_id" => $task->id,
-                        "task_url" => (($objUser->getGuard() != 'client') ? route(
+                        "task_url" => ((!$objUser->isClient()) ? route(
                             'tasks.drag.event',
                             [
                                 $currentWorkspace->slug,

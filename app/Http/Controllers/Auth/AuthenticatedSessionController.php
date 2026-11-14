@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request)
     {   
-        $checkUser = User::where('email', '=', $request->email)->where('type', '!=', 'admin')->first();
+        $checkUser = User::where('email', '=', $request->email)->nonAdministrators()->first();
         if ($checkUser) {
             if ($checkUser->is_enable_login == 1) {
                 $currentWorkspace = UserWorkspace::where('workspace_id', '=', $checkUser->currant_workspace)->where('user_id', $checkUser->id)->first();
@@ -102,7 +102,9 @@ class AuthenticatedSessionController extends Controller
         $totalWS = $user->countWorkspace();
         $permission = UserWorkspace::where('user_id', '=', $user->id)->where('permission', '=', 'Member')->count();
 
-        if ($user->type != 'company' && $user->type != 'admin' && ($totalWS <= 0 || $permission > 0)) {
+        // The legacy users.type = 'company' value no longer exists (UNA-002 normalizes it to 'user'),
+        // so the old "type != company" clause was always true; only administrators are excluded.
+        if (!$user->isAdministrator() && ($totalWS <= 0 || $permission > 0)) {
             $login_detail = LoginDetail::create([
                 'user_id' => $user->id,
                 'ip' => $ip,
@@ -118,7 +120,7 @@ class AuthenticatedSessionController extends Controller
             return redirect('/check');
         }
 
-        if ($user->type == 'user' && !\Auth::guard('client')->check()) {
+        if ($user->isRegularUser() && !\Auth::guard('client')->check()) {
             $plan = plan::find($user->plan);
             if ($plan) {
                 if ($plan->duration != 'unlimited') {

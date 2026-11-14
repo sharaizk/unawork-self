@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    @if(Auth::user()->type == 'admin')
+    @if(Auth::user()->isAdministrator())
       <link rel="icon" href="{{$logo.'/favicon.png'}}" type="image" sizes="16x16">
     @else
       {{-- <link rel="icon" href="{{(isset($company_favicon) && !empty($company_favicon)?asset(Storage::url($company_favicon)):'favicon.png')}}" type="image" sizes="16x16"> --}}

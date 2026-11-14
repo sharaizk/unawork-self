@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Models\Pod;
+use App\Models\PodUser;
 use App\Models\User;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 
@@ -33,19 +35,22 @@ class PodService
             $data['image'] = $this->uploadImage($data['image'], $settings);
         }
 
-        $pod = Pod::create($data);
+        // POD, its workspace and both owner memberships are created together or not at all.
+        return DB::transaction(function () use ($data) {
+            $pod = Pod::create($data);
 
-        if ($pod) {
-            $this->attachOwnerToPod($data['created_by'], $pod);
-            $workspace = $this->createWorkspaceForPod($pod);
-            $this->attachOwnerToWorkspace($workspace, $data['created_by']);
-        }
+            if ($pod) {
+                $this->attachOwnerToPod($data['created_by'], $pod);
+                $workspace = $this->createWorkspaceForPod($pod);
+                $this->attachOwnerToWorkspace($workspace, $data['created_by']);
+            }
 
-        if (isset($data['skills'])) {
-            $pod->skills()->sync($data['skills']);
-        }
+            if (isset($data['skills'])) {
+                $pod->skills()->sync($data['skills']);
+            }
 
-        return $pod;
+            return $pod;
+        });
     }
 
     public function updatePod(Pod $pod, array $data): Pod
@@ -105,10 +110,17 @@ class PodService
 
     protected function attachOwnerToPod(int $userId, Pod $pod): void
     {
-        $pod->users()->attach($userId, [
+        // The owner starts (and stays) in the Inner Circle; this is the membership's first state.
+        $owner = PodUser::findOrCreateMembership($userId, $pod->id, [
             'permission' => 'Owner',
-            'status' => 'active'
+            'state' => \App\Enums\PodUser\State::INNER_CIRCLE->value,
         ]);
+        if ($owner->wasRecentlyCreated) {
+            \App\Models\PodUserStateHistory::query()->forceCreate([
+                'pod_user_id' => $owner->id, 'from_state' => null,
+                'to_state' => \App\Enums\PodUser\State::INNER_CIRCLE->value, 'actor_id' => $userId, 'reason' => 'POD created',
+            ]);
+        }
     }
 
     protected function createWorkspaceForPod(Pod $pod): Workspace
@@ -127,9 +139,7 @@ class PodService
 
     protected function attachOwnerToWorkspace(Workspace $workspace,  int $userId): void
     {
-        $workspace->users()->attach($userId, ['permission' => 'Owner', 'is_active' => 1]);
-
-        $userWorkspace = UserWorkspace::where('workspace_id', $workspace->id)->where('user_id', $userId)->first();
+        $userWorkspace = UserWorkspace::findOrCreateMembership($userId, $workspace->id, ['permission' => 'Owner', 'is_active' => 1]);
         $userWorkspace->assignAllPermissionsToCreator();
     }
 

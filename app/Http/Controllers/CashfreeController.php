@@ -305,7 +305,7 @@ class CashfreeController extends Controller
         $this->setPaymentDetail_client($invoice_id);
         $currentWorkspace = Utility::getWorkspaceBySlug_copylink('invoice' , $invoice_id);
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
         if(Auth::check())
         {
@@ -378,7 +378,7 @@ class CashfreeController extends Controller
         $invoice_id = $request->invoice_id;
         $currentWorkspace = Utility::getWorkspaceBySlug_copylink('invoice' , $invoice_id);
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $this->setPaymentDetail_client($invoice_id);
         $slug  = $request->slug;
 

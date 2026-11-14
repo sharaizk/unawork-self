@@ -34,7 +34,7 @@ class PodController extends Controller
     {   
         $data = $request->validated();
         $data['created_by'] = auth('sanctum')->user()->id;
-        if (auth('sanctum')->user()->type == "admin") {
+        if (auth('sanctum')->user()->isAdministrator()) {
             return response()->json([
                 'message' => "superadmin can't create pods!"
             ], 400);

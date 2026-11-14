@@ -33,7 +33,7 @@ class PlanController extends Controller
         $paymentSetting   = Utility::getAdminPaymentSetting();
         $userId = \Auth::id();
 
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $plans = Plan::get();
 
             return view('plans.admin', compact('plans', 'currentWorkspace', 'paymentSetting'));
@@ -54,7 +54,7 @@ class PlanController extends Controller
         $planStatus = $request->enable;
         $findPlan = Plan::where('id', $planId)->first();
         if ($findPlan) {
-            $assignPlan = User::where('plan', $findPlan->id)->where('type', '!=', 'admin')->get();
+            $assignPlan = User::where('plan', $findPlan->id)->nonAdministrators()->get();
             if (count($assignPlan) > 0) {
                 $msg = 'The company has subscribed to this plan, so it cannot be disable.';
                 return response()->json(['success' => false, 'message' => $msg]);
@@ -81,7 +81,7 @@ class PlanController extends Controller
         $objUser = Auth::user();
         $planData = Plan::where('id', $planId)->first();
         if ($planData) {
-            $assignPlan = User::where('plan', $planData->id)->where('type', '!=', 'admin')->get();
+            $assignPlan = User::where('plan', $planData->id)->nonAdministrators()->get();
             // dd(count($assignPlan));
             if (count($assignPlan) > 0) {
                 return redirect()->back()->with('error', 'The Company Has Subscribed to this plan, So it can not be deleted..');
@@ -277,7 +277,7 @@ class PlanController extends Controller
         $currentWorkspace = Utility::getWorkspaceBySlug('');
         $paymentSetting   = Utility::getAdminPaymentSetting();
         $userId = \Auth::id();
-        if (\Auth::user()->type == 'admin') {
+        if (\Auth::user()->isAdministrator()) {
             $users = User::where('is_active', 1)->paginate(20);
 
             return view('plans.user_plans', compact('users', 'currentWorkspace', 'paymentSetting'));
@@ -329,7 +329,7 @@ class PlanController extends Controller
     {
         $plan = Plan::find($plan_id);
         $user = Auth::user();
-        if ($plan && $user->type == 'user' && $user->is_trial_done == 0) {
+        if ($plan && $user->isRegularUser() && $user->is_trial_done == 0) {
             $assignPlan = $user->assignPlan($plan->id);
             if ($assignPlan['is_success']) {
                 $days                   = $plan->trial_days == '-1' ? '36500' : $plan->trial_days;

@@ -95,6 +95,12 @@ Reference implementations:
 ### 4.3 Domain concepts to respect
 
 - **Users:** `users.type` is `admin` (super admin) or `user`. A separate **client** guard handles client logins. Spatie roles from `App\Enums\User\UserRole` are `company` and `employee`.
+- **Account identity (UNA-002):** never read `users.type`, call `hasRole('company'|'employee')` or compare `getGuard()` to decide who someone is. Use the `App\Contracts\HasAccountType` API that both `User` and `Client` implement:
+  - methods: `accountType()`, `isAdministrator()`, `isRegularUser()` (a non-admin web user), `isCompany()`, `isEmployee()`, `isClient()`
+  - query scopes: `User::administrators()`, `nonAdministrators()`, `companies()`, `employees()`
+  - precedence: administrator, then company, then employee
+  - write path: create accounts with `User::createWithAccountRole($attrs, UserRole::X)` and change them with `$user->assignAccountRole(UserRole::X)`. Both set `type = user` and keep exactly one persona role, leaving other roles alone. Invited or generated members are employees; admin "Create Company" and CSV import create companies.
+  - workspace and POD permissions (`Owner`, `users_edit`, ...) are a separate concept, not account identity.
 - **Workspace:** the tenant. The current one is `Auth::user()->currant_workspace` (sic, the misspelling is real). URLs use `$currentWorkspace->slug`. A workspace's owner is `$workspace->creater` (sic).
 - **POD:** each Pod owns a Workspace through the polymorphic `workspaces.ownerable`. Member permissions use `App\Enums\PodUser\Permission`, and workspace member permissions use `App\Enums\UserWorkspace\Permission` (`*_INDEX`, `*_EDIT`).
 - **Settings and files:** `App\Models\Utility::getAdminPaymentSetting()`, `getcompanySettings($workspaceId)` and `get_file($path)`. Reuse them; don't re-implement them.
@@ -104,6 +110,22 @@ Reference implementations:
 
 - Migrations live in `database/migrations` (118 so far). Name new ones in Laravel's timestamped style, keep them reversible, and add nullable columns or defaults for existing rows.
 - New models: put `$fillable` and relationships on the model, and add a Policy if it is user-owned.
+- **Memberships are unique** (UNA-004). `pod_users(user_id, pod_id)`, `user_workspaces(user_id, workspace_id)` and `user_projects(user_id, project_id)` each have a unique index.
+  - Create a membership only through `PodUser|UserWorkspace|UserProject::findOrCreateMembership($userId, $parentId, $values)`. Never use `attach()`, `create()`, `syncWithoutDetaching()` or `exists()` + `create()`.
+  - The helper returns an existing row untouched and survives a concurrent duplicate insert. Run notifications, emails and grants only when `->wasRecentlyCreated` is true.
+  - Change a pending membership's status with a conditional update (`where('status', <pending>)->update(...)`) and act only if exactly 1 row changed.
+- **Membership operations are transactional** (UNA-005). Multi-record membership changes live in services, never controllers: `PodUserService`, `App\Services\Membership\WorkspaceMembershipService` and `ProjectMembershipService`.
+  - Each operation runs in one `DB::transaction(..., 3)`, locks the rows it decides on, and returns a `MembershipResult` (`applied`, `state`, `reason`, named effects).
+  - Notifications, emails and chat invitations are effects. `AfterCommit` runs them after the commit, and only for the attempt that committed. Never call `Utility::sendNotification()`, `Mail` or `SendEmail::dispatch()` inside a membership transaction.
+  - Remove a `UserWorkspace` with `->delete()` so Spatie's hooks clean up its permissions and roles; never `detach()`.
+  - Use `CurrentWorkspace::reassignIfLost()` whenever access to a workspace is removed.
+- **POD membership state is explicit** (UNA-006).
+  - `pod_users.state` (`App\Enums\PodUser\State`) is the single workflow and circle source. The legacy `status` column and `PodUser\Status` enum are gone.
+  - Change it only through `App\Services\Membership\PodStateTransitionService`. It owns the graph (`State::transitions()`), the reason rules and access syncing, and appends one `pod_user_state_histories` row per change. The actor is passed explicitly.
+  - Workspace permissions follow the state (`State::accessProfile()`) and are never read to decide it. Inner Circle pages need both the `inner_circle` state and `projects_index`.
+  - Use the `PodUser` scopes (`current`, `applicants`, `activeMembers`, `outerCircle`, `innerCircle`) and `State` sets instead of string lists.
+  - Removal sets `removed` and keeps the row. `Pod::users()` and `User::pods()` hide removed memberships.
+- Roles and permissions are seeded from their enums. `DatabaseSeeder::FOUNDATION_SEEDERS` runs `RolesAndPermissionsSeeder` (every `UserRole` case) and then `PermissionsSeeder` (every `UserWorkspace\Permission` case) first, on every path. Both use the `web` guard and look records up by `name` + `guard_name`, so they are safe to rerun. To add a role or workspace permission, add an enum case and rerun `db:seed`; don't hand-write seeder lists. Workspace permissions belong to `UserWorkspace` records, never to the company/employee roles.
 
 ### 4.5 Translations
 
@@ -242,6 +264,9 @@ There is no frontend test suite, and backend tests are not DB-isolated (see sect
    - test both an owner and a non-owner/permissioned member, and the client guard if relevant
    - check RTL and dark mode if you changed layout CSS
 4. For migrations, run them only against a local or disposable database.
+   - The migrations are MySQL-specific and fail on SQLite (`create_zoom_meetings_table`). For DB-backed tests, copy `tests/Feature/Authorization/PodAndProjectClaimAuthorizationTest.php`: it forces in-memory SQLite before boot, refuses to run otherwise, and builds only the tables it needs. Run it with `DB_CONNECTION=sqlite DB_DATABASE=:memory: vendor/bin/phpunit <path>`.
+   - POD membership and project-claim authorization lives in `PodPolicy` (`viewMembers`, `manageMembers`, `acceptMember`, `declineMember`, `removeMember`, `updateMemberPermissions`, `toggleInnerCircle`, `requestToJoin`, `moderateJoinRequest`) and `UserProjectPolicy` (`create`, `accept`, `decline`). Reuse these abilities rather than re-checking `created_by` / `users_edit` inline.
+   - For manual testing of those abilities, `database/seeders/Una001AuthorizationDemoSeeder.php` creates `una001.*@example.test` users, a demo POD in every membership state, a pending project request and a second POD. It is local-only (refuses unless `APP_ENV=local`) and is not called by `DatabaseSeeder`.
 5. In your summary, state what you verified and what you could not.
 
 ---

@@ -12,7 +12,7 @@
         $company = $vacancy->company;
         $company_workspace = $company->ownWorkspace();
         if (Auth::user()) {
-            if (Auth::user()->hasRole('employee')) {
+            if (Auth::user()->isEmployee()) {
                 $sendRequestUrl = route('login');
             } else {
                 $sendRequestUrl = "#";
@@ -110,7 +110,7 @@
                                 @guest
                                     <a href="{{ route('login') }}"><span>Send Application</span></a>
                                 @endguest
-                                @if (Auth::check() && Auth::user()->hasRole('employee'))
+                                @if (Auth::check() && Auth::user()->isEmployee())
                                 <a href="#" id="sendApplButton"><span>Send Application</span></a>
                                 @endif
                             </div>

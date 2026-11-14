@@ -2,27 +2,30 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
+/**
+ * Seeds the workspace permissions: every App\Enums\UserWorkspace\Permission case under
+ * WorkspacePermission::GUARD.
+ *
+ * Idempotent: looks each permission up by (name, guard_name) directly in the database (not
+ * Spatie's cache, which may be stale) and creates only the missing ones. Existing permissions
+ * keep their IDs and assignments; other permissions and guards are never touched.
+ */
 class PermissionsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Permission::firstOrCreate(['name' => 'users_index', 'guard_name' => 'web']);
-        Permission::firstOrCreate(['name' => 'users_edit', 'guard_name' => 'web']);
+        $registrar = app(PermissionRegistrar::class);
+        $registrar->forgetCachedPermissions();
 
-        Permission::firstOrCreate(['name' => 'news_index', 'guard_name' => 'web']);
-        Permission::firstOrCreate(['name' => 'news_edit', 'guard_name' => 'web']);
+        foreach (WorkspacePermission::cases() as $permission) {
+            Permission::query()->firstOrCreate(['name' => $permission->value, 'guard_name' => WorkspacePermission::GUARD]);
+        }
 
-        Permission::firstOrCreate(['name' => 'projects_index', 'guard_name' => 'web']);
-        Permission::firstOrCreate(['name' => 'projects_edit', 'guard_name' => 'web']);
-
-        Permission::firstOrCreate(['name' => 'zoom_meeting_index', 'guard_name' => 'web']);
-        Permission::firstOrCreate(['name' => 'zoom_meeting_edit', 'guard_name' => 'web']);
+        $registrar->forgetCachedPermissions();
     }
 }

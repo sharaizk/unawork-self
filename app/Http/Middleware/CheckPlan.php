@@ -23,7 +23,7 @@ class CheckPlan
         if(\Auth::check())
         {
             $user = Auth::user();
-            if($user->type != 'admin')
+            if(!$user->isAdministrator())
             {
                 $workspace = Workspace::find($user->currant_workspace);
                 if($workspace->created_by == $user->id)

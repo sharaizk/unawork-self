@@ -231,7 +231,7 @@ class YooKassaController extends Controller
         $get_amount = $request->amount;
         // $orderID = strtoupper(str_replace('.', '', uniqid('', true)));
         $invoice = Invoice::find($invoice_id);
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
 
         if ($this->currancy == 'RUB') {
@@ -286,7 +286,7 @@ class YooKassaController extends Controller
         $user_auth = Auth::user();
         $invoice = Invoice::find($request->invoice_id);
         $amount = $request->amount;
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
         if ($invoice) {
             if (is_int((int)$this->yookassa_shopid)) {

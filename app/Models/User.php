@@ -17,9 +17,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
 use App\Enums\User\UserRole;
+use App\Enums\User\UserType;
+use App\Enums\User\AccountType;
+use App\Contracts\HasAccountType;
 use Cmgmyr\Messenger\Traits\Messagable;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasAccountType
 {
 
     use Notifiable, HasApiTokens, HasRoles, Messagable;
@@ -1043,10 +1049,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Skill::class, 'user_skills');
     }
 
+    /** Current POD memberships (every state except removed); the pivot carries `state`. */
     public function pods()
     {
         return $this->belongsToMany(Pod::class, 'pod_users')
-                    ->withPivot('permission', 'status', 'reason')
+                    ->withPivot('id', 'permission', 'state', 'reason')
+                    ->wherePivot('state', '!=', \App\Enums\PodUser\State::REMOVED->value)
                     ->withTimestamps();
     }
 
@@ -1066,14 +1074,137 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('ownerable_type', '!=', 'App\Models\Pod');
     }
 
-    public function isEmployee(): bool
+    /*
+    |--------------------------------------------------------------------------
+    | Account identity (UNA-002) - the only place that reads users.type / account roles
+    |--------------------------------------------------------------------------
+    |
+    | users.type = admin|user is the broad class; the company/employee persona of a
+    | non-admin is exactly one Spatie role (UserRole). Precedence: administrator, then
+    | company, then employee. Clients are App\Models\Client and never resolve here.
+    */
+
+    public function accountType(): ?AccountType
     {
-        return $this->hasRole(UserRole::EMPLOYEE->value);
+        if ($this->isAdministrator()) {
+            return AccountType::ADMINISTRATOR;
+        }
+
+        return match ($this->accountRole()) {
+            UserRole::COMPANY => AccountType::COMPANY,
+            UserRole::EMPLOYEE => AccountType::EMPLOYEE,
+            null => null,
+        };
+    }
+
+    /** The persona role of a non-administrator, company winning over a stray employee role. */
+    public function accountRole(): ?UserRole
+    {
+        if ($this->isAdministrator()) {
+            return null;
+        }
+
+        foreach ([UserRole::COMPANY, UserRole::EMPLOYEE] as $role) {
+            if ($this->hasRole($role->value)) {
+                return $role;
+            }
+        }
+
+        return null;
+    }
+
+    public function isAdministrator(): bool
+    {
+        return $this->type === UserType::ADMIN->value;
+    }
+
+    public function isRegularUser(): bool
+    {
+        return $this->type === UserType::USER->value;
     }
 
     public function isCompany(): bool
     {
-        return $this->hasRole(UserRole::COMPANY->value);
+        return $this->accountRole() === UserRole::COMPANY;
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->accountRole() === UserRole::EMPLOYEE;
+    }
+
+    public function isClient(): bool
+    {
+        return false;
+    }
+
+    /** Query scopes: use these instead of where('type', ...) / role(...) combinations. */
+    public function scopeAdministrators(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('type'), UserType::ADMIN->value);
+    }
+
+    public function scopeNonAdministrators(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('type'), '!=', UserType::ADMIN->value);
+    }
+
+    public function scopeCompanies(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('type'), UserType::USER->value)
+            ->role(UserRole::COMPANY->value, UserRole::GUARD);
+    }
+
+    public function scopeEmployees(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('type'), UserType::USER->value)
+            ->role(UserRole::EMPLOYEE->value, UserRole::GUARD)
+            ->whereDoesntHave('roles', function (Builder $roles) {
+                $roles->where('name', UserRole::COMPANY->value);
+            });
+    }
+
+    /**
+     * The single write path for a non-administrator's persona: sets users.type = user,
+     * removes only the opposing account role, keeps every unrelated Spatie role.
+     */
+    public function assignAccountRole(UserRole $role): static
+    {
+        if ($this->isAdministrator()) {
+            throw new \LogicException('Administrators cannot hold a company or employee account role.');
+        }
+
+        DB::transaction(function () use ($role) {
+            if ($this->type !== UserType::USER->value) {
+                $this->forceFill(['type' => UserType::USER->value]);
+            }
+            if (!$this->exists || $this->isDirty()) {
+                $this->save();
+            }
+
+            $opposite = $role->opposite();
+            if ($this->hasRole($opposite->value)) {
+                $this->removeRole($opposite->value);
+            }
+            if (!$this->hasRole($role->value)) {
+                $this->assignRole(Role::findOrCreate($role->value, UserRole::GUARD));
+            }
+        });
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->unsetRelation('roles');
+
+        return $this;
+    }
+
+    /** Create a non-administrator account and its persona role atomically. */
+    public static function createWithAccountRole(array $attributes, UserRole $role): static
+    {
+        return DB::transaction(function () use ($attributes, $role) {
+            $user = static::create(array_merge($attributes, ['type' => UserType::USER->value]));
+
+            return $user->assignAccountRole($role);
+        });
     }
 
     public function updateCurrentWorkspace()
@@ -1094,7 +1225,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if ($userId) {
             $user = User::find($userId);
-            if ($user && $user->hasRole(UserRole::EMPLOYEE->value)) {
+            if ($user && $user->isEmployee()) {
                 return $this->hasMany('App\Models\Workspace', 'created_by', 'id')
                     ->where('ownerable_type', '!=', 'App\Models\Pod')
                     ->whereDoesntHave('users', function($query) use ($userId) {
@@ -1115,9 +1246,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if ($userId) {
             $user = User::find($userId);
-            if ($user && $user->hasRole(UserRole::EMPLOYEE->value)) {
+            if ($user && $user->isEmployee()) {
                 return $this->belongsToMany('App\Models\Pod', 'pod_users')
-                    ->withPivot('permission', 'status', 'reason')
+                    ->withPivot('id', 'permission', 'state', 'reason')
                     ->wherePivot('permission', 'Owner')
                     ->whereDoesntHave('users', function($query) use ($userId) {
                         $query->where('user_id', $userId);
@@ -1129,7 +1260,7 @@ class User extends Authenticatable implements MustVerifyEmail
             }
         } else {
             return $this->belongsToMany('App\Models\Pod', 'pod_users')
-                ->withPivot('permission', 'status', 'reason')
+                ->withPivot('id', 'permission', 'state', 'reason')
                 ->wherePivot('permission', 'Owner')
                 ->withTimestamps()
                 ->get();

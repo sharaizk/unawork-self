@@ -349,12 +349,12 @@ class CinetPayController extends Controller
                 $get_amount = $request->amount;
 
                 $orderId = strtoupper(str_replace('.', '', uniqid('', true)));
-                $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+                $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
                 $cinetpay_api_key =  $this->cinetpay_api_key;
                 $cinetpay_site_id = $this->cinetpay_site_id;
                 $currency =  $this->currancy;
                 $user_auth = Auth::user();
-                $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+                $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
                 if (
                     $currency != 'XOF' &&
                     $currency != 'CDF' &&
@@ -429,7 +429,7 @@ class CinetPayController extends Controller
         $cinetpaySession = $request->session()->get('cinetpaySession');
         $request->session()->forget('cinetpaySession');
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $invoice = Invoice::where('id', $invoice_id)->first();
         if (!empty($invoice)) {
             $orderId = $cinetpaySession['order_id'];

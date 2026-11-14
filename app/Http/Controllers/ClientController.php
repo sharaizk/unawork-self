@@ -287,7 +287,7 @@ class ClientController extends Controller
 
         $objUser->name = $request->name;
         $objUser->email = $request->email;
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $objUser->password = Hash::make($request->password);
         }
         $objUser->city = $request->city;

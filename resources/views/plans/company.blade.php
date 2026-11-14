@@ -61,7 +61,7 @@
                                         ">
                                         <div class="card-body">
                                             <span class="price-badge bg-primary">{{ $plan->name }} </span>
-                                            @if (\Auth::user()->type == 'user' && \Auth::user()->plan == $plan->id && $userFrequency == 'monthly')
+                                            @if (\Auth::user()->isRegularUser() && \Auth::user()->plan == $plan->id && $userFrequency == 'monthly')
                                                 <div class="d-flex flex-row-reverse m-0 p-0 ">
                                                     <span class="d-flex align-items-center ms-2">
                                                         <i class="f-10 lh-1 fas fa-circle text-success"></i>
@@ -134,7 +134,7 @@
                                                     {{ __('Projects Per Workspace') }}
                                                 </li>
                                             </ul>
-                                            @if (Auth::user()->type != 'admin')
+                                            @if (!Auth::user()->isAdministrator())
                                                 <div class="d-grid text-center">
 
                                                     @if (\Auth::user()->plan == $plan->id && Auth::user()->is_trial_done == 1)
@@ -367,7 +367,7 @@
                                         <div class="card-body">
                                             <span class="price-badge bg-primary">{{ $plan->name }} </span>
 
-                                            @if (\Auth::user()->type == 'user' && \Auth::user()->plan == $plan->id && $userFrequency == 'annual')
+                                            @if (\Auth::user()->isRegularUser() && \Auth::user()->plan == $plan->id && $userFrequency == 'annual')
                                                 <div class="d-flex flex-row-reverse m-0 p-0 ">
                                                     <span class="d-flex align-items-center ms-2">
                                                         <i class="f-10 lh-1 fas fa-circle text-success"></i>
@@ -426,7 +426,7 @@
                                                     {{ __('Projects Per Workspace') }}
                                                 </li>
                                             </ul>
-                                            @if (Auth::user()->type != 'admin')
+                                            @if (!Auth::user()->isAdministrator())
                                                 <div class="d-grid text-center">
 
                                                     @if (\Auth::user()->plan == $plan->id && Auth::user()->is_trial_done == 1)

@@ -223,7 +223,7 @@ class FedapayPaymentController extends Controller
                 $user_auth = Auth::user();
                 $get_amount = $request->amount;
                 $orderId = strtoupper(str_replace('.', '', uniqid('', true)));
-                $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+                $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
                 \FedaPay\FedaPay::setApiKey($this->fedapay_secret_key);
 
@@ -250,7 +250,7 @@ class FedapayPaymentController extends Controller
     {
         $invoiceId = $request->invoice_id;
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
         $invoice = Invoice::find($invoiceId);
 
         if (!empty($invoice)) {

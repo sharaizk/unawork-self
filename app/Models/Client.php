@@ -6,9 +6,11 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Contracts\HasAccountType;
+use App\Enums\User\AccountType;
 
 
-class Client extends Authenticatable implements MustVerifyEmail
+class Client extends Authenticatable implements MustVerifyEmail, HasAccountType
 {
     use Notifiable;
     protected $guard = 'client';
@@ -37,6 +39,40 @@ class Client extends Authenticatable implements MustVerifyEmail
 
     public function getGuard(){
         return $this->guard;
+    }
+
+    /*
+    | Account identity (UNA-002): a Client is only ever a client, regardless of the
+    | company workspaces it belongs to. See App\Contracts\HasAccountType.
+    */
+    public function accountType(): ?AccountType
+    {
+        return AccountType::CLIENT;
+    }
+
+    public function isAdministrator(): bool
+    {
+        return false;
+    }
+
+    public function isRegularUser(): bool
+    {
+        return false;
+    }
+
+    public function isCompany(): bool
+    {
+        return false;
+    }
+
+    public function isEmployee(): bool
+    {
+        return false;
+    }
+
+    public function isClient(): bool
+    {
+        return true;
     }
 
     public function workspace()

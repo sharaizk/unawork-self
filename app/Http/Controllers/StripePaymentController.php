@@ -46,14 +46,14 @@ class StripePaymentController
         $currentWorkspace = Utility::getWorkspaceBySlug('');
         $objUser = \Auth::user();
 
-        if ($objUser->type == 'admin' || $currentWorkspace->creater->id == $objUser->id) {
+        if ($objUser->isAdministrator() || $currentWorkspace->creater->id == $objUser->id) {
             $query = Order::select([
                 'orders.*',
                 'users.name as user_name',
             ])->join('users', 'orders.user_id', '=', 'users.id');
             // dd($query->toArray());
 
-            if ($objUser->type !== 'admin') {
+            if (!$objUser->isAdministrator()) {
                 $query->where('users.id', $objUser->id);
             }
 

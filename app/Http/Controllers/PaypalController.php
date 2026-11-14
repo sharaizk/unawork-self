@@ -307,7 +307,7 @@ class PaypalController extends Controller
         //$user = $this->user;
         $totalAmount = $request->amount;
         $user_auth = Auth::user();
-        $client_keyword = isset($user_auth) ? (($user_auth->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user_auth) ? (($user_auth->isClient()) ? 'client.' : '') : '';
 
         $request->validate(['amount' => 'required|numeric|min:0']);
 

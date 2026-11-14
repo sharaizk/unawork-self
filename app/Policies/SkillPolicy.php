@@ -15,7 +15,7 @@ class SkillPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->type === 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -23,7 +23,7 @@ class SkillPolicy
      */
     public function view(User $user, Skill $skill): bool
     {
-        return $user->type === 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -31,7 +31,7 @@ class SkillPolicy
      */
     public function create(User $user): bool
     {
-        return $user->type === 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -39,7 +39,7 @@ class SkillPolicy
      */
     public function update(User $user, Skill $skill): bool
     {
-        return $user->type === 'admin';
+        return $user->isAdministrator();
     }
 
     /**
@@ -47,6 +47,6 @@ class SkillPolicy
      */
     public function delete(User $user, Skill $skill): bool
     {
-        return $user->type === 'admin';
+        return $user->isAdministrator();
     }
 }

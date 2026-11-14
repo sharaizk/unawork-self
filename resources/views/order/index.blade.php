@@ -35,7 +35,7 @@
                                     <th>{{ __('Coupon') }}</th>
                                     <th>{{ __('Date') }}</th>
                                     <th>{{ __('Invoice') }}</th>
-                                    @if (Auth::user()->type == 'admin')
+                                    @if (Auth::user()->isAdministrator())
                                         <th colspan="2">{{ __('Action') }}</th>
                                     @endif
                                 </tr>
@@ -68,7 +68,7 @@
                                                 </a>
                                             @endif
                                         </td>
-                                        @if (Auth::user()->type == 'admin')
+                                        @if (Auth::user()->isAdministrator())
                                             <td>
                                                 @if ($order->payment_type == 'Bank Transfer' && $order->payment_status == 'pending')
                                                     <a href="#"

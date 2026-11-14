@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @php
     $permissions = Auth::user()->getPermission($project->id);
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 
 @php

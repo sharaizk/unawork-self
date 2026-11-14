@@ -63,7 +63,7 @@ class Utility
         if (!$objUser) {
             $rs = Workspace::select(['workspaces.*'])->where('slug', '=', $slug)->limit(1)->first();
         } elseif ($objUser && !empty($slug)) {
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $rs = Workspace::select(['workspaces.*'])->join('client_workspaces', 'workspaces.id', '=', 'client_workspaces.workspace_id')->where('slug', '=', $slug)->where('client_id', '=', $objUser->id)->first();
             } else {
                 $rs = Workspace::select([
@@ -72,7 +72,7 @@ class Utility
                 ])->join('user_workspaces', 'workspaces.id', '=', 'user_workspaces.workspace_id')->where('slug', '=', $slug)->where('user_id', '=', $objUser->id)->first();
             }
         } elseif ($objUser) {
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $rs = Workspace::select(['workspaces.*'])->join('client_workspaces', 'workspaces.id', '=', 'client_workspaces.workspace_id')->where('client_id', '=', $objUser->id)->orderBy('workspaces.id', 'desc')->limit(1)->first();
                 $objUser->currant_workspace = $rs->id;
                 $objUser->save();
@@ -83,7 +83,7 @@ class Utility
                 ])->join('user_workspaces', 'workspaces.id', '=', 'user_workspaces.workspace_id')->where('user_id', '=', $objUser->id)->orderBy('workspaces.id', 'desc')->limit(1)->first();
             }
         } else {
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $rs = Workspace::select(['workspaces.*'])->join('client_workspaces', 'workspaces.id', '=', 'client_workspaces.workspace_id')->where('workspaces.id', '=', $objUser->currant_workspace)->where('client_id', '=', $objUser->id)->first();
             } else {
                 $rs = Workspace::select([
@@ -1038,7 +1038,7 @@ class Utility
             if (!empty($user->currant_workspace)) {
                 return $user->currant_workspace;
             } else {
-                if ($user->type == 'admin') {
+                if ($user->isAdministrator()) {
                     return 0;
                 } else {
                     $workspace = WorkSpace::where('created_by', $user->id)->first();
@@ -1069,7 +1069,7 @@ class Utility
     {
         $usr = Auth::user();
 
-        if ((isset($usr) && $usr->type == 'admin') || ($usr == null)) {
+        if ((isset($usr) && $usr->isAdministrator()) || ($usr == null)) {
             $settings = self::fetchAdminPaymentSetting();
             $settings =
                 [
@@ -1135,7 +1135,7 @@ class Utility
 
                 if ($is_active->is_active == 1) {
 
-                    if (Auth::user()->type == 'admin') {
+                    if (Auth::user()->isAdministrator()) {
                         $settings = self::fetchAdminPaymentSetting();
                         $settings =
                             [
@@ -1238,7 +1238,7 @@ class Utility
         if ($user_id != $usr->id) {
             $mailTo = Client::find($user_id)->email;
 
-            if ($usr->type != 'admin') {
+            if (!$usr->isAdministrator()) {
                 // find template is exist or not in our record
                 $template = EmailTemplate::where('name', 'LIKE', $emailTemplate)->first();
 
@@ -1248,7 +1248,7 @@ class Utility
 
                     if ($is_active->is_active == 1) {
 
-                        if (Auth::user()->type == 'admin') {
+                        if (Auth::user()->isAdministrator()) {
                             $settings = self::fetchAdminPaymentSetting();
                             $settings =
                                 [

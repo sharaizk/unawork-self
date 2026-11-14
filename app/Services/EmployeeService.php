@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\User\UserRole;
 use App\Filters\Employee\EmployeeFilter;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,8 +12,7 @@ class EmployeeService
     public function getEmployees(array $data): Collection
     {
         $filter = new EmployeeFilter($data);
-        $employees = User::where('plan', NULL)
-            ->where('type', 'user');
+        $employees = User::employees();
 
         $employees = $filter->apply($employees->with(['profile', 'skills']));
         return $employees->get();
@@ -30,7 +30,7 @@ class EmployeeService
     public function makeEmployee(User $user)
     {
         try {
-            $user->assignRole('employee');
+            $user->assignAccountRole(UserRole::EMPLOYEE);
         } catch (\Exception $e) {
             throw new \Exception(__($e->getMessage()));
         }

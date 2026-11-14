@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @php
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 
 @section('page-title')
@@ -81,12 +81,12 @@ $('.summernote').summernote({
             </div>
              @endif
         @endif
-         @if ($currentWorkspace->permission == 'Owner' || \Auth::user()->getGuard() == 'client')
+         @if ($currentWorkspace->permission == 'Owner' || \Auth::user()->isClient())
             <div class="col-auto pe-0 px-2">
                 <a href="{{route($client_keyword.'contract.download.pdf',[$currentWorkspace->slug,\Crypt::encrypt($contract->id)])}}" class="btn btn-sm btn-primary btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Download')}}" target="_blanks"><i class="ti ti-download"></i></a>
             </div>
         @endif
-        @if ($currentWorkspace->permission == 'Owner' || \Auth::user()->getGuard() == 'client')
+        @if ($currentWorkspace->permission == 'Owner' || \Auth::user()->isClient())
             <div class="col-auto pe-0 px-2">
                 <a href="{{route($client_keyword.'get.contract',[$currentWorkspace->slug,$contract->id])}}" target="_blank" class="btn btn-sm btn-primary btn-icon" title="{{__('Preview')}}" data-bs-toggle="tooltip" data-bs-placement="top">
                     <i class="ti ti-eye"></i>
@@ -94,7 +94,7 @@ $('.summernote').summernote({
             </div>
         @endif
 
-        @if($currentWorkspace->permission == 'Owner' && $contract->company_signature == null ||\Auth::user()->getGuard() == 'client' && $contract->client_signature == null)
+        @if($currentWorkspace->permission == 'Owner' && $contract->company_signature == null ||\Auth::user()->isClient() && $contract->client_signature == null)
         @if(($contract->status == 'accept')  || ($currentWorkspace->permission == 'Owner'))
             <div class="col-auto pe-0 px-2">
                 <a href="#" class="btn btn-sm btn-primary btn-icon" data-url="{{ route($client_keyword.'signature',[$currentWorkspace->slug,$contract->id]) }}" data-ajax-popup="true" data-title="{{__('Create Signature')}}" data-size="md" title="{{__('Signature')}}" data-bs-toggle="tooltip" data-bs-placement="top">
@@ -108,7 +108,7 @@ $('.summernote').summernote({
                  $editstatus = App\Models\Contract::editstatus();
            @endphp
            {{-- @if($currentWorkspace->permission == 'Owner') --}}
-           @if(\Auth::user()->getGuard() == 'client')
+           @if(\Auth::user()->isClient())
             <div class="col-auto pe-0">
             <ul class="list-unstyled mb-0 ms-1">
                 <li class="dropdown dash-h-item drp-language">
@@ -261,7 +261,7 @@ $('.summernote').summernote({
                                                      <div class="col-md-12 dropzone browse-file" id="dropzonewidget">
                                                         <div class="dz-message" data-dz-message>
                                                             <span>
-                                                                @if(Auth::user()->getGuard() == 'client')
+                                                                @if(Auth::user()->isClient())
                                                                     {{__('No files available')}}
                                                                 @else
                                                                     {{__('Drop files here to upload')}}

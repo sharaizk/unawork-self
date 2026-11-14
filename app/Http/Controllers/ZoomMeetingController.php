@@ -37,8 +37,8 @@ class ZoomMeetingController extends Controller
 
         $userWorkspace = UserWorkspace::where('user_id', $objUser->id)->where('workspace_id', $currentWorkspace->id)->first();
 
-        if(isset($objUser) && isset($currentWorkspace) && $objUser->type !== 'admin'){
-            if ($objUser->getGuard() == 'client') {
+        if(isset($objUser) && isset($currentWorkspace) && !$objUser->isAdministrator()){
+            if ($objUser->isClient()) {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
             } elseif ($currentWorkspace->permission == 'Owner' || $userWorkspace->hasPermissionTo(UserWorkspacePermission::ZOOM_MEETING_INDEX->value)) {
                 $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
@@ -266,7 +266,7 @@ class ZoomMeetingController extends Controller
         $objUser = Auth::user();
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
-        if ($objUser->getGuard() == 'client') {
+        if ($objUser->isClient()) {
             $meetings = ZoomMeeting::whereRaw("find_in_set(".\Auth::user()->id.",client_id)")->where('workspace_id',$currentWorkspace->id)->get();
         } elseif ($currentWorkspace->permission == 'Owner') {
             $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)
@@ -376,7 +376,7 @@ class ZoomMeetingController extends Controller
 
             $currentWorkspace = Utility::getWorkspaceBySlug($slug);
 
-            if ($objUser->getGuard() == 'client') {
+            if ($objUser->isClient()) {
                 $meetings = ZoomMeeting::whereRaw("find_in_set(" . \Auth::user()->id . ",client_id)")->where('workspace_id', $currentWorkspace->id)->get();
             } elseif ($currentWorkspace->permission == 'Owner') {
                 $meetings = ZoomMeeting::where('workspace_id', $currentWorkspace->id)

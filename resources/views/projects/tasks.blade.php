@@ -123,7 +123,7 @@
                                 <th>{{ __('Project') }}</th>
                                 <th>{{ __('Milestone') }}</th>
                                 <th>{{ __('Due Date') }}</th>
-                                @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+                                @if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient())
                                     <th>{{ __('Assigned to') }}</th>
                                 @endif
                                 <th>{{ __('Status') }}</th>

@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\User\UserRole;
+use App\Enums\User\UserType;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -31,6 +33,26 @@ class UserFactory extends Factory
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /** Administrator: users.type = admin and no company/employee role. */
+    public function administrator()
+    {
+        return $this->state(['type' => UserType::ADMIN->value]);
+    }
+
+    /** Company account, classified through the canonical write path. */
+    public function company()
+    {
+        return $this->state(['type' => UserType::USER->value])
+            ->afterCreating(fn (User $user) => $user->assignAccountRole(UserRole::COMPANY));
+    }
+
+    /** Employee account, classified through the canonical write path. */
+    public function employee()
+    {
+        return $this->state(['type' => UserType::USER->value])
+            ->afterCreating(fn (User $user) => $user->assignAccountRole(UserRole::EMPLOYEE));
     }
 
     /**

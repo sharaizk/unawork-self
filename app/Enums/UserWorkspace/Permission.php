@@ -2,6 +2,10 @@
 
 namespace App\Enums\UserWorkspace;
 
+/**
+ * Per-workspace permissions held by UserWorkspace records (never by account roles).
+ * PermissionsSeeder seeds every case; UserWorkspace::assignAllPermissionsToCreator() grants them.
+ */
 enum Permission: string
 {
     case USERS_INDEX = 'users_index';
@@ -15,4 +19,13 @@ enum Permission: string
     
     case ZOOM_MEETING_INDEX = 'zoom_meeting_index';
     case ZOOM_MEETING_EDIT = 'zoom_meeting_edit';
+
+    /** Spatie guard of workspace permissions; UserWorkspace::$guard_name uses this. */
+    public const GUARD = 'web';
+
+    /** @return string[] */
+    public static function values(): array
+    {
+        return array_map(fn (self $permission) => $permission->value, self::cases());
+    }
 }

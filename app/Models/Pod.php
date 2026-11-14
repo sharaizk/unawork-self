@@ -24,11 +24,28 @@ class Pod extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /** Current memberships (every state except removed); the pivot carries `state`. */
     public function users()
     {
         return $this->belongsToMany(User::class, 'pod_users')
-                    ->withPivot('permission', 'status', 'reason')
+                    ->withPivot('id', 'permission', 'state', 'reason')
+                    ->wherePivot('state', '!=', \App\Enums\PodUser\State::REMOVED->value)
                     ->withTimestamps();
+    }
+
+    /** Outer and Inner Circle members (incl. screening), e.g. for public member lists. */
+    public function activeUsers()
+    {
+        return $this->belongsToMany(User::class, 'pod_users')
+                    ->withPivot('id', 'permission', 'state', 'reason')
+                    ->wherePivotIn('state', \App\Enums\PodUser\State::values(\App\Enums\PodUser\State::activeMembers()))
+                    ->withTimestamps();
+    }
+
+    /** Every membership row of this POD, including removed ones (management/history). */
+    public function memberships()
+    {
+        return $this->hasMany(PodUser::class);
     }
 
     public function news()

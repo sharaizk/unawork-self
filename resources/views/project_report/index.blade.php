@@ -19,7 +19,7 @@
 @endsection
 @php
 
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
 @endphp
 
 @section('content')
@@ -36,7 +36,7 @@
         @endforeach
                 </select>
             </div> -->
-        @if ($currentWorkspace->permission == 'Owner' || Auth::user()->getGuard() == 'client')
+        @if ($currentWorkspace->permission == 'Owner' || Auth::user()->isClient())
             <div class="col-md-2 col-sm-6 pb-3">
                 <select class="select2 form-select" name="all_users" id="all_users">
                     <option value="" class="px-4">{{ __('All Users') }}</option>

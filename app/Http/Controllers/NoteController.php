@@ -63,7 +63,7 @@ class NoteController extends Controller
         }
         else
         {
-            $users = User::where('type', '!=', 'admin')->get();
+            $users = User::nonAdministrators()->get();
         }
 
         $projects = $user->projects()->get();
@@ -143,7 +143,7 @@ class NoteController extends Controller
         }
         else
         {
-            $users = User::where('type', '!=', 'admin')->get();
+            $users = User::nonAdministrators()->get();
         }
         $projects = Auth::user()->projects()->get();
 

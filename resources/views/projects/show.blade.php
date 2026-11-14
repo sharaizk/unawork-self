@@ -16,7 +16,7 @@
 @php
     $adminSetting = App\Models\Utility::getAdminPaymentSetting();
     $permissions = Auth::user()->getPermission($project->id);
-    $client_keyword = Auth::user()->getGuard() == 'client' ? 'client.' : '';
+    $client_keyword = Auth::user()->isClient() ? 'client.' : '';
     $logo = \App\Models\Utility::get_file('users-avatar/');
     $logo_project_files = \App\Models\Utility::get_file('project_files/');
     $userWorkspace = \App\Models\UserWorkspace::where('user_id', Auth::id())->where('workspace_id', $currentWorkspace->id)->first();
@@ -341,9 +341,12 @@
                                                                     <i class="ti ti-mail"></i>
                                                                 </a>
                                                             @endif
-                                                            @if ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
-
-                                                                @if ($user->pivot->status == 'pending')
+                                                            {{-- Join/claim requests: visibility follows UserProjectPolicy (owner or projects_edit), independent of the member-management condition below. --}}
+                                                            @if ($user->pivot->status == 'pending')
+                                                                    @php
+                                                                        $projectClaim = \App\Models\UserProject::find($user->pivot->id);
+                                                                    @endphp
+                                                                    @if ($projectClaim && Auth::user()->can('accept', $projectClaim))
                                                                         @php
                                                                             $acceptLink = route('pods.projects.join.accept', ['record' => $user->pivot->id]);
                                                                             $declineLink = route('pods.projects.join.decline', ['record' => $user->pivot->id]);
@@ -362,8 +365,8 @@
                                                                                 data-bs-title="{{ __('Decline User') }}">
                                                                             <i class="ti ti-thumb-down"></i>
                                                                         </a>
-
-                                                                @else
+                                                                    @endif
+                                                            @elseif ($currentWorkspace->permission == 'Owner' && $user->id != Auth::id() || $userWorkspace->hasPermissionTo('users_edit') && $user->id != Auth::id())
                                                                     @if ($user->pivot->status != 'declined')
                                                                         <a href="#"
                                                                            class="action-btn btn-primary mx-1  btn btn-sm d-inline-flex align-items-center"
@@ -386,7 +389,6 @@
                                                                         @csrf
                                                                         @method('DELETE')
                                                                     </form>
-                                                                @endif
                                                             @endif
                                                         @endauth
                                                     </div>
@@ -751,7 +753,7 @@
                                     <div class="col-md-12 dropzone browse-file" id="dropzonewidget">
                                         <div class="dz-message" data-dz-message>
                                             <span>
-                                                @if (Auth::user()->getGuard() == 'client')
+                                                @if (Auth::user()->isClient())
                                                     {{ __('No files available') }}
                                                 @else
                                                     {{ __('Drop files here to upload') }}

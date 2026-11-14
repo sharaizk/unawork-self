@@ -1,7 +1,7 @@
  @extends('layouts.admin')
 
  @section('page-title')
-     @if (\Auth::user()->type == 'admin')
+     @if (\Auth::user()->isAdministrator())
          {{ __('Manage Companies') }}
      @else
          {{ __('Manage Users') }}
@@ -14,7 +14,7 @@
          <li class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></li>
      @endif
 
-     @if (\Auth::user()->type == 'admin')
+     @if (\Auth::user()->isAdministrator())
          <li class="breadcrumb-item"> {{ __('company') }}</li>
      @else
          <li class="breadcrumb-item"> {{ __('Users') }}</li>
@@ -26,7 +26,7 @@
  @endphp
  @section('action-button')
      @auth('web')
-         @if (Auth::user()->type == 'admin')
+         @if (Auth::user()->isAdministrator())
              <a href="{{ route('user.export') }}" class="btn btn-sm btn-primary" data-toggle="tooltip" title="{{ __('Export') }}">
                  <i class="ti ti-file-x"></i>
              </a>
@@ -58,7 +58,7 @@
  @endsection
 
  @section('content')
-     @if ($currentWorkspace || Auth::user()->type == 'admin')
+     @if ($currentWorkspace || Auth::user()->isAdministrator())
          <div class="row">
              <div class="col-md-12 mb-3">
                  <div class="input-group mb-3">
@@ -75,7 +75,7 @@
                          <div class="card-header border-0 pb-0">
                              <div class="d-flex justify-content-between align-items-center">
                                  <h6 class="mb-0">
-                                     @if (Auth::user()->type == 'admin' && isset($user->getPlan))
+                                     @if (Auth::user()->isAdministrator() && isset($user->getPlan))
                                          <div class="badge p-2 px-3 rounded bg-info">{{ $user->getPlan->name }}</div>
                                      @else
                                          @if ($user->permission == 'Owner')
@@ -93,7 +93,7 @@
                                  </h6>
                              </div>
                              @if (
-                                 (Auth::user()->type == 'admin' && isset($user->getPlan)) ||
+                                 (Auth::user()->isAdministrator() && isset($user->getPlan)) ||
                                      (isset($currentWorkspace) &&
                                          $currentWorkspace &&
                                          $currentWorkspace->permission == 'Owner' &&
@@ -106,7 +106,7 @@
                                                  <i class="feather icon-more-vertical"></i>
                                              </button>
                                              <div class="dropdown-menu dropdown-menu-end">
-                                                 @if (Auth::user()->type == 'admin' && isset($user->getPlan))
+                                                 @if (Auth::user()->isAdministrator() && isset($user->getPlan))
                                                     <a href="#" class="dropdown-item" data-ajax-popup="true"
                                                          data-size="lg" data-title="{{ __('Change Plan') }}"
                                                          data-url="{{ route('users.change.plan', $user->id) }}"><i
@@ -256,7 +256,7 @@
                                        avatar="{{ $user->name }}" @endif>
                              </div>
                              <h4 class="mt-2">
-                                @if ($user->hasRole('employee'))
+                                @if ($user->isEmployee())
                                     <a href="{{ route('employee.show', ['employee' => $user]) }}">
                                         {{ $user->name }}
                                         <i class="ti ti-eye"></i>
@@ -270,14 +270,14 @@
                              <div class=" mb-0 mt-3">
                                  <div class=" p-3">
                                      <div class="row px-2">
-                                         @if (Auth::user()->type == 'admin')
+                                         @if (Auth::user()->isAdministrator())
                                              <div class="col-6 text-start">
 
                                                  <h6 class="mb-0 px-3">{{ $user->countWorkspace() }}</h6>
                                                  <p class="text-muted text-sm mb-0">{{ __('Workspaces') }}</p>
                                              </div>
                                              <div
-                                                 class="col-6 {{ Auth::user()->type == 'admin' ? 'text-end' : 'text-start' }}  ">
+                                                 class="col-6 {{ Auth::user()->isAdministrator() ? 'text-end' : 'text-start' }}  ">
                                                  <h6 class="mb-0 px-3">{{ $user->countUsers($workspace_id) }}</h6>
                                                  <p class="text-muted text-sm mb-0">{{ __('Users') }}</p>
                                              </div>
@@ -288,12 +288,12 @@
                                          @endif
 
                                          <div
-                                             class="col-6  {{ Auth::user()->type == 'admin' ? 'text-end mt-2' : 'text-start' }} ">
+                                             class="col-6  {{ Auth::user()->isAdministrator() ? 'text-end mt-2' : 'text-start' }} ">
                                              <h6 class="mb-0 px-3">{{ $user->countProject($workspace_id) }}</h6>
                                              <p class="text-muted text-sm mb-0">{{ __('Projects') }}</p>
                                          </div>
 
-                                         @if (Auth::user()->type == 'admin')
+                                         @if (Auth::user()->isAdministrator())
                                              <div class="col-12 text-center Id mt-3">
                                                  <a href="#" data-url="{{ route('company.info', $user->id) }}"
                                                      data-size="lg" data-ajax-popup="true"
@@ -302,7 +302,7 @@
                                              </div>
                                          @endif
 
-                                         @if (Auth::user()->type != 'admin')
+                                         @if (!Auth::user()->isAdministrator())
                                              <div class="col-6 text-end">
                                                  <h6 class="mb-0 px-3">{{ $user->countTask($workspace_id) }}</h6>
                                                  <p class="text-muted text-sm mb-0">{{ __('Tasks') }}</p>
@@ -312,7 +312,7 @@
                                  </div>
                              </div>
                              <p class="mt-2 mb-0">
-                                 @if (Auth::user()->type == 'admin' && isset($user->getPlan))
+                                 @if (Auth::user()->isAdministrator() && isset($user->getPlan))
                                      <button class="btn btn-sm btn-neutral mt-3 font-weight-500">
                                          @if (!empty($user->plan_expire_date))
                                              <a>{{ $user->is_trial_done == 1 ? __('Plan Trial') : __('Plan') }}
@@ -335,7 +335,7 @@
 
              <div class="col-xl-3 col-lg-4 col-sm-6">
                  @auth('web')
-                     @if (Auth::user()->type == 'admin')
+                     @if (Auth::user()->isAdministrator())
                          <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="md"
                              data-title="{{ __('Create Company') }}" data-url="{{ route('users.create') }}">
                              <div class="bg-primary proj-add-icon">
@@ -345,7 +345,7 @@
                              <p class="text-muted text-center">Click here to add New Company</p>
                          </a>
                      @elseif(isset($currentWorkspace) && $currentWorkspace->creater->id == Auth::id())
-                        @if (!$currentWorkspace->creater->hasRole('employee') && $currentWorkspace->ownerable_id == 0)
+                        @if (!$currentWorkspace->creater->isEmployee() && $currentWorkspace->ownerable_id == 0)
                             <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="md"
                                 data-title="{{ __('Invite New User') }}"
                                 data-url="{{ route('users.invite', $currentWorkspace->slug) }}">

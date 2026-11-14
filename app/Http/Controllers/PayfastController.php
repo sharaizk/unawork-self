@@ -230,7 +230,7 @@ class PayfastController extends Controller
 
         $invoice = Invoice::find($invoice_id);
         $user1 = Auth::user();
-        $client_keyword = isset($user1) ? (($user1->getGuard() == 'client') ? 'client.' : '') : '';
+        $client_keyword = isset($user1) ? (($user1->isClient()) ? 'client.' : '') : '';
 
         if(Auth::user() != null){
             $this->user         = Auth::user();

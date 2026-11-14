@@ -134,7 +134,7 @@
         </div>
     </div>
     @auth('web')
-    @if (\Auth::user()->type != 'admin')
+    @if (!\Auth::user()->isAdministrator())
     <!-- create meeting popup -->
     <div class="modal fade" tabindex="-1" role="dialog" id="newMeetingPopup">
         <div class="modal-dialog modal-dialog-centered" role="document">

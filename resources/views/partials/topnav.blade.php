@@ -7,7 +7,7 @@
 @endphp
 @php
     $languages = \App\Models\Utility::languages();
-    if (Auth::user()->type == 'admin') {
+    if (Auth::user()->isAdministrator()) {
         $setting = App\Models\Utility::getAdminPaymentSetting();
         if ($setting['color']) {
             $color = $setting['color'];
@@ -96,7 +96,7 @@
                         </div>
                     </a>
                 </li>
-                @if (Auth::user()->type != 'admin')
+                @if (!Auth::user()->isAdministrator())
                     <li class="dropdown dash-h-item">
                         <a class="dash-head-link dropdown-toggle arrow-none ms-0" data-bs-toggle="dropdown"
                             href="#" role="button" aria-haspopup="false" aria-expanded="false">
@@ -171,7 +171,7 @@
                                 @endif
 
                         @endforeach --}}
-                        @if (Auth::user()->getGuard() != 'client')
+                        @if (!Auth::user()->isClient())
                             @php
                                 $login_status = false;
                             @endphp
@@ -198,9 +198,9 @@
 
                                                         @if ($workspace->ownerable_type == "App\Models\Pod")
                                                             <span class="badge bg-primary">{{ __('POD') }}</span>
-                                                        @elseif ($workspace->creater->hasRole('company'))
+                                                        @elseif ($workspace->creater->isCompany())
                                                             <span class="badge bg-primary">{{ __('Company') }}</span>
-                                                        @elseif ($workspace->creater->hasRole('employee'))
+                                                        @elseif ($workspace->creater->isEmployee())
                                                             <span class="badge bg-primary">{{ __('Own') }}</span>
                                                         @endif
 
@@ -233,7 +233,7 @@
                             @endforeach
                         @endif
                         {{-- For Client  --}}
-                        @if (Auth::user()->getGuard() == 'client')
+                        @if (Auth::user()->isClient())
                             @php
                                 $client = Auth::user();
                             @endphp
@@ -275,7 +275,7 @@
                             @foreach (Auth::user()->workspace as $workspace)
                                 @if ($currentWorkspace->id == $workspace->id)
                                     @if ($workspace->pivot->permission == 'Owner')
-                                        @if (Auth::user()->hasRole('company'))
+                                        @if (Auth::user()->isCompany())
                                             <a href="#!" class="dropdown-item" data-toggle="modal"
                                                 data-target="#modelCreateWorkspace">
                                                 <i class="ti ti-circle-plus"></i>
@@ -325,7 +325,7 @@
                         @endif
 
                         <!--   @if (env('CHAT_MODULE') == 'on')
-                            @if (\Auth::user()->type == 'user')
+                            @if (\Auth::user()->isRegularUser())
                                 <a href="{{ url('chats') }}" class="dropdown-item">
                                 <i class="ti ti-message-circle"></i>
                                 <span>{{ __('Chats') }}</span>
@@ -346,7 +346,7 @@
         <div class="ms-auto">
             <ul class="list-unstyled">
 
-                @if (Auth::user()->getGuard() != 'client')
+                @if (!Auth::user()->isClient())
                     @impersonating($guard = null)
                         <li class="dropdown dash-h-item drp-company">
                             <a class="btn btn-danger btn-sm me-3" href="{{ route('exit.admin') }}"><i
@@ -358,7 +358,7 @@
                 @endif
 
 
-                @if (\Auth::user()->type == 'user')
+                @if (\Auth::user()->isRegularUser())
                     @if ($adminSetting['enable_chat'] == 'on')
                         <li class="dash-h-item">
                             <a class="dash-head-link me-0" href="{{ url('chats') }}">
@@ -378,7 +378,7 @@
 
 
 
-                @if (\Auth::user()->type == 'user')
+                @if (\Auth::user()->isRegularUser())
                     <li class="dropdown dash-h-item drp-notification">
                         @if (isset($currentWorkspace) && $currentWorkspace)
                             @auth('web')
@@ -612,19 +612,25 @@
                                                         if (!$workspace || !$user) {
                                                             continue;
                                                         }
+                                                        // Buttons only for whoever UserWorkspacePolicy lets decide (the routes enforce it too).
+                                                        $joinRequest = \App\Models\UserWorkspace::find($data->id);
+                                                        $canModerate = $joinRequest && \Auth::user()->can('acceptJoinRequest', $joinRequest);
                                                         $acceptLink = route('company.join.accept', ['userWorkspace' => $data->id]);
                                                         $declineLink = route('company.join.decline', ['userWorkspace' => $data->id]);
                                                         $text = __('User : ') . '
                                                             <a href="'. route('employee.show', ['employee' => $data->user_id]) .'"><b>' . $user->name . '</b></a>
                                                             sent join request to your workspace:
                                                             <b><a href="'. route('users.index', ['slug' => $workspace->slug]) .'">'. $workspace->name . ' </a></b>
+                                                        ';
+                                                        if ($canModerate) {
+                                                            $text .= '
                                                             <br>
                                                             <br>
                                                             <button class="btn btn-success btn-sm p-1 align-baseline" style="margin-right: 8px;"
                                                                 onclick="window.location.href=\'' . $acceptLink . '\'">ACCEPT</button>
                                                             <button class="btn btn-danger btn-sm p-1 m-0 align-baseline"
-                                                                onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>
-                                                        ';
+                                                                onclick="window.location.href=\'' . $declineLink . '\'">DECLINE</button>';
+                                                        }
                                                     @endphp
                                                 @elseif($notification->type == 'workspace_invite')
                                                     @php
@@ -848,7 +854,7 @@
                                 </a>
                             @endforeach
                         @endif
-                        @if (\Auth::user()->type == 'admin')
+                        @if (\Auth::user()->isAdministrator())
                             {{-- @foreach (\App\Models\Utility::languages() as $lang)
                                 <a href="{{ route('change_lang_admin', $lang) }}"
                                     class="dropdown-item {{ $currantLang == $lang ? 'text-danger' : '' }}">
@@ -899,14 +905,14 @@
                             <i class="ti ti-user"></i>
                             <span>{{ __('My Profile') }}</span>
                         </a>
-                        @if (Auth::user()->type != "admin")
+                        @if (!Auth::user()->isAdministrator())
                             <!-- <a href="{{ route('pods.index') }}" class="dropdown-item">
                                 <i class="ti ti-message-circle"></i>
                                 <span>{{ __('PODS') }}</span>
                             </a> -->
                         @endif
                         <!--   @if (env('CHAT_MODULE') == 'on')
-                            @if (\Auth::user()->type == 'user')
+                            @if (\Auth::user()->isRegularUser())
                                 <a href="{{ url('chats') }}" class="dropdown-item">
                                 <i class="ti ti-message-circle"></i>
                                 <span>{{ __('Chats') }}</span>
@@ -930,7 +936,7 @@
     </div>
 </header>
 @if (isset($login_status))
-    @if (\Auth::user()->type != 'admin' && $login_status == false)
+    @if (!\Auth::user()->isAdministrator() && $login_status == false)
         <script>
             document.getElementById('logout-form1').submit();
         </script>

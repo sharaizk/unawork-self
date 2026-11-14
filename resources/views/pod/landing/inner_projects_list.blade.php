@@ -24,7 +24,7 @@
                         <button class="btn-reject">Request Sent</button>
                     @elseif (in_array($project->id, \Auth::user()->projects->where('pivot.status', 'declined')->pluck('id')->toArray()))
                         <button class="btn-reject">Request Declined</button>
-                    @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()))
+                    @elseif (!in_array($project->id, \Auth::user()->projects->pluck('id')->toArray()) && \Auth::user()->can('create', [\App\Models\UserProject::class, $project]))
                         <a href="{{ route('pods.projects.join', ['project' => $project->id]) }}" class="btn-accept">Join</a>
                     @endif
                 </div>

@@ -16,7 +16,7 @@
 @endsection
 
 @section('action-button')
-    @if (Auth::user()->type == 'admin')
+    @if (Auth::user()->isAdministrator())
         <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg" data-title="{{ __('Add Plan') }}"
             data-toggle="tooltip" title="{{ __('Add Plan') }}" data-url="{{ route('plans.create') }}">
             <i class="ti ti-plus"></i>

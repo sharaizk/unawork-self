@@ -6,7 +6,7 @@
 @php
     $currentWorkspace = App\Models\Workspace::where('id', Auth::user()->currant_workspace)->first();
 
-    if (Auth::user()->type == 'admin') {
+    if (Auth::user()->isAdministrator()) {
         $setting = App\Models\Utility::getAdminPaymentSetting();
         if ($setting['color']) {
             $color = $setting['color'];

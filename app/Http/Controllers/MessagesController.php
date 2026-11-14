@@ -50,7 +50,7 @@ class MessagesController extends Controller
     {
         $currentWorkspace = Utility::getWorkspaceBySlug('');
 
-        if (Auth::user()->type != 'admin') {
+        if (!Auth::user()->isAdministrator()) {
 
             $routeName = FacadesRequest::route()->getName();
             $route = (in_array($routeName, ['user', config('chatify.routes.prefix')]))
