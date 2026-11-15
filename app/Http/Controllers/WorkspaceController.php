@@ -542,7 +542,12 @@ class WorkspaceController extends Controller
             $payment_detail = Utility::getPaymentSetting($currentWorkspace->id);
             $EmailTemplates = EmailTemplate::all();
 
-            return view('users.setting', compact('currentWorkspace', 'EmailTemplates', 'taxes', 'stages', 'bugStages', 'colors', 'payment_detail'));
+            // UNA-010: company details are edited on /company/onboarding; settings shows a summary.
+            $completion = app(\App\Services\Company\BusinessOnboardingCompletionService::class);
+            $companyWorkspace = $completion->companyWorkspace($objUser);
+            $companyProfile = $companyWorkspace ? ['workspace' => $companyWorkspace] + $completion->breakdown($companyWorkspace) : null;
+
+            return view('users.setting', compact('currentWorkspace', 'EmailTemplates', 'taxes', 'stages', 'bugStages', 'colors', 'payment_detail', 'companyProfile'));
         } else {
             return redirect()->route('home')->with('error', __("You can't access workspace settings!"));
         }
@@ -1210,19 +1215,11 @@ class WorkspaceController extends Controller
                     );
                 }
             } else {
-
-                $currentWorkspace->company = $request->company;
-                $currentWorkspace->address = $request->address;
-                $currentWorkspace->city = $request->city;
-                $currentWorkspace->state = $request->state;
-                $currentWorkspace->zipcode = $request->zipcode;
-                $currentWorkspace->country = $request->country;
-                $currentWorkspace->telephone = $request->telephone;
-                $currentWorkspace->description = $request->description;
-                $currentWorkspace->website = $request->website;
-                $currentWorkspace->linkedin = $request->linkedin;
-                $currentWorkspace->facebook = $request->facebook;
-                $currentWorkspace->industry_id = $request->industry_id;
+                // UNA-010: company details are no longer written here (no second, unvalidated
+                // write path). They are edited on /company/onboarding through
+                // UpdateBusinessOnboardingRequest and BusinessOnboardingService.
+                return redirect()->route('company.onboarding.edit')
+                    ->with('error', __('Company details are now managed on the Company Profile page.'));
             }
             $currentWorkspace->save();
 

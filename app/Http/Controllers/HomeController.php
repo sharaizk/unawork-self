@@ -115,16 +115,15 @@ class HomeController extends Controller
     }
 
     /**
-     * Post-login destination: an employee below the profile minimum goes to /my-profile (UNA-007);
-     * everyone else keeps the dashboard. Only /check redirects, so other pages stay reachable.
+     * Post-login destination: an incomplete employee goes to /my-profile (UNA-007), an incomplete
+     * company to /company/onboarding (UNA-010); everyone else keeps the dashboard. Only /check
+     * redirects, so other pages stay reachable.
      */
     private function afterLoginRedirect($user)
     {
-        if (app(\App\Services\Profile\ProfileCompletionService::class)->requiresOnboarding($user)) {
-            return redirect()->route('my-profile.edit')
-                ->with('error', __('Please complete your profile. :required% is required to access jobs and active POD circles.', [
-                    'required' => app(\App\Services\Profile\ProfileCompletionService::class)->required(),
-                ]));
+        $onboarding = app(\App\Services\Onboarding\OnboardingRedirect::class)->for($user);
+        if ($onboarding) {
+            return redirect()->route($onboarding['route'])->with('error', $onboarding['message']);
         }
 
         return redirect()->route('home');

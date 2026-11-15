@@ -64,6 +64,7 @@ class PodStateTransitionTest extends TestCase
         Bus::fake();
 
         $this->owner = $this->user('owner', UserRole::COMPANY);
+        $this->completeBusinessProfile($this->owner); // UNA-010: publishing a POD needs a complete company profile
         $this->pod = app(PodService::class)->createPod(['title' => 'Pod', 'description' => 'd', 'created_by' => $this->owner->id]);
         $this->podWorkspace = $this->pod->workspace;
     }

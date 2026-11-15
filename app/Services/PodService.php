@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
+use App\Services\Company\BusinessOnboardingCompletionService;
+use App\Services\Company\IncompleteBusinessProfile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +17,11 @@ use Spatie\Permission\Models\Permission;
 
 class PodService
 {
+    public function __construct(private ?BusinessOnboardingCompletionService $businessProfiles = null)
+    {
+        $this->businessProfiles ??= app(BusinessOnboardingCompletionService::class);
+    }
+
     public function getPods(?array $skillIds = null, $perPage = 15)
     {
         if ($skillIds) {
@@ -28,29 +35,86 @@ class PodService
         return $pods;
     }
 
+    /**
+     * Create (= publish; PODs have no draft state) a POD. UNA-010: a company must have a complete
+     * business profile; this is checked before anything is uploaded or written, so a refused attempt
+     * leaves no POD, workspace, membership, history, file or notification behind.
+     *
+     * @throws IncompleteBusinessProfile
+     */
     public function createPod(array $data): Pod
     {
+        $this->assertCanPublish((int) ($data['created_by'] ?? 0));
+
+        $settings = null;
         if (isset($data['image'])) {
             $settings = Utility::getAdminPaymentSetting();
             $data['image'] = $this->uploadImage($data['image'], $settings);
         }
 
         // POD, its workspace and both owner memberships are created together or not at all.
-        return DB::transaction(function () use ($data) {
-            $pod = Pod::create($data);
+        try {
+            return DB::transaction(function () use ($data) {
+                $pod = Pod::create($data);
 
-            if ($pod) {
-                $this->attachOwnerToPod($data['created_by'], $pod);
-                $workspace = $this->createWorkspaceForPod($pod);
-                $this->attachOwnerToWorkspace($workspace, $data['created_by']);
+                if ($pod) {
+                    $this->attachOwnerToPod($data['created_by'], $pod);
+                    $workspace = $this->createWorkspaceForPod($pod);
+                    $this->attachOwnerToWorkspace($workspace, $data['created_by']);
+                }
+
+                if (isset($data['skills'])) {
+                    $pod->skills()->sync($data['skills']);
+                }
+
+                return $pod;
+            });
+        } catch (\Throwable $e) {
+            if ($settings !== null && is_string($data['image'] ?? null)) {
+                Storage::disk($settings['storage_setting'])->delete($data['image']);
             }
+            throw $e;
+        }
+    }
 
-            if (isset($data['skills'])) {
-                $pod->skills()->sync($data['skills']);
-            }
+    /**
+     * UNA-010: companies publish PODs only with a complete business profile (current data, never the
+     * stored completed_at). Other account types are not subject to business onboarding.
+     *
+     * @throws IncompleteBusinessProfile
+     */
+    public function assertCanPublish(int $creatorId): void
+    {
+        $creator = User::find($creatorId);
+        if (!$creator || !$creator->isCompany()) {
+            return;
+        }
 
-            return $pod;
-        });
+        $workspace = $this->businessProfiles->companyWorkspace($creator);
+        if ($workspace === null) {
+            throw new IncompleteBusinessProfile(0, $this->businessProfiles->required(), [__('Create your company profile')]);
+        }
+        $breakdown = $this->businessProfiles->breakdown($workspace);
+        if (!$breakdown['complete']) {
+            throw new IncompleteBusinessProfile($breakdown['percentage'], $breakdown['required'], $this->businessProfiles->missingRequirements($workspace));
+        }
+    }
+
+    /**
+     * Company defaults for matching and approvals (UNA-010), for POD and future matching workflows.
+     * Stored preferences only: nothing is approved automatically.
+     *
+     * @return array{matching_mode:?\App\Enums\Company\MatchingMode, pod_application_approval:?\App\Enums\Company\ApprovalMode, inner_circle_approval:?\App\Enums\Company\ApprovalMode}
+     */
+    public function companyDefaults(User $owner): array
+    {
+        $workspace = $this->businessProfiles->companyWorkspace($owner);
+
+        return [
+            'matching_mode' => $workspace?->matching_mode,
+            'pod_application_approval' => $workspace?->default_pod_application_approval,
+            'inner_circle_approval' => $workspace?->default_inner_circle_approval,
+        ];
     }
 
     public function updatePod(Pod $pod, array $data): Pod

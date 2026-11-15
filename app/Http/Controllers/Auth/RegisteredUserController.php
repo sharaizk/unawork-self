@@ -251,9 +251,10 @@ class RegisteredUserController extends Controller
 
             Auth::login($user);
 
-            // New employees start their profile straight away (UNA-007).
-            if ($user->isEmployee()) {
-                return redirect()->route('my-profile.edit');
+            // New employees and companies start onboarding straight away (UNA-007, UNA-010).
+            $onboarding = app(\App\Services\Onboarding\OnboardingRedirect::class)->for($user);
+            if ($onboarding) {
+                return redirect()->route($onboarding['route']);
             }
 
             return redirect(RouteServiceProvider::HOME);

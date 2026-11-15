@@ -86,8 +86,9 @@ class OnboardingAndJobAccessTest extends TestCase
             ->assertRedirect(route('my-profile.edit'));
         auth()->logout();
 
+        // A new company goes to business onboarding instead (UNA-010).
         $this->post('/register', $this->registration('new-company@example.test', 'company'))
-            ->assertRedirect('/home');
+            ->assertRedirect(route('company.onboarding.edit'));
     }
 
     public function test_email_verification_sends_a_new_employee_to_my_profile(): void
@@ -103,6 +104,7 @@ class OnboardingAndJobAccessTest extends TestCase
         $this->assertTrue($employee->fresh()->hasVerifiedEmail());
 
         $this->flushSession(); // separate browser: no intended URL carried over from the employee
+        $this->completeBusinessProfile($company); // an incomplete company would go to business onboarding (UNA-010)
         $this->actingAs($company)->get($this->verificationUrl($company))->assertRedirect('/home?verified=1');
     }
 
@@ -115,6 +117,7 @@ class OnboardingAndJobAccessTest extends TestCase
         $this->actingAs($incomplete)->get('/check')
             ->assertRedirect(route('my-profile.edit'))->assertSessionHas('error');
         $this->actingAs($complete)->get('/check')->assertRedirect(route('home'));
+        $this->completeBusinessProfile($this->company); // UNA-010 covers incomplete companies
         $this->actingAs($this->company)->get('/check')->assertRedirect(route('home'));
         $this->actingAs($this->account('administrator'))->get('/check')->assertRedirect(route('home'));
     }

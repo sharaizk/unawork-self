@@ -32,9 +32,10 @@
                             class="list-group-item list-group-item-action border-0">{{ __('My Profile') }} <div
                                 class="float-end"><i class="ti ti-external-link"></i></div></a>
                     @elseif ($user->isCompany())
-                        <a href="{{ route('workspace.settings', \Auth::user()->ownWorkspace()->slug)  }}#company-settings"
-                           class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Company Settings') }} <div
-                                class="float-end"><i class="ti ti-clipboard"></i></div></a>
+                        {{-- UNA-010: company details live on the Company Profile page. --}}
+                        <a href="{{ route('company.onboarding.edit') }}"
+                           class="list-group-item list-group-item-action border-0">{{ __('Company Profile') }} <div
+                                class="float-end"><i class="ti ti-external-link"></i></div></a>
                     @endif
 
                     @auth('client')

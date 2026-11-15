@@ -74,6 +74,12 @@
                                                                             <i class="ti ti-user"></i>
                                                                             <span>{{ __('My Profile') }}</span>
                                                                         </a>
+                                                                    @elseif (Auth::user()->isCompany())
+                                                                        {{-- UNA-010 --}}
+                                                                        <a href="{{ route('company.onboarding.edit') }}" class="dropdown-item p-3">
+                                                                            <i class="ti ti-building"></i>
+                                                                            <span>{{ __('Company Profile') }}</span>
+                                                                        </a>
                                                                     @endif
                                                                     <a href="@auth('web'){{ route('users.my.account') }}@elseauth{{ route('client.users.my.account') }}@endauth"
                                                                         class="dropdown-item p-3">

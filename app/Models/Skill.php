@@ -18,7 +18,13 @@ class Skill extends Model
     /** Employee skill assignments, POD skills and job-vacancy requirements. */
     public static function usageRelations(): array
     {
-        return ['users', 'pods', 'jobVacancies'];
+        return ['users', 'pods', 'jobVacancies', 'workerRequirements'];
+    }
+
+    /** Company worker requirements needing this skill (UNA-010). */
+    public function workerRequirements()
+    {
+        return $this->belongsToMany(WorkspaceWorkerRequirement::class, 'workspace_worker_requirement_skill', 'skill_id', 'workspace_worker_requirement_id');
     }
 
     public static function tagRelations(): array

@@ -43,6 +43,8 @@ class PodController extends Controller
         try {
             $pod = $this->podService->createPod($data);
             return new PodResource($pod);
+        } catch (\App\Services\Company\IncompleteBusinessProfile $e) {
+            throw $e; // UNA-010: rendered as 409 JSON with the missing requirements and onboarding URL
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

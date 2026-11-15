@@ -272,6 +272,64 @@ trait UsesInMemorySqlite
         });
         $this->createPermissionSchema();
         $this->createProfileSchema();
+        $this->createCompanySchema();
+    }
+
+    /**
+     * Company profile columns on workspaces (existing production columns plus UNA-010) and the
+     * worker-requirement tables, built by the real UNA-010 migrations.
+     */
+    protected function createCompanySchema(): void
+    {
+        Schema::table('workspaces', function (Blueprint $t) {
+            foreach (['company', 'address', 'city', 'state', 'zipcode', 'country', 'telephone', 'logo', 'website', 'linkedin', 'facebook'] as $column) {
+                $t->string($column)->nullable();
+            }
+            $t->text('description')->nullable();
+            $t->unsignedBigInteger('industry_id')->nullable();
+        });
+        (require database_path('migrations/2026_11_18_000200_add_business_onboarding_to_workspaces.php'))->up();
+        (require database_path('migrations/2026_11_18_000300_create_workspace_worker_requirements_table.php'))->up();
+    }
+
+    /**
+     * Give a company account a 100% business profile on its own workspace (UNA-010). Use it for
+     * companies in tests unrelated to business onboarding (e.g. POD owners).
+     */
+    protected function completeBusinessProfile(\App\Models\User $company): \App\Models\Workspace
+    {
+        $workspace = $company->ownWorkspace();
+        if (!$workspace) {
+            $workspace = \App\Models\Workspace::create(['name' => $company->name . ' WS', 'created_by' => $company->id, 'lang' => 'en']);
+            $workspace->ownerable()->associate($company)->save();
+        }
+        $industry = \App\Models\Industry::firstOrCreate(['name' => 'Technology']);
+        $workspace->forceFill([
+            'company' => 'Acme Ltd',
+            'logo' => $workspace->id . '_company-logo-fixture.png',
+            'industry_id' => $industry->id,
+            'contact_name' => 'Casey Contact',
+            'contact_email' => 'contact@acme.example.test',
+            'telephone' => '+94 11 000 0000',
+            'city' => 'Colombo',
+            'country' => 'Sri Lanka',
+            'website' => 'https://acme.example.test',
+            'linkedin' => 'https://www.linkedin.com/company/acme',
+            'description' => str_repeat('Acme builds software with distributed teams. ', 4),
+            'matching_mode' => 'assisted',
+            'default_pod_application_approval' => 'manual',
+            'default_inner_circle_approval' => 'manual',
+        ])->save();
+
+        $role = \App\Models\JobTitle::firstOrCreate(['title' => 'Backend Developer']);
+        $skill = \App\Models\Skill::firstOrCreate(['name' => 'PHP']);
+        $requirement = new \App\Models\WorkspaceWorkerRequirement([
+            'job_title_id' => $role->id, 'headcount' => 2, 'preferred_work_mode' => 'remote', 'preferred_engagement_type' => 'contract', 'is_active' => true,
+        ]);
+        $requirement->forceFill(['workspace_id' => $workspace->id])->save();
+        $requirement->skills()->sync([$skill->id]);
+
+        return $workspace->fresh();
     }
 
     /**

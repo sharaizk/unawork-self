@@ -22,13 +22,36 @@ class PodController extends Controller
         $user = Auth::user();
         $currentWorkspace = $user->currentWorkspace;
         $pods = $user->pods;
-        return view('users.pod', compact('currentWorkspace', 'user', 'pods'));
+        $businessProfile = $this->businessProfile($user);
+
+        return view('users.pod', compact('currentWorkspace', 'user', 'pods', 'businessProfile'));
     }
 
     public function create()
     {
+        $businessProfile = $this->businessProfile(Auth::user());
+        if ($businessProfile && !$businessProfile['complete']) {
+            // UNA-010: the create form is replaced by what is missing (PodService still enforces it).
+            return view('pod.incomplete_business_profile', compact('businessProfile'));
+        }
+
         $skills = Skill::all();
         return view('pod.create_form', compact('skills'));
+    }
+
+    /** Company completion for the POD pages (null for non-companies). UNA-010. */
+    private function businessProfile($user): ?array
+    {
+        $completion = app(\App\Services\Company\BusinessOnboardingCompletionService::class);
+        if (!$user || !$user->isCompany()) {
+            return null;
+        }
+        $workspace = $completion->companyWorkspace($user);
+        if (!$workspace) {
+            return ['percentage' => 0, 'required' => $completion->required(), 'complete' => false, 'missing' => [__('Create your company profile')]];
+        }
+
+        return $completion->breakdown($workspace) + ['missing' => $completion->missingRequirements($workspace)];
     }
 
     public function destroy(int $id)

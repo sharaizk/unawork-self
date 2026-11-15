@@ -92,6 +92,7 @@ class WorkspaceJoinRequestAuthorizationTest extends TestCase
 
     public function test_pod_workspace_rows_cannot_be_moderated_through_these_routes(): void
     {
+        $this->completeBusinessProfile($this->owner); // UNA-010
         $pod = app(PodService::class)->createPod(['title' => 'Pod', 'description' => 'd', 'created_by' => $this->owner->id]);
         $podMembership = UserWorkspace::create(['user_id' => $this->requester->id, 'workspace_id' => $pod->workspace->id, 'permission' => 'Member', 'status' => 'workspace_pending']);
 

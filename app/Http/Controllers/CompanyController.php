@@ -23,6 +23,7 @@ class CompanyController extends Controller
         if (!$owner) {
             return redirect()->back()->with('error', 'Access denied!');
         }
+        $company->loadMissing('industry'); // UNA-010: structured company profile on the public page
         $vacancies = $owner->jobVacancies;
         $pods = Pod::where('created_by', $owner->id)->get();
         return view('company.landing.index', compact('company', 'vacancies', 'pods'));

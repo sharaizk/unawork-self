@@ -18,8 +18,35 @@
         background-color: #022d4d;
         height: 60px;
     }
+    .company-profile__industry { margin: 0.25rem 0 0; opacity: 0.75; font-weight: 500; }
+    .company-profile__description { white-space: pre-line; }
 </style>
 <section class="header__search"></section>
+@php
+    // UNA-010: the public page reads the structured company profile on the workspace. Links are shown
+    // only when they are valid http(s) URLs; every value is escaped by {{ }}.
+    $safeUrl = function ($url) {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+        if (!preg_match('#^https?://#i', $url)) {
+            $url = 'https://' . $url;
+        }
+        return filter_var($url, FILTER_VALIDATE_URL) ? $url : null;
+    };
+    $website = $safeUrl($company->website);
+    $linkedin = $safeUrl($company->linkedin);
+    $facebook = $safeUrl($company->facebook);
+    $contactEmail = filter_var((string) $company->contact_email, FILTER_VALIDATE_EMAIL) ? $company->contact_email : null;
+    $owner = $company->creater;
+    $logoSrc = $company->logo
+        ? \App\Models\Utility::get_file('logo/') . $company->logo
+        : ($owner && $owner->avatar
+            ? App\Helpers\FileHelper::getUrl('users-avatar/' . $owner->avatar)
+            : App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png'));
+    $address = implode(', ', array_filter([$company->address, $company->city, $company->state, $company->country, $company->zipcode]));
+@endphp
 <div class="container">
     <div class="row-master">
         <div class="col-12 col-md-12 col-xl-12">
@@ -28,83 +55,59 @@
             <section class="section__introduce">
                 <div class="col-left">
                     <div class="cm-shop__image">
-                        <img @if ($company->creater->avatar) src="{{ App\Helpers\FileHelper::getUrl('users-avatar/' . $company->creater->avatar) }}" @else src="{{ App\Helpers\FileHelper::getUrl('logo/' . 'logo-light.png') }}" @endif
-                            alt="Logo Shop">
+                        <img src="{{ $logoSrc }}" alt="{{ __(':company logo', ['company' => $company->company ?: $company->name]) }}" data-company-logo>
                     </div>
                 </div>
                 <div class="col-right">
                     <div class="item">
                         <div class="item__title">
-                            <h1>{{ $company->company }}</h1>
+                            <h1>{{ $company->company ?: $company->name }}</h1>
+                            @if ($company->industry)
+                                <p class="company-profile__industry" data-company-industry>{{ $company->industry->name }}</p>
+                            @endif
                         </div>
                         <div class="item__content">
                             <ul>
+                                @if ($address !== '')
                                     <li>
                                         <i class="fa fa-map-marker"></i>
-                                        @php
-                                            $addressParts = array_filter([
-                                                $company->address,
-                                                $company->city,
-                                                $company->state,
-                                                $company->country,
-                                                $company->zip_code
-                                            ]);
-                                            $address = implode(', ', array_filter($addressParts));
-                                        @endphp
-                                        <span title="Address">
-                                            {{ $address ?: 'n/a' }}
-                                        </span>
+                                        <span title="{{ __('Address') }}">{{ $address }}</span>
                                     </li>
-
-                                @if($company->telephone)
+                                @endif
+                                @if ($company->contact_name)
+                                    <li>
+                                        <i class="fa fa-user"></i>
+                                        <span>{{ $company->contact_name }}@if ($company->contact_position) · {{ $company->contact_position }}@endif</span>
+                                    </li>
+                                @endif
+                                @if ($contactEmail)
+                                    <li>
+                                        <i class="fa fa-envelope"></i>
+                                        <a href="mailto:{{ $contactEmail }}" title="{{ __('Email') }}">{{ $contactEmail }}</a>
+                                    </li>
+                                @endif
+                                @if ($company->telephone)
                                     <li>
                                         <i class="fa fa-phone"></i>
-                                        <a href="tel:{{$company->telephone}}" title="Phone">
-                                            {{$company->telephone}}
-                                        </a>
+                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $company->telephone) }}" title="{{ __('Phone') }}">{{ $company->telephone }}</a>
                                     </li>
                                 @endif
-                                @if($company->website)
+                                @if ($website)
                                     <li>
                                         <i class="fa fa-globe"></i>
-                                        @php
-                                            $website = $company->website;
-                                            if (!preg_match('#^http(s)?://#', $website)) {
-                                                $website = 'http://' . $website;
-                                            }
-                                        @endphp
-                                        <a href="{{ $website }}" title="Website">Visit</a>
+                                        <a href="{{ $website }}" title="{{ __('Website') }}" target="_blank" rel="noopener nofollow">{{ __('Visit') }}</a>
                                     </li>
                                 @endif
-                                @if($company->linkedin)
+                                @if ($linkedin)
                                     <li>
-                                        <!-- <i class="fa fa-globe"></i>  -->
-                                        @php
-                                            $linkedin = $company->linkedin;
-                                            if (!preg_match('#^http(s)?://#', $linkedin)) {
-                                                $linkedin = 'http://' . $linkedin;
-                                            }
-                                        @endphp
-                                        <a href="{{ $linkedin }}" title="Linkedin">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" style="margin-right:5px;" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#cfaa40" d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
-                                            LinkedIn
-                                        </a>
+                                        <i class="fa fa-linkedin"></i>
+                                        <a href="{{ $linkedin }}" title="{{ __('LinkedIn') }}" target="_blank" rel="noopener nofollow">{{ __('LinkedIn') }}</a>
                                     </li>
                                 @endif
-                                @if($company->facebook)
+                                @if ($facebook)
                                     <li>
-                                        <!-- <i class="fa fa-globe"></i>  -->
-
-                                        @php
-                                            $facebook = $company->facebook;
-                                            if (!preg_match('#^http(s)?://#', $facebook)) {
-                                                $facebook = 'http://' . $facebook;
-                                            }
-                                        @endphp
-                                        <a href="{{ $facebook }}" title="facebook">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" style="margin-right:5px;" viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#cfaa40" d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z"/></svg>
-                                            Facebook
-                                        </a>
+                                        <i class="fa fa-facebook"></i>
+                                        <a href="{{ $facebook }}" title="{{ __('Facebook') }}" target="_blank" rel="noopener nofollow">{{ __('Facebook') }}</a>
                                     </li>
                                 @endif
                             </ul>
@@ -114,22 +117,22 @@
             </section>
         </div>
         <section class="section__about section__layout col-12">
-            <div class="section__title">
-                <h2>About</h2>
-            </div>
-            <div class="section__content">
-                {{ $company->description }}
-            </div>
+            @if (trim((string) $company->description) !== '')
+                <div class="section__title">
+                    <h2>{{ __('About') }}</h2>
+                </div>
+                <div class="section__content company-profile__description">{{ $company->description }}</div>
+            @endif
             <div class="section__content">
                 @if (Auth::user())
-                    <button class="btn btn-primary sendMessageButton section__btnMore" data-employee-id="{{ $company->creater->id }}">
-                        <span> Send message </span>
+                    <button class="btn btn-primary sendMessageButton section__btnMore" data-employee-id="{{ $owner->id }}">
+                        <span>{{ __('Send message') }}</span>
                     </button>
                 @else
-                    <a class="section__btnMore" href="{{ route('login') }}"><span>Send message</span></a>
+                    <a class="section__btnMore" href="{{ route('login') }}"><span>{{ __('Send message') }}</span></a>
                 @endif
-                @if($company->website)
-                    <a href="{{$website}}" class="section__btnMore"><span>Visit Site</span></a>
+                @if ($website)
+                    <a href="{{ $website }}" class="section__btnMore" target="_blank" rel="noopener nofollow"><span>{{ __('Visit Site') }}</span></a>
                 @endif
             </div>
         </section>

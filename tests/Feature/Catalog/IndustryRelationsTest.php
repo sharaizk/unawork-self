@@ -35,7 +35,6 @@ class IndustryRelationsTest extends TestCase
         $this->assertUsingInMemorySqlite();
         $this->createIdentitySchema();
         $this->createAdminLayoutSchema();
-        Schema::table('workspaces', fn (Blueprint $t) => $t->unsignedBigInteger('industry_id')->nullable());
         foreach (['pods_skills' => 'pod_id', 'job_vacancy_skill' => 'job_vacancy_id'] as $table => $key) {
             Schema::create($table, function (Blueprint $t) use ($key) {
                 $t->id();

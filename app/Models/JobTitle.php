@@ -24,7 +24,13 @@ class JobTitle extends Model
     /** Current job titles, preferred roles and employment-experience records (UNA-007). */
     public static function usageRelations(): array
     {
-        return ['profiles', 'preferredRoles', 'experiences'];
+        return ['profiles', 'preferredRoles', 'experiences', 'workerRequirements'];
+    }
+
+    /** Company worker requirements for this role (UNA-010). */
+    public function workerRequirements()
+    {
+        return $this->hasMany(WorkspaceWorkerRequirement::class, 'job_title_id');
     }
 
     public static function tagRelations(): array

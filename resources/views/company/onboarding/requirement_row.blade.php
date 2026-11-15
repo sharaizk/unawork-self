@@ -1,0 +1,100 @@
+{{-- One worker requirement. Params: $index, $row (array), $jobTitles, $skills, $proficiencies, $workModes, $engagementTypes --}}
+@php
+    $p = "requirements.$index";
+    $selectedSkills = array_map('strval', (array) ($row['skill_ids'] ?? []));
+    $active = !array_key_exists('is_active', $row) || filter_var($row['is_active'], FILTER_VALIDATE_BOOLEAN);
+@endphp
+<div class="co-requirement" data-co-row>
+    <input type="hidden" name="requirements[{{ $index }}][id]" value="{{ $row['id'] ?? '' }}">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="co-requirement__title"><i class="ti ti-users" aria-hidden="true"></i> {{ __('Worker requirement') }}</span>
+        <div class="d-flex align-items-center gap-3">
+            <div class="form-check form-switch mb-0">
+                <input type="hidden" name="requirements[{{ $index }}][is_active]" value="0">
+                <input class="form-check-input" type="checkbox" role="switch" value="1" id="req-{{ $index }}-active"
+                    name="requirements[{{ $index }}][is_active]" @checked($active)>
+                <label class="form-check-label small" for="req-{{ $index }}-active">{{ __('Active') }}</label>
+            </div>
+            <button type="button" class="btn btn-sm btn-light-danger" data-co-remove
+                title="{{ __('Remove requirement') }}" aria-label="{{ __('Remove requirement') }}"><i class="ti ti-trash"></i></button>
+        </div>
+    </div>
+    @error("$p.id") <div class="alert alert-danger py-2 small">{{ $message }}</div> @enderror
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label class="form-label" for="req-{{ $index }}-role">{{ __('Professional role') }} <span class="text-danger">*</span></label>
+            <select class="form-select js-co-industry-sorted @error("$p.job_title_id") is-invalid @enderror" id="req-{{ $index }}-role" name="requirements[{{ $index }}][job_title_id]">
+                <option value="">{{ __('Select a role') }}</option>
+                @foreach ($jobTitles as $jobTitle)
+                    <option value="{{ $jobTitle->id }}" data-industries="{{ $jobTitle->industries->pluck('id')->implode(',') }}" @selected((string) ($row['job_title_id'] ?? '') === (string) $jobTitle->id)>{{ $jobTitle->title }}</option>
+                @endforeach
+            </select>
+            @error("$p.job_title_id") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="req-{{ $index }}-headcount">{{ __('Headcount') }} <span class="text-danger">*</span></label>
+            <input type="number" class="form-control @error("$p.headcount") is-invalid @enderror" id="req-{{ $index }}-headcount"
+                name="requirements[{{ $index }}][headcount]" value="{{ $row['headcount'] ?? '' }}" min="1" max="{{ config('company_onboarding.max_headcount', 500) }}" step="1" inputmode="numeric">
+            @error("$p.headcount") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-12">
+            <label class="form-label" for="req-{{ $index }}-skills">{{ __('Required skills') }} <span class="text-danger">*</span></label>
+            <select class="form-select js-co-skills js-co-industry-sorted @error("$p.skill_ids") is-invalid @enderror @error("$p.skill_ids.*") is-invalid @enderror"
+                id="req-{{ $index }}-skills" name="requirements[{{ $index }}][skill_ids][]" multiple size="5" data-placeholder="{{ __('Select skills') }}">
+                @foreach ($skills as $skill)
+                    <option value="{{ $skill->id }}" data-industries="{{ $skill->industries->pluck('id')->implode(',') }}" @selected(in_array((string) $skill->id, $selectedSkills, true))>{{ $skill->name }}</option>
+                @endforeach
+            </select>
+            @error("$p.skill_ids") <span class="invalid-feedback d-block" role="alert">{{ $message }}</span> @enderror
+            @error("$p.skill_ids.*") <span class="invalid-feedback d-block" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="req-{{ $index }}-mode">{{ __('Work mode') }} <span class="text-danger">*</span></label>
+            <select class="form-select @error("$p.preferred_work_mode") is-invalid @enderror" id="req-{{ $index }}-mode" name="requirements[{{ $index }}][preferred_work_mode]">
+                <option value="">{{ __('Select') }}</option>
+                @foreach ($workModes as $value => $label)
+                    <option value="{{ $value }}" @selected(($row['preferred_work_mode'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            @error("$p.preferred_work_mode") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="req-{{ $index }}-engagement">{{ __('Engagement type') }} <span class="text-danger">*</span></label>
+            <select class="form-select @error("$p.preferred_engagement_type") is-invalid @enderror" id="req-{{ $index }}-engagement" name="requirements[{{ $index }}][preferred_engagement_type]">
+                <option value="">{{ __('Select') }}</option>
+                @foreach ($engagementTypes as $value => $label)
+                    <option value="{{ $value }}" @selected(($row['preferred_engagement_type'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            @error("$p.preferred_engagement_type") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4 col-6">
+            <label class="form-label" for="req-{{ $index }}-years">{{ __('Minimum years of experience') }}</label>
+            <input type="number" class="form-control @error("$p.minimum_years_experience") is-invalid @enderror" id="req-{{ $index }}-years"
+                name="requirements[{{ $index }}][minimum_years_experience]" value="{{ $row['minimum_years_experience'] ?? '' }}" min="0" max="60" step="0.5" inputmode="decimal">
+            @error("$p.minimum_years_experience") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4 col-6">
+            <label class="form-label" for="req-{{ $index }}-proficiency">{{ __('Minimum proficiency') }}</label>
+            <select class="form-select @error("$p.minimum_skill_proficiency") is-invalid @enderror" id="req-{{ $index }}-proficiency" name="requirements[{{ $index }}][minimum_skill_proficiency]">
+                <option value="">{{ __('Any') }}</option>
+                @foreach ($proficiencies as $value => $label)
+                    <option value="{{ $value }}" @selected(($row['minimum_skill_proficiency'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            @error("$p.minimum_skill_proficiency") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="req-{{ $index }}-location">{{ __('Location') }}</label>
+            <input type="text" class="form-control @error("$p.location") is-invalid @enderror" id="req-{{ $index }}-location"
+                name="requirements[{{ $index }}][location]" value="{{ $row['location'] ?? '' }}" maxlength="255">
+            @error("$p.location") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-12">
+            <label class="form-label" for="req-{{ $index }}-notes">{{ __('Notes') }}</label>
+            <textarea class="form-control @error("$p.description") is-invalid @enderror" id="req-{{ $index }}-notes" rows="2"
+                name="requirements[{{ $index }}][description]" maxlength="2000">{{ $row['description'] ?? '' }}</textarea>
+            @error("$p.description") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+    </div>
+</div>

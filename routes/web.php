@@ -79,6 +79,7 @@ use App\Http\Controllers\ProjectUserController;
 use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\MyProfileController;
+use App\Http\Controllers\CompanyOnboardingController;
 use App\Http\Controllers\SkillController;
 
 /*
@@ -186,6 +187,12 @@ Route::get('/pods/{pod}/news', [PodNewsController::class, 'list'])->name('landin
 
 Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name('landing.pods.news.show');
 
+// Company profile / business onboarding (UNA-010). Registered before /company/{company} so the
+// literal path is not captured by the public company page.
+Route::middleware(['auth', 'verified', 'XSS'])->group(function () {
+    Route::get('/company/onboarding', [CompanyOnboardingController::class, 'edit'])->name('company.onboarding.edit');
+    Route::post('/company/onboarding', [CompanyOnboardingController::class, 'update'])->name('company.onboarding.update');
+});
 Route::get('/company/{company}', [CompanyController::class, 'show'])->name('landing.company.show');
 
 Route::get('/account/notifications', [NotificationController::class, 'list',])->name('view_all.notifications');

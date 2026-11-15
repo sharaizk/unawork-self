@@ -9,15 +9,52 @@
     <li class="breadcrumb-item"> {{ __('POD') }}</li>
 @endsection
 
+@php
+    // UNA-010: a company publishes PODs only with a complete company profile (null = not a company).
+    $canPublishPods = !$businessProfile || $businessProfile['complete'];
+@endphp
+
 @section('action-button')
-    <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
-        data-title="{{ __('Create new Pod') }}" data-url="{{ route('pods.create') }}"
-        data-toggle="tooltip" title="{{ __('Create new Pod') }}">
-        <i class="ti ti-plus"></i>
-    </a>
+    @if ($canPublishPods)
+        <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="lg"
+            data-title="{{ __('Create new Pod') }}" data-url="{{ route('pods.create') }}"
+            data-bs-toggle="tooltip" title="{{ __('Create new Pod') }}" aria-label="{{ __('Create new Pod') }}">
+            <i class="ti ti-plus"></i>
+        </a>
+    @else
+        <a href="{{ route('company.onboarding.edit') }}" class="btn btn-sm btn-primary">
+            <i class="ti ti-building"></i> {{ __('Complete Company Profile') }}
+        </a>
+    @endif
 @endsection
 
 @section('content')
+    @if ($businessProfile)
+        <div class="card mb-4" id="pod-business-profile">
+            <div class="card-body d-flex flex-wrap align-items-center gap-3">
+                <div class="flex-grow-1">
+                    <p class="fw-semibold mb-1">{{ __('Company profile: :percentage% complete', ['percentage' => $businessProfile['percentage']]) }}</p>
+                    <div class="progress mb-2" style="height: 8px;" role="progressbar" aria-label="{{ __('Company profile completion') }}"
+                        aria-valuenow="{{ $businessProfile['percentage'] }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: {{ (int) $businessProfile['percentage'] }}%"></div>
+                    </div>
+                    @if ($businessProfile['complete'])
+                        <p class="small text-success mb-0">{{ __('Your company profile is complete. You can publish PODs.') }}</p>
+                    @else
+                        <p class="small text-muted mb-1">{{ __(':required% is required to publish a POD. Still missing:', ['required' => $businessProfile['required']]) }}</p>
+                        <ul class="small text-muted mb-0">
+                            @foreach ($businessProfile['missing'] as $missing)
+                                <li>{{ $missing }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                @unless ($businessProfile['complete'])
+                    <a href="{{ route('company.onboarding.edit') }}" class="btn btn-primary"><i class="ti ti-building"></i> {{ __('Complete Company Profile') }}</a>
+                @endunless
+            </div>
+        </div>
+    @endif
     <div class="row">
         @foreach ($pods as $pod)
             <div class="col-xl-3 col-lg-4 col-sm-6">
@@ -122,92 +159,40 @@
             </div>
         @endforeach
         <div class="col-xl-3 col-lg-4 col-sm-6">
-            <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
-                data-title="{{ __('Create new Pod') }}" data-url="{{ route('pods.create') }}"
-                data-toggle="tooltip" title="{{ __('Create new Pod') }}">
-                <div class="bg-primary proj-add-icon">
-                    <i class="ti ti-plus"></i>
-                </div>
-                <h6 class="mt-4 mb-2">{{__('Create New Pod')}}</h6>
-                <p class="text-muted text-center">{{__('Click here to create New Pod')}}</p>
-            </a>
+            @if ($canPublishPods)
+                <a href="#" class="btn-addnew-project" data-ajax-popup="true" data-size="lg"
+                    data-title="{{ __('Create new Pod') }}" data-url="{{ route('pods.create') }}"
+                    data-bs-toggle="tooltip" title="{{ __('Create new Pod') }}">
+                    <div class="bg-primary proj-add-icon">
+                        <i class="ti ti-plus"></i>
+                    </div>
+                    <h6 class="mt-4 mb-2">{{__('Create New Pod')}}</h6>
+                    <p class="text-muted text-center">{{__('Click here to create New Pod')}}</p>
+                </a>
+            @else
+                <a href="{{ route('company.onboarding.edit') }}" class="btn-addnew-project">
+                    <div class="bg-primary proj-add-icon">
+                        <i class="ti ti-lock"></i>
+                    </div>
+                    <h6 class="mt-4 mb-2">{{ __('Complete Company Profile') }}</h6>
+                    <p class="text-muted text-center">{{ __('A complete company profile is required to publish a POD.') }}</p>
+                </a>
+            @endif
         </div>
     </div>
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
-    <!-- create pod JS -->
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            $(document).on('shown.bs.modal', function (e) {
-                const modal = $(e.target);
-                const form = modal.find('.create-pod-form');
-
-                $(".chosen-select").chosen({
-                    width: "100%",
-                    placeholder_text_multiple: "Select Skills"
-                });
-
-                if (form.length) {
-                form.off('submit').on('submit', async function(event) {
-                    event.preventDefault();
-
-                    const formData = new FormData(this);
-                    try {
-                        const response = await axios.post('./api/pod', formData);
-
-                        $("#commonModal").modal('hide');
-                        showNotification('Pod successfully created', 'success');
-                        this.reset();
-                        document.getElementById('success-message').style.display = 'block';
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    } catch (error) {
-                        $("#commonModal").modal('hide');
-                        showNotification('Pod creation failed.', 'danger');
-                        console.error(error);
-                    }
-                });
-                }
-            });
-        });
-    </script>
-    <!-- Update pod JS -->
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            $(document).on('shown.bs.modal', function (e) {
-                const modal = $(e.target);
-                const form = modal.find('.update-pod-form');
-
-                $(".chosen-select").chosen({
-                    width: "100%",
-                    placeholder_text_multiple: "Select Skills"
-                });
-
-                if (form.length) {
-                form.off('submit').on('submit', async function(event) {
-                    event.preventDefault();
-
-                    const formData = new FormData(this);
-                    const url = this.getAttribute('data-url');
-                    try {
-                        const response = await axios.post(url, formData);
-                        $("#commonModal").modal('hide');
-                        showNotification('Pod successfully updated', 'success');
-                        this.reset();
-                        setTimeout(function() {
-                            location.reload();
-                        }, 3000);
-                    } catch (error) {
-                        console.error(error);
-                    }
-                });
-                }
-            });
-        });
-    </script>
+    {{-- axios, jQuery and Chosen come from layouts.admin; no duplicate CDN copies here. --}}
+    <div class="d-none" id="pods-page-config"
+        data-store-url="{{ url('api/pod') }}"
+        data-i18n="{{ json_encode([
+            'created' => __('Pod successfully created'),
+            'updated' => __('Pod successfully updated'),
+            'failed' => __('The POD could not be saved. Please try again.'),
+            'fixErrors' => __('Please correct the highlighted fields.'),
+            'completeProfile' => __('Complete Company Profile'),
+            'selectSkills' => __('Select Skills'),
+        ]) }}"></div>
+    <script src="{{ asset('assets/custom/js/pods.js') }}"></script>
 @endpush

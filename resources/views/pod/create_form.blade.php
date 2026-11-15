@@ -8,6 +8,8 @@
 </style>
 <form class="create-pod-form position-relative">
         @csrf
+    {{-- Filled by pods.js with the server's message (e.g. incomplete company profile, UNA-010). --}}
+    <div class="alert alert-danger d-none" role="alert" data-pod-form-error></div>
 
     <div class="col-lg-12">
         <div class="row">
