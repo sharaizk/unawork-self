@@ -1198,7 +1198,12 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
         return $this;
     }
 
-    /** Create a non-administrator account and its persona role atomically. */
+    /**
+     * Low-level identity primitive: a non-administrator account and its persona role, atomically.
+     * UNA-012: production code must not call this directly - use
+     * App\Services\Provisioning\UserProvisioningService, which adds the plan, workspace,
+     * memberships and onboarding structure. Only seeders/tests may use it as-is.
+     */
     public static function createWithAccountRole(array $attributes, UserRole $role): static
     {
         return DB::transaction(function () use ($attributes, $role) {

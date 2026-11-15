@@ -127,7 +127,8 @@ class MembershipWritePathsTest extends TestCase
         $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $declined->id)->value('state'));
         $this->assertBusinessError('You have already submitted a join request for this pod.', fn () => $service->requestJoinPod($declined->id, $this->pod->id));
 
-        $this->assertBusinessError('This user is already a member of this pod.', fn () => $service->inviteExistedUser($this->owner->id, $this->pod->id, []));
+        // UNA-012: the owner is a company account, which can never be invited (or converted) as an employee.
+        $this->assertBusinessError(__('This email belongs to an account that cannot be invited as an employee.'), fn () => $service->inviteExistedUser($this->owner->id, $this->pod->id, []));
         $ownerRow = PodUser::where('pod_id', $this->pod->id)->where('user_id', $this->owner->id)->sole();
         $this->assertSame(['Owner', State::INNER_CIRCLE], [$ownerRow->permission, $ownerRow->state]);
     }

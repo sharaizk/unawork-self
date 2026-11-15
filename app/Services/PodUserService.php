@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\PodUser\State;
-use App\Enums\User\UserRole;
 use App\Enums\UserWorkspace\Permission as UserWorkspacePermission;
 use App\Jobs\SendEmail;
 use App\Models\Pod;
@@ -16,7 +15,10 @@ use App\Services\Membership\MembershipResult;
 use App\Services\Membership\PodStateTransitionService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use App\Services\Provisioning\DuplicateInvitation;
+use App\Services\Provisioning\ProvisionUserData;
+use App\Services\Provisioning\ProvisioningSource;
+use App\Services\Provisioning\UserProvisioningService;
 
 /**
  * POD membership workflows (UNA-005 transactions, UNA-006 explicit states).
@@ -41,47 +43,70 @@ class PodUserService
     public function __construct(
         private ?AfterCommit $afterCommit = null,
         private ?PodStateTransitionService $states = null,
+        private ?UserProvisioningService $provisioning = null,
     ) {
         $this->afterCommit ??= new AfterCommit();
         $this->states ??= new PodStateTransitionService($this->afterCommit);
+        $this->provisioning ??= app(UserProvisioningService::class);
     }
 
     // ------------------------------------------------------------------ invitations / applications
 
-    /** Invite an existing user: matched (or re-entry from rejected/removed). */
+    /**
+     * Invite an existing user: matched (or re-entry from rejected/removed). UNA-012: only a
+     * compatible employee can be invited (IncompatibleInvitee otherwise); a repeat throws
+     * DuplicateInvitation and sends nothing.
+     */
     public function inviteExistedUser(int $userId = null, int $podId, array $settings, ?User $actor = null): MembershipResult
     {
         $user = User::find($userId);
-        $pod = Pod::find($podId);
-
         if (is_null($user)) {
             throw new \Exception(__('This User is not connected with our system. Please fill out the below details to invite.'));
         }
 
-        $result = $this->run(fn () => $this->states->start($pod, $user, State::MATCHED, $actor, 'Invited to the POD', [
-            'invitation_email' => fn () => $this->sendInvitationEmail($user, $pod, $settings),
-        ]));
+        return $this->inviteByEmail(new ProvisionUserData(ProvisioningSource::POD_INVITATION, $user->email), Pod::findOrFail($podId), $settings, $actor);
+    }
+
+    /**
+     * Invite by email (UNA-012): one transaction provisions the invitee (a new employee, or a
+     * compatible existing employee) and creates the matched POD membership, its workspace access and
+     * state history. New accounts are always employees; emails run after commit.
+     */
+    public function inviteNewUser(array $data, int $podId, array $settings, ?User $actor = null): MembershipResult
+    {
+        $password = $data['password'] ?? null;
+
+        return $this->inviteByEmail(new ProvisionUserData(
+            source: ProvisioningSource::POD_INVITATION,
+            email: $data['email'],
+            name: $data['name'] ?? null,
+            password: $password ?: null,
+            generatePassword: empty($password),
+            sendLoginDetails: empty($password), // a generated password must reach the invitee
+        ), Pod::findOrFail($podId), $settings, $actor);
+    }
+
+    private function inviteByEmail(ProvisionUserData $data, Pod $pod, array $settings, ?User $actor): MembershipResult
+    {
+        $result = $this->run(function () use ($data, $pod, $settings, $actor) {
+            $provisioned = $this->provisioning->apply($data);
+            $user = $provisioned->user;
+            $effects = ['invitation_email' => fn () => $this->sendInvitationEmail($user, $pod, $settings)];
+            if ($provisioned->created) {
+                $effects['registration_email'] = fn () => $this->sendRegistrationEmail($user, $settings);
+            }
+
+            $result = $this->states->start($pod, $user, State::MATCHED, $actor,
+                $provisioned->created ? 'Invited to the POD (new account)' : 'Invited to the POD', $effects + $provisioned->effects());
+
+            return $result;
+        });
 
         if (!$result->applied) {
-            throw new \Exception(__('This user is already a member of this pod.'));
+            throw new DuplicateInvitation(__('This user is already a member of this pod.'));
         }
 
         return $result;
-    }
-
-    /** New employee account + matched POD membership + workspace membership, together or not at all. */
-    public function inviteNewUser(array $data, int $podId, array $settings, ?User $actor = null): MembershipResult
-    {
-        $pod = Pod::findOrFail($podId);
-
-        return $this->run(function () use ($data, $pod, $settings, $actor) {
-            $user = $this->createNewUser($data);
-
-            return $this->states->start($pod, $user, State::MATCHED, $actor, 'Invited to the POD (new account)', [
-                'invitation_email' => fn () => $this->sendInvitationEmail($user, $pod, $settings),
-                'registration_email' => fn () => $this->sendRegistrationEmail($user, $settings),
-            ]);
-        });
     }
 
     /** The applicant asks to join: pending_business_approval (or re-entry from rejected/removed). */
@@ -243,19 +268,6 @@ class PodUserService
     private function run(\Closure $operation): MembershipResult
     {
         return $this->afterCommit->run(DB::transaction($operation, self::ATTEMPTS));
-    }
-
-    private function createNewUser(array $data): User
-    {
-        // Accounts generated by a POD invitation are employees.
-        return User::createWithAccountRole([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'plan' => NULL,
-            'password' => Hash::make($data['password']), // should use bcrypt for hashing password
-            'email_verified_at' => date('Y-m-d i:h:s'),
-            'is_enable_login' => 1,
-        ], UserRole::EMPLOYEE);
     }
 
     private function sendInvitationEmail(User $user, Pod $pod, array $settings): void

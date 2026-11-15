@@ -2,39 +2,49 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\User\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Traits\ApiResponser;
+use App\Http\Requests\Auth\ApiRegisterRequest;
+use App\Services\Provisioning\ProvisionUserData;
+use App\Services\Provisioning\ProvisioningSource;
+use App\Services\Provisioning\UserProvisioningService;
 
 
 class AuthController extends Controller
 {   
     use ApiResponser;
 
-    public function register(Request $request): JsonResponse
-    {           
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+    /**
+     * API sign-up (UNA-012): always an employee, provisioned with the full account structure in one
+     * transaction. The token is issued only after that commits; a failure creates no token.
+     * 201 on success; a duplicate email is a 422 field error, like web registration.
+     */
+    public function register(ApiRegisterRequest $request, UserProvisioningService $provisioning): JsonResponse
+    {
+        $result = $provisioning->provision(new ProvisionUserData(
+            source: ProvisioningSource::API_REGISTRATION,
+            email: $request->validated('email'),
+            name: $request->validated('name'),
+            password: $request->validated('password'),
+            emailVerified: false,
+        ));
+        $user = $result->user;
 
-        // API sign-up always creates employees.
-        $user = User::createWithAccountRole([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-        ], UserRole::EMPLOYEE);
-        
         return $this->success([
             'token' => $user->createToken('API Token')->plainTextToken,
-            'user' => $user,
-        ],'Login successfully.');
+            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'account_type' => $result->role->value,
+            'workspace_id' => $result->workspace->id,
+            'onboarding_required' => $result->onboarding['required'],
+            'onboarding_type' => $result->onboarding['type'],
+            'completion_percentage' => $result->onboarding['percentage'],
+            'onboarding_route' => $result->onboarding['route'],
+            'onboarding_url' => $result->onboarding['url'],
+        ], __('Account created successfully.'), 201);
     }
 
     public function login(Request $request): JsonResponse

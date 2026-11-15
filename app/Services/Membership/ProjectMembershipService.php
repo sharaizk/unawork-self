@@ -11,6 +11,9 @@ use App\Models\UserProject;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Services\ChatService;
+use App\Services\Provisioning\ProvisionUserData;
+use App\Services\Provisioning\ProvisioningSource;
+use App\Services\Provisioning\UserProvisioningService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -24,9 +27,12 @@ class ProjectMembershipService
     public const ATTEMPTS = 3;
     private const PENDING = 'pending';
 
-    public function __construct(private ?AfterCommit $afterCommit = null)
-    {
+    public function __construct(
+        private ?AfterCommit $afterCommit = null,
+        private ?UserProvisioningService $provisioning = null,
+    ) {
         $this->afterCommit ??= new AfterCommit();
+        $this->provisioning ??= app(UserProvisioningService::class);
     }
 
     /**
@@ -35,37 +41,75 @@ class ProjectMembershipService
      */
     public function invite(User $user, Project $project, string $permission, User $invitedBy): MembershipResult
     {
-        $result = DB::transaction(function () use ($user, $project, $permission, $invitedBy) {
-            $workspaceMembership = UserWorkspace::findOrCreateMembership($user->id, (int) $project->workspace, ['permission' => $permission]);
-            $projectMembership = UserProject::findOrCreateMembership($user->id, $project->id, [
-                'permission' => json_encode(Utility::getAllPermission()),
-            ]);
+        $result = DB::transaction(fn () => $this->applyInvite($user, $project, $permission, $invitedBy), self::ATTEMPTS);
 
-            $effects = [];
-            if ($workspaceMembership->wasRecentlyCreated) {
-                $effects['workspace_invitation_email'] = fn () => Mail::to($user->email)->send(new SendWorkspaceInvication($user, $project->workspaceData));
-            }
-            if ($projectMembership->wasRecentlyCreated) {
-                $effects['project_chat_invite'] = fn () => (new ChatService())->inviteUserBySlug('project-' . $project->id, $user->id);
-                if ($permission !== 'Owner') {
-                    $effects['project_assign_notification'] = fn () => Utility::sendNotification('project_assign', $project->workspaceData, $user->id, $project);
-                    $effects['project_assign_email'] = fn () => Utility::sendEmailTemplate('Project Assigned', $user->id, [
-                        'user_name' => $user->name,
-                        'app_name' => Utility::fetchAdminPaymentSetting()['app_name'] ?? config('app.name'),
-                        'owner_name' => $invitedBy->name,
-                        'project_name' => $project->name,
-                        'project_status' => $project->status,
-                        'app_url' => config('app.url'),
-                    ]);
-                }
-            }
+        return $this->afterCommit->run($result);
+    }
 
-            return $projectMembership->wasRecentlyCreated || $workspaceMembership->wasRecentlyCreated
-                ? MembershipResult::applied($projectMembership, $projectMembership->status, $effects)
-                : MembershipResult::unchanged($projectMembership, 'already_member');
+    /**
+     * Invite by email (UNA-012). One transaction provisions the invitee - a new employee with a
+     * generated password, or a compatible existing employee - and creates the workspace and
+     * project memberships. The inviting owner may add themselves. Companies, administrators and
+     * unclassified accounts are refused (IncompatibleInvitee). Login details and invitation
+     * effects run after commit, only for what this call created.
+     *
+     * @throws \App\Services\Provisioning\ProvisioningException
+     */
+    public function inviteByEmail(string $email, Project $project, string $permission, User $invitedBy, ?string $locale = null): MembershipResult
+    {
+        $email = ProvisionUserData::normalizeEmail($email);
+
+        $result = DB::transaction(function () use ($email, $project, $permission, $invitedBy, $locale) {
+            if ($email === ProvisionUserData::normalizeEmail($invitedBy->email)) {
+                return $this->applyInvite($invitedBy, $project, $permission, $invitedBy);
+            }
+            $provisioned = $this->provisioning->apply(new ProvisionUserData(
+                source: ProvisioningSource::PROJECT_INVITATION,
+                email: $email,
+                generatePassword: true,
+                locale: $locale,
+                sendLoginDetails: true,
+            ));
+            $invite = $this->applyInvite($provisioned->user, $project, $permission, $invitedBy);
+
+            return $invite->applied
+                ? MembershipResult::applied($invite->membership, $invite->state, $provisioned->effects() + $invite->effects())
+                : $invite;
         }, self::ATTEMPTS);
 
         return $this->afterCommit->run($result);
+    }
+
+    /** Inside a transaction: the workspace + project memberships of one invitation. */
+    private function applyInvite(User $user, Project $project, string $permission, User $invitedBy): MembershipResult
+    {
+        $workspaceMembership = UserWorkspace::findOrCreateMembership($user->id, (int) $project->workspace, ['permission' => $permission]);
+        $projectMembership = UserProject::findOrCreateMembership($user->id, $project->id, [
+            'permission' => json_encode(Utility::getAllPermission()),
+        ]);
+
+        $effects = [];
+        if ($workspaceMembership->wasRecentlyCreated) {
+            $effects['workspace_invitation_email'] = fn () => Mail::to($user->email)->send(new SendWorkspaceInvication($user, $project->workspaceData));
+        }
+        if ($projectMembership->wasRecentlyCreated) {
+            $effects['project_chat_invite'] = fn () => (new ChatService())->inviteUserBySlug('project-' . $project->id, $user->id);
+            if ($permission !== 'Owner') {
+                $effects['project_assign_notification'] = fn () => Utility::sendNotification('project_assign', $project->workspaceData, $user->id, $project);
+                $effects['project_assign_email'] = fn () => Utility::sendEmailTemplate('Project Assigned', $user->id, [
+                    'user_name' => $user->name,
+                    'app_name' => Utility::fetchAdminPaymentSetting()['app_name'] ?? config('app.name'),
+                    'owner_name' => $invitedBy->name,
+                    'project_name' => $project->name,
+                    'project_status' => $project->status,
+                    'app_url' => config('app.url'),
+                ]);
+            }
+        }
+
+        return $projectMembership->wasRecentlyCreated || $workspaceMembership->wasRecentlyCreated
+            ? MembershipResult::applied($projectMembership, $projectMembership->status, $effects)
+            : MembershipResult::unchanged($projectMembership, 'already_member');
     }
 
     /**

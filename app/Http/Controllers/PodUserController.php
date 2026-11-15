@@ -67,6 +67,9 @@ class PodUserController extends Controller
                     'status' => 'Success',
                     'message' => __('User Invited Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''),
                 ], 200);
+            } catch (\App\Services\Provisioning\ProvisioningException $e) {
+                // UNA-012: already invited, or an account that cannot be invited as an employee.
+                return response()->json(['code' => $e->status(), 'status' => 'error', 'message' => $e->getMessage()], $e->status());
             } catch (\Exception $e) {
                 return response()->json([
                     'code' => 500,

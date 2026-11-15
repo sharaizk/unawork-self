@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
+use App\Services\Provisioning\ProvisionUserData;
+use App\Services\Provisioning\UserProvisioningService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -22,9 +24,57 @@ class WorkspaceMembershipService
     public function __construct(
         private ?AfterCommit $afterCommit = null,
         private ?CurrentWorkspace $currentWorkspace = null,
+        private ?UserProvisioningService $provisioning = null,
     ) {
         $this->afterCommit ??= new AfterCommit();
         $this->currentWorkspace ??= new CurrentWorkspace();
+        $this->provisioning ??= app(UserProvisioningService::class);
+    }
+
+    /**
+     * Invite an email to a company workspace (UNA-012). One transaction provisions the invitee
+     * (a new employee, or a compatible existing employee whose account structure is repaired) and
+     * creates the pending invitation; companies and administrators are refused (IncompatibleInvitee).
+     * The invitee's current workspace stays their own workspace until they accept. A repeated
+     * invitation returns 'already_member' and sends nothing.
+     *
+     * @throws \App\Services\Provisioning\ProvisioningException
+     */
+    public function invite(Workspace $workspace, User $inviter, ProvisionUserData $data): MembershipResult
+    {
+        $result = DB::transaction(function () use ($workspace, $inviter, $data) {
+            if ($workspace->isPartOfPod()) {
+                return MembershipResult::unchanged(null, 'pod_workspace');
+            }
+            $provisioned = $this->provisioning->apply($data);
+            $user = $provisioned->user;
+
+            $membership = UserWorkspace::findOrCreateMembership($user->id, $workspace->id, [
+                'permission' => 'Member',
+                'status' => Status::EMPLOYEE_PENDING->value,
+            ]);
+            if (!$membership->wasRecentlyCreated) {
+                return MembershipResult::unchanged($membership, 'already_member'); // never reset
+            }
+            $membership->syncPermissions(['users_index', 'projects_index']);
+            $membership->refresh();
+
+            $settings = Utility::getAdminPaymentSetting();
+            $payload = $membership;
+
+            return MembershipResult::applied($membership, $membership->status, $provisioned->effects() + [
+                'workspace_invite_notification' => fn () => Utility::sendNotification('workspace_invite', null, $user->id, $payload),
+                'workspace_invite_email' => fn () => Utility::sendEmailTemplate('User Invited', $user->id, [
+                    'user_name' => $user->name,
+                    'app_name' => $settings['app_name'] ?? config('app.name'),
+                    'workspace_name' => $workspace->name,
+                    'owner_name' => $inviter->name,
+                    'app_url' => config('app.url'),
+                ]),
+            ]);
+        }, self::ATTEMPTS);
+
+        return $this->afterCommit->run($result);
     }
 
     /** Owner approves a join request. */

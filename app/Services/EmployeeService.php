@@ -30,12 +30,4 @@ class EmployeeService
         }
     }
 
-    public function makeEmployee(User $user)
-    {
-        try {
-            $user->assignAccountRole(UserRole::EMPLOYEE);
-        } catch (\Exception $e) {
-            throw new \Exception(__($e->getMessage()));
-        }
-    }
 }

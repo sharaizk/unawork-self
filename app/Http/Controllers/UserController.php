@@ -17,6 +17,13 @@ use App\Models\Client;
 use App\Models\Comment;
 use App\Models\Events;
 use App\Models\Mail\SendLoginDetail;
+use App\Http\Requests\Users\ImportUsersRequest;
+use App\Http\Requests\Users\InviteWorkspaceUserRequest;
+use App\Http\Requests\Users\StoreCompanyRequest;
+use App\Services\Provisioning\CsvAccountImporter;
+use App\Services\Provisioning\ProvisionUserData;
+use App\Services\Provisioning\ProvisioningSource;
+use App\Services\Provisioning\UserProvisioningService;
 use App\Models\Mail\SendWorkspaceInvication;
 use App\Models\Message;
 use App\Models\Milestone;
@@ -308,139 +315,27 @@ class UserController extends Controller
         return view('users.import');
     }
 
-    public function import(Request $request)
+    /**
+     * Administrator CSV import (UNA-012): the whole file is validated first and every new account
+     * is provisioned through UserProvisioningService in one transaction; existing accounts are
+     * skipped, never overwritten. Column 4 is the account type (company/employee).
+     */
+    public function import(ImportUsersRequest $request, CsvAccountImporter $importer)
     {
-        // "Import Companies" is an administrator tool (the button only renders for admins).
-        abort_unless(Auth::user() && Auth::user()->isAdministrator(), 403);
+        $rows = (new UsersImport())->toArray($request->file('file'))[0] ?? [];
 
-        $rules = [
-            'file' => 'required|mimes:csv,txt',
-        ];
-
-        $validator = \Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
-            return redirect()->back()->with('error', $messages->first());
+        try {
+            $report = $importer->import($rows);
+        } catch (ValidationException $e) {
+            return redirect()->back()->with('error', implode(' ', $e->errors()['file'] ?? [__('The file could not be imported.')]));
         }
 
-        $Users = (new UsersImport())->toArray(request()->file('file'))[0];
-
-        $totalCustomer = count($Users) - 1;
-        $errorArray = [];
-
-
-
-        // Validate every row before writing anything. Column 4 is the account type: only the
-        // company/employee personas can be imported; blank or the legacy value "user" means
-        // company (this is the "Import Companies" tool). Administrators are never modified.
-        $accountRoles = [];
-        for ($i = 1; $i <= count($Users) - 1; $i++) {
-            $accountRole = self::importAccountRole($Users[$i][3] ?? null);
-            if (!$accountRole) {
-                return redirect()->back()->with('error', __('Row :row: invalid account type ":type". Use "company" or "employee".', ['row' => $i + 1, 'type' => (string) ($Users[$i][3] ?? '')]));
-            }
-            if (User::administrators()->where('email', $Users[$i][1] ?? null)->exists()) {
-                return redirect()->back()->with('error', __('Row :row: administrator accounts cannot be changed by import.', ['row' => $i + 1]));
-            }
-            $accountRoles[$i] = $accountRole;
+        $message = __(':created accounts imported.', ['created' => count($report['created'])]);
+        if ($report['skipped']) {
+            $message .= ' ' . __(':count existing accounts were skipped and left unchanged.', ['count' => count($report['skipped'])]);
         }
 
-        for ($i = 1; $i <= count($Users) - 1; $i++) {
-            $user = $Users[$i];
-            $accountRole = $accountRoles[$i];
-            $userByEmail = User::where('email', $user[1])->first();
-
-
-            if (!empty($userByEmail)) {
-                $userData = $userByEmail;
-            } else {
-                $userData = new User();
-                // $userData->id = $this->UserNumber();
-
-            }
-            $userData->name = $user[0];
-            $userData->email = $user[1];
-            $userData->password = Hash::make($user[2]);
-            $userData->email_verified_at = date('Y-m-d H:i:s');
-
-
-            if (Auth::user()->isAdministrator()) {
-
-                $userData->assignPlan(1, 'monthly');
-            }
-
-            if (empty($userData)) {
-                $errorArray[] = $userData;
-            } else {
-                // Saves the row with users.type = user and exactly the imported persona role.
-                $userData->assignAccountRole($accountRole);
-            }
-
-            // $objWorkspace = new Workspace();
-            // $objWorkspace->created_by = $userData->id;
-            // $objWorkspace->name = $userData->name;
-            // $objWorkspace->slug = $userData->name;
-            // $objWorkspace->lang = 'en';
-            // $objWorkspace->currency_code = 'USD';
-            // $objWorkspace->paypal_mode = 'sandbox';
-
-            $objWorkspace = Workspace::create(
-
-                [
-                    'created_by' => $userData->id,
-                    'name' => $userData->name,
-                    'currency_code' => 'USD',
-                    'paypal_mode' => 'sandbox',
-                    'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
-                ]
-            );
-
-            if (empty($objWorkspace)) {
-                $errorArray[] = $objWorkspace;
-            } else {
-                $objWorkspace->save();
-            }
-
-
-            $userData->currant_workspace = $objWorkspace->id;
-            $userData->save();
-
-            UserWorkspace::findOrCreateMembership($userData->id, $objWorkspace->id, ['permission' => 'Owner']);
-
-            User::userDefaultDataRegister($userData);
-        }
-
-        $errorRecord = [];
-        if (empty($errorArray)) {
-            $data['status'] = 'success';
-            $data['msg'] = __('Record successfully imported');
-        } else {
-            $data['status'] = 'error';
-            $data['msg'] = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalCustomer . ' ' . 'record');
-
-
-            foreach ($errorArray as $errorData) {
-
-                $errorRecord[] = implode(',', $errorData);
-            }
-
-            \Session::put('errorArray', $errorRecord);
-        }
-
-        return redirect()->back()->with($data['status'], $data['msg']);
-    }
-
-    /** Normalize the CSV account-type column; null means invalid/ambiguous. */
-    private static function importAccountRole($value): ?UserRole
-    {
-        $value = strtolower(trim((string) $value));
-
-        return match ($value) {
-            '', 'user', UserRole::COMPANY->value => UserRole::COMPANY,
-            UserRole::EMPLOYEE->value => UserRole::EMPLOYEE,
-            default => null,
-        };
+        return redirect()->back()->with('success', $message);
     }
 
     public function create(Request $request)
@@ -452,119 +347,29 @@ class UserController extends Controller
         }
     }
 
-    public function store(Request $request)
+    /**
+     * Administrator "Create Company" (UNA-012): always a company, provisioned with plan, workspace,
+     * owner permissions and onboarding state in one transaction; the login-details email is sent
+     * after commit.
+     */
+    public function store(StoreCompanyRequest $request, UserProvisioningService $provisioning)
     {
-        if (Auth::user()->isAdministrator()) {
-            $validation = [
-                'name' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-                'workspace' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-                'email' => [
-                    'required',
-                    'string',
-                    'email',
-                    'max:255',
-                    'unique:users',
-                ],
-            ];
+        $data = $request->validated();
+        $canLogin = ($data['password_switch'] ?? null) === 'on';
+        $setting = Utility::getAdminPaymentSetting();
 
-            $adminData = Utility::getAdminPaymentSetting();
-            $validator = \Validator::make($request->all(), $validation);
+        $provisioning->provision(new ProvisionUserData(
+            source: ProvisioningSource::ADMINISTRATOR_CREATED,
+            email: $data['email'],
+            name: $data['name'],
+            password: $canLogin ? $data['password'] : null,
+            canLogin: $canLogin,
+            locale: $setting['default_admin_lang'] ?? null,
+            workspaceName: $data['workspace'],
+            sendLoginDetails: true,
+        ));
 
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
-            }
-
-            $passwordSwitch = 0;
-            if (!empty($request->password_switch) && $request->password_switch == 'on') {
-                $passwordSwitch = 1;
-                $validator = Validator::make($request->all(), ['password' => 'required|min:6']);
-                if ($validator->fails()) {
-                    return redirect()->back()->with('error', $validator->errors()->first());
-                }
-            }
-            $userPassword = $request->password;
-            $password = !is_null($userPassword) ? Hash::make($userPassword) : null;
-            do {
-                $code = rand(100000, 999999);
-            } while (DB::table('users')->where('referral_code', $code)->exists());
-            // Administrator "Create Company": always a company account.
-            $objUser = User::createWithAccountRole(
-                [
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => $password,
-                    'email_verified_at' => date('Y-m-d H:i:s'),
-                    'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
-                    'is_enable_login' => $passwordSwitch,
-                    'referral_code' => $code
-                ],
-                UserRole::COMPANY
-            );
-            // dd($objUser);
-            $assignPlan = $objUser->assignPlan(1);
-
-            if (!$assignPlan['is_success']) {
-                return redirect()->back()->with('error', __($assignPlan['error']));
-            }
-
-
-            $objWorkspace = Workspace::create(
-
-                [
-                    'created_by' => $objUser->id,
-                    'name' => $request->workspace,
-                    'theme_color' => $adminData['color'],
-                    'color_flag' => $adminData['color_flag'],
-                    'currency_code' => 'USD',
-                    'paypal_mode' => 'sandbox',
-                    'lang' => (env('DEFAULT_ADMIN_LANG')) ? env('DEFAULT_ADMIN_LANG') : 'en',
-                ]
-            );
-
-
-            $objUser->currant_workspace = $objWorkspace->id;
-            $objWorkspace->ownerable()->associate($objUser);
-            $objUser->save();
-
-            UserWorkspace::findOrCreateMembership($objUser->id, $objWorkspace->id, ['permission' => 'Owner']);
-
-            $emailTemplate = EmailTemplate::all();
-
-            foreach ($emailTemplate as $emailtemp) {
-                UserEmailTemplate::create(
-                    [
-                        'template_id' => $emailtemp->id,
-                        'user_id' => $objUser->id,
-                        'workspace_id' => $objUser->currant_workspace,
-                        'is_active' => 0,
-                    ]
-                );
-            }
-            Utility::setMailConfig();
-            try {
-                // event(new Registered($objUser));
-                $objUser->password = $request->password;
-                Mail::to($objUser->email)->send(new SendLoginDetail($objUser));
-                // Append the success message
-                $msg = 'Mail sent successfully. ';
-            } catch (\Exception $e) {
-                $msg = __('E-Mail has been not sent due to SMTP configuration');
-            }
-            // return redirect()->route('users.index', '')->with('success', __('User Created Successfully' . $msg));
-            return redirect()->route('users.index', '')->with('success', __('Company Created Successfully' . ((isset($msg)) ? ' <br> <span class="text-danger">' . $msg . '</span>' : '')));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
+        return redirect()->route('users.index', '')->with('success', __('Company Created Successfully'));
     }
 
     public function account()
@@ -913,106 +718,53 @@ class UserController extends Controller
         return view('users.invite', compact('currentWorkspace'));
     }
 
-    public function inviteUser($slug, Request $request)
+    /**
+     * Invite a new or existing person to the current company workspace by email (UNA-012). The
+     * invitee is provisioned as an employee and invited in one transaction
+     * (WorkspaceMembershipService::invite); emails and notifications run after commit.
+     */
+    public function inviteUser($slug, InviteWorkspaceUserRequest $request)
     {
         $currentWorkspace = Utility::getWorkspaceBySlug($slug);
-
-        $post = $request->all();
-        $name = $post['username'];
-        $email = $post['useremail'];
-        $password = !is_null($post['userpassword']) ? Hash::make($post['userpassword']) : null;
-
-        $passwordSwitch = 0;
-        if (!empty($request->password_switch) && $request->password_switch == 'on') {
-            $passwordSwitch = 1;
+        $inviter = \Auth::user();
+        if (!$currentWorkspace || (int) $currentWorkspace->created_by !== (int) $inviter->id) {
+            return response()->json(['code' => 403, 'status' => 'Error', 'error' => __('Permission denied.')], 403);
         }
 
-
-        $verify = date('Y-m-d i:h:s');
-        $registerUsers = User::where('email', $email)->first();
-
-        if ($registerUsers) {
-            return json_encode(
-                [
-                    'code' => 400,
-                    'status' => 'Error',
-                    'error' => __('Email is Already Exits.'),
-                ]
-            );
-        } else {
-            $objUser = \Auth::user();
-            $plan = Plan::find($objUser->plan);
-            if ($plan) {
-                $totalWS = $objUser->countUsers($currentWorkspace->id);
-                if ($totalWS < $plan->max_users || $plan->max_users == -1) {
-                    $arrUser = [];
-                    $arrUser['name'] = $name;
-                    $arrUser['email'] = $email;
-                    $arrUser['plan'] = NULL;
-                    $arrUser['password'] = $password;
-                    $arrUser['currant_workspace'] = $currentWorkspace->id;
-                    $arrUser['email_verified_at'] = $verify;
-                    $arrUser['lang'] = $currentWorkspace->lang;
-                    $arrUser['is_enable_login'] = $passwordSwitch;
-                    // Accounts generated by a workspace invitation are employees.
-                    $registerUsers = User::createWithAccountRole($arrUser, UserRole::EMPLOYEE);
-                    $registerUsers->password = $request->userpassword;
-                    // $assignPlan = $registerUsers->assignPlan(1);
-
-                    // if (!$assignPlan['is_success']) {
-                    //     return json_encode(
-                    //         [
-                    //             'code' => 400,
-                    //             'status' => 'Error',
-                    //             'error' => __($assignPlan['error']),
-                    //         ]
-                    //     );
-                    // }
-                    Utility::setMailConfig();
-                    try {
-                        Mail::to($email)->send(new SendLoginDetail($registerUsers));
-                    } catch (\Exception $e) {
-                        $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-                    }
-                } else {
-                    return json_encode(
-                        [
-                            'code' => 400,
-                            'status' => 'Error',
-                            'error' => __('Your user limit is over, Please upgrade plan.'),
-                        ]
-                    );
-                }
-            } else {
-                return json_encode(
-                    [
-                        'code' => 400,
-                        'status' => 'Error',
-                        'error' => __('Default plan is deleted.'),
-                    ]
-                );
-            }
+        $plan = Plan::find($inviter->plan);
+        if (!$plan) {
+            return json_encode(['code' => 400, 'status' => 'Error', 'error' => __('Default plan is deleted.')]);
+        }
+        if ($plan->max_users != -1 && $inviter->countUsers($currentWorkspace->id) >= $plan->max_users) {
+            return json_encode(['code' => 400, 'status' => 'Error', 'error' => __('Your user limit is over, Please upgrade plan.')]);
         }
 
-        // assign workspace first (atomic; the invitation mail goes out only for a new membership)
-        $membership = UserWorkspace::findOrCreateMembership($registerUsers->id, $currentWorkspace->id, ['permission' => 'Member']);
-
-        if ($membership->wasRecentlyCreated) {
-            try {
-                Mail::to($registerUsers->email)->send(new SendWorkspaceInvication($registerUsers, $currentWorkspace));
-            } catch (\Exception $e) {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-            }
+        $canLogin = $request->validated('password_switch') === 'on';
+        $password = $request->validated('userpassword');
+        try {
+            $result = app(\App\Services\Membership\WorkspaceMembershipService::class)->invite($currentWorkspace, $inviter, new ProvisionUserData(
+                source: ProvisioningSource::WORKSPACE_INVITATION,
+                email: $request->validated('useremail'),
+                name: $request->validated('username'),
+                password: $canLogin ? $password : null,
+                canLogin: $canLogin,
+                locale: $currentWorkspace->lang,
+                sendLoginDetails: $canLogin && $password !== null,
+            ));
+        } catch (\App\Services\Provisioning\ProvisioningException $e) {
+            return json_encode(['code' => 400, 'status' => 'Error', 'error' => $e->getMessage()]);
         }
 
-        return json_encode(
-            [
-                'code' => 200,
-                'status' => 'Success',
-                'url' => route('users.index', $currentWorkspace->slug),
-                'success' => __('Users Invited Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''),
-            ]
-        );
+        if (!$result->applied) {
+            return json_encode(['code' => 400, 'status' => 'Error', 'error' => __('This user is already a member of this workspace.')]);
+        }
+
+        return json_encode([
+            'code' => 200,
+            'status' => 'Success',
+            'url' => route('users.index', $currentWorkspace->slug),
+            'success' => __('Users Invited Successfully!'),
+        ]);
     }
 
     /*public function removeUser($slug, $id)
@@ -1322,49 +1074,18 @@ class UserController extends Controller
         ];
 
         if (!empty($registerUsers)) {
-            // Atomic: an existing membership (any status) is never reset; repeats and racing
-            // invitations get the "already a member" response and no duplicate side effects.
-            $userWorkspace = UserWorkspace::findOrCreateMembership($registerUsers->id, $currentWorkspace->id, [
-                'permission' => 'Member',
-                'status' => Status::EMPLOYEE_PENDING->value,
-            ]);
-
-            if ($userWorkspace->wasRecentlyCreated) {
-                $userWorkspace->refresh();
-                $userWorkspace->syncPermissions(['users_index', 'projects_index']);
-
-                $workspace_name = Workspace::where('id', $authuser->currant_workspace)->first();
-
-                Utility::sendNotification('workspace_invite', null, $registerUsers->id, $userWorkspace);
-
-                try {
-                    $uArr = [
-                        'user_name' => $registerUsers->name,
-                        // 'app_name' => env('APP_NAME'),
-                        'app_name' => $setting['app_name'],
-                        'workspace_name' => $workspace_name->name,
-                        'owner_name' => $authusername->name,
-                        'app_url' => env('APP_URL'),
-                    ];
-
-                    // Send Email
-                    $resp = Utility::sendEmailTemplate('User Invited', $registerUsers->id, $uArr);
-                } catch (\Exception $e) {
-                    $smtp_error = __('E-Mail has not been sent due to SMTP configuration');
-                }
-
-                $response = [
-                    'code' => 200,
-                    'status' => 'Success',
-                    'url' => route('users.index', $currentWorkspace->slug),
-                    'message' => __('User Invited Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''),
-                ];
-            } else {
-                $response = [
-                    'code' => 202,
-                    'status' => 'error',
-                    'message' => __('This user is already a member of this workspace.'),
-                ];
+            // UNA-012: one transaction (WorkspaceMembershipService::invite); an existing membership
+            // (any status) is never reset, companies/administrators are refused, effects after commit.
+            try {
+                $result = app(\App\Services\Membership\WorkspaceMembershipService::class)->invite($currentWorkspace, $authuser, new ProvisionUserData(
+                    source: ProvisioningSource::WORKSPACE_INVITATION,
+                    email: $registerUsers->email,
+                ));
+                $response = $result->applied
+                    ? ['code' => 200, 'status' => 'Success', 'url' => route('users.index', $currentWorkspace->slug), 'message' => __('User Invited Successfully!')]
+                    : ['code' => 202, 'status' => 'error', 'message' => __('This user is already a member of this workspace.')];
+            } catch (\App\Services\Provisioning\ProvisioningException $e) {
+                $response = ['code' => 202, 'status' => 'error', 'message' => $e->getMessage()];
             }
         }
 

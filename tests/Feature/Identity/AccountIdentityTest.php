@@ -162,7 +162,7 @@ class AccountIdentityTest extends TestCase
         $this->postJson('/api/register', [
             'name' => 'Api Person', 'email' => 'api@example.test',
             'password' => 'Secret123!', 'password_confirmation' => 'Secret123!',
-        ])->assertOk();
+        ])->assertCreated(); // UNA-012: 201 for a created account
 
         $user = User::where('email', 'api@example.test')->firstOrFail();
         $this->assertSame(UserType::USER->value, $user->type);

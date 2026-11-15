@@ -19,6 +19,10 @@ use App\Models\Mail\SendLoginDetail;
 use Illuminate\Support\Facades\DB;
 use App\Enums\User\UserRole;
 use Illuminate\Validation\Rules\Enum;
+use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Services\Provisioning\ProvisionUserData;
+use App\Services\Provisioning\ProvisioningSource;
+use App\Services\Provisioning\UserProvisioningService;
 
 
 class RegisteredUserController extends Controller
@@ -39,17 +43,6 @@ class RegisteredUserController extends Controller
     public function create()
     {
         // return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        $user = User::create($request->validated());
-
-        event(new Registered($user));
-
-        auth()->login($user);
-
-        return redirect('/')->with('success', "Account successfully registered.");
     }
 
     public function showRegistrationForm($ref = '', $lang = '')
@@ -162,102 +155,53 @@ class RegisteredUserController extends Controller
 
     // }
 
-    public function store(Request $request)
+    /**
+     * Web self-registration (UNA-012): validation here, account structure in
+     * UserProvisioningService (one transaction), then login, verification/welcome email and the
+     * onboarding redirect - all after the account has committed.
+     */
+    public function store(RegisterUserRequest $request, UserProvisioningService $provisioning)
     {
         $setting = Utility::getAdminPaymentSetting();
-        // if (env('RECAPTCHA_MODULE') == 'on') {
-        if ($setting['recaptcha_module'] == 'on') {
-            $validation['g-recaptcha-response'] = 'required';
-        } else {
-            $validation = [];
-        }
+        $verify = ($setting['email_verification'] ?? 'off') === 'on';
+        $lang = $setting['default_admin_lang'] ?: 'en';
 
-        $this->validate($request, $validation);
+        $result = $provisioning->provision(new ProvisionUserData(
+            source: ProvisioningSource::WEB_REGISTRATION,
+            email: $request->validated('email'),
+            name: $request->validated('name'),
+            role: UserRole::from($request->validated('role')),
+            password: $request->validated('password'),
+            emailVerified: !$verify,
+            locale: $lang,
+            workspaceName: $request->validated('name'),
+            referralUsed: $request->validated('ref_code'),
+            sendLoginDetails: !$verify, // after commit; the password is never included
+        ));
+        $user = $result->user;
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
-            // Only the account personas offered on the form; anything else is rejected.
-            'role' => ['required', new Enum(UserRole::class)],
-        ]);
-        $accountRole = UserRole::from($request->role);
+        Auth::login($user);
 
-        do {
-            $code = rand(100000, 999999);
-        } while (DB::table('users')->where('referral_code', $code)->exists());
-
-        // User, own workspace and account role are created together or not at all.
-        $user = DB::transaction(function () use ($request, $setting, $code, $accountRole) {
-            $user = User::createWithAccountRole([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'workspace' => $request->name,
-                'password'  => Hash::make($request->password),
-                'plan'      => 1,
-                'lang'      => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en',
-                'referral_code' => $code,
-                'referral_used' => !empty($request->ref_code) ? $request->ref_code : '0',
-            ], $accountRole);
-
-            $objWorkspace = Workspace::create(['lang' => $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en', 'created_by' => $user->id, 'name' => $request->name, 'currency_code' => 'USD', 'paypal_mode' => 'sandbox']);
-        
-            $objWorkspace->ownerable()->associate($user);
-            $objWorkspace->save();
-
-
-            $userWorkspace = UserWorkspace::findOrCreateMembership($user->id, $objWorkspace->id, ['permission' => 'Owner']);
-
-            $userWorkspace->assignAllPermissionsToCreator();
-
-            $user->currant_workspace = $objWorkspace->id;
-            $user->save();
-
-            User::userDefaultDataRegister($user);
-
-            return $user;
-        });
-
-        $setting = Utility::getAdminPaymentSetting();
-        // dd($user,$setting,$setting['email_verification']);
-        if ($setting['email_verification'] == 'on') {
-
+        if ($verify) {
+            \App::setLocale($lang);
             Utility::setMailConfig();
             try {
                 event(new Registered($user));
-                // UserWorkspace::create(['user_id'=> $user->id,'workspace_id'=>$objWorkspace->id,'permission'=>'Owner']);
-                if (empty($lang)) {
-                    $lang = $setting['default_admin_lang'] ? $setting['default_admin_lang'] : 'en';
-                }
-                \App::setLocale($lang);
             } catch (\Exception $e) {
-                $user->delete();
-                // return redirect('/register/lang?')->with('statuss', __('Email SMTP settings does not configure so please contact to your site admin.'));
-                return redirect()->route('register')->with('statuss', __('Email SMTP settings does not configure so please contact to your site admin.'));
+                report($e);
+                // The account exists; the user can resend the verification email from this page.
+                session()->flash('statuss', __('Email SMTP settings does not configure so please contact to your site admin.'));
             }
-            Auth::login($user);
+
             return view('auth.verify-email', compact('lang'));
-        } else {
-            $user->email_verified_at = date('h:i:s');
-            // UserWorkspace::create(['user_id'=> $user->id,'workspace_id'=>$objWorkspace->id,'permission'=>'Owner']);
-            $user->save();
-            $user->password = $request->password;
-            Utility::setMailConfig();
-            try {
-                Mail::to($user->email)->send(new SendLoginDetail($user));
-            } catch (\Exception $e) {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-            }
-
-            Auth::login($user);
-
-            // New employees and companies start onboarding straight away (UNA-007, UNA-010).
-            $onboarding = app(\App\Services\Onboarding\OnboardingRedirect::class)->for($user);
-            if ($onboarding) {
-                return redirect()->route($onboarding['route']);
-            }
-
-            return redirect(RouteServiceProvider::HOME);
         }
+
+        // New employees and companies start onboarding straight away (UNA-007, UNA-010).
+        $onboarding = app(\App\Services\Onboarding\OnboardingRedirect::class)->for($user);
+        if ($onboarding) {
+            return redirect()->route($onboarding['route']);
+        }
+
+        return redirect(RouteServiceProvider::HOME);
     }
 }
