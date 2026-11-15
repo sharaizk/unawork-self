@@ -41,7 +41,15 @@ class CompanyOnboardingController extends Controller
         $breakdown = $this->completion->breakdown($workspace);
         $step = $request->query('step', $workspace->business_onboarding_step ?: 'company');
 
+        // UNA-011: first-POD card. Deterministic lookup; viewing this page never creates a draft.
+        $user = $request->user();
+        $publishedPod = \App\Models\Pod::published()->where('created_by', $user->id)->orderBy('published_at')->orderBy('id')->first();
+        $draftPod = $publishedPod ? null : \App\Models\Pod::drafts()->where('created_by', $user->id)->latest('updated_at')->orderByDesc('id')->first();
+
         return view('company.onboarding', [
+            'publishedPod' => $publishedPod,
+            'draftPod' => $draftPod,
+            'draftPodPercentage' => $draftPod ? app(\App\Services\Pod\PodConfigurationService::class)->percentage($draftPod) : null,
             'workspace' => $workspace,
             'breakdown' => $breakdown,
             'step' => in_array($step, BusinessOnboardingService::STEPS, true) ? $step : 'company',

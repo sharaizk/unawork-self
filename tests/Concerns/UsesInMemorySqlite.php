@@ -290,6 +290,15 @@ trait UsesInMemorySqlite
         });
         (require database_path('migrations/2026_11_18_000200_add_business_onboarding_to_workspaces.php'))->up();
         (require database_path('migrations/2026_11_18_000300_create_workspace_worker_requirements_table.php'))->up();
+        Schema::create('pods_skills', function (Blueprint $t) { // POD-level skill tags
+            $t->id();
+            $t->unsignedBigInteger('pod_id');
+            $t->unsignedBigInteger('skill_id');
+            $t->timestamps();
+            $t->unique(['pod_id', 'skill_id']);
+        });
+        // UNA-011: POD draft/publish lifecycle and POD-owned requirements.
+        (require database_path('migrations/2026_11_18_000400_add_publication_lifecycle_to_pods.php'))->up();
     }
 
     /**

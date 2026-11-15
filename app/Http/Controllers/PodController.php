@@ -24,19 +24,13 @@ class PodController extends Controller
         $pods = $user->pods;
         $businessProfile = $this->businessProfile($user);
 
-        return view('users.pod', compact('currentWorkspace', 'user', 'pods', 'businessProfile'));
-    }
+        // UNA-011: setup progress of the drafts this user owns (drafts of others are never listed).
+        $configuration = app(\App\Services\Pod\PodConfigurationService::class);
+        $podSetup = $pods->filter(fn (Pod $pod) => $pod->isDraft() && (int) $pod->created_by === (int) $user->id)
+            ->mapWithKeys(fn (Pod $pod) => [$pod->id => $configuration->breakdown($pod) + ['missing' => $configuration->missingRequirements($pod)]])
+            ->all();
 
-    public function create()
-    {
-        $businessProfile = $this->businessProfile(Auth::user());
-        if ($businessProfile && !$businessProfile['complete']) {
-            // UNA-010: the create form is replaced by what is missing (PodService still enforces it).
-            return view('pod.incomplete_business_profile', compact('businessProfile'));
-        }
-
-        $skills = Skill::all();
-        return view('pod.create_form', compact('skills'));
+        return view('users.pod', compact('currentWorkspace', 'user', 'pods', 'businessProfile', 'podSetup'));
     }
 
     /** Company completion for the POD pages (null for non-companies). UNA-010. */
@@ -95,7 +89,7 @@ class PodController extends Controller
         $skillIds = $request->input('skill_ids', []);
         $perPage = 15;
 
-        $podsQuery = Pod::query();
+        $podsQuery = Pod::published(); // UNA-011: drafts are never public
 
         if (!empty($query)) {
             $podsQuery->where('title', 'LIKE', "%$query%");
@@ -128,6 +122,7 @@ class PodController extends Controller
 
     public function showOuter(Pod $pod)
     {
+        abort_unless($pod->isPublished(), 404); // UNA-011: drafts only via the owner's setup page
         $news = $pod->news()->latest('created_at')->get();
         return view('pod.landing.index', compact('pod', 'news'));
     }
@@ -144,6 +139,7 @@ class PodController extends Controller
 
     public function showInner(Pod $pod)
     {
+        abort_unless($pod->isPublished(), 404);
         $this->authorize('viewInner', $pod);
 
         $objUser = Auth::user();

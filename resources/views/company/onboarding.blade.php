@@ -140,7 +140,7 @@
 
         {{-- ============================================================ form --}}
         <div class="col-xl-8 col-lg-7">
-            <form id="company-onboarding-form" method="POST" action="{{ route('company.onboarding.update') }}" enctype="multipart/form-data" novalidate
+            <form id="company-onboarding-form" data-co-form method="POST" action="{{ route('company.onboarding.update') }}" enctype="multipart/form-data" novalidate
                 data-initial-step="{{ $step }}"
                 data-i18n="{{ json_encode([
                     'suggested' => __('Suggested for your industry'),
@@ -332,6 +332,20 @@
                                 <i class="ti ti-circle-check"></i> {{ __('Your company profile is complete. You can publish PODs.') }}
                             @else
                                 <i class="ti ti-alert-triangle"></i> {{ __('Your company profile is :percentage% complete. :required% is required to publish a POD.', ['percentage' => $breakdown['percentage'], 'required' => $breakdown['required']]) }}
+                            @endif
+                        </div>
+                        {{-- UNA-011: optional first POD. Creating one is not part of the company score. --}}
+                        <div class="co-first-pod mb-3" data-first-pod="{{ $publishedPod ? 'published' : ($draftPod ? 'draft' : 'none') }}">
+                            @if ($publishedPod)
+                                <p class="fw-semibold mb-1"><i class="ti ti-world" aria-hidden="true"></i> {{ __('Your POD :title is published.', ['title' => $publishedPod->title]) }}</p>
+                                <a href="{{ route('pods.index') }}" class="btn btn-sm btn-outline-primary">{{ __('Manage your PODs') }}</a>
+                            @elseif ($draftPod)
+                                <p class="fw-semibold mb-1"><i class="ti ti-pencil" aria-hidden="true"></i> {{ __('Your first POD is a draft (:percentage% configured).', ['percentage' => $draftPodPercentage]) }}</p>
+                                <a href="{{ route('pods.setup.edit', $draftPod) }}" class="btn btn-sm btn-primary">{{ __('Resume POD setup') }}</a>
+                            @else
+                                <p class="fw-semibold mb-1"><i class="ti ti-rocket" aria-hidden="true"></i> {{ __('Create your first POD') }}</p>
+                                <p class="small text-muted">{{ __('Optional: start a draft now. It stays private and can be published once your company profile and the POD setup are complete.') }}</p>
+                                <a href="{{ route('pods.create') }}" class="btn btn-sm btn-primary">{{ __('Create your first POD') }}</a>
                             @endif
                         </div>
                         <ul class="list-group co-review">

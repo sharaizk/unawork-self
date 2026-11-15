@@ -31,7 +31,7 @@ class PublicCompanyProfileTest extends TestCase
         $this->assertUsingInMemorySqlite();
         $this->createIdentitySchema();
         Schema::table('job_vacancies', fn (Blueprint $t) => $t->text('description')->nullable());
-        foreach (['job_vacancy_skill' => 'job_vacancy_id', 'pods_skills' => 'pod_id'] as $table => $key) {
+        foreach (['job_vacancy_skill' => 'job_vacancy_id'] as $table => $key) {
             Schema::create($table, function (Blueprint $t) use ($key) {
                 $t->id();
                 $t->unsignedBigInteger($key);

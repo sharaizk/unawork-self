@@ -80,6 +80,7 @@ use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\MyProfileController;
 use App\Http\Controllers\CompanyOnboardingController;
+use App\Http\Controllers\PodSetupController;
 use App\Http\Controllers\SkillController;
 
 /*
@@ -97,7 +98,12 @@ Route::get('/hiring/search', [HirePageController::class, 'search'])->name('hirin
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/pods', [PodController::class, 'index'])->name('pods.index');
-    Route::get('/pods/create', [PodController::class, 'create'])->name('pods.create');
+    // Guided POD creation (UNA-011): drafts, setup, publication. Only the owning company.
+    Route::get('/pods/create', [PodSetupController::class, 'create'])->name('pods.create');
+    Route::post('/pods/drafts', [PodSetupController::class, 'storeDraft'])->name('pods.drafts.store')->middleware('XSS');
+    Route::get('/pods/{pod}/setup', [PodSetupController::class, 'edit'])->whereNumber('pod')->name('pods.setup.edit');
+    Route::post('/pods/{pod}/setup', [PodSetupController::class, 'update'])->whereNumber('pod')->name('pods.setup.update')->middleware('XSS');
+    Route::post('/pods/{pod}/publish', [PodSetupController::class, 'publish'])->whereNumber('pod')->name('pods.publish');
     Route::get('/pods/{podId}/edit', [PodController::class, 'edit'])->name('pods.edit');
     Route::delete('/pods/{podId}', [PodController::class, 'destroy'])->name('pods.delete');
 

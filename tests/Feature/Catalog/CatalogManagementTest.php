@@ -37,12 +37,6 @@ class CatalogManagementTest extends TestCase
         $this->assertUsingInMemorySqlite();
         $this->createIdentitySchema();
         $this->createAdminLayoutSchema();
-        Schema::create('pods_skills', function (Blueprint $t) {
-            $t->id();
-            $t->unsignedBigInteger('pod_id');
-            $t->unsignedBigInteger('skill_id');
-            $t->timestamps();
-        });
         Schema::create('job_vacancy_skill', function (Blueprint $t) {
             $t->id();
             $t->unsignedBigInteger('job_vacancy_id');

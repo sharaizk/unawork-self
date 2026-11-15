@@ -1,5 +1,6 @@
 /**
- * Company onboarding / Company Profile (UNA-010). Plain JS; select2/jQuery from layouts.admin (optional).
+ * Guided step forms ([data-co-form]): company onboarding / Company Profile (UNA-010) and guided POD
+ * setup (UNA-011). Plain JS; select2/jQuery from layouts.admin (optional).
  *
  * - Steps: one form, one panel per step ([data-co-step]); the active step is shown, written into the
  *   hidden `step` input and the URL (?step=). Without JS every panel is visible and still saves.
@@ -14,7 +15,7 @@
 (function () {
     'use strict';
 
-    var form = document.getElementById('company-onboarding-form');
+    var form = document.querySelector('[data-co-form]');
     if (!form) {
         return;
     }
@@ -29,7 +30,11 @@
     var panels = Array.prototype.slice.call(form.querySelectorAll('[data-co-step]'));
     var order = panels.map(function (panel) { return panel.getAttribute('data-co-step'); });
     var stepInput = form.querySelector('[data-co-step-input]');
-    var industrySelect = document.getElementById('industry_id');
+    // The company page has an industry select; the POD page passes the company industry as data.
+    var industrySelect = form.querySelector('#industry_id');
+    function currentIndustry() {
+        return industrySelect ? industrySelect.value : (form.getAttribute('data-industry-id') || '');
+    }
 
     // layouts.admin loads jQuery/select2 more than once (a later copy replaces window.jQuery), so
     // always resolve it at call time instead of capturing it when this file runs.
@@ -147,7 +152,7 @@
     function addRequirement() {
         var template = document.getElementById('co-requirement-template');
         if (!template || !rows) {
-            return;
+            return null;
         }
         var index = parseInt(rows.getAttribute('data-next-index') || '0', 10);
         rows.setAttribute('data-next-index', String(index + 1));
@@ -165,7 +170,13 @@
         if (first) {
             first.focus();
         }
+
+        return row;
     }
+
+    // Let page-specific scripts (pod-onboarding.js) add rows and refresh selects.
+    form.coAddRequirement = addRequirement;
+    form.coPrioritize = prioritize;
 
     // ------------------------------------------------------------------ industry prioritizing
 
@@ -234,7 +245,7 @@
     }
 
     function prioritize(scope) {
-        var industryId = industrySelect ? industrySelect.value : '';
+        var industryId = currentIndustry();
         (scope || form).querySelectorAll('.js-co-industry-sorted').forEach(function (select) {
             regroup(select, industryId);
         });

@@ -1,4 +1,5 @@
-{{-- One worker requirement. Params: $index, $row (array), $jobTitles, $skills, $proficiencies, $workModes, $engagementTypes --}}
+{{-- One worker requirement. Params: $index, $row (array), $jobTitles, $skills, $proficiencies, $workModes, $engagementTypes;
+     optional $withSource (POD setup, UNA-011: keeps the company template a row was copied from). --}}
 @php
     $p = "requirements.$index";
     $selectedSkills = array_map('strval', (array) ($row['skill_ids'] ?? []));
@@ -6,8 +7,15 @@
 @endphp
 <div class="co-requirement" data-co-row>
     <input type="hidden" name="requirements[{{ $index }}][id]" value="{{ $row['id'] ?? '' }}">
+    @if (!empty($withSource))
+        <input type="hidden" name="requirements[{{ $index }}][source_workspace_requirement_id]" value="{{ $row['source_workspace_requirement_id'] ?? '' }}" data-co-source>
+    @endif
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="co-requirement__title"><i class="ti ti-users" aria-hidden="true"></i> {{ __('Worker requirement') }}</span>
+        <span class="co-requirement__title"><i class="ti ti-users" aria-hidden="true"></i> {{ __('Worker requirement') }}
+            @if (!empty($withSource))
+                <span class="badge co-badge co-badge--todo ms-1 {{ empty($row['source_workspace_requirement_id']) ? 'd-none' : '' }}" data-co-source-badge>{{ __('Copied from company template') }}</span>
+            @endif
+        </span>
         <div class="d-flex align-items-center gap-3">
             <div class="form-check form-switch mb-0">
                 <input type="hidden" name="requirements[{{ $index }}][is_active]" value="0">

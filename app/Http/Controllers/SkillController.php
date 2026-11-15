@@ -32,7 +32,7 @@ class SkillController extends CatalogController
             'add' => __('Add Skill'),
             'edit' => __('Edit Skill'),
             'usage_label' => __('Assignments'),
-            'usage_help' => __('Employees with this skill, plus PODs, job vacancies and company worker requirements that require it.'),
+            'usage_help' => __('Employees with this skill, plus PODs, job vacancies and company or POD worker requirements that require it.'),
             'created' => __('Skill created successfully.'),
             'updated' => __('Skill updated successfully.'),
             'deleted' => __('Skill deleted successfully.'),

@@ -36,7 +36,7 @@ class JobTitleController extends CatalogController
             'add' => __('Add Professional Role'),
             'edit' => __('Edit Professional Role'),
             'usage_label' => __('Profiles'),
-            'usage_help' => __('Profiles using this role as their current title or a preferred role, plus experience records and company worker requirements.'),
+            'usage_help' => __('Profiles using this role as their current title or a preferred role, plus experience records and company or POD worker requirements.'),
             'created' => __('Professional role created successfully.'),
             'updated' => __('Professional role updated successfully.'),
             'deleted' => __('Professional role deleted successfully.'),

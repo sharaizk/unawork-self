@@ -25,7 +25,7 @@ class PodController extends Controller
     
     public function index(): AnonymousResourceCollection
     {
-        $pods = Pod::all();
+        $pods = Pod::published()->get(); // UNA-011: drafts are never public
 
         return PodResource::collection($pods);
     }
@@ -41,10 +41,12 @@ class PodController extends Controller
         }
         
         try {
-            $pod = $this->podService->createPod($data);
+            // UNA-011: creates a draft through the hardened PodService path; publishing is separate.
+            unset($data['created_by']);
+            $pod = $this->podService->createDraft($request->user(), $data, $request->file('image'));
             return new PodResource($pod);
-        } catch (\App\Services\Company\IncompleteBusinessProfile $e) {
-            throw $e; // UNA-010: rendered as 409 JSON with the missing requirements and onboarding URL
+        } catch (\App\Services\Pod\UnauthorizedPodMutation $e) {
+            throw $e;
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -55,6 +57,8 @@ class PodController extends Controller
     public function show(int $id): PodResource
     {   
         $pod = Pod::findOrFail($id);
+        // UNA-011: a draft is visible only to the company that owns it.
+        abort_unless($pod->isPublished() || (int) optional(auth('sanctum')->user())->id === (int) $pod->created_by, 404);
 
         return new PodResource($pod);
     }
@@ -64,11 +68,14 @@ class PodController extends Controller
         $pod = Pod::findOrFail($id);
         $this->authorize('update', $pod);
         $data = $request->validated();
-        $sata = $request->all();
-    
+        unset($data['image']);
+
         try {
-            $updatedPod = $this->podService->updatePod($pod, $sata);
+            // Same hardened path as the guided setup; a published POD cannot lose a complete section.
+            $updatedPod = $this->podService->updateDraft($pod, $request->user(), $data, $request->file('image'));
             return new PodResource($updatedPod);
+        } catch (\App\Services\Pod\PodPublicationRefused|\App\Services\Pod\UnauthorizedPodMutation $e) {
+            throw $e;
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

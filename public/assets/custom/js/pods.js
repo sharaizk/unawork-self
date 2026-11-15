@@ -1,10 +1,11 @@
 /**
- * POD management page (users/pod.blade.php): create and update forms loaded into #commonModal.
+ * POD management page (users/pod.blade.php): the published-POD edit form loaded into #commonModal.
+ * New PODs use the guided full-page setup (UNA-011), so there is no create modal any more.
  * Uses the axios, jQuery and Chosen copies provided by layouts.admin.
  *
- * Errors stay inside the modal: 422 shows the field messages next to the fields, other responses
- * (e.g. 409 incomplete company profile, UNA-010) show the server's message and, when given, a link
- * to the onboarding page. Nothing is replaced by a generic failure toast.
+ * Errors stay inside the modal: 422 shows the field messages next to the fields; other responses
+ * show the server's message (e.g. an edit that would leave a published POD incomplete) and, when
+ * given, a link to the setup page.
  */
 (function () {
     'use strict';
@@ -67,12 +68,13 @@
             return;
         }
         box.textContent = (response && response.status === 422) ? (i18n.fixErrors || data.message) : (data.message || i18n.failed);
-        if (data.onboarding_url) {
+        var target = data.setup_url || data.onboarding_url;
+        if (target) {
             box.appendChild(document.createTextNode(' '));
             var link = document.createElement('a');
-            link.href = data.onboarding_url;
+            link.href = target;
             link.className = 'alert-link';
-            link.textContent = i18n.completeProfile;
+            link.textContent = data.setup_url ? i18n.openSetup : i18n.completeProfile;
             box.appendChild(link);
         }
         box.classList.remove('d-none');
@@ -85,30 +87,6 @@
         if ($.fn.chosen) {
             modal.find('.chosen-select').chosen({ width: '100%', placeholder_text_multiple: i18n.selectSkills });
         }
-
-        modal.find('.create-pod-form').off('submit').on('submit', function (event) {
-            event.preventDefault();
-            var form = this;
-            var button = form.querySelector('[type="submit"]');
-            clearErrors(form);
-            if (button) {
-                button.disabled = true;
-            }
-            window.axios.post(config.getAttribute('data-store-url'), new FormData(form), { headers: { Accept: 'application/json' } })
-                .then(function () {
-                    $('#commonModal').modal('hide');
-                    notify(i18n.created, 'success');
-                    setTimeout(function () { window.location.reload(); }, 800);
-                })
-                .catch(function (error) {
-                    showError(form, error);
-                })
-                .finally(function () {
-                    if (button) {
-                        button.disabled = false;
-                    }
-                });
-        });
 
         modal.find('.update-pod-form').off('submit').on('submit', function (event) {
             event.preventDefault();

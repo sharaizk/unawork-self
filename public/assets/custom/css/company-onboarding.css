@@ -241,3 +241,10 @@
         position: static;
     }
 }
+
+/* UNA-011: first-POD card in the review step */
+.co-first-pod {
+    padding: 1rem;
+    border-radius: 14px;
+    background-color: var(--co-accent-soft);
+}

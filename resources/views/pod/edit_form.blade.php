@@ -3,9 +3,10 @@
         padding: 20px;
     }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
-<form class="update-pod-form" id="edit-pod-form" data-url="./api/pod/{{ $pod->id }}">
+{{-- Chosen CSS/JS come from layouts.admin. Saved through PodService::updateDraft (UNA-011). --}}
+<form class="update-pod-form" id="edit-pod-form" data-url="{{ url('api/pod/' . $pod->id) }}">
     @csrf
+    <div class="alert alert-danger d-none" role="alert" data-pod-form-error></div>
     <div class="col-lg-12">
         <div class="row">
             <div class="alert alert-success" id="success-message" style="display: none;">
