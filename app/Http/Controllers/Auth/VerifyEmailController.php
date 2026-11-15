@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Services\Profile\ProfileCompletionService;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
@@ -23,6 +24,11 @@ class VerifyEmailController extends Controller
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
+        }
+
+        // A newly verified employee continues with profile onboarding (UNA-007).
+        if (app(ProfileCompletionService::class)->requiresOnboarding($request->user())) {
+            return redirect()->route('my-profile.edit', ['verified' => 1]);
         }
 
         return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');

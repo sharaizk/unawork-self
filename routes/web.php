@@ -78,6 +78,8 @@ use App\Http\Controllers\PodUserController;
 use App\Http\Controllers\ProjectUserController;
 use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\MyProfileController;
+use App\Http\Controllers\SkillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,8 +95,6 @@ Route::get('/pods/search', [PodController::class, 'search'])->name('pods.search'
 Route::get('/hiring/search', [HirePageController::class, 'search'])->name('hiring.search');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/employee/profile', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
-
     Route::get('/pods', [PodController::class, 'index'])->name('pods.index');
     Route::get('/pods/create', [PodController::class, 'create'])->name('pods.create');
     Route::get('/pods/{podId}/edit', [PodController::class, 'edit'])->name('pods.edit');
@@ -144,7 +144,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pods/{pod}/inner-circle', [PodController::class, 'showInner'])->name('landing.pods.show.inner');
     Route::get('/pods/{pod}/projects/search', [PodController::class, 'searchProjects'])->name('pods.projects.search');
 
-    Route::resource('industries', IndustryController::class)->names([
+    // Administrator catalog management (policies: admin only). Route names kept for compatibility.
+    Route::resource('industries', IndustryController::class)->middleware('XSS')->names([
         'index' => 'industries.index',
         'create' => 'industries.create',
         'store' => 'industries.store',
@@ -153,7 +154,9 @@ Route::middleware(['auth'])->group(function () {
         'update' => 'industries.update',
         'destroy' => 'industries.destroy',
     ]);
-    Route::resource('job-titles', JobTitleController::class)->names([
+    Route::resource('skills', SkillController::class)->except(['show'])->middleware('XSS');
+    // "Professional Roles" in the admin UI (job titles, not authorization roles).
+    Route::resource('job-titles', JobTitleController::class)->middleware('XSS')->names([
         'index' => 'job-titles.index',
         'create' => 'job-titles.create',
         'store' => 'job-titles.store',
@@ -164,15 +167,16 @@ Route::middleware(['auth'])->group(function () {
     ]);
 });
 
-Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work');
+// Public for guests; a logged-in employee below the profile minimum is sent to /my-profile (UNA-007).
+Route::get('/find-work', [FindWorkController::class, 'index'])->name('landing.find-work')->middleware('profile.complete');
 Route::get('/pods/list', [PodController::class, 'list'])->name('pods.list');
 Route::get('/companies/list', [CompanyController::class, 'list'])->name('companies.list');
 Route::get('/search-companies', [JobVacancyController::class, 'searchCompanies'])->name('companies.search');
 
 Route::get('/project/list', [ProjectController::class, 'list'])->name('project.list');
-Route::get('/job-vacancies/list', [JobVacancyController::class, 'list'])->name('job-vacancies.landing.list');
+Route::get('/job-vacancies/list', [JobVacancyController::class, 'list'])->name('job-vacancies.landing.list')->middleware('profile.complete');
 
-Route::get('/job-vacancies/{vacancy}', [JobVacancyController::class, 'show'])->name('job-vacancies.landing.show');
+Route::get('/job-vacancies/{vacancy}', [JobVacancyController::class, 'show'])->name('job-vacancies.landing.show')->middleware('profile.complete');
 
 
 Route::get('/hiring', [HirePageController::class, 'index'])->name('landing.hiring');
@@ -746,6 +750,10 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('/my-account/password', [UserController::class, 'updatePassword'])->name('update.password')->middleware(['auth', 'XSS']);
     Route::delete('/my-account', [UserController::class, 'deleteAvatar'])->name('delete.avatar')->middleware(['auth', 'XSS']);
     Route::delete('/delete-my-account', [UserController::class, 'deleteMyAccount'])->name('delete.my.account')->middleware(['auth', 'XSS']);
+
+    // Employee profile onboarding and editing (UNA-007); employees only (ProfilePolicy).
+    Route::get('/my-profile', [MyProfileController::class, 'edit'])->name('my-profile.edit')->middleware(['auth', 'XSS']);
+    Route::post('/my-profile', [MyProfileController::class, 'update'])->name('my-profile.update')->middleware(['auth', 'XSS']);
 
 
     // Plans

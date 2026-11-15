@@ -106,9 +106,25 @@ class HomeController extends Controller
 
                     //$error = $user->is_trial_done ? __('Your Plan is expired.') : ($user->plan_expire_date < date('Y-m-d') ? __('Please upgrade your plan') : '');
 
-                    return redirect()->route('home')->with('success', __('Free Plan Activated Successfully.!'));
+                    return $this->afterLoginRedirect($user)->with('success', __('Free Plan Activated Successfully.!'));
                 }
             }
+        }
+
+        return $this->afterLoginRedirect($user);
+    }
+
+    /**
+     * Post-login destination: an employee below the profile minimum goes to /my-profile (UNA-007);
+     * everyone else keeps the dashboard. Only /check redirects, so other pages stay reachable.
+     */
+    private function afterLoginRedirect($user)
+    {
+        if (app(\App\Services\Profile\ProfileCompletionService::class)->requiresOnboarding($user)) {
+            return redirect()->route('my-profile.edit')
+                ->with('error', __('Please complete your profile. :required% is required to access jobs and active POD circles.', [
+                    'required' => app(\App\Services\Profile\ProfileCompletionService::class)->required(),
+                ]));
         }
 
         return redirect()->route('home');

@@ -1,0 +1,348 @@
+/*
+ * /my-profile (UNA-007). Modular cards, a completion ring and a warm accent on top of the Dash
+ * theme. Colours come from theme variables (--bs-*) so light/dark mode follow the active
+ * stylesheet; spacing uses logical properties so RTL mirrors automatically.
+ */
+.una-profile {
+    --una-accent: #f08c38;
+    --una-accent-soft: rgba(240, 140, 56, 0.14);
+    --una-success: #2ab27b;
+    --una-success-soft: rgba(42, 178, 123, 0.14);
+    --una-radius: 18px;
+    --una-primary: var(--bs-primary, #51459d);
+}
+
+.una-profile .card {
+    border-radius: var(--una-radius);
+    overflow: hidden;
+}
+
+.una-profile-aside {
+    position: sticky;
+    top: 90px;
+}
+
+/* ---------------------------------------------------------------- hero / completion ring */
+
+.una-profile-hero {
+    background:
+        radial-gradient(circle at 100% 0, var(--una-accent-soft), transparent 55%),
+        var(--bs-card-bg, var(--bs-body-bg));
+}
+
+.una-profile-ring {
+    --una-pct: 0;
+    flex: 0 0 auto;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(var(--una-accent) calc(var(--una-pct) * 1%), var(--bs-border-color, #e6e6ef) 0);
+}
+
+.una-profile-ring::before {
+    content: "";
+    grid-area: 1 / 1;
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: var(--bs-card-bg, var(--bs-body-bg, #fff));
+}
+
+.una-profile-ring__value {
+    grid-area: 1 / 1;
+    position: relative;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.una-profile-ring__value small {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.una-profile-progress {
+    position: relative;
+    height: 10px;
+    border-radius: 999px;
+    overflow: visible;
+    background-color: var(--bs-border-color, #e6e6ef);
+}
+
+.una-profile-progress .progress-bar {
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--una-primary), var(--una-accent));
+}
+
+[dir="rtl"] .una-profile-progress .progress-bar {
+    background: linear-gradient(270deg, var(--una-primary), var(--una-accent));
+}
+
+.una-profile-progress__marker {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    inset-inline-start: var(--una-required);
+    width: 2px;
+    background: var(--bs-body-color, #293240);
+    opacity: 0.55;
+}
+
+.una-profile .min-w-0 {
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------------- badges */
+
+.una-profile-badge {
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.35em 0.8em;
+}
+
+.una-profile-badge--done {
+    color: var(--una-success);
+    background-color: var(--una-success-soft);
+}
+
+.una-profile-badge--todo {
+    color: var(--una-accent);
+    background-color: var(--una-accent-soft);
+}
+
+/* ---------------------------------------------------------------- checklist */
+
+.una-profile-checklist .list-group-item {
+    padding: 0;
+    background: transparent;
+}
+
+.una-profile-checklist__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.8rem 1.25rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.una-profile-checklist__item:hover,
+.una-profile-checklist__item:focus-visible {
+    background-color: var(--una-accent-soft);
+    color: inherit;
+}
+
+.una-profile-checklist__item > .ti {
+    font-size: 1.25rem;
+    color: var(--una-accent);
+    margin-top: 1px;
+}
+
+.una-profile-checklist__item.is-complete > .ti {
+    color: var(--una-success);
+}
+
+/* ---------------------------------------------------------------- section cards */
+
+.una-profile-card {
+    scroll-margin-top: 90px;
+}
+
+.una-profile-card__header {
+    border-bottom: 0;
+    padding-bottom: 0.5rem;
+}
+
+/* The Dash theme draws an accent bar 25px left of every card-header h5; these headers have an icon there. */
+.una-profile-card__header h5::after,
+.una-profile-hero h5::after {
+    display: none;
+}
+
+.una-profile-card__icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    color: var(--una-accent);
+    background-color: var(--una-accent-soft);
+}
+
+.una-profile-subtitle {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.una-profile-rows {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.una-profile-rows:empty {
+    display: none;
+}
+
+.una-profile-row {
+    border: 1px solid var(--bs-border-color, #e6e6ef);
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+.una-profile-row--inline {
+    padding: 0.6rem 0.75rem;
+}
+
+.una-profile-row__title {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.una-profile-row__title .ti {
+    color: var(--una-accent);
+    margin-inline-end: 0.25rem;
+}
+
+.una-profile-remove {
+    border-radius: 10px;
+}
+
+/* ---------------------------------------------------------------- chips */
+
+.una-profile-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.una-profile-chip {
+    border: 1px solid var(--bs-border-color, #e6e6ef);
+    border-radius: 999px;
+    padding-inline: 0.9rem;
+    color: inherit;
+    background: transparent;
+}
+
+.btn-check:checked + .una-profile-chip {
+    border-color: var(--una-accent);
+    color: var(--una-accent);
+    background-color: var(--una-accent-soft);
+}
+
+.btn-check:focus-visible + .una-profile-chip {
+    box-shadow: 0 0 0 0.2rem var(--una-accent-soft);
+}
+
+/* ---------------------------------------------------------------- save bar */
+
+.una-profile-savebar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--una-radius);
+    background: var(--bs-card-bg, var(--bs-body-bg, #fff));
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    .una-profile-aside {
+        position: static;
+    }
+}
+
+/* ---------------------------------------------------------------- preferred-role chip picker */
+
+.una-role-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.una-role-chips:empty {
+    display: none;
+}
+
+.una-role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.35rem 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--una-accent);
+    background-color: var(--una-accent-soft);
+    border: 1px solid var(--una-accent);
+}
+
+[dir="rtl"] .una-role-chip {
+    padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+}
+
+.una-role-chip__remove {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: inherit;
+    background: transparent;
+    line-height: 1;
+}
+
+.una-role-chip__remove:hover,
+.una-role-chip__remove:focus-visible {
+    color: #fff;
+    background-color: var(--una-accent);
+    outline: none;
+}
+
+.una-role-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--bs-border-color, #e6e6ef);
+    border-radius: 14px;
+}
+
+.una-role-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px dashed var(--bs-border-color, #ced4da);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    color: inherit;
+    background: transparent;
+}
+
+.una-role-option[hidden] {
+    display: none;
+}
+
+.una-role-option:hover,
+.una-role-option:focus-visible {
+    border-color: var(--una-accent);
+    color: var(--una-accent);
+    outline: none;
+}
+
+.una-role-picker.is-invalid .una-role-options {
+    border-color: var(--bs-danger, #dc3545);
+}

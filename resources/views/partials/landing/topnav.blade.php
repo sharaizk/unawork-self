@@ -68,10 +68,17 @@
                                                                     <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                                                                 </a>
                                                                 <div class="dropdown-menu dash-h-dropdown">
+                                                                    {{-- Employees edit their profile on /my-profile (UNA-007); every account keeps its settings page. --}}
+                                                                    @if (Auth::user()->isEmployee())
+                                                                        <a href="{{ route('my-profile.edit') }}" class="dropdown-item p-3">
+                                                                            <i class="ti ti-user"></i>
+                                                                            <span>{{ __('My Profile') }}</span>
+                                                                        </a>
+                                                                    @endif
                                                                     <a href="@auth('web'){{ route('users.my.account') }}@elseauth{{ route('client.users.my.account') }}@endauth"
                                                                         class="dropdown-item p-3">
-                                                                        <i class="ti ti-user"></i>
-                                                                        <span>{{ __('My Profile') }}</span>
+                                                                        <i class="ti ti-settings"></i>
+                                                                        <span>{{ __('Account Settings') }}</span>
                                                                     </a>
                                                                     <a href="{{ route('dashboard') }}"
                                                                         class="dropdown-item p-3">

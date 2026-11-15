@@ -418,6 +418,9 @@ class PodStateTransitionTest extends TestCase
         $workspace->ownerable()->associate($user)->save();
         UserWorkspace::findOrCreateMembership($user->id, $workspace->id, ['permission' => 'Owner'])->assignAllPermissionsToCreator();
         $user->forceFill(['currant_workspace' => $workspace->id])->save();
+        if ($role === UserRole::EMPLOYEE) {
+            $this->completeEmployeeProfile($user); // unrelated to UNA-007 profile eligibility
+        }
 
         return $user->fresh();
     }

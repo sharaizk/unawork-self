@@ -13,8 +13,44 @@ class JobTitle extends Model
         'title',
     ];
     
+    /** "Professional Roles" in the admin UI; never an authorization role. */
+    use \App\Models\Concerns\IsCatalogEntry;
+
+    public static function catalogColumn(): string
+    {
+        return 'title';
+    }
+
+    /** Current job titles, preferred roles and employment-experience records (UNA-007). */
+    public static function usageRelations(): array
+    {
+        return ['profiles', 'preferredRoles', 'experiences'];
+    }
+
+    public static function tagRelations(): array
+    {
+        return ['industries'];
+    }
+
+    /** Industries this role belongs to (none = a general role offered for every industry). */
+    public function industries()
+    {
+        return $this->belongsToMany(Industry::class, 'industry_job_title')->withTimestamps();
+    }
+
+    /** Profiles using this as their current job title. */
     public function profiles()
     {
-        return $this->hasMany(Profile::class);
+        return $this->hasMany(Profile::class, 'job_title_id');
+    }
+
+    public function preferredRoles()
+    {
+        return $this->hasMany(ProfilePreferredRole::class, 'job_title_id');
+    }
+
+    public function experiences()
+    {
+        return $this->hasMany(ProfileExperience::class, 'job_title_id');
     }
 }

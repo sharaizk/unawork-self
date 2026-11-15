@@ -6,6 +6,7 @@
     $logo = \App\Models\Utility::get_file('users-avatar/');
 @endphp
 <link rel="stylesheet" href="{{ asset('assets/css/landing/hub-shop.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/landing/employee-profile.css') }}">
 <link rel="stylesheet" href="http://unawork.net/plugins/fancybox/fancybox.min.css">
 <style>
     .header__search{
@@ -32,6 +33,17 @@
             <div class="item">
               <div class="item__title">
                 <h1>{{ $employee->name }}</h1>
+                @php
+                    $p = $employee->profile;
+                    $headline = array_filter([
+                        optional($p->jobTitle)->title,
+                        optional($p->industry)->name,
+                        $p->years_experience !== null ? __(':years years of experience', ['years' => rtrim(rtrim(number_format((float) $p->years_experience, 1), '0'), '.')]) : null,
+                    ]);
+                @endphp
+                @if ($headline)
+                  <p class="emp-profile__headline">{{ implode(' · ', $headline) }}</p>
+                @endif
               </div>
               <div class="item__content">
                 <ul>
@@ -51,6 +63,9 @@
                       {{ $address ?: 'n/a' }}
                     </span>
                   </li>
+                  @if ($p->timezone)
+                    <li><i class="fa fa-clock-o"></i> <span>{{ str_replace('_', ' ', $p->timezone) }}</span></li>
+                  @endif
                 </ul>
               </div>
             </div>
@@ -63,7 +78,8 @@
                 </div>
                 <ul class="p-0">
                   @forelse ($employee->skills as $skill)
-                    <li class="skill__name">{{$skill->name}}</li>
+                    @php $level = \App\Enums\Profile\SkillProficiency::tryFrom((string) $skill->pivot->proficiency); @endphp
+                    <li class="skill__name">{{$skill->name}}@if ($level) <small class="emp-profile__level">· {{ $level->label() }}</small>@endif</li>
                   @empty
                     <li class="skill__name">n/a</li>
                   @endforelse
@@ -84,13 +100,14 @@
                     <p class="mt-2 cv-title">{{ __('CV File:') }} <a href="{{ asset('storage/'.$employee->profile->cv_file) }}" target="_blank"> cv_file </a></p>
                 @endif
               </div>
+              @include('employee.public_profile_sections', ['profile' => $p])
            </section>
           </div>
 
         </section>
 
       </div>
-      @if (Auth::user()->id != $employee->id)
+      @if (Auth::id() != $employee->id)
       <div class="col-12 col-md-12 col-xl-3">
         <aside class="aside__container">
 

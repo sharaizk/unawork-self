@@ -1046,7 +1046,8 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
 
     public function skills()
     {
-        return $this->belongsToMany(Skill::class, 'user_skills');
+        // proficiency (App\Enums\Profile\SkillProficiency) is nullable for legacy rows (UNA-007).
+        return $this->belongsToMany(Skill::class, 'user_skills')->withPivot('proficiency')->withTimestamps();
     }
 
     /** Current POD memberships (every state except removed); the pivot carries `state`. */

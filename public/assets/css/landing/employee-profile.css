@@ -1,0 +1,93 @@
+/* Structured sections on the public employee page (UNA-007). Scoped to .tpl-hub-shop. */
+.tpl-hub-shop .emp-profile__headline {
+    margin: 0.25rem 0 0;
+    color: #5b6b7b;
+    font-weight: 500;
+}
+
+.tpl-hub-shop .emp-profile__level {
+    opacity: 0.75;
+}
+
+.tpl-hub-shop .emp-profile__section {
+    margin-top: 1.75rem;
+}
+
+.tpl-hub-shop .emp-profile__label {
+    margin: 0.75rem 0 0.35rem;
+    font-weight: 600;
+}
+
+.tpl-hub-shop .emp-profile__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin: 0.5rem 0 0;
+}
+
+.tpl-hub-shop .emp-profile__facts dt {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.tpl-hub-shop .emp-profile__facts dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.tpl-hub-shop .emp-profile__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0.35rem 0 0;
+    list-style: none;
+}
+
+.tpl-hub-shop .emp-profile__chips li {
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    background-color: rgba(240, 140, 56, 0.14);
+    color: #b45f17;
+    font-size: 0.875rem;
+}
+
+.tpl-hub-shop .emp-profile__chips a {
+    color: inherit;
+}
+
+.tpl-hub-shop .emp-profile__timeline {
+    padding: 0;
+    margin: 0.5rem 0 0;
+    list-style: none;
+}
+
+.tpl-hub-shop .emp-profile__timeline li {
+    position: relative;
+    padding-inline-start: 1.25rem;
+    padding-bottom: 0.9rem;
+    border-inline-start: 2px solid rgba(240, 140, 56, 0.35);
+}
+
+.tpl-hub-shop .emp-profile__timeline li::before {
+    content: "";
+    position: absolute;
+    top: 0.35rem;
+    inset-inline-start: -6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #f08c38;
+}
+
+.tpl-hub-shop .emp-profile__meta {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.tpl-hub-shop .emp-profile__timeline p {
+    margin: 0.35rem 0 0;
+    white-space: pre-line;
+}

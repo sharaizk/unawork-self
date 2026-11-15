@@ -27,9 +27,10 @@
                             class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
                     @if ($user->isEmployee())
-                        <a href="#v-pills-profiler"
-                            class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Employee Profile') }} <div
-                                class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+                        {{-- The employee profile editor lives on its own page (UNA-007). --}}
+                        <a href="{{ route('my-profile.edit') }}"
+                            class="list-group-item list-group-item-action border-0">{{ __('My Profile') }} <div
+                                class="float-end"><i class="ti ti-external-link"></i></div></a>
                     @elseif ($user->isCompany())
                         <a href="{{ route('workspace.settings', \Auth::user()->ownWorkspace()->slug)  }}#company-settings"
                            class="list-group-item list-group-item-action list-group-item-special border-0">{{ __('Company Settings') }} <div
@@ -221,21 +222,6 @@
             </form>
         </div>
     </div>
-    @if ($user->isEmployee())
-        <div class="card" id="v-pills-profiler">
-            <div class="card-header">
-                <h5>{{ __('Employee Profile') }}</h5>
-            </div>
-            <div class="card-body">
-                @php
-                    $profile = $user->profile;
-                    $skills = \App\Models\Skill::all();
-                @endphp
-                @include('employee.edit_profile', ['user' => $user, 'profile' => $profile, 'skills' => $skills])
-
-            </div>
-        </div>
-    @endif
     @auth('client')
         <div class="card" id="v-pills-billing">
 

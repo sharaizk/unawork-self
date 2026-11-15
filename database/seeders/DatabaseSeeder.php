@@ -30,6 +30,8 @@ class DatabaseSeeder extends Seeder
         Artisan::call('module:migrate LandingPage');  
         Artisan::call('module:seed LandingPage');
         $this->call(NotificationSeeder::class);
+        // Reference catalog (industries, skills, professional roles); idempotent, never destructive.
+        $this->call(CatalogSeeder::class);
 
         if((\Request::route() != null) && (\Request::route()->getName()!='LaravelUpdater::database'))
         {

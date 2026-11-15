@@ -7,7 +7,9 @@ use App\Models\Profile;
 use App\Models\Skill;
 use App\Filters\Employee\EmployeeFilter;
 use App\Http\Requests\Employee\FilterRequest;
+use App\Services\EmployeeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class HirePageController extends Controller
 {
@@ -16,11 +18,11 @@ class HirePageController extends Controller
         $countries = Profile::distinct()->pluck('country');
         $skills = Skill::all();
 
-        $data = $request->all();
+        $data = $request->validated();
         $employees = User::employees();
 
         $filter = new EmployeeFilter($data);
-        $employees = $filter->apply($employees->with(['profile', 'skills']));
+        $employees = $filter->apply($employees->with(EmployeeService::LISTING_RELATIONS));
         $employees = $employees->get();
 
 
@@ -34,9 +36,11 @@ class HirePageController extends Controller
         $jobTitleId = $request->input('job_title_id', '');
         $skillIds = $request->input('skill_ids', []);
         $perPage = 12;
+        // UNA-007 structured filters (validated; all optional).
+        $structured = Arr::except($request->validate(FilterRequest::structuredRules()), ['job_title_id']);
 
         $employeesQuery = User::employees()
-            ->with(['profile', 'skills']);
+            ->with(EmployeeService::LISTING_RELATIONS);
 
         if (!empty($query)) {
             $employeesQuery->where('name', 'LIKE', "%$query%");
@@ -59,6 +63,12 @@ class HirePageController extends Controller
                 $q->whereIn('skills.id', $skillIds);
             });
         }
+
+        if (!empty($skillIds) && !empty($structured['skill_proficiency'])) {
+            // the proficiency applies to the selected skills (handled by EmployeeFilter::skill_ids)
+            $structured['skill_ids'] = (array) $skillIds;
+        }
+        (new EmployeeFilter($structured))->applyFilters($employeesQuery);
 
         $employees = $employeesQuery->paginate($perPage);
 

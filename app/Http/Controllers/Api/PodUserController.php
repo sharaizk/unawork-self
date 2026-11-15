@@ -141,6 +141,13 @@ class PodUserController extends Controller
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             throw $e; // unexpected database failure: 500, transaction already rolled back
+        } catch (\App\Services\Membership\InvalidStateTransition $e) {
+            // a domain rule refused the change (e.g. incomplete employee profile, UNA-007); nothing changed
+            return response()->json([
+                'code' => 422,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,

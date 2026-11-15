@@ -16,6 +16,7 @@ use App\Models\UserProject;
 use App\Models\UserWorkspace;
 use App\Models\Utility;
 use App\Models\Workspace;
+use App\Services\Profile\ProfileCompletionService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,6 +27,11 @@ use Illuminate\Support\Facades\DB;
  * history row, and return the after-commit notifications. transition()/enter() own their
  * transaction; apply()/start() participate in the caller's (e.g. PodUserService) transaction.
  * The actor is always passed explicitly (null = system); Auth is never read here.
+ *
+ * UNA-007: an employee must meet the profile minimum (ProfileCompletionService) before entering an
+ * active-access state or progressing within one; the check runs under the row lock, before any
+ * state, access, history or effect is produced. Stepping back to the plain Outer Circle from
+ * another active state is not gated, and existing memberships are never rewritten.
  */
 class PodStateTransitionService
 {
@@ -47,9 +53,11 @@ class PodStateTransitionService
     public function __construct(
         private ?AfterCommit $afterCommit = null,
         private ?CurrentWorkspace $currentWorkspace = null,
+        private ?ProfileCompletionService $completion = null,
     ) {
         $this->afterCommit ??= new AfterCommit();
         $this->currentWorkspace ??= new CurrentWorkspace();
+        $this->completion ??= app(ProfileCompletionService::class);
     }
 
     /** Transition an existing membership in its own transaction; effects run after commit. */
@@ -70,6 +78,10 @@ class PodStateTransitionService
     /** Inside a transaction: create the membership in $initial, or move a re-entry row there. */
     public function start(Pod $pod, User $user, State $initial, ?User $actor, ?string $reason = null, array $effects = []): MembershipResult
     {
+        if ($initial->accessProfile() !== 'none') {
+            $this->assertProfileEligible($user->id);
+        }
+
         $membership = PodUser::findOrCreateMembership($user->id, $pod->id, ['permission' => 'Member', 'state' => $initial->value]);
 
         if ($membership->wasRecentlyCreated) {
@@ -115,6 +127,9 @@ class PodStateTransitionService
         if ($reason === null && $target->requiresReasonFrom($from)) {
             throw new InvalidStateTransition(__('A reason is required for this change.'));
         }
+        if ($this->requiresCompleteProfile($from, $target)) {
+            $this->assertProfileEligible((int) $locked->user_id);
+        }
 
         $changed = PodUser::whereKey($locked->id)->where('state', $from->value)
             ->update(['state' => $target->value] + ($target === State::REJECTED ? ['reason' => $reason] : []));
@@ -127,6 +142,39 @@ class PodStateTransitionService
         $this->record($locked, $from, $target, $actor, $reason);
 
         return MembershipResult::applied($locked, $target->value, $this->effects($locked, $from, $target));
+    }
+
+    // ------------------------------------------------------------------ profile eligibility (UNA-007)
+
+    /**
+     * Entering any active-access state (from an applicant, suspended or other no-access state), or
+     * progressing within the active states, needs a complete profile. Returning to the plain Outer
+     * Circle from another active state (a demotion or a closed screening) does not.
+     */
+    public function requiresCompleteProfile(?State $from, State $to): bool
+    {
+        if ($to->accessProfile() === 'none') {
+            return false;
+        }
+        if ($from === null || $from->accessProfile() === 'none') {
+            return true;
+        }
+
+        return $to !== State::OUTER_CIRCLE;
+    }
+
+    /** Throws (changing nothing) when the member is an employee below the profile minimum. */
+    private function assertProfileEligible(int $userId): void
+    {
+        $member = User::findOrFail($userId); // fresh: no stale profile relations
+        if ($this->completion->isEligible($member)) {
+            return;
+        }
+
+        throw new InvalidStateTransition(__('This member\'s profile is :percentage% complete. At least :required% is required to join an active POD circle.', [
+            'percentage' => $this->completion->percentage($member),
+            'required' => $this->completion->required(),
+        ]));
     }
 
     // ------------------------------------------------------------------ access synchronization

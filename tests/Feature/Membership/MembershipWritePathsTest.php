@@ -274,7 +274,12 @@ class MembershipWritePathsTest extends TestCase
 
     private function user(string $name, UserRole $role): User
     {
-        return User::createWithAccountRole(['name' => $name, 'email' => $name . '-' . uniqid() . '@example.test', 'plan' => 1, 'email_verified_at' => now()], $role);
+        $user = User::createWithAccountRole(['name' => $name, 'email' => $name . '-' . uniqid() . '@example.test', 'plan' => 1, 'email_verified_at' => now()], $role);
+        if ($role === UserRole::EMPLOYEE) {
+            $this->completeEmployeeProfile($user); // unrelated to UNA-007 profile eligibility
+        }
+
+        return $user;
     }
 
     private function ownWorkspace(User $owner): Workspace

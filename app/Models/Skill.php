@@ -8,6 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 class Skill extends Model
 {
     use HasFactory;
+    use \App\Models\Concerns\IsCatalogEntry;
+
+    public static function catalogColumn(): string
+    {
+        return 'name';
+    }
+
+    /** Employee skill assignments, POD skills and job-vacancy requirements. */
+    public static function usageRelations(): array
+    {
+        return ['users', 'pods', 'jobVacancies'];
+    }
+
+    public static function tagRelations(): array
+    {
+        return ['industries'];
+    }
+
+    /** Industries this skill belongs to (none = a general skill offered for every industry). */
+    public function industries()
+    {
+        return $this->belongsToMany(Industry::class, 'industry_skill')->withTimestamps();
+    }
 
     protected $fillable = ['name'];
 

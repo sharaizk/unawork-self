@@ -2,65 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Catalog\CatalogController;
+use App\Http\Requests\Catalog\StoreJobTitleRequest;
+use App\Http\Requests\Catalog\UpdateJobTitleRequest;
 use App\Models\JobTitle;
 use Illuminate\Http\Request;
 
-class JobTitleController extends Controller
+/**
+ * Administrator catalog: professional roles (job titles such as "Backend Developer"), used as an
+ * employee's current job title, preferred roles and experience titles. Labelled "Professional
+ * Roles" in the UI; unrelated to Spatie authorization roles or account personas.
+ */
+class JobTitleController extends CatalogController
 {
-    public function index()
+    protected function model(): string
     {
-        $this->authorize('viewAny', JobTitle::class);
-
-        $jobTitles = JobTitle::all();
-        return view('job_titles.index', compact('jobTitles'));
+        return JobTitle::class;
     }
 
-    public function create()
+    protected function labels(): array
     {
-        $this->authorize('create', JobTitle::class);
-        
-        return view('job_titles.create');
+        return [
+            'route' => 'job-titles',
+            'param' => 'job_title',
+            'title' => __('Professional Roles'),
+            'singular' => __('Professional Role'),
+            'description' => __('Job titles employees use for their current role, preferred roles and experience.'),
+            'icon' => 'id',
+            'field_label' => __('Role title'),
+            'placeholder' => __('e.g. Backend Developer'),
+            'search' => __('Search professional roles'),
+            'empty' => __('No professional roles found.'),
+            'add' => __('Add Professional Role'),
+            'edit' => __('Edit Professional Role'),
+            'usage_label' => __('Profiles'),
+            'usage_help' => __('Profiles using this role as their current title or a preferred role, plus experience records.'),
+            'created' => __('Professional role created successfully.'),
+            'updated' => __('Professional role updated successfully.'),
+            'deleted' => __('Professional role deleted successfully.'),
+            'in_use' => 'This professional role cannot be deleted because it is currently used by :count records.',
+        ];
     }
 
-    public function store(Request $request)
+    public function index(Request $request)
     {
-        $this->authorize('create', JobTitle::class);
-
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-        ]);
-
-        JobTitle::create($data);
-
-        return redirect()->route('job-titles.index')->with('success', 'Job Title created successfully.');
+        return $this->listing($request);
     }
 
-    public function edit(JobTitle $jobTitle)
+    public function create(Request $request)
     {
-        $this->authorize('update', $jobTitle);
-        
-        return view('job_titles.edit', compact('jobTitle'));
+        return $this->form($request);
     }
 
-    public function update(Request $request, JobTitle $jobTitle)
+    public function store(StoreJobTitleRequest $request)
     {
-        $this->authorize('update', $jobTitle);
-
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-        ]);
-
-        $jobTitle->update($data);
-
-        return redirect()->route('job-titles.index')->with('success', 'Job Title updated successfully.');
+        return $this->created($request->label(), $request->industryIds());
     }
 
-    public function destroy(JobTitle $jobTitle)
+    public function edit(Request $request, JobTitle $jobTitle)
     {
-        $this->authorize('delete', $jobTitle);
+        return $this->form($request, $jobTitle);
+    }
 
-        $jobTitle->delete();
+    public function update(UpdateJobTitleRequest $request, JobTitle $jobTitle)
+    {
+        return $this->renamed($jobTitle, $request->label(), $request->industryIds());
+    }
 
-        return redirect()->route('job-titles.index')->with('success', 'Job Title deleted successfully.');
+    public function destroy(Request $request, JobTitle $jobTitle)
+    {
+        return $this->deleted($request, $jobTitle);
     }
 }
