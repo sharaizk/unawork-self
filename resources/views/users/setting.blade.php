@@ -76,7 +76,7 @@
 
                             @if (Auth::user()->isCompany())
                                 <a href="#company-settings"
-                                    class="list-group-item list-group-item-action border-0">{{ __('Company Settings') }} <div
+                                    class="list-group-item list-group-item-action border-0">{{ __('Company Profile') }} <div
                                         class="float-end"><i class="ti ti-chevron-right"></i></div></a>
                             @endif
 
@@ -447,105 +447,35 @@
                         {{ Form::close() }}
                     </div>
 
-                    @if (Auth::user()->isCompany())
+                    @if (Auth::user()->isCompany() && !empty($companyProfile))
+                        {{-- UNA-010: company details are edited on the Company Profile page; this is a summary only. --}}
                         <div id="company-settings" class="tab-pane">
                             <div class="row justify-content-center">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5 class="">
-                                                {{ __('Company Settings') }}
-                                            </h5>
+                                            <h5 class="">{{ __('Company Profile') }}</h5>
                                         </div>
                                         <div class="card-body p-4">
-                                            <form method="post"
-                                                action="{{ route('workspace.settings.store', $currentWorkspace->slug) }}"
-                                                class="payment-form">
-                                                @csrf
-                                                <div class="row mt-3">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="company" class="form-label">{{ __('Name') }}</label>
-                                                        <input type="text" name="company" id="company"
-                                                            class="form-control" value="{{ $currentWorkspace->company }}"
-                                                            required="required" />
+                                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                                <div class="flex-grow-1">
+                                                    <p class="fw-semibold mb-1">{{ $companyProfile['workspace']->company ?: __('Your company') }}</p>
+                                                    <div class="progress mb-2" style="height: 8px;" role="progressbar" aria-label="{{ __('Company profile completion') }}"
+                                                        aria-valuenow="{{ $companyProfile['percentage'] }}" aria-valuemin="0" aria-valuemax="100">
+                                                        <div class="progress-bar" style="width: {{ (int) $companyProfile['percentage'] }}%"></div>
                                                     </div>
-                                                    @php
-                                                        $industries = \App\Models\Industry::all();
-                                                        $currentIndustryId = $currentWorkspace->industry_id ?? null;
-                                                    @endphp
-                                                        <div class="form-group col-md-6">
-                                                            <label for="industry_id" class="form-label">Industry:</label>
-                                                            <select class="form-control" name="industry_id" id="industry_id">
-                                                                <option value="">Select your Industry </option>
-                                                                @foreach($industries as $industry)
-                                                                    <option value="{{ $industry->id }}" {{ $currentIndustryId == $industry->id ? 'selected' : '' }}>
-                                                                        {{ $industry->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="address" class="form-label">{{ __('Address') }}</label>
-                                                        <input type="text" name="address" id="address"
-                                                            class="form-control" value="{{ $currentWorkspace->address }}"
-                                                            required="required" />
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="city" class="form-label">{{ __('City') }}</label>
-                                                        <input class="form-control" name="city" type="text"
-                                                            value="{{ $currentWorkspace->city }}" id="city">
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="state" class="form-label">{{ __('State') }}</label>
-                                                        <input class="form-control" name="state" type="text"
-                                                            value="{{ $currentWorkspace->state }}" id="state">
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="zipcode"
-                                                            class="form-label">{{ __('Zip/Post Code') }}</label>
-                                                        <input class="form-control" name="zipcode" type="text"
-                                                            value="{{ $currentWorkspace->zipcode }}" id="zipcode">
-                                                    </div>
-                                                    <div class="form-group  col-md-6">
-                                                        <label for="country" class="form-label">{{ __('Country') }}</label>
-                                                        <input class="form-control" name="country" type="text"
-                                                            value="{{ $currentWorkspace->country }}" id="country">
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="telephone"
-                                                            class="form-label">{{ __('Telephone') }}</label>
-                                                        <input class="form-control" name="telephone" type="text"
-                                                            value="{{ $currentWorkspace->telephone }}" id="telephone">
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="website"
-                                                            class="form-label">{{ __('Website') }}</label>
-                                                        <input class="form-control" name="website" type="text"
-                                                            value="{{ $currentWorkspace->website }}" id="website">
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="linkedin"
-                                                            class="form-label">{{ __('Linkedin') }}</label>
-                                                        <input class="form-control" name="linkedin" type="text"
-                                                            value="{{ $currentWorkspace->linkedin }}" id="linkedin">
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="facebook"
-                                                            class="form-label">{{ __('Facebook') }}</label>
-                                                        <input class="form-control" name="facebook" type="text"
-                                                            value="{{ $currentWorkspace->facebook }}" id="facebook">
-                                                    </div>
-                                                    <div class="form-group col-md-12">
-                                                        <label for="description"
-                                                            class="form-label">{{ __('Description') }}</label>
-                                                            <textarea class="form-control" name="description" id="description" rows="4">{{ $currentWorkspace->description }}</textarea>
-                                                    </div>
+                                                    <p class="small mb-0 {{ $companyProfile['complete'] ? 'text-success' : 'text-muted' }}">
+                                                        @if ($companyProfile['complete'])
+                                                            {{ __(':percentage% complete. You can publish PODs.', ['percentage' => $companyProfile['percentage']]) }}
+                                                        @else
+                                                            {{ __(':percentage% complete. :required% is required to publish a POD.', ['percentage' => $companyProfile['percentage'], 'required' => $companyProfile['required']]) }}
+                                                        @endif
+                                                    </p>
                                                 </div>
-                                                <div class="text-end">
-                                                    <button type="submit"
-                                                        class="btn-submit btn btn-primary">{{ __('Save Changes') }}</button>
-                                                </div>
-                                            </form>
+                                                <a href="{{ route('company.onboarding.edit') }}" class="btn btn-primary">
+                                                    <i class="ti ti-building"></i> {{ __('Manage Company Profile') }}
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

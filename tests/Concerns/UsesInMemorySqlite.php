@@ -207,12 +207,6 @@ trait UsesInMemorySqlite
             $t->string('title')->nullable();
             $t->timestamps();
         });
-        Schema::create('user_skills', function (Blueprint $t) {
-            $t->id();
-            $t->unsignedBigInteger('user_id');
-            $t->unsignedBigInteger('skill_id');
-            $t->timestamps();
-        });
         Schema::create('email_templates', function (Blueprint $t) {
             $t->id();
             $t->string('name')->nullable();
@@ -277,6 +271,211 @@ trait UsesInMemorySqlite
             $t->timestamps();
         });
         $this->createPermissionSchema();
+        $this->createProfileSchema();
+        $this->createCompanySchema();
+    }
+
+    /**
+     * Company profile columns on workspaces (existing production columns plus UNA-010) and the
+     * worker-requirement tables, built by the real UNA-010 migrations.
+     */
+    protected function createCompanySchema(): void
+    {
+        Schema::table('workspaces', function (Blueprint $t) {
+            foreach (['company', 'address', 'city', 'state', 'zipcode', 'country', 'telephone', 'logo', 'website', 'linkedin', 'facebook'] as $column) {
+                $t->string($column)->nullable();
+            }
+            $t->text('description')->nullable();
+            $t->unsignedBigInteger('industry_id')->nullable();
+        });
+        (require database_path('migrations/2026_11_18_000200_add_business_onboarding_to_workspaces.php'))->up();
+        (require database_path('migrations/2026_11_18_000300_create_workspace_worker_requirements_table.php'))->up();
+        Schema::create('pods_skills', function (Blueprint $t) { // POD-level skill tags
+            $t->id();
+            $t->unsignedBigInteger('pod_id');
+            $t->unsignedBigInteger('skill_id');
+            $t->timestamps();
+            $t->unique(['pod_id', 'skill_id']);
+        });
+        // UNA-011: POD draft/publish lifecycle and POD-owned requirements.
+        (require database_path('migrations/2026_11_18_000400_add_publication_lifecycle_to_pods.php'))->up();
+    }
+
+    /**
+     * Give a company account a 100% business profile on its own workspace (UNA-010). Use it for
+     * companies in tests unrelated to business onboarding (e.g. POD owners).
+     */
+    protected function completeBusinessProfile(\App\Models\User $company): \App\Models\Workspace
+    {
+        $workspace = $company->ownWorkspace();
+        if (!$workspace) {
+            $workspace = \App\Models\Workspace::create(['name' => $company->name . ' WS', 'created_by' => $company->id, 'lang' => 'en']);
+            $workspace->ownerable()->associate($company)->save();
+        }
+        $industry = \App\Models\Industry::firstOrCreate(['name' => 'Technology']);
+        $workspace->forceFill([
+            'company' => 'Acme Ltd',
+            'logo' => $workspace->id . '_company-logo-fixture.png',
+            'industry_id' => $industry->id,
+            'contact_name' => 'Casey Contact',
+            'contact_email' => 'contact@acme.example.test',
+            'telephone' => '+94 11 000 0000',
+            'city' => 'Colombo',
+            'country' => 'Sri Lanka',
+            'website' => 'https://acme.example.test',
+            'linkedin' => 'https://www.linkedin.com/company/acme',
+            'description' => str_repeat('Acme builds software with distributed teams. ', 4),
+            'matching_mode' => 'assisted',
+            'default_pod_application_approval' => 'manual',
+            'default_inner_circle_approval' => 'manual',
+        ])->save();
+
+        $role = \App\Models\JobTitle::firstOrCreate(['title' => 'Backend Developer']);
+        $skill = \App\Models\Skill::firstOrCreate(['name' => 'PHP']);
+        $requirement = new \App\Models\WorkspaceWorkerRequirement([
+            'job_title_id' => $role->id, 'headcount' => 2, 'preferred_work_mode' => 'remote', 'preferred_engagement_type' => 'contract', 'is_active' => true,
+        ]);
+        $requirement->forceFill(['workspace_id' => $workspace->id])->save();
+        $requirement->skills()->sync([$skill->id]);
+
+        return $workspace->fresh();
+    }
+
+    /**
+     * Employee profile tables in their current shape: profiles (incl. industry_id), user_skills (with
+     * proficiency and the unique pair), skills, job_titles, industries with the skill/role industry
+     * tags, and the structured profile_* tables.
+     */
+    protected function createProfileSchema(): void
+    {
+        Schema::create('skills', function (Blueprint $t) {
+            $t->id();
+            $t->string('name');
+            $t->timestamps();
+        });
+        Schema::create('job_titles', function (Blueprint $t) {
+            $t->id();
+            $t->string('title');
+            $t->timestamps();
+        });
+        Schema::create('user_skills', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('user_id');
+            $t->unsignedBigInteger('skill_id');
+            $t->timestamps();
+            $t->string('proficiency', 20)->nullable(); // UNA-007
+            $t->unique(['user_id', 'skill_id'], 'user_skills_user_id_skill_id_unique');
+        });
+        Schema::create('profiles', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('job_title_id')->nullable();
+            $t->unsignedBigInteger('user_id');
+            $t->string('country')->nullable();
+            $t->string('state')->nullable();
+            $t->string('city')->nullable();
+            $t->string('zip_code')->nullable();
+            $t->string('address')->nullable();
+            $t->string('phone_number')->nullable();
+            $t->string('cv_file')->nullable();
+            $t->timestamps();
+            $t->string('website')->nullable();
+            $t->text('about')->nullable();
+            $t->decimal('years_experience', 4, 1)->nullable();
+            $t->string('linkedin_url', 500)->nullable();
+            $t->string('github_url', 500)->nullable();
+            $t->string('timezone', 64)->nullable();
+            $t->string('availability_status', 32)->nullable();
+            $t->date('available_from')->nullable();
+            $t->unsignedSmallInteger('hours_per_week')->nullable();
+            $t->string('preferred_work_mode', 32)->nullable();
+            $t->string('preferred_engagement_type', 32)->nullable();
+            $t->boolean('open_to_relocation')->nullable();
+            $t->boolean('willing_to_travel')->nullable();
+        });
+        (require database_path('migrations/2026_11_17_000200_create_profile_detail_tables.php'))->up();
+        Schema::create('industries', function (Blueprint $t) {
+            $t->id();
+            $t->string('name');
+            $t->timestamps();
+        });
+        // Skill/role industry tags and profiles.industry_id.
+        (require database_path('migrations/2026_11_18_000100_add_industry_relations_to_catalogs.php'))->up();
+    }
+
+    /**
+     * Give $user a profile that satisfies every ProfileCompletionService section (100%). Use it for
+     * employees in tests unrelated to profile eligibility (UNA-007).
+     */
+    protected function completeEmployeeProfile(\App\Models\User $user): \App\Models\Profile
+    {
+        $jobTitle = \App\Models\JobTitle::firstOrCreate(['title' => 'Engineer']);
+        $profile = \App\Models\Profile::where('user_id', $user->id)->first() ?? new \App\Models\Profile();
+        $profile->forceFill([
+            'user_id' => $user->id,
+            'about' => 'Fixture summary',
+            'job_title_id' => $jobTitle->id,
+            'years_experience' => 5,
+            'country' => 'Sri Lanka',
+            'city' => 'Colombo',
+            'timezone' => 'Asia/Colombo',
+            'availability_status' => 'immediately',
+            'hours_per_week' => 40,
+            'preferred_work_mode' => 'remote',
+            'preferred_engagement_type' => 'contract',
+            'linkedin_url' => 'https://www.linkedin.com/in/fixture',
+        ])->save();
+
+        $skills = [];
+        foreach (['PHP', 'Laravel', 'SQL'] as $name) {
+            $skills[\App\Models\Skill::firstOrCreate(['name' => $name])->id] = ['proficiency' => 'advanced'];
+        }
+        $user->skills()->syncWithoutDetaching($skills);
+
+        $profile->experiences()->forceCreate(['profile_id' => $profile->id, 'employer' => 'Acme', 'job_title' => 'Engineer', 'is_current' => true]);
+        $profile->educations()->forceCreate(['profile_id' => $profile->id, 'institution' => 'University']);
+        $profile->preferredRoles()->forceCreate(['profile_id' => $profile->id, 'job_title_id' => $jobTitle->id]);
+        $profile->projectTypes()->forceCreate(['profile_id' => $profile->id, 'project_type' => 'long_term']);
+
+        $user->unsetRelation('profile')->unsetRelation('skills');
+
+        return $profile;
+    }
+
+    /** Tables layouts.admin (topnav, sidebar, messenger) reads on every page. */
+    protected function createAdminLayoutSchema(): void
+    {
+        \Illuminate\Support\Facades\Schema::create('threads', function ($t) {
+            $t->id();
+            $t->string('subject')->nullable();
+            $t->string('slug')->nullable();
+            $t->timestamps();
+            $t->softDeletes();
+        });
+        \Illuminate\Support\Facades\Schema::create('participants', function ($t) {
+            $t->id();
+            $t->unsignedBigInteger('thread_id');
+            $t->unsignedBigInteger('user_id');
+            $t->timestamp('last_read')->nullable();
+            $t->timestamps();
+            $t->softDeletes();
+        });
+        \Illuminate\Support\Facades\Schema::create('messages', function ($t) {
+            $t->id();
+            $t->unsignedBigInteger('thread_id');
+            $t->unsignedBigInteger('user_id');
+            $t->text('body')->nullable();
+            $t->timestamps();
+            $t->softDeletes();
+        });
+        foreach (['tasks', 'bug_reports'] as $table) {
+            \Illuminate\Support\Facades\Schema::create($table, function ($t) {
+                $t->id();
+                $t->string('title')->nullable();
+                $t->unsignedBigInteger('project_id')->nullable();
+                $t->string('assign_to')->nullable();
+                $t->timestamps();
+            });
+        }
     }
 
     /** Run seeders in-process (no Artisan), e.g. $this->runSeeders([RolesAndPermissionsSeeder::class]). */

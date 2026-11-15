@@ -106,9 +106,24 @@ class HomeController extends Controller
 
                     //$error = $user->is_trial_done ? __('Your Plan is expired.') : ($user->plan_expire_date < date('Y-m-d') ? __('Please upgrade your plan') : '');
 
-                    return redirect()->route('home')->with('success', __('Free Plan Activated Successfully.!'));
+                    return $this->afterLoginRedirect($user)->with('success', __('Free Plan Activated Successfully.!'));
                 }
             }
+        }
+
+        return $this->afterLoginRedirect($user);
+    }
+
+    /**
+     * Post-login destination: an incomplete employee goes to /my-profile (UNA-007), an incomplete
+     * company to /company/onboarding (UNA-010); everyone else keeps the dashboard. Only /check
+     * redirects, so other pages stay reachable.
+     */
+    private function afterLoginRedirect($user)
+    {
+        $onboarding = app(\App\Services\Onboarding\OnboardingRedirect::class)->for($user);
+        if ($onboarding) {
+            return redirect()->route($onboarding['route'])->with('error', $onboarding['message']);
         }
 
         return redirect()->route('home');

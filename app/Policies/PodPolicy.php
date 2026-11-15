@@ -46,6 +46,20 @@ class PodPolicy
     }
 
     /**
+     * UNA-011: configure (edit setup of) a draft or published POD, and publish a draft - only the
+     * company account that owns it. Never derived from the current workspace.
+     */
+    public function configure(User $user, Pod $pod): bool
+    {
+        return app(\App\Services\Pod\PodConfigurationService::class)->isOwner($pod, $user);
+    }
+
+    public function publish(User $user, Pod $pod): bool
+    {
+        return $pod->isDraft() && $this->configure($user, $pod);
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Pod $pod): bool
@@ -199,7 +213,8 @@ class PodPolicy
      */
     public function requestToJoin(User $user, Pod $pod): bool
     {
-        return !$this->isOwner($user, $pod) && $pod->workspace !== null;
+        // UNA-011: only published PODs accept applications.
+        return $pod->isPublished() && !$this->isOwner($user, $pod) && $pod->workspace !== null;
     }
 
     /**

@@ -479,19 +479,27 @@
 
 
                                         @if (Auth::user()->isAdministrator())
-                                            <li
-                                                class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">
-                                                <a href="{{ route('industries.index') }}" class="dash-link "><span
-                                                        class="dash-micon">
-                                                        <i class="ti ti-clipboard"></i></span><span
-                                                        class="dash-mtext">{{ __('Industries') }}</span></a>
-                                            </li>
-                                            <li
-                                                class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">
-                                                <a href="{{ route('job-titles.index') }}" class="dash-link "><span
-                                                        class="dash-micon">
-                                                        <i class="ti ti-clipboard"></i></span><span
-                                                        class="dash-mtext">{{ __('Job Titles') }}</span></a>
+                                            {{-- Catalog Management (administrators only; no queries here). --}}
+                                            @php
+                                                $catalogRoute = (string) optional(Request::route())->getName();
+                                                $catalogActive = fn (string $prefix) => str_starts_with($catalogRoute, $prefix . '.');
+                                                $inCatalog = $catalogActive('industries') || $catalogActive('skills') || $catalogActive('job-titles');
+                                            @endphp
+                                            <li class="dash-item dash-hasmenu {{ $inCatalog ? 'active dash-trigger' : '' }}" data-sidebar-section="catalog">
+                                                <a href="#" class="dash-link"><span class="dash-micon"><i class="ti ti-folders"></i></span><span
+                                                        class="dash-mtext">{{ __('Catalog Management') }}</span><span class="dash-arrow"><i
+                                                            data-feather="chevron-right"></i></span></a>
+                                                <ul class="dash-submenu {{ $inCatalog ? 'show' : '' }}">
+                                                    <li class="dash-item {{ $catalogActive('industries') ? 'active' : '' }}">
+                                                        <a class="dash-link" href="{{ route('industries.index') }}"><i class="ti ti-building-factory me-1" aria-hidden="true"></i>{{ __('Industries') }}</a>
+                                                    </li>
+                                                    <li class="dash-item {{ $catalogActive('skills') ? 'active' : '' }}">
+                                                        <a class="dash-link" href="{{ route('skills.index') }}"><i class="ti ti-bulb me-1" aria-hidden="true"></i>{{ __('Skills') }}</a>
+                                                    </li>
+                                                    <li class="dash-item {{ $catalogActive('job-titles') ? 'active' : '' }}">
+                                                        <a class="dash-link" href="{{ route('job-titles.index') }}"><i class="ti ti-id me-1" aria-hidden="true"></i>{{ __('Professional Roles') }}</a>
+                                                    </li>
+                                                </ul>
                                             </li>
                                             <!-- <li
                                                 class="dash-item {{ Request::route()->getName() == 'referral-programs.index' || Request::segment(1) == 'referral-programs' ? ' active' : '' }}">

@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\User;
+use App\Contracts\HasAccountType;
 use App\Models\JobTitle;
 
 class JobTitlePolicy
@@ -10,7 +10,7 @@ class JobTitlePolicy
     /**
      * Determine if the user can view the list of job titles.
      */
-    public function viewAny(User $user)
+    public function viewAny(HasAccountType $user)
     {
         return $user->isAdministrator();
     }
@@ -18,7 +18,7 @@ class JobTitlePolicy
     /**
      * Determine if the user can create job titles.
      */
-    public function create(User $user)
+    public function create(HasAccountType $user)
     {
         return $user->isAdministrator();
     }
@@ -26,7 +26,7 @@ class JobTitlePolicy
     /**
      * Determine if the user can update the job title.
      */
-    public function update(User $user, JobTitle $jobTitle)
+    public function update(HasAccountType $user, JobTitle $jobTitle)
     {
         return $user->isAdministrator();
     }
@@ -34,7 +34,7 @@ class JobTitlePolicy
     /**
      * Determine if the user can delete the job title.
      */
-    public function delete(User $user, JobTitle $jobTitle)
+    public function delete(HasAccountType $user, JobTitle $jobTitle)
     {
         return $user->isAdministrator();
     }

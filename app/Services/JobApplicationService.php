@@ -16,6 +16,14 @@ class JobApplicationService
     
     public function createApplication(array $data): JobApplication
     {
+        // UNA-007: an employee below the profile minimum cannot apply, whatever the entry point.
+        $applicant = \App\Models\User::find($data['user_id']);
+        if ($applicant && !app(\App\Services\Profile\ProfileCompletionService::class)->isEligible($applicant)) {
+            throw new \Exception(__('Complete at least :required% of your profile before applying for jobs.', [
+                'required' => app(\App\Services\Profile\ProfileCompletionService::class)->required(),
+            ]));
+        }
+
         $existingApplication = JobApplication::where('user_id', $data['user_id'])
             ->where('job_vacancy_id', $data['job_vacancy_id'])
             ->where('status', 'pending')

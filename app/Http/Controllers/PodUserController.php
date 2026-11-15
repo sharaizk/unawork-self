@@ -67,6 +67,9 @@ class PodUserController extends Controller
                     'status' => 'Success',
                     'message' => __('User Invited Successfully!') . ((isset($smtp_error)) ? ' <br> <span class="text-danger">' . $smtp_error . '</span>' : ''),
                 ], 200);
+            } catch (\App\Services\Provisioning\ProvisioningException $e) {
+                // UNA-012: already invited, or an account that cannot be invited as an employee.
+                return response()->json(['code' => $e->status(), 'status' => 'error', 'message' => $e->getMessage()], $e->status());
             } catch (\Exception $e) {
                 return response()->json([
                     'code' => 500,
@@ -123,7 +126,12 @@ class PodUserController extends Controller
     {
         $this->authorize('acceptMember', [$pod, $user]);
 
-        $result = $this->podUserService->respondToMembership($pod, $user, State::OUTER_CIRCLE, Auth::user());
+        try {
+            $result = $this->podUserService->respondToMembership($pod, $user, State::OUTER_CIRCLE, Auth::user());
+        } catch (InvalidStateTransition $e) {
+            // e.g. the employee's profile is below the minimum for an active circle (UNA-007)
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return $result->applied
             ? response()->json(['message' => 'User status updated to active'], 200)

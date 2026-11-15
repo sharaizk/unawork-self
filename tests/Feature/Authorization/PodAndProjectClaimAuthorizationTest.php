@@ -453,7 +453,8 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
 
     private function makePod(User $owner): Pod
     {
-        $pod = Pod::forceCreate(['title' => 'Pod ' . uniqid(), 'description' => 'd', 'created_by' => $owner->id, 'inner_enabled' => 0]);
+        // Published, as every POD was before UNA-011 (applications need a published POD).
+        $pod = Pod::forceCreate(['title' => 'Pod ' . uniqid(), 'description' => 'd', 'created_by' => $owner->id, 'inner_enabled' => 0, 'status' => 'published', 'published_at' => now()]);
 
         $workspaceId = DB::table('workspaces')->insertGetId([
             'name' => 'Workspace ' . $pod->id,
@@ -558,6 +559,11 @@ class PodAndProjectClaimAuthorizationTest extends TestCase
             $t->unsignedBigInteger('created_by');
             $t->boolean('inner_enabled')->default(false);
             $t->timestamps();
+            $t->string('status', 20)->default('draft'); // UNA-011
+            $t->string('matching_mode', 20)->nullable();
+            $t->timestamp('published_at')->nullable();
+            $t->timestamp('configuration_started_at')->nullable();
+            $t->timestamp('configuration_completed_at')->nullable();
         });
         Schema::create('pod_users', function (Blueprint $t) {
             $t->id();

@@ -16,6 +16,17 @@ class ProjectPolicy
         //
     }
 
+    /**
+     * UNA-010: only a company may view/edit the company profile of its own, non-POD workspace.
+     * (Workspace maps to this policy for the plan abilities below as well.)
+     */
+    public function manageCompanyProfile(User $user, Workspace $workspace): bool
+    {
+        return $user->isCompany()
+            && (int) $workspace->created_by === (int) $user->id
+            && $workspace->ownerable_type !== \App\Services\Company\BusinessOnboardingCompletionService::POD_MORPH;
+    }
+
     public function viewProjects(User $user, Workspace $workspace)
     {
         $creator = $workspace->creater;

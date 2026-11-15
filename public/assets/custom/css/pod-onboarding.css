@@ -1,0 +1,27 @@
+/*
+ * Guided POD setup (UNA-011). Builds on company-onboarding.css (shared guided-step components);
+ * only POD-specific pieces live here. Theme variables keep dark mode and RTL working.
+ */
+.pod-onboarding .pod-templates {
+    padding: 0.85rem 1rem;
+    border: 1px dashed var(--bs-border-color, #ced4da);
+    border-radius: 14px;
+}
+
+.pod-onboarding .pod-templates .btn {
+    border-radius: 999px;
+}
+
+.pod-onboarding #pod-skills {
+    min-height: 10rem;
+}
+
+/* POD management cards (users/pod.blade.php) */
+.pod-draft-card .pod-draft-card__progress {
+    height: 6px;
+    border-radius: 999px;
+}
+
+.pod-draft-card .pod-draft-card__missing {
+    text-align: start;
+}

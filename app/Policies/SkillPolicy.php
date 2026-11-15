@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\User;
+use App\Contracts\HasAccountType;
 use App\Models\Skill;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -13,7 +13,7 @@ class SkillPolicy
     /**
      * Determine whether the user can view any skillss.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(HasAccountType $user): bool
     {
         return $user->isAdministrator();
     }
@@ -21,7 +21,7 @@ class SkillPolicy
     /**
      * Determine whether the user can view the skills.
      */
-    public function view(User $user, Skill $skill): bool
+    public function view(HasAccountType $user, Skill $skill): bool
     {
         return $user->isAdministrator();
     }
@@ -29,7 +29,7 @@ class SkillPolicy
     /**
      * Determine whether the user can create skillss.
      */
-    public function create(User $user): bool
+    public function create(HasAccountType $user): bool
     {
         return $user->isAdministrator();
     }
@@ -37,7 +37,7 @@ class SkillPolicy
     /**
      * Determine whether the user can update the skills.
      */
-    public function update(User $user, Skill $skill): bool
+    public function update(HasAccountType $user, Skill $skill): bool
     {
         return $user->isAdministrator();
     }
@@ -45,7 +45,7 @@ class SkillPolicy
     /**
      * Determine whether the user can delete the skills.
      */
-    public function delete(User $user, Skill $skill): bool
+    public function delete(HasAccountType $user, Skill $skill): bool
     {
         return $user->isAdministrator();
     }

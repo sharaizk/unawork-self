@@ -53,6 +53,8 @@ class AuthServiceProvider extends ServiceProvider
         // Company-workspace join requests (user_workspaces rows).
         UserWorkspace::class => UserWorkspacePolicy::class,
         ZoomMeeting::class => ZoomMeetingPolicy::class,
+        // Employee profiles (UNA-007).
+        \App\Models\Profile::class => \App\Policies\ProfilePolicy::class,
     ];
 
     /**

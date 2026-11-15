@@ -9,11 +9,13 @@
         <td>:</td>
         <td>{{$user->email}}</td>
     </tr>
+    @if ($password)
     <tr>
         <td>{{ __('Password')}}</td>
         <td>:</td>
-        <td>{{$user->password}}</td>
+        <td>{{ $password }}</td>
     </tr>
+    @endif
 </table>
 
 @component('mail::button', ['url' => route('login')])

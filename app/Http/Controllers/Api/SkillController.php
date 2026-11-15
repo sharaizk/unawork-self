@@ -3,58 +3,57 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Catalog\StoreSkillRequest;
+use App\Http\Requests\Catalog\UpdateSkillRequest;
 use App\Models\Skill;
+use App\Services\Catalog\CatalogEntryInUse;
+use App\Services\Catalog\CatalogService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Gate;
 
+/**
+ * Global skills catalog API (auth:sanctum). Any authenticated account may read the catalog (it is
+ * the reference list profile, POD and vacancy forms select from); creating, renaming and deleting
+ * are administrator-only through SkillPolicy, enforced by the FormRequests and authorize().
+ */
 class SkillController extends Controller
 {
-    public function index(): JsonResponse
-    {   
-        $this->authorize('viewAny', Skill::class);
-        $skills = Skill::all();
-        return response()->json($skills);
+    public function __construct(private CatalogService $catalog)
+    {
     }
 
-    public function store(Request $request): JsonResponse
-    {   
-        // $this->authorize('create', Skill::class);
+    public function index(): JsonResponse
+    {
+        // Optional ?industry= narrows to that industry's skills plus general (untagged) skills.
+        return response()->json(Skill::query()->forIndustry(request()->integer('industry') ?: null)->alphabetical()->get());
+    }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $skill = Skill::create($validated);
+    public function store(StoreSkillRequest $request): JsonResponse
+    {
+        $skill = $this->catalog->create(Skill::class, $request->label(), $request->industryIds());
 
         return response()->json($skill, Response::HTTP_CREATED);
     }
 
     public function show(Skill $skill): JsonResponse
-    {   
-        $this->authorize('view', $skill);
+    {
         return response()->json($skill);
     }
 
-    public function update(Request $request, Skill $skill): JsonResponse
-    {   
-        $this->authorize('update', $skill);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $skill->update($validated);
-
-        return response()->json($skill);
+    public function update(UpdateSkillRequest $request, Skill $skill): JsonResponse
+    {
+        return response()->json($this->catalog->rename($skill, $request->label(), $request->industryIds()));
     }
 
     public function destroy(Skill $skill): JsonResponse
-    {   
+    {
         $this->authorize('delete', $skill);
 
-        $skill->delete();
+        try {
+            $this->catalog->delete($skill, 'This skill cannot be deleted because it is currently used by :count records.');
+        } catch (CatalogEntryInUse $e) {
+            return response()->json(['message' => $e->getMessage(), 'usage' => $e->usage], Response::HTTP_CONFLICT);
+        }
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }

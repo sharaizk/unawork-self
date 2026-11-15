@@ -900,10 +900,23 @@
                         <i class="ti ti-chevron-down drp-arrow nocolor hide-mob"></i>
                     </a>
                     <div class="dropdown-menu dash-h-dropdown">
+                        {{-- Employees edit their profile on /my-profile (UNA-007); every account keeps its settings page. --}}
+                        @if (Auth::user()->isEmployee())
+                            <a href="{{ route('my-profile.edit') }}" class="dropdown-item">
+                                <i class="ti ti-user"></i>
+                                <span>{{ __('My Profile') }}</span>
+                            </a>
+                        @elseif (Auth::user()->isCompany())
+                            {{-- UNA-010 --}}
+                            <a href="{{ route('company.onboarding.edit') }}" class="dropdown-item">
+                                <i class="ti ti-building"></i>
+                                <span>{{ __('Company Profile') }}</span>
+                            </a>
+                        @endif
                         <a href="@auth('web'){{ route('users.my.account') }}@elseauth{{ route('client.users.my.account') }}@endauth"
                             class="dropdown-item">
-                            <i class="ti ti-user"></i>
-                            <span>{{ __('My Profile') }}</span>
+                            <i class="ti ti-settings"></i>
+                            <span>{{ __('Account Settings') }}</span>
                         </a>
                         @if (!Auth::user()->isAdministrator())
                             <!-- <a href="{{ route('pods.index') }}" class="dropdown-item">

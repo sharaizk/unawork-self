@@ -13,14 +13,17 @@ class SendLoginDetail extends Mailable
 {
     use Queueable, SerializesModels;
     public $user;
+
     /**
-     * Create a new message instance.
-     *
-     * @return void
+     * The password to show, passed explicitly (UNA-012): never read from $user->password, which
+     * is the hash. Null omits the password row (e.g. self-registration).
      */
-    public function __construct(User $user)
+    public ?string $password;
+
+    public function __construct(User $user, #[\SensitiveParameter] ?string $password = null)
     {
         $this->user = $user;
+        $this->password = $password;
     }
 
     /**

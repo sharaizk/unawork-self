@@ -34,6 +34,8 @@ class PodUserController extends Controller
         
         try {
             $this->podUserService->inviteExistedUser($data['user_id'], $podId, $settings, $request->user());
+        } catch (\App\Services\Provisioning\ProvisioningException $e) {
+            throw $e; // UNA-012: already invited (409) or incompatible account (422)
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -57,6 +59,8 @@ class PodUserController extends Controller
 
         try {
             $this->podUserService->inviteNewUser($data, $podId, $settings, $request->user());
+        } catch (\App\Services\Provisioning\ProvisioningException $e) {
+            throw $e; // UNA-012: already invited (409) or incompatible account (422)
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,
@@ -141,6 +145,13 @@ class PodUserController extends Controller
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             throw $e; // unexpected database failure: 500, transaction already rolled back
+        } catch (\App\Services\Membership\InvalidStateTransition $e) {
+            // a domain rule refused the change (e.g. incomplete employee profile, UNA-007); nothing changed
+            return response()->json([
+                'code' => 422,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,

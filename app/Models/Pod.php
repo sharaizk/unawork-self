@@ -2,17 +2,63 @@
 
 namespace App\Models;
 
+use App\Enums\Pod\PodMatchingMode;
+use App\Enums\Pod\PodStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * A POD. UNA-011: `status` is draft until PodService::publish(); only published PODs are public
+ * (use the published() scope). status, published_at and the configuration timestamps are never
+ * mass assigned.
+ */
 class Pod extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'title', 'image', 'description', 'created_by', 'inner_enabled'
+        'title', 'image', 'description', 'created_by', 'inner_enabled', 'matching_mode',
     ];
+
+    protected $attributes = [
+        'status' => 'draft',
+    ];
+
+    protected $casts = [
+        'status' => PodStatus::class,
+        'matching_mode' => PodMatchingMode::class,
+        'published_at' => 'datetime',
+        'configuration_started_at' => 'datetime',
+        'configuration_completed_at' => 'datetime',
+    ];
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('status'), PodStatus::PUBLISHED->value);
+    }
+
+    public function scopeDrafts(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('status'), PodStatus::DRAFT->value);
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status === PodStatus::PUBLISHED;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === PodStatus::DRAFT;
+    }
+
+    /** POD-owned worker requirements (UNA-011). */
+    public function workerRequirements()
+    {
+        return $this->hasMany(PodWorkerRequirement::class)->orderBy('id');
+    }
 
     public function skills()
     {

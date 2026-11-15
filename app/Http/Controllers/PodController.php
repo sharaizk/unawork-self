@@ -22,13 +22,30 @@ class PodController extends Controller
         $user = Auth::user();
         $currentWorkspace = $user->currentWorkspace;
         $pods = $user->pods;
-        return view('users.pod', compact('currentWorkspace', 'user', 'pods'));
+        $businessProfile = $this->businessProfile($user);
+
+        // UNA-011: setup progress of the drafts this user owns (drafts of others are never listed).
+        $configuration = app(\App\Services\Pod\PodConfigurationService::class);
+        $podSetup = $pods->filter(fn (Pod $pod) => $pod->isDraft() && (int) $pod->created_by === (int) $user->id)
+            ->mapWithKeys(fn (Pod $pod) => [$pod->id => $configuration->breakdown($pod) + ['missing' => $configuration->missingRequirements($pod)]])
+            ->all();
+
+        return view('users.pod', compact('currentWorkspace', 'user', 'pods', 'businessProfile', 'podSetup'));
     }
 
-    public function create()
+    /** Company completion for the POD pages (null for non-companies). UNA-010. */
+    private function businessProfile($user): ?array
     {
-        $skills = Skill::all();
-        return view('pod.create_form', compact('skills'));
+        $completion = app(\App\Services\Company\BusinessOnboardingCompletionService::class);
+        if (!$user || !$user->isCompany()) {
+            return null;
+        }
+        $workspace = $completion->companyWorkspace($user);
+        if (!$workspace) {
+            return ['percentage' => 0, 'required' => $completion->required(), 'complete' => false, 'missing' => [__('Create your company profile')]];
+        }
+
+        return $completion->breakdown($workspace) + ['missing' => $completion->missingRequirements($workspace)];
     }
 
     public function destroy(int $id)
@@ -72,7 +89,7 @@ class PodController extends Controller
         $skillIds = $request->input('skill_ids', []);
         $perPage = 15;
 
-        $podsQuery = Pod::query();
+        $podsQuery = Pod::published(); // UNA-011: drafts are never public
 
         if (!empty($query)) {
             $podsQuery->where('title', 'LIKE', "%$query%");
@@ -105,6 +122,7 @@ class PodController extends Controller
 
     public function showOuter(Pod $pod)
     {
+        abort_unless($pod->isPublished(), 404); // UNA-011: drafts only via the owner's setup page
         $news = $pod->news()->latest('created_at')->get();
         return view('pod.landing.index', compact('pod', 'news'));
     }
@@ -121,6 +139,7 @@ class PodController extends Controller
 
     public function showInner(Pod $pod)
     {
+        abort_unless($pod->isPublished(), 404);
         $this->authorize('viewInner', $pod);
 
         $objUser = Auth::user();

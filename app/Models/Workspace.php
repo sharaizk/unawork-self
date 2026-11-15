@@ -43,6 +43,27 @@ class Workspace extends Model
         'google_calender_id',
         'google_calender_jason_file',
         'is_active',
+        // Company profile (existing columns, UNA-010)
+        'industry_id',
+        'description',
+        'website',
+        'linkedin',
+        'facebook',
+        // Business onboarding (UNA-010)
+        'contact_name',
+        'contact_email',
+        'contact_position',
+        'matching_mode',
+        'default_pod_application_approval',
+        'default_inner_circle_approval',
+    ];
+
+    protected $casts = [
+        'matching_mode' => \App\Enums\Company\MatchingMode::class,
+        'default_pod_application_approval' => \App\Enums\Company\ApprovalMode::class,
+        'default_inner_circle_approval' => \App\Enums\Company\ApprovalMode::class,
+        'business_onboarding_started_at' => 'datetime',
+        'business_onboarding_completed_at' => 'datetime',
     ];
 
     public static function create($data)
@@ -153,6 +174,12 @@ class Workspace extends Model
     public function projects()
     {
         return $this->hasMany('App\Models\Project', 'workspace', 'id');
+    }
+
+    /** Structured worker requirements of a company workspace (UNA-010). */
+    public function workerRequirements()
+    {
+        return $this->hasMany(WorkspaceWorkerRequirement::class)->orderBy('id');
     }
 
     public function industry()

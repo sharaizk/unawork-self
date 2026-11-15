@@ -162,7 +162,7 @@ class AccountIdentityTest extends TestCase
         $this->postJson('/api/register', [
             'name' => 'Api Person', 'email' => 'api@example.test',
             'password' => 'Secret123!', 'password_confirmation' => 'Secret123!',
-        ])->assertOk();
+        ])->assertCreated(); // UNA-012: 201 for a created account
 
         $user = User::where('email', 'api@example.test')->firstOrFail();
         $this->assertSame(UserType::USER->value, $user->type);
@@ -174,6 +174,7 @@ class AccountIdentityTest extends TestCase
     public function test_pod_invitation_generates_an_employee(): void
     {
         $owner = User::factory()->company()->create();
+        $this->completeBusinessProfile($owner); // UNA-010
         $pod = app(\App\Services\PodService::class)->createPod(['title' => 'Pod', 'created_by' => $owner->id]); // a POD always owns a workspace
 
         app(PodUserService::class)->inviteNewUser(

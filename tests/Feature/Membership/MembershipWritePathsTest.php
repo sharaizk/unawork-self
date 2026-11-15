@@ -61,6 +61,7 @@ class MembershipWritePathsTest extends TestCase
         Bus::fake();
 
         $this->owner = $this->user('owner', UserRole::COMPANY);
+        $this->completeBusinessProfile($this->owner); // UNA-010: publishing a POD needs a complete company profile
         $this->pod = app(PodService::class)->createPod(['title' => 'Pod', 'description' => 'd', 'created_by' => $this->owner->id]);
         $this->podWorkspace = $this->pod->workspace;
     }
@@ -126,7 +127,8 @@ class MembershipWritePathsTest extends TestCase
         $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $declined->id)->value('state'));
         $this->assertBusinessError('You have already submitted a join request for this pod.', fn () => $service->requestJoinPod($declined->id, $this->pod->id));
 
-        $this->assertBusinessError('This user is already a member of this pod.', fn () => $service->inviteExistedUser($this->owner->id, $this->pod->id, []));
+        // UNA-012: the owner is a company account, which can never be invited (or converted) as an employee.
+        $this->assertBusinessError(__('This email belongs to an account that cannot be invited as an employee.'), fn () => $service->inviteExistedUser($this->owner->id, $this->pod->id, []));
         $ownerRow = PodUser::where('pod_id', $this->pod->id)->where('user_id', $this->owner->id)->sole();
         $this->assertSame(['Owner', State::INNER_CIRCLE], [$ownerRow->permission, $ownerRow->state]);
     }
@@ -274,7 +276,12 @@ class MembershipWritePathsTest extends TestCase
 
     private function user(string $name, UserRole $role): User
     {
-        return User::createWithAccountRole(['name' => $name, 'email' => $name . '-' . uniqid() . '@example.test', 'plan' => 1, 'email_verified_at' => now()], $role);
+        $user = User::createWithAccountRole(['name' => $name, 'email' => $name . '-' . uniqid() . '@example.test', 'plan' => 1, 'email_verified_at' => now()], $role);
+        if ($role === UserRole::EMPLOYEE) {
+            $this->completeEmployeeProfile($user); // unrelated to UNA-007 profile eligibility
+        }
+
+        return $user;
     }
 
     private function ownWorkspace(User $owner): Workspace
