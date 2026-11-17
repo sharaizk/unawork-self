@@ -9,6 +9,7 @@ use App\Enums\Profile\SkillProficiency;
 use App\Enums\Profile\WorkMode;
 use App\Services\Company\BusinessOnboardingCompletionService;
 use App\Services\Company\BusinessOnboardingService;
+use App\Http\Requests\Concerns\ValidatesMatchingConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -21,6 +22,8 @@ use Illuminate\Validation\Rules\Enum;
  */
 class UpdateBusinessOnboardingRequest extends FormRequest
 {
+    use ValidatesMatchingConfiguration; // UNA-013
+
     private const URL = ['nullable', 'string', 'max:500', 'url', 'starts_with:http://,https://'];
 
     private const REQUIREMENT_VALUE_FIELDS = [
@@ -44,7 +47,7 @@ class UpdateBusinessOnboardingRequest extends FormRequest
                 if (!is_array($row) || (isset($row['id']) && $row['id'] !== '') || !empty($row['skill_ids'])) {
                     return true;
                 }
-                foreach (self::REQUIREMENT_VALUE_FIELDS as $field) {
+                foreach (array_merge(self::REQUIREMENT_VALUE_FIELDS, self::matchingValueFields()) as $field) {
                     if (isset($row[$field]) && trim((string) $row[$field]) !== '') {
                         return true;
                     }
@@ -84,6 +87,8 @@ class UpdateBusinessOnboardingRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:10000'],
 
             'matching_mode' => ['nullable', new Enum(MatchingMode::class)],
+            // UNA-014: default for new PODs only; empty falls back to config('pod_matching.default_minimum_threshold').
+            'default_minimum_match_threshold' => ['nullable', 'integer', 'between:0,100'],
             'default_pod_application_approval' => ['nullable', new Enum(ApprovalMode::class)],
             'default_inner_circle_approval' => ['nullable', new Enum(ApprovalMode::class)],
 
@@ -102,7 +107,7 @@ class UpdateBusinessOnboardingRequest extends FormRequest
             'requirements.*.location' => ['nullable', 'string', 'max:255'],
             'requirements.*.description' => ['nullable', 'string', 'max:2000'],
             'requirements.*.is_active' => ['nullable', 'boolean'],
-        ];
+        ] + $this->matchingRequirementRules();
     }
 
     public function attributes(): array
@@ -120,6 +125,7 @@ class UpdateBusinessOnboardingRequest extends FormRequest
             'facebook' => __('Facebook URL'),
             'description' => __('company description'),
             'matching_mode' => __('matching mode'),
+            'default_minimum_match_threshold' => __('default minimum match score'),
             'default_pod_application_approval' => __('POD application approval'),
             'default_inner_circle_approval' => __('Inner Circle approval'),
             'requirements.*.id' => __('worker requirement'),
@@ -133,6 +139,6 @@ class UpdateBusinessOnboardingRequest extends FormRequest
             'requirements.*.preferred_engagement_type' => __('engagement type'),
             'requirements.*.location' => __('location'),
             'requirements.*.description' => __('notes'),
-        ];
+        ] + $this->matchingRequirementAttributes();
     }
 }

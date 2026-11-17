@@ -69,14 +69,15 @@ class PodStateTransitionService
     /**
      * Start (or restart, from rejected/removed) a membership in $initial state, in its own
      * transaction. An existing membership in any other state is returned unchanged.
+     * $allowReentry = false (UNA-014 system matching) also leaves rejected/removed rows unchanged.
      */
-    public function enter(Pod $pod, User $user, State $initial, ?User $actor, ?string $reason = null, array $effects = []): MembershipResult
+    public function enter(Pod $pod, User $user, State $initial, ?User $actor, ?string $reason = null, array $effects = [], bool $allowReentry = true): MembershipResult
     {
-        return $this->afterCommit->run(DB::transaction(fn () => $this->start($pod, $user, $initial, $actor, $reason, $effects), self::ATTEMPTS));
+        return $this->afterCommit->run(DB::transaction(fn () => $this->start($pod, $user, $initial, $actor, $reason, $effects, $allowReentry), self::ATTEMPTS));
     }
 
-    /** Inside a transaction: create the membership in $initial, or move a re-entry row there. */
-    public function start(Pod $pod, User $user, State $initial, ?User $actor, ?string $reason = null, array $effects = []): MembershipResult
+    /** Inside a transaction: create the membership in $initial, or move a re-entry row there (unless $allowReentry is false). */
+    public function start(Pod $pod, User $user, State $initial, ?User $actor, ?string $reason = null, array $effects = [], bool $allowReentry = true): MembershipResult
     {
         if ($initial->accessProfile() !== 'none') {
             $this->assertProfileEligible($user->id);
@@ -91,6 +92,9 @@ class PodStateTransitionService
             return MembershipResult::applied($membership, $initial->value, $this->effects($membership, null, $initial) + $effects);
         }
 
+        if (!$allowReentry && in_array($membership->state, State::reentry(), true)) {
+            return MembershipResult::unchanged($membership, 'reentry_not_allowed');
+        }
         if (in_array($membership->state, State::reentry(), true)) {
             $result = $this->apply($membership, $initial, $actor, $reason);
 
@@ -140,6 +144,8 @@ class PodStateTransitionService
 
         $this->syncAccess($locked, $from, $target);
         $this->record($locked, $from, $target, $actor, $reason);
+        // UNA-018: a matching proposal's review is resolved in the same transaction, whatever the write path.
+        app(\App\Services\Matching\PodMatchReviewResolver::class)->onTransition($locked, $from, $target, $actor, $reason);
 
         return MembershipResult::applied($locked, $target->value, $this->effects($locked, $from, $target));
     }

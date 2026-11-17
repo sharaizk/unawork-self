@@ -88,8 +88,16 @@ class PodUserController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => 'success',
-                'message' => 'Join request submitted successfully'
+                'message' => __('Join request submitted successfully'),
+                'state' => \App\Enums\PodUser\State::PENDING_BUSINESS_APPROVAL->value,
             ]);
+        } catch (\App\Services\AlreadyRequestedToJoin $e) {
+            // UNA-017: a duplicate or already-decided request is a conflict, not a server error.
+            return response()->json([
+                'code' => 409,
+                'status' => 'already_requested',
+                'message' => __('You have already submitted a join request for this pod.'),
+            ], 409);
         } catch (\Exception $e) {
             return response()->json([
                 'code' => 500,

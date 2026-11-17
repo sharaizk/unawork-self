@@ -18,7 +18,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // UNA-016: the configured POD matching algorithm (deterministic by default).
+        $this->app->bind(\App\Contracts\PodMatchingAlgorithm::class, fn ($app) => $app->make(\App\Services\Matching\PodMatchingAlgorithmResolver::class)->resolve());
     }
 
     /**

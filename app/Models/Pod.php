@@ -29,6 +29,7 @@ class Pod extends Model
     protected $casts = [
         'status' => PodStatus::class,
         'matching_mode' => PodMatchingMode::class,
+        'minimum_match_threshold' => 'integer',
         'published_at' => 'datetime',
         'configuration_started_at' => 'datetime',
         'configuration_completed_at' => 'datetime',
@@ -52,6 +53,21 @@ class Pod extends Model
     public function isDraft(): bool
     {
         return $this->status === PodStatus::DRAFT;
+    }
+
+    /**
+     * UNA-014: minimum match score (0-100) for a match to qualify. Never mass assigned; written by
+     * PodService only. Falls back to the config default for an unsaved model.
+     */
+    public function minimumMatchThreshold(): int
+    {
+        return (int) ($this->minimum_match_threshold ?? config('pod_matching.default_minimum_threshold', 70));
+    }
+
+    /** Persisted match snapshots of this POD's requirements (UNA-013). */
+    public function matches()
+    {
+        return $this->hasMany(PodMatch::class);
     }
 
     /** POD-owned worker requirements (UNA-011). */

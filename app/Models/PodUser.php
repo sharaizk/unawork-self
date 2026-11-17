@@ -81,4 +81,10 @@ class PodUser extends Model
     {
         return $query->where('state', State::INNER_CIRCLE->value);
     }
+
+    /** Matching provenance of this membership, when the matching workflow proposed it (UNA-018). */
+    public function matchReview()
+    {
+        return $this->hasOne(PodMatchReview::class, 'pod_user_id');
+    }
 }

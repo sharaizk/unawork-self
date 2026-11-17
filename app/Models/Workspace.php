@@ -56,12 +56,14 @@ class Workspace extends Model
         'matching_mode',
         'default_pod_application_approval',
         'default_inner_circle_approval',
+        'default_minimum_match_threshold', // UNA-014: default for new PODs only
     ];
 
     protected $casts = [
         'matching_mode' => \App\Enums\Company\MatchingMode::class,
         'default_pod_application_approval' => \App\Enums\Company\ApprovalMode::class,
         'default_inner_circle_approval' => \App\Enums\Company\ApprovalMode::class,
+        'default_minimum_match_threshold' => 'integer',
         'business_onboarding_started_at' => 'datetime',
         'business_onboarding_completed_at' => 'datetime',
     ];

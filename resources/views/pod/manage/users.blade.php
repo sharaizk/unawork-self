@@ -11,6 +11,11 @@
         @can('manageMembers', $pod)
             <div class="row d-flex align-items-end">
                 <div class="col-lg-11">
+                    @can('viewMatchReviews', $pod)
+                        <a href="{{ route('pods.match-reviews.index', $pod) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="ti ti-user-check" aria-hidden="true"></i> {{ __('Match reviews') }}
+                        </a>
+                    @endcan
                 </div>
                 <div class="col-lg-1">
                     <a href="#" class="btn btn-primary" data-ajax-popup="true" data-size="lg"

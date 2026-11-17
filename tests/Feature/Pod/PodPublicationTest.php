@@ -73,7 +73,9 @@ class PodPublicationTest extends PodTestCase
         }
         $this->assertSame($before, $counts());
         $this->assertEquals($published->published_at, $pod->fresh()->published_at);
-        Bus::assertNothingDispatched();
+        // UNA-016: only the first publication queues match generation; nothing else is dispatched.
+        Bus::assertDispatchedTimes(\App\Jobs\Matching\GenerateMatchesForPod::class, 1);
+        Bus::assertNotDispatched(\App\Jobs\SendEmail::class);
         Mail::assertNothingSent();
 
         // The publish form is gone once published.

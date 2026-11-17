@@ -118,7 +118,7 @@ class PodUserService
         $result = $this->run(fn () => $this->states->start($pod, $user, State::PENDING_BUSINESS_APPROVAL, $user, 'Applied to join the POD'));
 
         if (!$result->applied) {
-            throw new \Exception('You have already submitted a join request for this pod.');
+            throw new AlreadyRequestedToJoin('You have already submitted a join request for this pod.');
         }
 
         return $result;

@@ -101,6 +101,11 @@
                                                 <i class="ti ti-adjustments"></i> <span>{{ __('Requirements and matching') }}</span>
                                             </a>
                                         @endcan
+                                        @can('viewMatchReviews', $pod)
+                                            <a href="{{ route('pods.match-reviews.index', $pod) }}" class="dropdown-item">
+                                                <i class="ti ti-user-check"></i> <span>{{ __('Match reviews') }}</span>
+                                            </a>
+                                        @endcan
                                         <a href="#" class="dropdown-item" data-ajax-popup="true" data-size="md"
                                             data-title="{{ __('Edit') }}"
                                             data-url="{{ route('pods.edit', $podId=$pod->id) }}"><i

@@ -137,6 +137,21 @@ class PodPolicy
     }
 
     /**
+     * UNA-018: the business match-review queue. Same authority as member management (owner or a
+     * member with users_edit); no administrator or client bypass.
+     */
+    public function viewMatchReviews(User $user, Pod $pod): bool
+    {
+        return $this->manageMembers($user, $pod);
+    }
+
+    /** UNA-018: decide a review; it must belong to this POD. */
+    public function decideMatchReview(User $user, Pod $pod, \App\Models\PodMatchReview $review): bool
+    {
+        return (int) $review->membership?->pod_id === (int) $pod->id && $this->manageMembers($user, $pod);
+    }
+
+    /**
      * Apply a validated state transition (screening, suspension, resumption, circle moves) to
      * $member. Managers only; never the owner or oneself. The graph is enforced by
      * PodStateTransitionService.
@@ -213,8 +228,8 @@ class PodPolicy
      */
     public function requestToJoin(User $user, Pod $pod): bool
     {
-        // UNA-011: only published PODs accept applications.
-        return $pod->isPublished() && !$this->isOwner($user, $pod) && $pod->workspace !== null;
+        // UNA-011: only published PODs accept applications. UNA-017: only employees apply.
+        return $user->isEmployee() && $pod->isPublished() && !$this->isOwner($user, $pod) && $pod->workspace !== null;
     }
 
     /**

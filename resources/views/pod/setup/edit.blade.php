@@ -3,7 +3,8 @@
     workerRequirements.skills loaded), $breakdown (PodConfigurationService::breakdown), $company
     (company completeness), $canPublish, $step, $steps, $imageUrl, $industryId (company industry, for
     prioritizing selectors), $templates (company worker requirements), $jobTitles, $skills,
-    $matchingModes, $proficiencies, $workModes, $engagementTypes.
+    $matchingModes, $proficiencies, $workModes, $engagementTypes. UNA-014: the matching step also
+    edits $pod->minimum_match_threshold.
     Reuses the guided-step components of company onboarding (company-onboarding.js/.css).
 --}}
 @extends('layouts.admin')
@@ -40,10 +41,11 @@
         'location' => $r->location,
         'description' => $r->description,
         'is_active' => $r->is_active,
-    ])->all();
+    ] + $r->matchingAttributes())->all();
     $nextIndex = count($requirementRows) ? max(array_map('intval', array_keys($requirementRows))) + 1 : 0;
     $selectedSkills = array_map('strval', $submitted || old('skills_present') !== null ? old('skills', []) : $pod->skills->pluck('id')->all());
     $currentMatching = old('matching_mode', $enumValue($pod->matching_mode));
+    $currentThreshold = old('minimum_match_threshold', $pod->minimumMatchThreshold());
     $pageTitle = $isDraft ? __('POD setup') : __('Edit POD');
 @endphp
 
@@ -228,7 +230,7 @@
                                                 'preferred_engagement_type' => $enumValue($template->preferred_engagement_type),
                                                 'location' => $template->location,
                                                 'description' => $template->description,
-                                            ]) }}"
+                                            ] + $template->matchingAttributes()) }}"
                                             aria-label="{{ __('Import :role', ['role' => $template->jobTitle?->title ?? __('requirement')]) }}">
                                             <i class="ti ti-download" aria-hidden="true"></i>
                                             {{ $template->jobTitle?->title ?? __('Untitled requirement') }}@if ($template->headcount) × {{ $template->headcount }}@endif
@@ -253,12 +255,13 @@
                 <section class="card co-panel" id="co-step-matching" data-co-step="matching" role="tabpanel">
                     @include('company.onboarding.panel_header', ['key' => 'matching'])
                     <div class="card-body">
+                        <input type="hidden" name="matching_present" value="1">
                         <fieldset>
-                            <legend class="form-label fs-6">{{ __('How should matches for this POD be handled?') }} <span class="text-danger">*</span></legend>
+                            <legend class="form-label fs-6">{{ __('How should qualified matches for this POD be handled?') }} <span class="text-danger">*</span></legend>
                             <div class="row g-3">
                                 @foreach ($matchingModes as $mode)
-                                    <div class="col-md-6">
-                                        <input type="radio" class="btn-check" name="matching_mode" id="pod-matching-{{ $mode->value }}" value="{{ $mode->value }}" autocomplete="off" @checked($currentMatching === $mode->value)>
+                                    <div class="col-md-4">
+                                        <input type="radio" class="btn-check" name="matching_mode" id="pod-matching-{{ $mode->value }}" value="{{ $mode->value }}" autocomplete="off" data-pod-matching-mode @checked($currentMatching === $mode->value)>
                                         <label class="co-choice h-100 @error('matching_mode') is-invalid @enderror" for="pod-matching-{{ $mode->value }}">
                                             <span class="fw-semibold d-block">{{ $mode->label() }}</span>
                                             <span class="small text-muted">{{ $mode->description() }}</span>
@@ -268,7 +271,24 @@
                             </div>
                             @error('matching_mode') <span class="invalid-feedback d-block" role="alert">{{ $message }}</span> @enderror
                         </fieldset>
-                        <p class="small text-muted mt-3 mb-0">{{ __('Nobody joins automatically: every membership still follows the POD approval rules and the worker profile requirement.') }}</p>
+                        <div class="alert alert-warning small mt-3 mb-0 {{ $currentMatching === \App\Enums\Pod\PodMatchingMode::AUTOMATIC->value ? '' : 'd-none' }}" role="alert" data-pod-automatic-warning>
+                            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+                            {{ __('Automatic mode places qualified candidates directly in the Outer Circle of this published POD, without asking you first. They get Outer Circle access to the POD workspace. Nobody is ever moved to the Inner Circle automatically.') }}
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-4">
+                                <label class="form-label" for="minimum_match_threshold">{{ __('Minimum match score') }} <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control @error('minimum_match_threshold') is-invalid @enderror" id="minimum_match_threshold" name="minimum_match_threshold"
+                                        value="{{ $currentThreshold }}" min="0" max="100" step="1" inputmode="numeric" required aria-describedby="minimum-match-threshold-help">
+                                    <span class="input-group-text">/ 100</span>
+                                    @error('minimum_match_threshold') <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <p class="small text-muted mb-0" id="minimum-match-threshold-help">{{ __('A match qualifies when the candidate meets every mandatory criterion and scores at least this much (a score equal to it qualifies). Qualified matches are only acted on once the POD is published. Changing the mode or score re-checks existing matches; it never removes or demotes members.') }}</p>
+                            </div>
+                        </div>
                     </div>
                     @include('company.onboarding.panel_footer', ['key' => 'matching'])
                 </section>
