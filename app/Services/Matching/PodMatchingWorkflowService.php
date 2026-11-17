@@ -1,0 +1,135 @@
+<?php
+
+namespace App\Services\Matching;
+
+use App\Enums\Matching\MembershipAction;
+use App\Enums\Pod\PodMatchingMode;
+use App\Enums\PodUser\State;
+use App\Models\Pod;
+use App\Models\PodMatch;
+use App\Models\PodUser;
+use App\Models\PodWorkerRequirement;
+use App\Models\User;
+use App\Services\Membership\AfterCommit;
+use App\Services\Membership\InvalidStateTransition;
+use App\Services\Membership\MembershipResult;
+use App\Services\Membership\PodStateTransitionService;
+use App\Services\Profile\ProfileCompletionService;
+use DateTimeInterface;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * The single application entry point that turns a match into a POD action (UNA-014):
+ *
+ *   1. score + persist through PodMatchService (information only),
+ *   2. qualify with MatchQualification (eligible, score >= POD threshold, active requirement, published POD),
+ *   3. apply the POD matching mode through PodStateTransitionService only:
+ *        recommend_only   → nothing
+ *        pending_approval → a candidate without any membership enters pending_business_approval
+ *        automatic        → a candidate without any membership enters outer_circle (profile gate),
+ *                           an applicant (matched / pending_business_approval) advances to outer_circle
+ *
+ * Forward-only: an existing membership in any other state (rejected, removed, suspended, Outer or
+ * Inner Circle, screening) is never changed, nothing is removed or demoted, nobody reaches the
+ * Inner Circle, and rejected/removed rows are not re-entered. Effects (notifications) run after
+ * the membership transaction commits (AfterCommit). Repeated calls are idempotent.
+ */
+class PodMatchingWorkflowService
+{
+    private const ATTEMPTS = 3;
+
+    // Stored in pod_user_state_histories.reason (actor = null, a system action).
+    public const AUTOMATIC_REASON = 'Qualified automatically by POD matching';
+    public const PENDING_REASON = 'Matched by POD matching, awaiting approval';
+
+    public function __construct(
+        private PodMatchService $matches,
+        private PodStateTransitionService $transitions,
+        private AfterCommit $afterCommit,
+        private ProfileCompletionService $completion,
+    ) {
+    }
+
+    /**
+     * Evaluate $candidate against $requirement, persist the match and apply the POD's mode.
+     *
+     * @throws IneligibleCandidate|InactiveRequirement
+     */
+    public function evaluateAndApply(PodWorkerRequirement $requirement, User $candidate, ?DateTimeInterface $at = null): PodMatchOutcome
+    {
+        $match = $this->matches->evaluate($requirement, $candidate, $at);
+        $pod = $requirement->relationLoaded('pod') ? $requirement->pod : $requirement->pod()->first();
+        $qualification = MatchQualification::of($match, $requirement, $pod);
+
+        return $this->apply($match, $qualification, $pod, $candidate);
+    }
+
+    /**
+     * Apply the POD mode to a match that is already persisted, e.g. the best match of a
+     * DeterministicPodMatchingService run (UNA-015). Nothing is re-scored: qualification uses the
+     * stored score/status and the POD's current threshold.
+     */
+    public function applyPersisted(PodMatch $match): PodMatchOutcome
+    {
+        $match->loadMissing(['requirement.pod', 'user']);
+        $pod = $match->requirement->pod;
+
+        return $this->apply($match, MatchQualification::of($match, $match->requirement, $pod), $pod, $match->user);
+    }
+
+    /** Apply the POD mode to an already persisted, qualified-or-not match. */
+    public function apply(PodMatch $match, MatchQualification $qualification, Pod $pod, User $candidate): PodMatchOutcome
+    {
+        $mode = $pod->matching_mode;
+        if (!$qualification->qualified) {
+            return new PodMatchOutcome($match, $qualification, MembershipAction::NONE, $this->currentState($pod, $candidate), $qualification->reason->value);
+        }
+        if (!$mode instanceof PodMatchingMode || !$mode->actsOnMemberships()) {
+            return new PodMatchOutcome($match, $qualification, MembershipAction::NONE, $this->currentState($pod, $candidate), 'recommend_only');
+        }
+
+        $target = $mode === PodMatchingMode::AUTOMATIC ? State::OUTER_CIRCLE : State::PENDING_BUSINESS_APPROVAL;
+
+        try {
+            [$action, $result] = DB::transaction(function () use ($pod, $candidate, $mode, $target) {
+                $existing = PodUser::query()->where('pod_id', $pod->id)->where('user_id', $candidate->id)->lockForUpdate()->first();
+                $wouldPlace = $existing === null || ($mode === PodMatchingMode::AUTOMATIC && in_array($existing->state, State::applicants(), true));
+
+                // Automatic placement obeys the profile minimum (the transition service checks it
+                // again under its own lock); an existing applicant then stays where it is.
+                if ($wouldPlace && $target === State::OUTER_CIRCLE && !$this->completion->isEligible($candidate)) {
+                    return [MembershipAction::BLOCKED, MembershipResult::unchanged($existing, 'profile_incomplete')];
+                }
+
+                if ($existing === null) {
+                    // No re-entry: a concurrently created rejected/removed row is left alone.
+                    $reason = $target === State::OUTER_CIRCLE ? self::AUTOMATIC_REASON : self::PENDING_REASON;
+
+                    return [MembershipAction::CREATED, $this->transitions->start($pod, $candidate, $target, null, $reason, [], false)];
+                }
+                if ($mode === PodMatchingMode::AUTOMATIC && in_array($existing->state, State::applicants(), true)) {
+                    return [MembershipAction::ADVANCED, $this->transitions->apply($existing, State::OUTER_CIRCLE, null, self::AUTOMATIC_REASON, State::applicants())];
+                }
+
+                return [MembershipAction::UNCHANGED, MembershipResult::unchanged($existing, 'already_member')];
+            }, self::ATTEMPTS);
+        } catch (InvalidStateTransition) {
+            return new PodMatchOutcome($match, $qualification, MembershipAction::BLOCKED, $this->currentState($pod, $candidate), 'transition_refused');
+        }
+
+        $this->afterCommit->run($result);
+
+        return new PodMatchOutcome(
+            $match,
+            $qualification,
+            $result->applied || $action === MembershipAction::BLOCKED ? $action : MembershipAction::UNCHANGED,
+            $this->currentState($pod, $candidate),
+            $result->applied ? null : $result->reason,
+        );
+    }
+
+    private function currentState(Pod $pod, User $candidate): ?State
+    {
+        return PodUser::query()->where('pod_id', $pod->id)->where('user_id', $candidate->id)->first()?->state;
+    }
+}

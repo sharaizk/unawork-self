@@ -49,6 +49,12 @@ class PodMatch extends Model
         return $this->status === MatchStatus::ELIGIBLE;
     }
 
+    /** Matches of one candidate within one POD (one per requirement), UNA-015. */
+    public function scopeForPodAndUser(Builder $query, int $podId, int $userId): Builder
+    {
+        return $query->where($query->qualifyColumn('pod_id'), $podId)->where($query->qualifyColumn('user_id'), $userId);
+    }
+
     public function scopeEligible(Builder $query): Builder
     {
         return $query->where($query->qualifyColumn('status'), MatchStatus::ELIGIBLE->value);

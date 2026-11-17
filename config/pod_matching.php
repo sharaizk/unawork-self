@@ -30,6 +30,13 @@ return [
         'within_one_month_months' => 1,
     ],
 
+    // UNA-014: minimum match score (0-100) a POD requires before a match qualifies. New PODs copy
+    // their company's default (workspaces.default_minimum_match_threshold) or, without one, this.
+    'default_minimum_threshold' => 70,
+
+    // UNA-014: persisted matches are reprocessed in chunks of this size after a configuration change.
+    'recalculation_chunk_size' => 100,
+
     // Upper bound for pod_worker_requirements.timezone_tolerance_hours.
     'max_timezone_tolerance_hours' => 14,
 

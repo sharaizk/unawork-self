@@ -22,12 +22,13 @@ enum MatchingMode: string
         };
     }
 
+    /** UNA-014: also the default for new PODs (PodMatchingMode::fromCompanyPreference). */
     public function description(): string
     {
         return match ($this) {
-            self::MANUAL => __('Your company searches for and selects workers itself.'),
-            self::ASSISTED => __('UnaWork recommends suitable workers, but your company decides.'),
-            self::AUTOMATIC => __('Matching workflows may recommend or start eligible matches automatically, according to your preferences.'),
+            self::MANUAL => __('Your company searches for and selects workers itself. New PODs start in Recommend only mode.'),
+            self::ASSISTED => __('UnaWork recommends suitable workers, but your company decides. New PODs start in pending-approval mode.'),
+            self::AUTOMATIC => __('Qualified workers may be placed in the Outer Circle automatically. New PODs start in automatic mode.'),
         };
     }
 }

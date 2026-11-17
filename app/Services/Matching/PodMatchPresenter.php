@@ -20,7 +20,7 @@ use App\Models\PodMatchReason;
 class PodMatchPresenter
 {
     /**
-     * @return array{score:string, status:string, status_label:string, eligible:bool, summary:string,
+     * @return array{score:string, threshold:int, qualified:bool, qualification:array{code:string, label:string}, status:string, status_label:string, eligible:bool, summary:string,
      *     scoring_version:string, evaluated_at:?string, failed_mandatory: array<int, array{criterion:string, label:string}>,
      *     criteria: array<int, array<string, mixed>>}
      */
@@ -28,9 +28,14 @@ class PodMatchPresenter
     {
         $reasons = $match->relationLoaded('reasons') ? $match->reasons : $match->reasons()->get();
         $criteria = $reasons->sortBy([['position', 'asc'], ['id', 'asc']])->values()->map(fn (PodMatchReason $r) => $this->criterion($r))->all();
+        $match->loadMissing('requirement.pod');
+        $qualification = MatchQualification::of($match); // UNA-014: the POD's current threshold
 
         return [
             'score' => (string) $match->score,
+            'threshold' => $qualification->threshold,
+            'qualified' => $qualification->qualified,
+            'qualification' => ['code' => $qualification->reason->value, 'label' => $qualification->reason->label()],
             'status' => $match->status->value,
             'status_label' => $match->status->label(),
             'eligible' => $match->isEligible(),

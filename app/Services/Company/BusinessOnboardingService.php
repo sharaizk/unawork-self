@@ -34,6 +34,8 @@ class BusinessOnboardingService
         'description', 'website', 'linkedin', 'facebook',
         'contact_name', 'contact_email', 'contact_position',
         'matching_mode', 'default_pod_application_approval', 'default_inner_circle_approval',
+        // UNA-014: preselects new PODs only; existing PODs keep their own snapshot.
+        'default_minimum_match_threshold',
     ];
 
     /** Guided steps, in order (the last saved one is stored as business_onboarding_step). */

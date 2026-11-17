@@ -14,6 +14,7 @@ use App\Models\Workspace;
 use App\Models\WorkspaceWorkerRequirement;
 use App\Services\Company\BusinessOnboardingCompletionService;
 use App\Services\Matching\MatchingConfiguration;
+use App\Services\Matching\PodMatchRecalculationService;
 use App\Services\Pod\IncompleteBusinessOnboarding;
 use App\Services\Pod\IncompletePodConfiguration;
 use App\Services\Pod\PodAlreadyPublished;
@@ -23,6 +24,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 /**
  * POD lifecycle (UNA-011, hardened UNA-005 style).
@@ -54,9 +56,11 @@ class PodService
     public function __construct(
         private ?BusinessOnboardingCompletionService $businessProfiles = null,
         private ?PodConfigurationService $configuration = null,
+        private ?PodMatchRecalculationService $recalculation = null,
     ) {
         $this->businessProfiles ??= app(BusinessOnboardingCompletionService::class);
         $this->configuration ??= app(PodConfigurationService::class);
+        $this->recalculation ??= app(PodMatchRecalculationService::class);
     }
 
     /** Public listing: published PODs only. */
@@ -72,8 +76,10 @@ class PodService
     /**
      * Create a draft POD owned by $actor (a company with its own workspace).
      *
-     * @param array $data title (required by the request), description, matching_mode, skills[],
-     *                    requirements[] (+ requirements_present), import_template_ids[]
+     * @param array $data title (required by the request), description, matching_mode,
+     *                    minimum_match_threshold, skills[], requirements[] (+ requirements_present),
+     *                    import_template_ids[]. Mode and threshold default to a snapshot of the
+     *                    company defaults (UNA-014).
      */
     public function createDraft(User $actor, array $data, ?UploadedFile $image = null): Pod
     {
@@ -88,6 +94,7 @@ class PodService
                     'status' => PodStatus::DRAFT,
                     'image' => $newImage,
                     'matching_mode' => $this->initialMatchingMode($data, $companyWorkspace),
+                    'minimum_match_threshold' => $this->initialThreshold($data, $companyWorkspace),
                     'configuration_started_at' => now(),
                 ])->save();
 
@@ -130,11 +137,15 @@ class PodService
             [$saved, $previousImage] = DB::transaction(function () use ($pod, $actor, $data, $newImage, $companyWorkspace) {
                 $locked = $this->lockOwned($pod, $actor);
                 $before = $locked->isPublished() ? $this->configuration->breakdown($locked) : null;
+                $matchingBefore = $this->recalculation->configurationSnapshot($locked->id);
                 $previousImage = $locked->image;
 
                 $locked->fill($this->basics($data));
                 if (array_key_exists('matching_mode', $data)) {
                     $locked->matching_mode = $data['matching_mode'] ?: null;
+                }
+                if (array_key_exists('minimum_match_threshold', $data)) {
+                    $locked->minimum_match_threshold = self::validThreshold($data['minimum_match_threshold']);
                 }
                 if ($newImage !== null) {
                     $locked->image = $newImage;
@@ -159,6 +170,10 @@ class PodService
                         );
                     }
                 }
+
+                // UNA-014: invalidate matches of inactivated requirements now; re-evaluate affected
+                // persisted matches only after this configuration has committed.
+                $this->recalculation->scheduleChanges($locked->id, $matchingBefore, $this->recalculation->configurationSnapshot($locked->id));
 
                 return [$locked, $previousImage];
             }, self::ATTEMPTS);
@@ -231,6 +246,9 @@ class PodService
                 throw new PodAlreadyPublished($locked);
             }
 
+            // UNA-014: existing persisted matches are processed once publication has committed.
+            $this->recalculation->schedulePod($locked->id);
+
             return $locked->fresh();
         }, self::ATTEMPTS);
     }
@@ -239,7 +257,9 @@ class PodService
      * Company defaults for matching and approvals (UNA-010), for POD and future matching workflows.
      * Stored preferences only: nothing is approved automatically.
      *
-     * @return array{matching_mode:?\App\Enums\Company\MatchingMode, pod_application_approval:?\App\Enums\Company\ApprovalMode, inner_circle_approval:?\App\Enums\Company\ApprovalMode}
+     * UNA-014: pod_matching_mode / minimum_match_threshold are what a new POD of this company starts with.
+     *
+     * @return array{matching_mode:?\App\Enums\Company\MatchingMode, pod_matching_mode:?PodMatchingMode, minimum_match_threshold:int, pod_application_approval:?\App\Enums\Company\ApprovalMode, inner_circle_approval:?\App\Enums\Company\ApprovalMode}
      */
     public function companyDefaults(User $owner): array
     {
@@ -247,6 +267,8 @@ class PodService
 
         return [
             'matching_mode' => $workspace?->matching_mode,
+            'pod_matching_mode' => PodMatchingMode::fromCompanyPreference($workspace?->matching_mode),
+            'minimum_match_threshold' => self::defaultThreshold($workspace),
             'pod_application_approval' => $workspace?->default_pod_application_approval,
             'inner_circle_approval' => $workspace?->default_inner_circle_approval,
         ];
@@ -296,6 +318,37 @@ class PodService
         }
 
         return $basics;
+    }
+
+    /** Snapshot of the company default threshold (or the explicit value); never a live link. */
+    private function initialThreshold(array $data, Workspace $companyWorkspace): int
+    {
+        if (isset($data['minimum_match_threshold']) && $data['minimum_match_threshold'] !== '') {
+            return self::validThreshold($data['minimum_match_threshold']);
+        }
+
+        return self::defaultThreshold($companyWorkspace);
+    }
+
+    public static function defaultThreshold(?Workspace $companyWorkspace): int
+    {
+        $value = $companyWorkspace?->default_minimum_match_threshold ?? config('pod_matching.default_minimum_threshold', 70);
+
+        return max(0, min(100, (int) $value));
+    }
+
+    /**
+     * Domain guard for pods.minimum_match_threshold: an integer from 0 through 100 (the request
+     * validates the same; this protects every other caller).
+     */
+    public static function validThreshold(mixed $value): int
+    {
+        $valid = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 100]]);
+        if ($valid === false || is_bool($value)) {
+            throw ValidationException::withMessages(['minimum_match_threshold' => __('The minimum match score must be a whole number from 0 to 100.')]);
+        }
+
+        return $valid;
     }
 
     private function initialMatchingMode(array $data, Workspace $companyWorkspace): ?PodMatchingMode

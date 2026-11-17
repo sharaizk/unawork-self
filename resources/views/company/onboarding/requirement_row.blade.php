@@ -101,7 +101,7 @@
         {{-- UNA-013 matching targets: every field is optional; an empty one is simply not scored. --}}
         <div class="col-12">
             <p class="fw-semibold small mb-0 mt-1">{{ __('Matching criteria') }}</p>
-            <p class="small text-muted mb-0">{{ __('Only the criteria you configure are scored. Mark a criterion as mandatory to rule out candidates who do not meet it; nobody is invited or accepted automatically.') }}</p>
+            <p class="small text-muted mb-0">{{ __('Only the criteria you configure are scored. Configured criteria are optional unless you tick them as mandatory: optional criteria only raise or lower the match score, while a mandatory criterion that is not met disqualifies the candidate whatever their score. Work mode and engagement type never change the score; they only disqualify when mandatory.') }}</p>
         </div>
         <div class="col-md-4 col-6">
             <label class="form-label" for="req-{{ $index }}-start">{{ __('Required start date') }}</label>
@@ -144,7 +144,7 @@
         <div class="col-12">
             @php $mandatory = array_map('strval', (array) ($row['mandatory_criteria'] ?? [])); @endphp
             <input type="hidden" name="requirements[{{ $index }}][mandatory_criteria_present]" value="1">
-            <span class="form-label d-block">{{ __('Mandatory criteria') }}</span>
+            <span class="form-label d-block">{{ __('Mandatory criteria') }} <span class="small text-muted fw-normal">{{ __('(failure disqualifies; only configured criteria can be mandatory)') }}</span></span>
             <div class="d-flex flex-wrap gap-3 @error("$p.mandatory_criteria") is-invalid @enderror @error("$p.mandatory_criteria.*") is-invalid @enderror">
                 @foreach (\App\Enums\Matching\MatchCriterion::options() as $value => $label)
                     <div class="form-check mb-0">

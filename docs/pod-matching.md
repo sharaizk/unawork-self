@@ -1,11 +1,20 @@
-# POD matching criteria and explainable scoring (UNA-013)
+# POD matching: scoring (UNA-013), configuration (UNA-014) and user-to-POD matching (UNA-015)
 
 This document describes the code as implemented. The only scoring code is
 `App\Services\Matching\PodMatchScorer`. Configuration lives in `config/pod_matching.php`.
 
 A match always compares **one employee** with **one active POD worker requirement**
 (`pod_worker_requirements`). A POD with three requirements gives an employee up to three
-independent matches. Nothing here chooses a "best" requirement, and nothing changes POD membership.
+independent matches. Nothing here chooses a "best" requirement.
+
+There are three separate layers:
+
+1. **Scoring** (UNA-013, §2–§8): `PodMatchScorer` / `PodMatchService` compute and persist a score,
+   a status (`eligible` / `disqualified` / `not_scorable`) and reasons. Information only.
+2. **Qualification** (UNA-014, §10): `MatchQualification` decides whether a persisted match is
+   good enough for its POD (status, threshold, active requirement, published POD).
+3. **Membership action** (UNA-014, §11): `PodMatchingWorkflowService` applies the POD's matching
+   mode to a qualified match, only through `PodStateTransitionService`.
 
 ## 1. Code map
 
@@ -20,7 +29,12 @@ independent matches. Nothing here chooses a "best" requirement, and nothing chan
 | Display | `App\Services\Matching\PodMatchPresenter`, `App\Http\Resources\PodMatchResource` |
 | Models | `PodMatch` (`pod_matches`), `PodMatchReason` (`pod_match_reasons`) |
 | Requirement fields | `App\Models\Concerns\HasMatchingConfiguration` (used by `PodWorkerRequirement` and `WorkspaceWorkerRequirement`) |
-| Config | `config/pod_matching.php` (`version`, `weights`, `availability`, `max_timezone_tolerance_hours`) |
+| Config | `config/pod_matching.php` (`version`, `weights`, `availability`, `default_minimum_threshold`, `recalculation_chunk_size`, `max_timezone_tolerance_hours`) |
+| POD matching mode (UNA-014) | `App\Enums\Pod\PodMatchingMode` (`recommend_only`, `pending_approval`, `automatic`) |
+| Qualification (UNA-014) | `App\Services\Matching\MatchQualification`, `App\Enums\Matching\QualificationReason` |
+| Mode application (UNA-014) | `App\Services\Matching\PodMatchingWorkflowService::evaluateAndApply()` → `PodMatchOutcome` (`App\Enums\Matching\MembershipAction`) |
+| Recalculation (UNA-014) | `App\Services\Matching\PodMatchRecalculationService` → `RecalculationSummary` |
+| User-to-POD matching (UNA-015) | `App\Services\Matching\DeterministicPodMatchingService` → `PodMatchingResult` |
 
 ## 2. Criteria
 
@@ -153,7 +167,8 @@ A criterion **passes** when `num = den`, which means full attainment.
   - Otherwise `eligible`.
 - The numeric score is **kept** when a match is disqualified. It is never forced to zero.
 - A mandatory criterion that is somehow not configured (legacy data) is shown with `mandatory = true` and `active = false`, and it never disqualifies.
-- Matching never writes `pod_users`, workspace or project memberships, histories or notifications, and it never invites or accepts anyone. `pods.matching_mode` is not read.
+- Scoring (`PodMatchScorer`, `PodMatchService`) never writes `pod_users`, workspace or project memberships, histories or notifications, and never reads `pods.matching_mode`. Membership actions belong to `PodMatchingWorkflowService` (§11).
+- **Optional vs mandatory:** a configured criterion that is not ticked as mandatory is optional. An optional weighted criterion only adds to or subtracts from the score; an optional compatibility check (work mode, engagement type) only explains. A mandatory criterion that fails disqualifies whatever the score. There is no second mandatory/optional structure: `mandatory_criteria` is the only list.
 
 ## 6. Persistence
 
@@ -191,7 +206,16 @@ It also returns the ordered `criteria` entries. Each entry has:
 - `explanation` (translated with `__()` from code and context)
 - `details` (the structured context, e.g. `details.missing` skills)
 
-`PodMatchResource` wraps the same data with ids, for JSON.
+UNA-014 adds the POD's current qualification to the match-level fields:
+- `threshold` (the POD's `minimum_match_threshold` now)
+- `qualified` (bool)
+- `qualification` (`{code, label}`, a `QualificationReason`)
+
+The threshold is read live from the POD, so a threshold change is visible immediately without
+re-scoring; the stored score never changes because of it.
+
+`PodMatchResource` wraps the same data with ids, for JSON. Eager-load `reasons` and
+`requirement.pod` for collections.
 
 ## 8. Worked example
 
@@ -244,7 +268,303 @@ This example is asserted number for number by
 
 - No recommendations or matching page, and no candidate search UI.
 - No selection of an employee's best requirement within a POD.
-- No automatic invitations, acceptances or `PodUser` state transitions, whatever `pods.matching_mode` says.
 - No queues, scheduled re-evaluation, AI/LLM calls, vector search, geocoding or external APIs.
 - No extra weighted categories: work mode and engagement type stay unweighted compatibility checks.
-- No caching or invalidation of stored matches when a profile or requirement changes. A later task decides when to call `PodMatchService::evaluate()`.
+- No re-evaluation when an employee profile changes (configuration changes are handled by UNA-014, §12).
+
+## 10. POD matching configuration and qualification (UNA-014)
+
+### 10.1 Configuration
+
+| Column | Values | Notes |
+|---|---|---|
+| `pods.matching_mode` | `recommend_only`, `pending_approval`, `automatic` (or null on a draft) | `pending_approval` and `automatic` rows from UNA-011 stay valid. A null mode acts like recommend only. |
+| `pods.minimum_match_threshold` | integer 0–100, not null | Existing PODs got `config('pod_matching.default_minimum_threshold')` (70) from the column default. |
+| `workspaces.default_minimum_match_threshold` | integer 0–100 or null | Company default for **new** PODs; null means the config default. |
+
+The POD setup "Matching" step edits both POD values. The form always sends `matching_present`, so the
+request requires an integer 0–100 there. `PodService::validThreshold()` rejects anything else
+(negative, above 100, fractions, booleans, null) for every other caller with a `ValidationException`.
+
+`PodConfigurationService`: the matching section is complete only with a mode **and** a threshold
+from 0 to 100. A published POD still cannot lose a complete section.
+
+### 10.2 Company defaults
+
+Company onboarding ("Matching" step) stores `workspaces.matching_mode` and
+`default_minimum_match_threshold`. `PodService::createDraft()` copies them into the new POD (unless
+the input sets them explicitly):
+
+| Company `matching_mode` | New POD `matching_mode` |
+|---|---|
+| `manual` | `recommend_only` |
+| `assisted` | `pending_approval` |
+| `automatic` | `automatic` |
+| none | none (the company must choose before publishing) |
+
+These are snapshots. Changing company defaults later never touches existing PODs, and
+`PodService::companyDefaults()` returns the values a new POD would get (`pod_matching_mode`,
+`minimum_match_threshold`).
+
+### 10.3 Qualification formula
+
+`MatchQualification::of($match)` is the only qualification rule:
+
+```
+qualified = match.status == eligible
+        AND score_hundredths >= threshold × 100
+        AND requirement.is_active
+        AND pod.status == published
+```
+
+- Equality qualifies: 70.00 with threshold 70 qualifies; 69.99 does not.
+- The score is compared in integer hundredths.
+- A disqualified match (failed mandatory criterion) or a `not_scorable` match is never qualified,
+  however high its score.
+- The reason is the first failing condition, in this order: `not_eligible`, `below_threshold`,
+  `requirement_inactive`, `pod_not_published`; otherwise `qualified`.
+
+## 11. Mode application and membership safety (UNA-014)
+
+`PodMatchingWorkflowService::evaluateAndApply($requirement, $candidate, $at = null)` is the single
+entry point for future workflows:
+
+1. `PodMatchService::evaluate()` scores and persists the match (employees with a profile only).
+2. `MatchQualification::of()` qualifies it with the POD's current threshold.
+3. If qualified and the mode acts on memberships, it applies the mode through
+   `PodStateTransitionService` with `actor = null` (a system action).
+4. It returns a `PodMatchOutcome`: the match, the qualification, a `MembershipAction`
+   (`none`, `created`, `advanced`, `unchanged`, `blocked`), the membership state afterwards and a
+   short reason.
+
+| Mode | Candidate without a membership | Applicant (`matched` / `pending_business_approval`) | Any other existing membership |
+|---|---|---|---|
+| `recommend_only` (or null) | nothing (`none`, reason `recommend_only`) | nothing | nothing |
+| `pending_approval` | enters `pending_business_approval` (`created`) | unchanged | unchanged |
+| `automatic` | enters `outer_circle` (`created`) if the profile is complete, else `blocked` / `profile_incomplete` | advances to `outer_circle` (`advanced`) if the profile is complete, else `blocked` | unchanged |
+
+Details:
+- New memberships use `PodStateTransitionService::start(..., allowReentry: false)`, and advances
+  use `apply(..., allowedFrom: applicants)`. Both run inside one `DB::transaction(..., 3)` that
+  first locks the candidate's `pod_users` row. The transition service writes the state, the
+  history row and the workspace access.
+- History reasons are `Matched by POD matching, awaiting approval` (pending) and
+  `Qualified automatically by POD matching` (automatic).
+- Notifications are the transition service's existing effects only, run through `AfterCommit`
+  after the membership transaction commits:
+  - a new pending applicant: the owner gets `pod_request`
+  - an applicant advanced to the Outer Circle: the owner and the member get the acceptance notifications
+  - a direct automatic placement (no previous membership): no notification, because the transition
+    service defines no effect for entering `outer_circle` from nothing. See the follow-ups.
+- Automatic placement gives Outer Circle access only: `users_index` + `news_index`, never
+  `projects_index`.
+
+Membership safety rules (all enforced by the code above):
+- Nothing writes `pod_users.state` directly or reads workspace permissions to decide a state.
+- Nobody is moved into the Inner Circle, demoted, suspended or removed by matching.
+- `rejected`, `removed` and `suspended` rows are never re-entered or resumed. Neither are Outer
+  Circle, screening, pending-inner or Inner Circle members.
+- A falling score, a raised threshold or a switch to recommend only never undoes a membership.
+- Draft PODs can store scores but never create or advance memberships (`pod_not_published`).
+- Repeated processing is idempotent: the second call finds the membership and returns `unchanged`.
+  Duplicates are prevented by the row lock, the `pod_users` unique index and
+  `findOrCreateMembership`.
+- Headcount is not enforced (no existing documented rule requires it).
+
+## 12. Recalculation (UNA-014)
+
+`PodService` detects matching-relevant changes inside its existing configuration transaction:
+`PodMatchRecalculationService::configurationSnapshot()` runs before and after the change, and
+`scheduleChanges()` compares the two. The snapshot holds the POD's mode, threshold and status, and
+a fingerprint per requirement made of:
+- role, minimum years, minimum proficiency, work mode, engagement type, location
+- active flag, start date, minimum hours, timezone, tolerance, project type, mandatory criteria
+- sorted skill ids
+
+| Change | Effect |
+|---|---|
+| POD mode or threshold | after commit: every persisted match of the POD is re-evaluated and re-applied |
+| A requirement's matching fingerprint | after commit: that requirement's persisted matches only |
+| A requirement made inactive | its `pod_matches` are deleted in the same transaction (no stale recommendation) |
+| A requirement deleted | its matches are removed by the FK cascade |
+| A new requirement | nothing: there are no persisted candidates yet |
+| Publication (`PodService::publish()`) | after commit: every persisted match of the POD is processed |
+| Title, description, image, POD skills, headcount, notes | nothing |
+| Company template edits | nothing: POD snapshots are independent |
+| Company default changes | nothing: existing PODs are not touched |
+
+- The re-evaluation is registered with `DB::afterCommit()`. It therefore runs only after the
+  configuration (and any enclosing transaction) commits, never after a rollback, and outside the
+  configuration transaction.
+- Scope is limited to candidates already in `pod_matches`; there is no candidate discovery.
+- Matches are processed with `chunkById(config('pod_matching.recalculation_chunk_size'))` and the
+  relations in `CHUNK_RELATIONS` eager-loaded. Each one goes through `evaluateAndApply()`.
+- A candidate who is no longer an employee, or whose requirement is inactive, is counted as
+  `skipped`. Any other exception is `report()`ed and counted as `failed`; the run continues.
+  Exception details never reach users.
+- `RecalculationSummary` counts `evaluated`, `qualified`, `created`, `advanced`, `unchanged`,
+  `skipped`, `failed` and `invalidated`. `lastSummary()` returns the latest run.
+
+## 13. Examples (UNA-014)
+
+The candidate below has a complete profile (role Engineer; PHP, Laravel and SQL).
+
+- **Eligible but below threshold:** the requirement is Engineer + PHP + Docker, so the score is
+  (12.50 + 15.00) / 40 = **68.75**, status eligible. With threshold 70 the result is
+  `qualified = false` (`below_threshold`) and nothing happens in any mode. With threshold 68 it is
+  qualified.
+- **Disqualified despite a high score:** Engineer + PHP + project type `hourly`, which is mandatory.
+  The score is (25 + 15 + 0) / 50 = **80.00**, but the status is disqualified. It is not qualified
+  even with threshold 0.
+- **Recommend only, qualified:** score 100 with threshold 70 gives `qualified = true` and
+  `membership action = none`. The match is just a stored recommendation.
+- **Pending approval, qualified:** the candidate has no membership, so a `pending_business_approval`
+  row is created with a history row (`actor_id = null`). The company owner gets the usual
+  `pod_request` notification after commit.
+- **Automatic, qualified:**
+  - With no membership, the candidate enters `outer_circle` with history reason `Qualified
+    automatically by POD matching` and gets active Outer Circle workspace access.
+  - An incomplete profile leaves them untouched (`blocked`).
+  - An existing applicant is advanced to `outer_circle`.
+- **Threshold change:** the 68.75 candidate in a pending-approval POD with threshold 70 has no
+  membership. The company lowers the threshold to 65; after the save commits, the POD's matches
+  are reprocessed and the candidate becomes `pending_business_approval`. Raising it to 100 later
+  re-evaluates the match (now not qualified) and leaves the pending membership as it is.
+
+## 14. Non-goals (UNA-014)
+
+- Candidate discovery across all employees (only already persisted matches are reprocessed).
+- Automatic removal, demotion or suspension.
+- Inner Circle placement.
+- Reopening rejected, removed or suspended memberships.
+- Headcount/staffing enforcement.
+- Re-evaluation on employee profile changes, queues or scheduled jobs.
+
+## 15. Deterministic user-to-POD matching (UNA-015)
+
+UNA-015 adds no new scorer, table or formula. The UNA-013 algorithm (`config('pod_matching.version')`
+= `una-013.1`) is the **first production matching version**. UNA-015 adds a POD-level facade over
+it:
+
+| Layer | Scope | Writes |
+|---|---|---|
+| `PodMatchScorer` | one employee vs one requirement, pure | nothing |
+| `PodMatchService` | one employee vs one requirement (`evaluate()`), or several results of one employee (`persistMany()`) | `pod_matches`, `pod_match_reasons` |
+| `DeterministicPodMatchingService` | one employee vs every active requirement of one POD | through `PodMatchService::persistMany()` only |
+| `PodMatchingWorkflowService` (UNA-014) | applies the POD mode to a qualified match | memberships, via `PodStateTransitionService` only |
+
+### 15.1 API
+
+```php
+public function match(Pod $pod, HasAccountType $candidate, ?DateTimeInterface $evaluatedAt = null): PodMatchingResult;
+public function matchMany(Pod $pod, iterable $candidates, ?DateTimeInterface $evaluatedAt = null): \Generator; // user id => PodMatchingResult
+```
+
+`match()`:
+1. **Validates the candidate** with `PodMatchService::assertCandidate()`. Only a `User` that passes
+   `isRegularUser()` and `isEmployee()` and has a saved profile is accepted. Companies,
+   administrators, clients and unclassified accounts throw `IneligibleCandidate::notEmployee()`; an
+   employee without a profile throws `IneligibleCandidate::withoutProfile()`.
+2. **Loads the candidate relations once** (`PodMatchScorer::CANDIDATE_RELATIONS`): skills (with
+   proficiency), and the profile's experiences, preferred roles and project types.
+3. **Loads the POD's active requirements once**, ordered by id, with `REQUIREMENT_RELATIONS`
+   (skills, job title). The given `$pod` is attached as their `pod` relation. Inactive requirements
+   are neither evaluated nor selected.
+4. **Fixes one evaluation time.** `$evaluatedAt`, or `now()` taken once at the service boundary, is
+   passed to the scorer for every requirement. No criterion reads the clock.
+5. **Scores every active requirement** with `PodMatchScorer::score()`.
+6. **Persists all results** with `PodMatchService::persistMany()`:
+   - one `DB::transaction(..., 3)`, so a run is all or nothing
+   - one upsert on the unique `(user_id, pod_worker_requirement_id)` pair
+   - one locked read
+   - one delete of the old reasons and one insert of the new reasons
+
+   The query count does not grow with the number of requirements or criteria.
+7. **Returns a `PodMatchingResult`.** Its persisted matches have their ordered reasons loaded, and it
+   names the best match.
+
+`matchMany()` loads the requirements once and uses one timestamp for an **explicit** list of
+candidates. For an Eloquent collection it eager-loads every candidate's relations in one go. It never
+looks for candidates itself, and an ineligible candidate throws, just like in `match()`.
+
+### 15.2 Result
+
+`PodMatchingResult` exposes:
+- `podId`, `userId`, `evaluatedAt`, `scoringVersion`
+- `matches`: every evaluated requirement match, keyed and ordered by requirement id
+- `best`, `bestRequirementId()`, `bestScore()`, `bestStatus()`
+- `bestFailedMandatory()`: criteria in declaration order
+- `bestMeetsThreshold()`: the best match is eligible and its score ≥ the POD threshold
+- `bestQualification` / `bestIsQualified()`: the full UNA-014 rule, which also requires an active
+  requirement and a published POD
+- `reason`
+
+When the POD has **no active requirement**, `matches` is empty, `best` is null, `bestStatus()` is
+`not_scorable` and `reason` is `no_active_requirements`. Nothing is written, because a match always
+belongs to a worker requirement.
+
+### 15.3 Best requirement
+
+`DeterministicPodMatchingService::rank()` gives each match the key
+`[status precedence, −score in hundredths, pod_worker_requirement_id]`, and the smallest key wins:
+
+1. Status: `eligible` (0) before `disqualified` (1) before `not_scorable` (2).
+2. Within a status, the higher score.
+3. On an exact tie, the lowest requirement id.
+
+A failed mandatory criterion therefore always loses to an eligible requirement, whatever the
+scores. The POD threshold does not take part in the selection and never changes a score or a
+status. It only decides `bestMeetsThreshold()` and `bestQualification`.
+
+Raw score, eligibility and qualification are three different things:
+- **score**: the weighted points.
+- **status**: eligible, disqualified or not scorable, decided by mandatory criteria and active
+  weight.
+- **qualification**: eligible + threshold + active requirement + published POD (UNA-014 §10.3).
+
+### 15.4 Repeatability and versioning
+
+For the same candidate data, requirement data, configuration, evaluation timestamp and
+`pod_matching.version`, the service returns the same scores, statuses, reasons and best
+requirement. There is no randomness, no free-text similarity, no embeddings and no external call.
+
+Every stored row carries `scoring_version` (unchanged by UNA-015: no formula changed) and the
+run's `evaluated_at`. Running again updates the same rows in place and replaces their reasons.
+Matches of other POD requirements or other users are never touched.
+
+`Pod::matches()`, `User::podMatches()` and `PodMatch::forPodAndUser($podId, $userId)` read the
+stored results.
+
+### 15.5 No membership changes
+
+The deterministic service never:
+- creates or changes a `pod_users` row or its state history
+- creates or activates a workspace membership, or grants permissions
+- sends a notification
+- calls `PodStateTransitionService`
+
+It never grants Outer or Inner Circle access. Acting on a result is the job of UNA-014's
+`PodMatchingWorkflowService`, e.g. `applyPersisted($result->best)`. That applies the POD mode to the
+stored match without re-scoring it, may place a qualified employee in the **Outer Circle only**, and
+keeps every UNA-014 safety rule (§11).
+
+### 15.6 Worked example (two requirements)
+
+POD in recommend-only mode, threshold 70. The candidate has a complete profile with role Engineer,
+PHP/Laravel/SQL at advanced, and project type long-term.
+
+| Requirement | Configuration | Score | Status |
+|---|---|---:|---|
+| #1 | Engineer, PHP, project type `hourly` (**mandatory**) | (25 + 15 + 0) / 50 = **80.00** | `disqualified` (project type) |
+| #2 | Engineer, PHP + Docker | (12.50 + 15.00) / 40 = **68.75** | `eligible` |
+
+- **Ranking:** #1 has the key `[1, −8000, 1]` and #2 has `[0, −6875, 2]`, so the best requirement is
+  **#2**.
+- **Best score and status:** `bestScore()` is 68.75 and `bestStatus()` is `eligible`.
+- **Mandatory failures:** `bestFailedMandatory()` is empty for #2. #1 keeps its 80.00 score and its
+  `project_type` reason with `mandatory = disqualifying = true`.
+- **Threshold:** 68.75 < 70, so `bestMeetsThreshold()` is false and `bestIsQualified()` is false.
+- **Stored rows:** both requirement rows are stored with nine reasons each, and no membership changes.
+
+This example is asserted by
+`tests/Feature/Matching/DeterministicPodMatchingTest::test_an_eligible_requirement_outranks_a_higher_scoring_disqualified_one`.

@@ -302,6 +302,8 @@ trait UsesInMemorySqlite
         // UNA-013: matching targets on both requirement tables, and the persisted match snapshots.
         (require database_path('migrations/2026_11_19_000000_add_matching_configuration_to_worker_requirements.php'))->up();
         (require database_path('migrations/2026_11_19_000100_create_pod_matches_tables.php'))->up();
+        // UNA-014: POD minimum match threshold and the company default.
+        (require database_path('migrations/2026_11_19_000200_add_matching_thresholds.php'))->up();
     }
 
     /**

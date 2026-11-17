@@ -45,6 +45,8 @@
     ] + $r->matchingAttributes())->all();
     $nextIndex = count($requirementRows) ? max(array_map('intval', array_keys($requirementRows))) + 1 : 0;
     $currentMatching = old('matching_mode', $enumValue($workspace->matching_mode));
+    $currentThreshold = old('default_minimum_match_threshold', $workspace->default_minimum_match_threshold);
+    $defaultThreshold = (int) config('pod_matching.default_minimum_threshold', 70);
 @endphp
 
 @section('page-title')
@@ -296,6 +298,21 @@
                             </div>
                             @error('matching_mode') <span class="invalid-feedback d-block" role="alert">{{ $message }}</span> @enderror
                         </fieldset>
+                        {{-- UNA-014: defaults copied into each new POD; never a live link. --}}
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-4">
+                                <label class="form-label" for="default_minimum_match_threshold">{{ __('Default minimum match score') }}</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control @error('default_minimum_match_threshold') is-invalid @enderror" id="default_minimum_match_threshold" name="default_minimum_match_threshold"
+                                        value="{{ $currentThreshold }}" min="0" max="100" step="1" inputmode="numeric" placeholder="{{ $defaultThreshold }}" aria-describedby="default-threshold-help">
+                                    <span class="input-group-text">/ 100</span>
+                                    @error('default_minimum_match_threshold') <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <p class="small text-muted mb-0" id="default-threshold-help">{{ __('The matching mode and minimum match score preselect every new POD (Manual starts as Recommend only, Assisted as pending approval, Automatic as automatic Outer Circle placement). Each POD keeps its own copy: changing these defaults never updates existing PODs. Left empty, new PODs use :default.', ['default' => $defaultThreshold]) }}</p>
+                            </div>
+                        </div>
                     </div>
                     @include('company.onboarding.panel_footer', ['key' => 'matching'])
                 </section>

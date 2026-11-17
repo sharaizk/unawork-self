@@ -6,39 +6,49 @@ use App\Enums\Company\MatchingMode;
 use App\Enums\Profile\HasOptions;
 
 /**
- * pods.matching_mode (UNA-011): how proposed matches for this POD are handled. Distinct from the
- * company-level preference (App\Enums\Company\MatchingMode), which only preselects it. No matching
- * engine exists yet; selecting automatic never changes a membership by itself.
+ * pods.matching_mode (UNA-011, extended UNA-014): what happens to a qualified match of a published
+ * POD. Applied only by App\Services\Matching\PodMatchingWorkflowService. The company preference
+ * (App\Enums\Company\MatchingMode) only preselects it for new PODs.
  */
 enum PodMatchingMode: string
 {
     use HasOptions;
 
-    case AUTOMATIC = 'automatic';
+    case RECOMMEND_ONLY = 'recommend_only';
     case PENDING_APPROVAL = 'pending_approval';
+    case AUTOMATIC = 'automatic';
 
     public function label(): string
     {
         return match ($this) {
-            self::AUTOMATIC => __('Automatic'),
-            self::PENDING_APPROVAL => __('Pending approval'),
+            self::RECOMMEND_ONLY => __('Recommend only'),
+            self::PENDING_APPROVAL => __('Match with pending approval'),
+            self::AUTOMATIC => __('Automatic Outer Circle placement'),
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::AUTOMATIC => __('Future matching workflows may start eligible matches automatically, according to this POD configuration.'),
-            self::PENDING_APPROVAL => __('Every proposed match needs your company approval.'),
+            self::RECOMMEND_ONLY => __('Qualified candidates are shown as recommendations. Nobody is added to the POD.'),
+            self::PENDING_APPROVAL => __('Qualified candidates are added as applicants awaiting your approval.'),
+            self::AUTOMATIC => __('Qualified candidates with a complete profile are placed directly in the Outer Circle.'),
         };
     }
 
-    /** Preselection from the company preference: automatic → automatic; manual/assisted → pending approval. */
+    /** Does this mode create or advance memberships for qualified matches? */
+    public function actsOnMemberships(): bool
+    {
+        return $this !== self::RECOMMEND_ONLY;
+    }
+
+    /** Preselection from the company preference: manual → recommend only, assisted → pending approval, automatic → automatic. */
     public static function fromCompanyPreference(?MatchingMode $preference): ?self
     {
         return match ($preference) {
+            MatchingMode::MANUAL => self::RECOMMEND_ONLY,
+            MatchingMode::ASSISTED => self::PENDING_APPROVAL,
             MatchingMode::AUTOMATIC => self::AUTOMATIC,
-            MatchingMode::MANUAL, MatchingMode::ASSISTED => self::PENDING_APPROVAL,
             null => null,
         };
     }

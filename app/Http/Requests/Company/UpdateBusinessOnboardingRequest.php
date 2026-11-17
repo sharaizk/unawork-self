@@ -87,6 +87,8 @@ class UpdateBusinessOnboardingRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:10000'],
 
             'matching_mode' => ['nullable', new Enum(MatchingMode::class)],
+            // UNA-014: default for new PODs only; empty falls back to config('pod_matching.default_minimum_threshold').
+            'default_minimum_match_threshold' => ['nullable', 'integer', 'between:0,100'],
             'default_pod_application_approval' => ['nullable', new Enum(ApprovalMode::class)],
             'default_inner_circle_approval' => ['nullable', new Enum(ApprovalMode::class)],
 
@@ -123,6 +125,7 @@ class UpdateBusinessOnboardingRequest extends FormRequest
             'facebook' => __('Facebook URL'),
             'description' => __('company description'),
             'matching_mode' => __('matching mode'),
+            'default_minimum_match_threshold' => __('default minimum match score'),
             'default_pod_application_approval' => __('POD application approval'),
             'default_inner_circle_approval' => __('Inner Circle approval'),
             'requirements.*.id' => __('worker requirement'),

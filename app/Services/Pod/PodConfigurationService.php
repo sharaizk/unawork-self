@@ -128,8 +128,11 @@ class PodConfigurationService
                 __('Add at least one active worker requirement with a role, headcount, skills, work mode and engagement type') => $pod->workerRequirements
                     ->contains(fn (PodWorkerRequirement $requirement) => $requirement->isComplete()),
             ]],
+            // UNA-014: a mode and a valid minimum match score (0-100).
             'matching' => [__('Matching mode'), [
-                __('Choose automatic or pending-approval matching') => $pod->matching_mode instanceof PodMatchingMode,
+                __('Choose a matching mode') => $pod->matching_mode instanceof PodMatchingMode,
+                __('Set a minimum match score from 0 to 100') => is_numeric($pod->minimum_match_threshold)
+                    && (int) $pod->minimum_match_threshold >= 0 && (int) $pod->minimum_match_threshold <= 100,
             ]],
         ];
 

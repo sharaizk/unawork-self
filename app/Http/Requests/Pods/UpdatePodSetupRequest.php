@@ -76,6 +76,9 @@ class UpdatePodSetupRequest extends FormRequest
             'skills.*' => ['integer', 'distinct', 'exists:skills,id'],
 
             'matching_mode' => ['nullable', new Enum(PodMatchingMode::class)],
+            // UNA-014: the setup form always sends matching_present, so the threshold cannot be blanked.
+            'matching_present' => ['nullable', 'boolean'],
+            'minimum_match_threshold' => ['nullable', 'required_if_accepted:matching_present', 'integer', 'between:0,100'],
 
             'import_template_ids' => ['nullable', 'array', 'max:' . (int) config('pod_onboarding.max_requirements', 20)],
             'import_template_ids.*' => ['integer', 'distinct', $template],
@@ -107,6 +110,7 @@ class UpdatePodSetupRequest extends FormRequest
             'image' => __('image'),
             'skills.*' => __('skill'),
             'matching_mode' => __('matching mode'),
+            'minimum_match_threshold' => __('minimum match score'),
             'import_template_ids.*' => __('worker requirement template'),
             'requirements.*.id' => __('worker requirement'),
             'requirements.*.source_workspace_requirement_id' => __('worker requirement template'),

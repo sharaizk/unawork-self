@@ -3,6 +3,7 @@
  *
  * - [data-pod-import]: copies a company worker-requirement template into a new POD requirement row
  *   (a snapshot: the row keeps the template id only as its origin; the server never live-links it).
+ * - [data-pod-automatic-warning]: shown while the automatic matching mode is selected (UNA-014).
  * - Publishing asks for confirmation (SweetAlert2 from layouts.admin when available).
  */
 (function () {
@@ -73,6 +74,14 @@
             importTemplate(JSON.parse(button.getAttribute('data-template') || '{}'));
         } catch (e) {
             // malformed data attribute: nothing to import
+        }
+    });
+
+    // UNA-014: show the automatic-placement warning only while automatic mode is selected.
+    var automaticWarning = form.querySelector('[data-pod-automatic-warning]');
+    form.addEventListener('change', function (event) {
+        if (automaticWarning && event.target.matches('[data-pod-matching-mode]')) {
+            automaticWarning.classList.toggle('d-none', event.target.value !== 'automatic');
         }
     });
 

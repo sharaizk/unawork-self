@@ -47,7 +47,7 @@ abstract class MatchingTestCase extends PodTestCase
     protected function requirement(array $attributes = [], array $skillIds = []): PodWorkerRequirement
     {
         $this->pod ??= $this->pods()->createDraft($this->company, ['title' => 'Platform Team']);
-        $requirement = new PodWorkerRequirement(['is_active' => true, 'headcount' => 1] + $attributes);
+        $requirement = new PodWorkerRequirement($attributes + ['is_active' => true, 'headcount' => 1]); // explicit attributes win
         $requirement->forceFill(['pod_id' => $this->pod->id])->save();
         $requirement->skills()->sync($skillIds);
 

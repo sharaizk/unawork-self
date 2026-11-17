@@ -1050,6 +1050,12 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
         return $this->belongsToMany(Skill::class, 'user_skills')->withPivot('proficiency')->withTimestamps();
     }
 
+    /** Persisted POD match snapshots of this employee, one per worker requirement (UNA-013/015). */
+    public function podMatches()
+    {
+        return $this->hasMany(PodMatch::class);
+    }
+
     /** Current POD memberships (every state except removed); the pivot carries `state`. */
     public function pods()
     {

@@ -7,7 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * JSON shape of a persisted POD match (UNA-013): ids plus PodMatchPresenter's translated, ordered
- * criterion entries. Load `reasons` before wrapping a collection to avoid N+1 queries.
+ * criterion entries, plus the UNA-014 threshold and qualification. Load `reasons` and
+ * `requirement.pod` before wrapping a collection to avoid N+1 queries.
  *
  * @mixin \App\Models\PodMatch
  */
