@@ -62,6 +62,11 @@ return [
         'strong_score' => 80, // display-only: "strong matches" summary metric
     ],
 
+    // UNA-018: business match-review queue.
+    'reviews' => [
+        'per_page' => 10,
+    ],
+
     // Upper bound for pod_worker_requirements.timezone_tolerance_hours.
     'max_timezone_tolerance_hours' => 14,
 

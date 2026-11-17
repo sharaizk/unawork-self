@@ -1,0 +1,541 @@
+/*
+ * Business match-review queue (UNA-018). Same calm visual language as the employee
+ * recommendations (UNA-017): warm surface, white rounded cards, navy type, restrained gold.
+ * Scoped to .pod-match-reviews; .mr-theme-dark mirrors the theme's dark stylesheet (which only
+ * defines its card colour inside .card). Logical properties keep RTL mirrored.
+ */
+.pod-match-reviews {
+    --mr-navy: #022d4d;
+    --mr-gold: #cfaa40;
+    --mr-gold-soft: rgba(207, 170, 64, 0.16);
+    --mr-ink: var(--mr-navy);
+    --mr-muted: #5f6b7a;
+    --mr-surface: #fbf7ef;
+    --mr-card: #fff;
+    --mr-border: rgba(2, 45, 77, 0.1);
+    --mr-success: #217a57;
+    --mr-success-soft: rgba(42, 157, 111, 0.13);
+    --mr-warning: #9a6416;
+    --mr-warning-soft: rgba(183, 121, 31, 0.14);
+    --mr-danger: #b4380a;
+    --mr-danger-soft: rgba(194, 65, 12, 0.1);
+    --mr-radius: 20px;
+    --mr-shadow: 0 1px 2px rgba(2, 45, 77, 0.04), 0 8px 24px rgba(2, 45, 77, 0.06);
+
+    color: var(--bs-body-color);
+}
+
+.pod-match-reviews[data-mr-root] {
+    background: var(--mr-surface);
+    border-radius: calc(var(--mr-radius) + 6px);
+    padding: clamp(16px, 3vw, 32px);
+}
+
+.pod-match-reviews.mr-theme-dark,
+.mr-theme-dark .pod-match-reviews {
+    --mr-ink: #e9eef4;
+    --mr-muted: #a9afbb;
+    --mr-surface: rgba(207, 170, 64, 0.06);
+    --mr-card: #292a33;
+    --mr-border: rgba(255, 255, 255, 0.09);
+    --mr-gold: #e0bf62;
+    --mr-success: #4cc795;
+    --mr-warning: #e2a94b;
+    --mr-danger: #f08a5d;
+    --mr-shadow: none;
+}
+
+/* ---------------------------------------------------------------- hero, metrics */
+
+.pod-match-reviews .mr-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px 24px;
+    margin-block-end: 22px;
+}
+
+.pod-match-reviews .mr-eyebrow {
+    margin: 0 0 4px;
+    color: var(--mr-gold);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.pod-match-reviews .mr-hero__title {
+    margin: 0;
+    color: var(--mr-ink);
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    font-weight: 700;
+}
+
+.pod-match-reviews .mr-hero__lead {
+    margin: 6px 0 10px;
+    color: var(--mr-muted);
+    max-inline-size: 70ch;
+}
+
+.pod-match-reviews .mr-config {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pod-match-reviews .mr-config li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--mr-gold-soft);
+    color: var(--mr-ink);
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.pod-match-reviews .mr-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-block-end: 22px;
+}
+
+.pod-match-reviews .mr-metric {
+    display: flex;
+    flex-direction: column;
+    background: var(--mr-card);
+    border: 1px solid var(--mr-border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: var(--mr-shadow);
+}
+
+.pod-match-reviews .mr-metric__value {
+    color: var(--mr-ink);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.pod-match-reviews .mr-metric__label {
+    color: var(--mr-muted);
+    font-size: 0.82rem;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.pod-match-reviews .btn {
+    border-radius: 999px;
+    min-block-size: 40px;
+    padding-inline: 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pod-match-reviews .mr-btn-primary {
+    background: var(--mr-navy);
+    border: 1px solid var(--mr-navy);
+    color: #fff;
+}
+
+.pod-match-reviews .mr-btn-primary:hover,
+.pod-match-reviews .mr-btn-primary:focus-visible {
+    background: #0c3a63;
+    color: #fff;
+}
+
+.mr-theme-dark .mr-btn-primary,
+.pod-match-reviews.mr-theme-dark .mr-btn-primary {
+    background: var(--mr-gold);
+    border-color: var(--mr-gold);
+    color: #1b1d24;
+}
+
+.pod-match-reviews .mr-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--mr-border);
+    color: var(--mr-ink);
+}
+
+.pod-match-reviews .mr-btn-ghost:hover,
+.pod-match-reviews .mr-btn-ghost:focus-visible {
+    border-color: var(--mr-ink);
+}
+
+.pod-match-reviews .mr-btn-danger {
+    background: transparent;
+    border: 1px solid var(--mr-danger-soft);
+    color: var(--mr-danger);
+}
+
+.pod-match-reviews .mr-btn-danger:hover,
+.pod-match-reviews .mr-btn-danger:focus-visible,
+.pod-match-reviews .mr-btn-danger-solid {
+    background: var(--mr-danger);
+    border-color: var(--mr-danger);
+    color: #fff;
+}
+
+.pod-match-reviews .mr-btn-link {
+    background: transparent;
+    border: 0;
+    color: var(--mr-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.pod-match-reviews .btn:focus-visible,
+.pod-match-reviews a:focus-visible,
+.pod-match-reviews .mr-why-toggle:focus-visible,
+.pod-match-reviews [tabindex="-1"]:focus-visible {
+    outline: 3px solid var(--mr-gold);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.pod-match-reviews .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.pod-match-reviews .mr-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.pod-match-reviews .mr-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-inline-size: 0;
+    background: var(--mr-card);
+    border: 1px solid var(--mr-border);
+    border-radius: var(--mr-radius);
+    padding: 20px;
+    box-shadow: var(--mr-shadow);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.pod-match-reviews .mr-card.is-leaving {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+.pod-match-reviews .mr-card__head {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+}
+
+.pod-match-reviews .mr-avatar {
+    inline-size: 52px;
+    block-size: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: var(--mr-gold-soft);
+    color: var(--mr-ink);
+    font-weight: 700;
+}
+
+.pod-match-reviews .mr-avatar img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+.pod-match-reviews .mr-card__name {
+    margin: 0;
+    color: var(--mr-ink);
+    font-size: 1.08rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.pod-match-reviews .mr-card__headline {
+    margin: 2px 0 0;
+    color: var(--mr-ink);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.pod-match-reviews .mr-facts {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    color: var(--mr-muted);
+    font-size: 0.82rem;
+}
+
+.pod-match-reviews .mr-score {
+    min-inline-size: 76px;
+    text-align: end;
+}
+
+.pod-match-reviews .mr-score__value {
+    display: block;
+    color: var(--mr-ink);
+    font-size: 1.7rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.pod-match-reviews .mr-score__value small {
+    font-size: 0.9rem;
+}
+
+.pod-match-reviews .mr-score__label {
+    display: block;
+    color: var(--mr-muted);
+    font-size: 0.74rem;
+    margin-block-start: 2px;
+}
+
+.pod-match-reviews .mr-status {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.pod-match-reviews .mr-status--ok {
+    background: var(--mr-success-soft);
+    color: var(--mr-success);
+}
+
+.pod-match-reviews .mr-status--stale {
+    background: var(--mr-warning-soft);
+    color: var(--mr-warning);
+}
+
+.pod-match-reviews .mr-card__role,
+.pod-match-reviews .mr-card__time {
+    margin: 0;
+    color: var(--mr-muted);
+    font-size: 0.84rem;
+}
+
+.pod-match-reviews .mr-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pod-match-reviews .mr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--mr-success-soft);
+    color: var(--mr-success);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.pod-match-reviews .mr-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* why this match */
+.pod-match-reviews .mr-why-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    inline-size: 100%;
+    background: transparent;
+    border: 0;
+    border-block-start: 1px solid var(--mr-border);
+    padding: 12px 0 0;
+    color: var(--mr-ink);
+    font-weight: 600;
+    text-align: start;
+}
+
+.pod-match-reviews .mr-why-toggle i {
+    transition: transform 0.2s ease;
+}
+
+.pod-match-reviews .mr-why-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.pod-match-reviews .mr-why__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.pod-match-reviews .mr-why__item {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--mr-surface);
+    border-inline-start: 3px solid var(--mr-border);
+}
+
+.pod-match-reviews .mr-why__item--met { border-inline-start-color: var(--mr-success); }
+.pod-match-reviews .mr-why__item--partial { border-inline-start-color: var(--mr-warning); }
+.pod-match-reviews .mr-why__item--missed { border-inline-start-color: var(--mr-danger); }
+
+.pod-match-reviews .mr-why__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 10px;
+}
+
+.pod-match-reviews .mr-why__label {
+    color: var(--mr-ink);
+    font-weight: 600;
+}
+
+.pod-match-reviews .mr-why__badges {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.pod-match-reviews .mr-why__points,
+.pod-match-reviews .mr-why__meta {
+    color: var(--mr-muted);
+    font-size: 0.78rem;
+}
+
+.pod-match-reviews .mr-why__text {
+    margin: 4px 0 0;
+    font-size: 0.86rem;
+}
+
+.pod-match-reviews .mr-why__meta {
+    margin: 12px 0 0;
+}
+
+.pod-match-reviews .mr-badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.pod-match-reviews .mr-badge--met { background: var(--mr-success-soft); color: var(--mr-success); }
+.pod-match-reviews .mr-badge--partial { background: var(--mr-warning-soft); color: var(--mr-warning); }
+.pod-match-reviews .mr-badge--missed { background: var(--mr-danger-soft); color: var(--mr-danger); }
+.pod-match-reviews .mr-badge--mandatory { background: var(--mr-gold-soft); color: var(--mr-ink); }
+
+/* ---------------------------------------------------------------- empty, dialog, pagination */
+
+.pod-match-reviews .mr-empty {
+    text-align: center;
+    background: var(--mr-card);
+    border: 1px dashed var(--mr-border);
+    border-radius: var(--mr-radius);
+    padding: clamp(28px, 5vw, 48px) 20px;
+}
+
+.pod-match-reviews .mr-empty[hidden] { display: none; }
+
+.pod-match-reviews .mr-empty__icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 64px;
+    block-size: 64px;
+    border-radius: 50%;
+    background: var(--mr-success-soft);
+    color: var(--mr-success);
+    font-size: 1.8rem;
+    margin-block-end: 12px;
+}
+
+.pod-match-reviews .mr-empty__title {
+    color: var(--mr-ink);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.pod-match-reviews .mr-empty__text {
+    color: var(--mr-muted);
+    max-inline-size: 52ch;
+    margin: 8px auto 18px;
+}
+
+.pod-match-reviews.mr-dialog {
+    background: var(--mr-card);
+    color: var(--bs-body-color);
+    border-radius: var(--mr-radius);
+}
+
+.pod-match-reviews.mr-dialog .modal-title {
+    color: var(--mr-ink);
+    font-weight: 700;
+}
+
+.pod-match-reviews .mr-pagination {
+    margin-block-start: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 575.98px) {
+    .pod-match-reviews .mr-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .pod-match-reviews .mr-card__head {
+        grid-template-columns: 44px minmax(0, 1fr);
+    }
+
+    .pod-match-reviews .mr-avatar {
+        inline-size: 44px;
+        block-size: 44px;
+    }
+
+    .pod-match-reviews .mr-score {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        text-align: start;
+    }
+
+    .pod-match-reviews .mr-actions .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pod-match-reviews .mr-card,
+    .pod-match-reviews .mr-why-toggle i {
+        transition: none;
+    }
+}

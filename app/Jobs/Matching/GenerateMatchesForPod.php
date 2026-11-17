@@ -47,6 +47,9 @@ class GenerateMatchesForPod implements ShouldQueue, ShouldBeUniqueUntilProcessin
         $dispatched = 0;
         User::query()->employees()
             ->whereHas('profile')
+            // UNA-018: employees excluded from this POD's matching are never discovered.
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('pod_matching_exclusions as pme')
+                ->whereColumn('pme.user_id', 'users.id')->where('pme.pod_id', $this->podId))
             ->with(array_merge(['roles'], ProfileCompletionService::RELATIONS))
             ->chunkById($this->chunkSize(), function ($users) use ($completion, &$dispatched) {
                 foreach ($users as $user) {

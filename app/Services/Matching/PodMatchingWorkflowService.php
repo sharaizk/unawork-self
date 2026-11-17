@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\DB;
  *        recommend_only   → nothing
  *        pending_approval → a candidate without any membership enters pending_business_approval
  *        automatic        → a candidate without any membership enters outer_circle (profile gate),
+ *   (UNA-018: a pending_approval proposal gets its pod_match_reviews row in the same transaction;
+ *    an excluded employee/POD pair is never placed),
  *                           an applicant (matched / pending_business_approval) advances to outer_circle
  *
  * Forward-only: an existing membership in any other state (rejected, removed, suspended, Outer or
@@ -47,6 +49,7 @@ class PodMatchingWorkflowService
         private PodStateTransitionService $transitions,
         private AfterCommit $afterCommit,
         private ProfileCompletionService $completion,
+        private PodMatchingExclusionService $exclusions,
     ) {
     }
 
@@ -98,8 +101,13 @@ class PodMatchingWorkflowService
         $target = $mode === PodMatchingMode::AUTOMATIC ? State::OUTER_CIRCLE : State::PENDING_BUSINESS_APPROVAL;
 
         try {
-            [$action, $result] = DB::transaction(function () use ($pod, $candidate, $mode, $target) {
+            [$action, $result] = DB::transaction(function () use ($pod, $candidate, $mode, $target, $match) {
                 $existing = PodUser::query()->where('pod_id', $pod->id)->where('user_id', $candidate->id)->lockForUpdate()->first();
+
+                // UNA-018: last line of defence; an excluded pair is never placed, whatever called us.
+                if ($this->exclusions->isExcluded($pod, $candidate)) {
+                    return [MembershipAction::NONE, MembershipResult::unchanged($existing, 'excluded')];
+                }
                 $wouldPlace = $existing === null || ($mode === PodMatchingMode::AUTOMATIC && in_array($existing->state, State::applicants(), true));
 
                 // Automatic placement obeys the profile minimum (the transition service checks it
@@ -112,7 +120,13 @@ class PodMatchingWorkflowService
                     // No re-entry: a concurrently created rejected/removed row is left alone.
                     $reason = $target === State::OUTER_CIRCLE ? self::AUTOMATIC_REASON : self::PENDING_REASON;
 
-                    return [MembershipAction::CREATED, $this->transitions->start($pod, $candidate, $target, null, $reason, [], false)];
+                    $started = $this->transitions->start($pod, $candidate, $target, null, $reason, [], false);
+                    if ($started->applied && $target === State::PENDING_BUSINESS_APPROVAL) {
+                        // UNA-018: explicit provenance, created with the membership (same transaction).
+                        $this->recordReview((int) $started->membership->id, (int) $match->id);
+                    }
+
+                    return [MembershipAction::CREATED, $started];
                 }
                 if ($mode === PodMatchingMode::AUTOMATIC && in_array($existing->state, State::applicants(), true)) {
                     return [MembershipAction::ADVANCED, $this->transitions->apply($existing, State::OUTER_CIRCLE, null, self::AUTOMATIC_REASON, State::applicants())];
@@ -129,10 +143,22 @@ class PodMatchingWorkflowService
         return new PodMatchOutcome(
             $match,
             $qualification,
-            $result->applied || $action === MembershipAction::BLOCKED ? $action : MembershipAction::UNCHANGED,
+            $result->applied || in_array($action, [MembershipAction::BLOCKED, MembershipAction::NONE], true) ? $action : MembershipAction::UNCHANGED,
             $this->currentState($pod, $candidate),
             $result->applied ? null : $result->reason,
         );
+    }
+
+    /** One review per membership (unique pod_user_id): a retry or race never duplicates it. */
+    private function recordReview(int $podUserId, int $matchId): void
+    {
+        $now = now();
+        DB::table('pod_match_reviews')->insertOrIgnore([
+            'pod_user_id' => $podUserId,
+            'source_pod_match_id' => $matchId,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
     }
 
     private function currentState(Pod $pod, User $candidate): ?State

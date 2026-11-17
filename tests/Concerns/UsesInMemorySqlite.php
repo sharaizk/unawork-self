@@ -308,6 +308,9 @@ trait UsesInMemorySqlite
         (require database_path('migrations/2026_11_19_000300_add_algorithm_to_pod_matches.php'))->up();
         // UNA-017: recommendation dismissals.
         (require database_path('migrations/2026_11_19_000400_create_pod_recommendation_dismissals_table.php'))->up();
+        // UNA-018: match-review provenance and matching exclusions.
+        (require database_path('migrations/2026_11_19_000500_create_pod_match_reviews_table.php'))->up();
+        (require database_path('migrations/2026_11_19_000600_create_pod_matching_exclusions_table.php'))->up();
     }
 
     /**

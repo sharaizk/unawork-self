@@ -26,7 +26,7 @@ use Illuminate\Support\Collection;
  *    until regenerated),
  *  - is qualified by MatchQualification::of() (eligible, score >= the POD's current threshold,
  *    active requirement, published POD),
- *  - belongs to a POD the employee has not dismissed,
+ *  - belongs to a POD the employee has not dismissed and that has not excluded them from matching (UNA-018),
  *  - belongs to a POD where the employee has no membership, or only an open applicant one
  *    (matched / pending_business_approval, shown as a status instead of "Apply"); active,
  *    suspended, rejected and removed memberships are left to manual discovery.
@@ -84,6 +84,9 @@ class PodRecommendationService
             ->whereHas('requirement', fn ($q) => $q->where('is_active', true))
             ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('pod_recommendation_dismissals as prd')
                 ->whereColumn('prd.pod_id', 'pod_matches.pod_id')->where('prd.user_id', $employee->id))
+            // UNA-018: a POD that excluded the employee from matching is not recommended.
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('pod_matching_exclusions as pme')
+                ->whereColumn('pme.pod_id', 'pod_matches.pod_id')->where('pme.user_id', $employee->id))
             ->with(['requirement', 'pod'])
             ->get();
 
@@ -159,21 +162,12 @@ class PodRecommendationService
             pod: $match->pod,
             match: $match,
             presented: $presented,
-            highlights: $this->highlights($presented['criteria']),
+            highlights: $this->presenter->topHighlights($presented['criteria']),
             details: $this->details($requirement),
             companyName: $creator?->workspacesOwner->first(fn ($w) => trim((string) $w->company) !== '')?->company ?? $creator?->name,
             roleTitle: $requirement->jobTitle?->title,
             membershipState: $state,
         );
-    }
-
-    /** Up to three passed criteria with a highlight: weighted ones by awarded points, then compatibility checks. */
-    private function highlights(array $criteria): array
-    {
-        return collect($criteria)
-            ->filter(fn (array $c) => $c['active'] && $c['passed'] && $c['highlight'] !== null)
-            ->sort(fn (array $a, array $b) => [!$a['weighted'], -(float) $a['awarded_points'], $a['position']] <=> [!$b['weighted'], -(float) $b['awarded_points'], $b['position']])
-            ->take(3)->values()->all();
     }
 
     /** @return array<string, string> configured requirement metadata, translated */

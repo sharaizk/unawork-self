@@ -144,6 +144,8 @@ class PodStateTransitionService
 
         $this->syncAccess($locked, $from, $target);
         $this->record($locked, $from, $target, $actor, $reason);
+        // UNA-018: a matching proposal's review is resolved in the same transaction, whatever the write path.
+        app(\App\Services\Matching\PodMatchReviewResolver::class)->onTransition($locked, $from, $target, $actor, $reason);
 
         return MembershipResult::applied($locked, $target->value, $this->effects($locked, $from, $target));
     }

@@ -1,4 +1,4 @@
-# POD matching: scoring (UNA-013), configuration (UNA-014), user-to-POD matching (UNA-015), queued generation (UNA-016) and recommendations (UNA-017)
+# POD matching: scoring (UNA-013), configuration (UNA-014), user-to-POD matching (UNA-015), queued generation (UNA-016), recommendations (UNA-017) and business review (UNA-018)
 
 This document describes the code as implemented. The only scoring code is
 `App\Services\Matching\PodMatchScorer`. Configuration lives in `config/pod_matching.php`.
@@ -36,6 +36,7 @@ There are three separate layers:
 | Change detection (UNA-014/016) | `App\Services\Matching\PodMatchRecalculationService` (POD), `EmployeeMatchingFingerprint` (employee) |
 | Queued generation (UNA-016) | `App\Jobs\Matching\GenerateMatchesForEmployee`, `GenerateMatchesForPod`, `GenerateEmployeePodMatch`; `MatchGenerationDispatcher` |
 | Algorithm contract (UNA-016) | `App\Contracts\PodMatchingAlgorithm`, `PodMatchingAlgorithmResolver` |
+| Business match review (UNA-018) | `PodMatchReview` (`pod_match_reviews`), `PodMatchingExclusion` (`pod_matching_exclusions`), `PodMatchReviewService`, `PodMatchReviewDecisionService`, `PodMatchingExclusionService`, `PodMatchReviewResolver`, `PodMatchReviewController`, `resources/views/pod/match_reviews/*` |
 | Employee recommendations (UNA-017) | `PodRecommendationService` → `PodRecommendation`; `PodRecommendationDismissalService`; `PodRecommendationController`; `resources/views/pod/recommendations/*` |
 | User-to-POD matching (UNA-015) | `App\Services\Matching\DeterministicPodMatchingService` → `PodMatchingResult` |
 
@@ -859,3 +860,166 @@ Behaviour:
 
 `pods.list`, `landing.find-work` and the POD search are unchanged and need no matching.
 "Browse all PODs" is always visible: in the hero and in both empty states.
+
+## 18. Business match-review queue (UNA-018)
+
+### 18.1 Manual applications vs match proposals
+
+`pending_business_approval` holds two different things:
+- **Manual applications.** `PodUserService::requestJoinPod()` creates them, and they stay in the
+  existing join-request listing and moderation API.
+- **Match proposals.** `PodMatchingWorkflowService` creates them for a POD in `pending_approval`
+  mode, and only they go to the review queue.
+
+Origin is never inferred from the state, from a `PodMatch` or from a history reason. It is an
+explicit row in `pod_match_reviews`:
+
+| Column | Meaning |
+|---|---|
+| `pod_user_id` | the proposal's membership; unique; cascades with the membership |
+| `source_pod_match_id` | the match the proposal was made from; `nullOnDelete`, so regenerating matches keeps provenance |
+| `resolved_at`, `decision` (`MatchReviewDecision`: approved / rejected / excluded / automatically_advanced / otherwise_resolved), `decided_by` (`nullOnDelete`), `decision_reason` | review metadata |
+
+`pod_users.state` stays the authoritative workflow state, and `pod_user_state_histories` stays the
+authoritative decision record.
+
+**Creation.** When `pending_approval` mode creates a new pending membership, the workflow inserts
+the review in the **same transaction** with `insertOrIgnore` on the unique `pod_user_id`. Retries
+and races create one row; a failure rolls back both.
+
+No review is created for:
+- manual applications
+- recommend-only or automatic mode
+- unqualified matches
+- existing memberships
+- excluded pairs
+
+**Backfill.** Migration `2026_11_19_000500` creates a review (with a null source) only for
+memberships that are pending now **and** whose history shows the exact UNA-014 workflow reason. Runtime
+code never reads that string.
+
+### 18.2 Keeping reviews consistent
+
+`PodStateTransitionService::apply()` calls `PodMatchReviewResolver::onTransition()` in its own
+transaction whenever a membership leaves `pending_business_approval`. Every write path therefore
+resolves an open review together with the transition:
+
+| Write path | Review decision |
+|---|---|
+| The review queue | `PodMatchReviewDecisionService` records `approved`, `rejected` or `excluded` itself; the hook then has nothing left to resolve |
+| Generic moderation API, accept | `approved` (actor recorded) |
+| Generic moderation API, decline | `rejected` (actor recorded); its required reason is unchanged |
+| Web accept / decline | `approved` / `rejected` |
+| Automatic mode advancing the proposal | `automatically_advanced` (actor null) |
+| Removal | `otherwise_resolved` |
+
+A resolved review stays resolved. A later manual re-entry of the same row is a manual application
+and never reappears in the queue.
+
+### 18.3 Queue (`PodMatchReviewService`)
+
+`GET /account/pods/{pod}/match-reviews` (`pods.match-reviews.index`) runs behind `auth`, `verified`
+and `XSS`, and `PodPolicy::viewMatchReviews` (owner or a member with `users_edit`, the same as
+`manageMembers`).
+
+Another company, a permissionless member, an employee or an administrator gets 403; a client is
+redirected.
+
+A review is listed when:
+- it is unresolved,
+- its membership belongs to this POD and is still pending,
+- the membership is not the owner's,
+- the employee still exists.
+
+Each card shows:
+- **Profile:** the employee's avatar or initials, name, primary role, years of experience,
+  city/country and availability. Never their address, phone, postal code, e-mail or links.
+- **Current match:** the employee's **current** best match for the POD (active algorithm/version,
+  active requirement, `DeterministicPodMatchingService::rank()`) with its qualification.
+- **Explanation:** top reason chips and the full `PodMatchPresenter` explanation, with algorithm,
+  version, generation time and current minimum.
+
+When the current match no longer qualifies, or none remains, the card stays but approval is
+disabled with a clear message:
+- below the minimum,
+- a required criterion not met or the POD not open,
+- details unavailable.
+
+Reject and exclude remain available. The source match is kept only for provenance.
+
+Ranking:
+1. qualified first,
+2. then score, descending,
+3. then review creation, ascending,
+4. then review id, ascending.
+
+Pagination is per review (`config('pod_matching.reviews.per_page')`, 10). The query count does not
+depend on the page size.
+
+The page metrics (pending, highest current score, ready to approve, no longer qualified) are
+computed in the controller and service. The POD management nav, the member-management screen and
+the company POD list each link to the queue with `@can('viewMatchReviews')`. No counts are queried
+in shared layouts.
+
+### 18.4 Decisions (`PodMatchReviewDecisionService`)
+
+`POST /account/pods/{pod}/match-reviews/{review}/decision` (`pods.match-reviews.decision`) is
+validated by `DecideMatchReviewRequest`:
+- `action` must be `approve`, `reject` or `exclude` (`MatchReviewAction`).
+- `reason` is optional and at most 1000 characters.
+- Any other input (user, POD, state, score) is ignored.
+- A review of another POD gives 404, and an unauthorized user gets 403.
+
+Each decision is one `DB::transaction(..., 3)` that:
+1. locks the review and the membership,
+2. checks they belong to the POD, the review is unresolved and the membership is still pending
+   (otherwise **409**),
+3. records the review decision,
+4. applies the transition through `PodStateTransitionService::apply()`, restricted to pending.
+
+That transition writes exactly one history row with the business user as actor. Notifications
+run after commit.
+
+| Action | Checks | Transition | History reason |
+|---|---|---|---|
+| approve | not excluded, current best match still qualified (**422** otherwise; profile gate 422 too) | pending → `outer_circle` (Outer Circle access only, never Inner Circle) | `Match approved by business` |
+| reject | — | pending → `rejected` | the business reason, or `Match rejected by business` |
+| exclude | — | create the exclusion idempotently, then pending → `rejected` | `Excluded from future POD matching` (+ `: <reason>`) |
+
+Exclusion and rejection commit together or not at all.
+
+### 18.5 Exclusions (`pod_matching_exclusions`, `PodMatchingExclusionService`)
+
+The table has one row per `(pod_id, user_id)`, with `excluded_by` (`nullOnDelete`) and an optional
+`reason`. It cascades when the POD or the user is deleted. Repeated exclusion keeps the first row.
+
+Enforcement layers:
+1. `GenerateEmployeePodMatch` skips the pair before running the algorithm (`skipped_excluded`).
+2. `GenerateMatchesForPod` leaves excluded employees out of the discovery query.
+3. `GenerateMatchesForEmployee` leaves PODs that excluded the employee out of discovery.
+4. `PodMatchingWorkflowService` re-checks inside its membership transaction and never creates or
+   advances a membership for an excluded pair (`none`, reason `excluded`), whoever calls it.
+5. `PodRecommendationService` never recommends the POD to the employee.
+6. Approval refuses an excluded pair, and an excluded review is resolved.
+
+An exclusion is **not** a POD ban:
+- It never removes or demotes an existing member.
+- It deletes no match, reason or history.
+- It keeps the POD in manual discovery.
+- The employee can still apply manually under the existing `requestToJoin` policy.
+
+Other PODs still match the employee, and other employees still match the POD.
+
+### 18.6 Sequences
+
+**Approval**
+
+    qualified match → pending_business_approval + pod_match_reviews row (one transaction)
+    → business approves → re-validated qualification, pending → outer_circle
+    → history row (actor = business user, "Match approved by business"), review = approved
+
+**Exclusion**
+
+    qualified match → pending review → business excludes
+    → exclusion record + pending → rejected (history "Excluded from future POD matching…") + review = excluded, atomically
+    → future automated matching skips this employee/POD pair

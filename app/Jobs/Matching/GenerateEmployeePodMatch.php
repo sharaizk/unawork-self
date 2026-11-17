@@ -63,6 +63,11 @@ class GenerateEmployeePodMatch implements ShouldQueue, ShouldBeUniqueUntilProces
             return 'invalidated_incomplete_profile';
         }
 
+        // UNA-018: an excluded pair is not generated (the workflow refuses it again under its lock).
+        if (app(\App\Services\Matching\PodMatchingExclusionService::class)->isExcluded($pod, $user)) {
+            return 'skipped_excluded';
+        }
+
         $result = $algorithm->match($pod, $user, $this->generatedAt());
         if ($result->stale) {
             return 'stale';

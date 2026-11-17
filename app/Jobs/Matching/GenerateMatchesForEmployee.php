@@ -50,6 +50,9 @@ class GenerateMatchesForEmployee implements ShouldQueue, ShouldBeUniqueUntilProc
         $dispatched = 0;
         Pod::published()
             ->whereHas('workerRequirements', fn ($q) => $q->where('is_active', true))
+            // UNA-018: PODs that excluded this employee from matching are skipped.
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('pod_matching_exclusions as pme')
+                ->whereColumn('pme.pod_id', 'pods.id')->where('pme.user_id', $this->userId))
             ->select('pods.id')
             ->chunkById($this->chunkSize(), function ($pods) use (&$dispatched) {
                 foreach ($pods as $pod) {

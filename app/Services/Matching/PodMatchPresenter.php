@@ -136,6 +136,20 @@ class PodMatchPresenter
         };
     }
 
+    /**
+     * Up to $limit passed criteria with a highlight, strongest first: weighted ones by awarded
+     * points, then compatibility checks, then criterion order (UNA-017/018 reason chips).
+     *
+     * @param array<int, array<string, mixed>> $criteria present()['criteria']
+     */
+    public function topHighlights(array $criteria, int $limit = 3): array
+    {
+        return collect($criteria)
+            ->filter(fn (array $c) => $c['active'] && $c['passed'] && $c['highlight'] !== null)
+            ->sort(fn (array $a, array $b) => [!$a['weighted'], -(float) $a['awarded_points'], $a['position']] <=> [!$b['weighted'], -(float) $b['awarded_points'], $b['position']])
+            ->take($limit)->values()->all();
+    }
+
     /** Short, supportive phrase for a passed criterion (UNA-017 recommendation chips). */
     public function highlight(Code $code): ?string
     {
