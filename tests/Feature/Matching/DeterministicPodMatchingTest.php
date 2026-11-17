@@ -50,7 +50,7 @@ class DeterministicPodMatchingTest extends WorkflowTestCase
             'status' => $match->status->value,
             'active_weight' => $match->active_weight,
             'version' => $match->scoring_version,
-            'evaluated_at' => $match->evaluated_at->format('Y-m-d H:i:s'),
+            'evaluated_at' => $match->evaluated_at->utc()->format('Y-m-d H:i:s'),
             'reasons' => $match->reasons->map(fn (PodMatchReason $r) => [
                 $r->criterion->value, $r->position, $r->active, $r->possible_points, (string) $r->awarded_points,
                 $r->passed, $r->mandatory, $r->disqualifying, $r->code->value, $r->context,
@@ -175,7 +175,7 @@ class DeterministicPodMatchingTest extends WorkflowTestCase
         $this->assertSame($ids, PodMatch::orderBy('id')->pluck('id')->all(), 'same rows, no duplicates');
         $this->assertSame([3, 27], [PodMatch::count(), PodMatchReason::count()], 'stale reasons replaced');
         $this->assertSame([config('pod_matching.version')], PodMatch::distinct()->pluck('scoring_version')->all());
-        $this->assertSame([self::AT], PodMatch::get()->map(fn ($m) => $m->evaluated_at->format('Y-m-d H:i:s'))->unique()->values()->all(), 'one timestamp for the whole run');
+        $this->assertSame([self::AT], PodMatch::get()->map(fn ($m) => $m->evaluated_at->utc()->format('Y-m-d H:i:s'))->unique()->values()->all(), 'one timestamp for the whole run');
     }
 
     public function test_time_sensitive_criteria_use_the_supplied_timestamp(): void
@@ -192,7 +192,7 @@ class DeterministicPodMatchingTest extends WorkflowTestCase
 
         $late = $this->match($candidate, null, CarbonImmutable::parse('2026-06-20 12:00:00', 'UTC'))->matches[$requirement->id];
         $this->assertSame([370, '2026-07-04', false], [$context($late, 'experience')['relevant_days'], $context($late, 'availability')['available_on'], $context($late, 'availability')['start_met']]);
-        $this->assertSame('2026-06-20 12:00:00', $late->evaluated_at->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-20 12:00:00', $late->evaluated_at->utc()->format('Y-m-d H:i:s'));
     }
 
     public function test_changing_structured_data_changes_only_the_affected_components(): void
@@ -283,7 +283,7 @@ class DeterministicPodMatchingTest extends WorkflowTestCase
         $this->match($candidate);
 
         $this->assertSame(1, PodMatch::where('pod_id', $other->id)->count());
-        $this->assertSame('2026-01-01 00:00:00', PodMatch::where('pod_id', $other->id)->sole()->evaluated_at->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-01-01 00:00:00', PodMatch::where('pod_id', $other->id)->sole()->evaluated_at->utc()->format('Y-m-d H:i:s'));
         $this->assertSame(1, PodMatch::forPodAndUser($this->pod->id, $candidate->id)->count());
         $this->assertSame(2, $candidate->podMatches()->count());
         $this->assertCount(1, array_filter($otherRows['pod_matches'], fn ($r) => (int) $r['pod_id'] === $other->id));

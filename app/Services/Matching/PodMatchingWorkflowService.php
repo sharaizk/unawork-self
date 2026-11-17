@@ -57,9 +57,16 @@ class PodMatchingWorkflowService
      */
     public function evaluateAndApply(PodWorkerRequirement $requirement, User $candidate, ?DateTimeInterface $at = null): PodMatchOutcome
     {
-        $match = $this->matches->evaluate($requirement, $candidate, $at);
+        $result = $this->matches->score($requirement, $candidate, $at);
+        $generation = $this->matches->persistGeneration($candidate, [[$requirement, $result]], DeterministicPodMatchingService::KEY);
+        $match = $generation->matches[$requirement->id];
         $pod = $requirement->relationLoaded('pod') ? $requirement->pod : $requirement->pod()->first();
         $qualification = MatchQualification::of($match, $requirement, $pod);
+
+        if ($generation->isStale()) {
+            // UNA-016: a newer generation is stored; never act on an older one.
+            return new PodMatchOutcome($match, $qualification, MembershipAction::NONE, $this->currentState($pod, $candidate), 'stale_generation');
+        }
 
         return $this->apply($match, $qualification, $pod, $candidate);
     }
@@ -71,7 +78,7 @@ class PodMatchingWorkflowService
      */
     public function applyPersisted(PodMatch $match): PodMatchOutcome
     {
-        $match->loadMissing(['requirement.pod', 'user']);
+        $match->loadMissing(['requirement.pod', 'user', 'reasons']);
         $pod = $match->requirement->pod;
 
         return $this->apply($match, MatchQualification::of($match, $match->requirement, $pod), $pod, $match->user);

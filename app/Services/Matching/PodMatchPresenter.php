@@ -42,6 +42,10 @@ class PodMatchPresenter
             'summary' => $this->summary($match, $reasons),
             'scoring_version' => (string) $match->scoring_version,
             'evaluated_at' => $match->evaluated_at?->toIso8601String(),
+            // UNA-016 names for the same metadata (evaluated_at / scoring_version kept for compatibility).
+            'algorithm' => (string) $match->algorithm,
+            'algorithm_version' => (string) $match->scoring_version,
+            'generated_at' => $match->evaluated_at?->toIso8601String(),
             'failed_mandatory' => $reasons->where('disqualifying', true)->sortBy('position')->values()
                 ->map(fn (PodMatchReason $r) => ['criterion' => $r->criterion->value, 'label' => $r->criterion->label()])->all(),
             'criteria' => $criteria,

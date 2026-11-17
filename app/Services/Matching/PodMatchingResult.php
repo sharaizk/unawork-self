@@ -19,6 +19,8 @@ use Carbon\CarbonImmutable;
 final class PodMatchingResult
 {
     public const NO_ACTIVE_REQUIREMENTS = 'no_active_requirements';
+    // UNA-016: a newer generation was already stored for at least one requirement; nothing older was written.
+    public const STALE_GENERATION = 'stale_generation';
 
     /**
      * @param array<int, PodMatch> $matches keyed by pod_worker_requirement_id, ascending
@@ -32,6 +34,10 @@ final class PodMatchingResult
         public readonly ?PodMatch $best,
         public readonly ?MatchQualification $bestQualification,
         public readonly ?string $reason = null,
+        // UNA-016: the algorithm key (pod_matches.algorithm); scoringVersion is its version.
+        public readonly string $algorithm = DeterministicPodMatchingService::KEY,
+        // UNA-016: true when this generation was older than a stored one (callers must not act on it).
+        public readonly bool $stale = false,
     ) {
     }
 

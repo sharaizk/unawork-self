@@ -9,10 +9,12 @@ use App\Models\PodWorkerRequirement;
 use App\Models\User;
 use App\Services\Matching\PodMatchingWorkflowService;
 use App\Services\Matching\PodMatchOutcome;
-use App\Services\Matching\PodMatchRecalculationService;
-use App\Services\Matching\RecalculationSummary;
-use DateTimeInterface;
-use Illuminate\Support\Facades\DB;
+use App\Jobs\Matching\GenerateEmployeePodMatch;
+use App\Jobs\Matching\GenerateMatchesForEmployee;
+use App\Jobs\Matching\GenerateMatchesForPod;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Support\Facades\Bus;
 
 /**
  * Shared fixtures for the UNA-014 matching-workflow tests. In-memory SQLite only.
@@ -83,30 +85,42 @@ abstract class WorkflowTestCase extends MatchingTestCase
         return $this->snapshot(['pod_users', 'pod_user_state_histories', 'user_workspaces', 'model_has_permissions', 'notifications']);
     }
 
-    /** Replace the container's recalculation service with one that records each run and the transaction level. */
-    protected function spyRecalculation(): object
+    /** How many GenerateMatchesForPod jobs were queued for $podId (PodTestCase fakes the bus). */
+    protected function podJobsFor(int $podId): int
     {
-        $spy = new class(app(PodMatchingWorkflowService::class)) extends PodMatchRecalculationService {
-            public array $calls = [];
-
-            public function recalculatePod(int $podId, ?DateTimeInterface $at = null): RecalculationSummary
-            {
-                $this->calls[] = ['pod', $podId, DB::transactionLevel()];
-
-                return parent::recalculatePod($podId, $at);
-            }
-
-            public function recalculateRequirements(array $requirementIds, ?DateTimeInterface $at = null): RecalculationSummary
-            {
-                $this->calls[] = ['requirements', array_values($requirementIds), DB::transactionLevel()];
-
-                return parent::recalculateRequirements($requirementIds, $at);
-            }
-        };
-        $this->app->instance(PodMatchRecalculationService::class, $spy);
-
-        return $spy;
+        return Bus::dispatched(GenerateMatchesForPod::class, fn (GenerateMatchesForPod $job) => $job->podId === $podId)->count();
     }
+
+    /**
+     * Run every queued matching job that has not run yet, including the pair jobs the coordinators
+     * queue, until none is left (like a worker would). Each job's unique lock is released as the
+     * queue worker does. @return string[] job class => handle() result, in run order
+     */
+    protected function drainMatchingJobs(): array
+    {
+        $ran = [];
+        do {
+            $pending = collect([GenerateMatchesForEmployee::class, GenerateMatchesForPod::class, GenerateEmployeePodMatch::class])
+                ->flatMap(fn ($class) => Bus::dispatched($class)->all())
+                ->reject(fn ($job) => isset($this->ranJobs[spl_object_id($job)]));
+            foreach ($pending as $job) {
+                $this->ranJobs[spl_object_id($job)] = true;
+                $ran[] = [class_basename($job), $this->runJob($job)];
+            }
+        } while ($pending->isNotEmpty());
+
+        return $ran;
+    }
+
+    /** Handle one queued job like a worker: release its unique lock, then resolve handle() dependencies. */
+    protected function runJob(object $job): mixed
+    {
+        (new UniqueLock(app(CacheRepository::class)))->release($job);
+
+        return $this->app->call([$job, 'handle']);
+    }
+
+    private array $ranJobs = [];
 
     /** setup-form row for an existing requirement, everything as stored. */
     protected function requirementRow(PodWorkerRequirement $requirement, array $overrides = []): array

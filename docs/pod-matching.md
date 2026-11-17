@@ -1,4 +1,4 @@
-# POD matching: scoring (UNA-013), configuration (UNA-014) and user-to-POD matching (UNA-015)
+# POD matching: scoring (UNA-013), configuration (UNA-014), user-to-POD matching (UNA-015) and queued generation (UNA-016)
 
 This document describes the code as implemented. The only scoring code is
 `App\Services\Matching\PodMatchScorer`. Configuration lives in `config/pod_matching.php`.
@@ -29,11 +29,13 @@ There are three separate layers:
 | Display | `App\Services\Matching\PodMatchPresenter`, `App\Http\Resources\PodMatchResource` |
 | Models | `PodMatch` (`pod_matches`), `PodMatchReason` (`pod_match_reasons`) |
 | Requirement fields | `App\Models\Concerns\HasMatchingConfiguration` (used by `PodWorkerRequirement` and `WorkspaceWorkerRequirement`) |
-| Config | `config/pod_matching.php` (`version`, `weights`, `availability`, `default_minimum_threshold`, `recalculation_chunk_size`, `max_timezone_tolerance_hours`) |
+| Config | `config/pod_matching.php` (`version`, `weights`, `availability`, `default_minimum_threshold`, `algorithm`, `algorithms`, `queue`, `jobs`, `max_timezone_tolerance_hours`) |
 | POD matching mode (UNA-014) | `App\Enums\Pod\PodMatchingMode` (`recommend_only`, `pending_approval`, `automatic`) |
 | Qualification (UNA-014) | `App\Services\Matching\MatchQualification`, `App\Enums\Matching\QualificationReason` |
 | Mode application (UNA-014) | `App\Services\Matching\PodMatchingWorkflowService::evaluateAndApply()` → `PodMatchOutcome` (`App\Enums\Matching\MembershipAction`) |
-| Recalculation (UNA-014) | `App\Services\Matching\PodMatchRecalculationService` → `RecalculationSummary` |
+| Change detection (UNA-014/016) | `App\Services\Matching\PodMatchRecalculationService` (POD), `EmployeeMatchingFingerprint` (employee) |
+| Queued generation (UNA-016) | `App\Jobs\Matching\GenerateMatchesForEmployee`, `GenerateMatchesForPod`, `GenerateEmployeePodMatch`; `MatchGenerationDispatcher` |
+| Algorithm contract (UNA-016) | `App\Contracts\PodMatchingAlgorithm`, `PodMatchingAlgorithmResolver` |
 | User-to-POD matching (UNA-015) | `App\Services\Matching\DeterministicPodMatchingService` → `PodMatchingResult` |
 
 ## 2. Criteria
@@ -371,7 +373,7 @@ Membership safety rules (all enforced by the code above):
   `findOrCreateMembership`.
 - Headcount is not enforced (no existing documented rule requires it).
 
-## 12. Recalculation (UNA-014)
+## 12. Recalculation after configuration changes (UNA-014, queued since UNA-016)
 
 `PodService` detects matching-relevant changes inside its existing configuration transaction:
 `PodMatchRecalculationService::configurationSnapshot()` runs before and after the change, and
@@ -381,29 +383,19 @@ a fingerprint per requirement made of:
 - active flag, start date, minimum hours, timezone, tolerance, project type, mandatory criteria
 - sorted skill ids
 
-| Change | Effect |
+| Change on a **published** POD | Effect |
 |---|---|
-| POD mode or threshold | after commit: every persisted match of the POD is re-evaluated and re-applied |
-| A requirement's matching fingerprint | after commit: that requirement's persisted matches only |
-| A requirement made inactive | its `pod_matches` are deleted in the same transaction (no stale recommendation) |
-| A requirement deleted | its matches are removed by the FK cascade |
-| A new requirement | nothing: there are no persisted candidates yet |
-| Publication (`PodService::publish()`) | after commit: every persisted match of the POD is processed |
-| Title, description, image, POD skills, headcount, notes | nothing |
-| Company template edits | nothing: POD snapshots are independent |
-| Company default changes | nothing: existing PODs are not touched |
+| mode, threshold, any requirement fingerprint, a requirement added/removed/activated | `GenerateMatchesForPod` queued after commit (§16) |
+| a requirement made inactive | its `pod_matches` deleted in the same transaction, plus the job above |
+| a requirement deleted | its matches removed by the FK cascade, plus the job above |
+| publication (`PodService::publish()`) | `GenerateMatchesForPod` queued after commit |
+| title, description, image, POD skills, headcount, notes | nothing |
+| company template or company default edits | nothing (POD snapshots are independent) |
 
-- The re-evaluation is registered with `DB::afterCommit()`. It therefore runs only after the
-  configuration (and any enclosing transaction) commits, never after a rollback, and outside the
-  configuration transaction.
-- Scope is limited to candidates already in `pod_matches`; there is no candidate discovery.
-- Matches are processed with `chunkById(config('pod_matching.recalculation_chunk_size'))` and the
-  relations in `CHUNK_RELATIONS` eager-loaded. Each one goes through `evaluateAndApply()`.
-- A candidate who is no longer an employee, or whose requirement is inactive, is counted as
-  `skipped`. Any other exception is `report()`ed and counted as `failed`; the run continues.
-  Exception details never reach users.
-- `RecalculationSummary` counts `evaluated`, `qualified`, `created`, `advanced`, `unchanged`,
-  `skipped`, `failed` and `invalidated`. `lastSummary()` returns the latest run.
+Drafts never queue generation (an inactivated draft requirement still loses its matches);
+publication picks their configuration up. Nothing is scored in the web request any more: the
+synchronous recalculation of UNA-014 was replaced by the queued jobs, so there is one generation
+path, not two.
 
 ## 13. Examples (UNA-014)
 
@@ -474,7 +466,8 @@ public function matchMany(Pod $pod, iterable $candidates, ?DateTimeInterface $ev
    passed to the scorer for every requirement. No criterion reads the clock.
 5. **Scores every active requirement** with `PodMatchScorer::score()`.
 6. **Persists all results** with `PodMatchService::persistMany()`:
-   - one `DB::transaction(..., 3)`, so a run is all or nothing
+   - one `DB::transaction(..., 3)`, so a run is all or nothing (UNA-016: `persistGeneration()`,
+     with the stale-generation guard of §16.5)
    - one upsert on the unique `(user_id, pod_worker_requirement_id)` pair
    - one locked read
    - one delete of the old reasons and one insert of the new reasons
@@ -568,3 +561,194 @@ PHP/Laravel/SQL at advanced, and project type long-term.
 
 This example is asserted by
 `tests/Feature/Matching/DeterministicPodMatchingTest::test_an_eligible_requirement_outranks_a_higher_scoring_disqualified_one`.
+
+## 16. Asynchronous match generation (UNA-016)
+
+Matching runs in queued jobs on the `matching` queue (`config('pod_matching.queue')`). Request-time
+code only records changes and queues work after commit; no web request scores anything.
+
+### 16.1 Jobs
+
+All three jobs:
+- implement `ShouldQueue` and `ShouldBeUniqueUntilProcessing`
+- carry only scalar ids and a generation timestamp (ISO-8601, whole seconds), never models
+- get their queue and limits from `config('pod_matching.jobs')`:
+  - `tries` 5
+  - `backoff` 30 / 120 / 300 s
+  - `timeout` 80 s, kept below the database connection's `retry_after` of 90 s; raise both together
+  - `unique_for` 3600 s
+  - `coordinator_chunk_size` 200
+
+| Job | Unique id | Does |
+|---|---|---|
+| `GenerateMatchesForEmployee(userId, generatedAt)` | `matching:employee:{userId}` | Coordinator: no-op unless the user is a regular employee. When the profile is below the matching minimum, deletes that user's `pod_matches` (memberships, access and history untouched). Otherwise queues one pair job per published POD with an active requirement, `chunkById` in POD id order. Scores nothing. |
+| `GenerateMatchesForPod(podId, generatedAt)` | `matching:pod:{podId}` | Coordinator: no-op unless the POD exists, is published and has an active requirement. Otherwise queues one pair job per `User::employees()` account with a saved profile that `ProfileCompletionService::isEligible()`, `chunkById` in user id order, relations eager-loaded per chunk. Scores nothing. There is no lossy pre-filter. |
+| `GenerateEmployeePodMatch(userId, podId, generatedAt)` | `matching:employee-pod:{userId}:{podId}` | The atomic retry unit, described below. |
+
+`GenerateEmployeePodMatch` runs these steps:
+1. Load both records. A missing record, an unpublished POD or a non-employee is a no-op. An
+   ineligible profile deletes that pair's matches.
+2. Run the configured `PodMatchingAlgorithm` **once for the whole POD** with the job's timestamp.
+3. Stop if the generation was stale (§16.5).
+4. Pass the stored best match to `PodMatchingWorkflowService::applyPersisted()`. That method
+   re-qualifies the stored row and applies the UNA-014 mode (§11) without re-scoring.
+
+Expected skip conditions return normally. Unexpected exceptions escape, so Laravel retries the job
+and finally records it in `failed_jobs`.
+
+### 16.2 Triggers
+
+| Trigger | Where | Job |
+|---|---|---|
+| A matching-relevant profile change (§16.3), including first reaching or losing the profile minimum | `ProfileService::saveProfile()` (`/my-profile`) and the legacy `createProfile()` / `updateProfile()` (`api/profile`) | `GenerateMatchesForEmployee` |
+| POD publication, or a configuration change of a published POD (§12) | `PodService::publish()` / `updateDraft()` | `GenerateMatchesForPod` |
+
+`MatchGenerationDispatcher` is the only dispatcher:
+- It registers each dispatch with `DB::afterCommit()`, so dispatch happens only after the outermost
+  transaction commits, never on rollback, and only for the attempt that committed.
+- It takes the generation timestamp at that moment.
+- It reports and swallows an enqueue failure. The committed profile or POD stays as saved; nothing
+  is rolled back or marked failed.
+
+There are no model observers.
+
+### 16.3 Employee fingerprint
+
+`EmployeeMatchingFingerprint::of($userId)` is the single list of what affects employee matching.
+Writers compare it before and after their change, inside their transaction.
+
+Included:
+- skills with proficiency
+- primary role, preferred roles
+- experiences (role, dates, current)
+- years of experience
+- availability status and date, weekly hours
+- city, state, country, timezone
+- project types, work mode, engagement type
+- profile eligibility
+
+Not included on their own:
+- phone, ZIP code, street address
+- CV, portfolio
+- LinkedIn, GitHub, website
+- about text, industry
+- education, certifications
+- relocation, travel
+
+Any of these can still trigger generation if changing it moves the profile across the eligibility
+minimum.
+
+### 16.4 Idempotency and retries
+
+Queue uniqueness (`ShouldBeUniqueUntilProcessing`) only collapses duplicates that are still queued.
+A change made while a job is already running queues a follow-up job. Correctness comes from the
+database:
+- `pod_matches` unique `(user_id, pod_worker_requirement_id)` and an atomic upsert
+- reasons replaced in the same transaction, so there is never a partial set
+- deterministic best-match selection
+- `findOrCreateMembership`, the row lock and the conditional transitions of
+  `PodStateTransitionService`, with after-commit effects
+
+Running a pair job twice changes nothing: no duplicate matches, reasons, memberships, workspace
+access, history or notifications.
+
+A failure at any step is safe to retry:
+
+| Failure point | What has happened | Retry |
+|---|---|---|
+| Before scoring | nothing | Runs the job from the start. |
+| During match persistence | the whole transaction rolled back | Runs the job from the start. |
+| After persistence, before the membership step | the match is committed | Rewrites the same generation and finishes the membership step. |
+| In a notification | the match and membership are committed | Nothing to redo; the failure is reported by `AfterCommit`. |
+
+Matching jobs never write onboarding fields:
+- business onboarding timestamps and step
+- POD `published_at` and configuration timestamps
+- profile data
+
+### 16.5 Generation timestamp, stale jobs, algorithm metadata
+
+- **One timestamp per run.** Every pair job carries one `generatedAt` that stays the same across
+  retries. Every requirement of the run is scored at that time and stored with it in
+  `pod_matches.evaluated_at`, converted to the application timezone because the column stores no
+  offset. Resources expose it as `generated_at` too.
+- **Stale guard.** `PodMatchService::persistGeneration()` locks the candidate's rows and skips any
+  requirement whose stored `evaluated_at` is **newer** than the incoming one.
+  - Newer rows and their reasons are never overwritten.
+  - The result is flagged `stale`; the pair job returns `stale`, and `evaluateAndApply()` returns
+    reason `stale_generation`. Neither applies a membership.
+  - An equal timestamp is rewritten idempotently.
+- **Algorithm metadata.** Every row stores:
+  - `algorithm`: NOT NULL, rows from before UNA-016 backfilled as `deterministic`
+  - `scoring_version`: the algorithm version
+  - `evaluated_at`: the generation timestamp
+
+  `PodMatchPresenter` / `PodMatchResource` add `algorithm`, `algorithm_version` and
+  `generated_at` next to the existing `scoring_version` / `evaluated_at`.
+
+The deterministic version stays `una-013.1`, because no formula changed.
+
+### 16.6 Algorithm contract and future AI
+
+`App\Contracts\PodMatchingAlgorithm` has three methods: `key()`, `version()` and
+`match(Pod, HasAccountType, ?DateTimeInterface): PodMatchingResult`. There is no membership API on
+it. The pair job depends only on this contract.
+
+`PodMatchingAlgorithmResolver` resolves `config('pod_matching.algorithm')` (default
+`deterministic`) from `config('pod_matching.algorithms')`. It throws an `InvalidArgumentException`
+when:
+- the key is unknown
+- the class does not implement the contract
+- the class reports a different key
+
+It never instantiates user-supplied class names. Tests bind a fake with
+`app()->instance(PodMatchingAlgorithm::class, ...)`.
+
+Rules for a future AI ranker (none is implemented: no SDK, prompt, credentials or remote call):
+- It may only enrich or re-rank on top of the deterministic baseline.
+- Deterministic mandatory failures stay authoritative, and it cannot turn a disqualification into
+  an eligible result. `MatchQualification` treats a match with any stored disqualifying reason as
+  not eligible, whatever status an algorithm reports; a test proves this with a fake that promotes
+  a disqualified requirement.
+- It never touches memberships. Only `PodMatchingWorkflowService` applies the mode, through
+  `PodStateTransitionService`. Profile eligibility, publication and the threshold are re-checked
+  there.
+- Its output needs a stable `key()` and `version()`.
+- Its failure policy (fall back to deterministic, or fail the job) must be decided explicitly
+  when it is built.
+- Storing several algorithms side by side (shadow mode) would need a later schema design. It is not
+  supported: one row per candidate × requirement.
+
+No matching path grants Inner Circle access. Automatic mode places a qualified employee in the
+Outer Circle at most.
+
+### 16.7 Flow example
+
+1. The employee changes their weekly hours on `/my-profile`.
+2. `ProfileService` sees the fingerprint change. The transaction commits, and
+   `GenerateMatchesForEmployee(42, 2026-11-17T10:00:00+05:30)` is queued on `matching`.
+3. A worker runs the coordinator. Profile 42 is eligible, so it queues
+   `GenerateEmployeePodMatch(42, 7, same timestamp)` for each published POD with an active
+   requirement, such as POD 7.
+4. The pair job scores every active requirement of POD 7 at that timestamp and stores them atomically
+   (`algorithm = deterministic`, `scoring_version = una-013.1`). The best requirement is eligible
+   with 81.25 against threshold 70.
+5. POD 7 is in pending-approval mode, so `applyPersisted()` enters `pending_business_approval`
+   through `PodStateTransitionService`. The owner's `pod_request` notification goes out after that
+   commit.
+6. A retry or a duplicate later finds the membership and the same rows, and changes nothing.
+
+### 16.8 Deployment requirement
+
+`.env.example` now shows `QUEUE_CONNECTION=database`; `jobs` and `failed_jobs` already exist.
+Production and dev need a persistent worker (Supervisor or systemd) that includes the `matching`
+queue, for example:
+
+```
+php artisan queue:work database --queue=matching,default --tries=5
+```
+
+`deploy.php` defines a `supervisor:restart` task for `{{worker_name}}` (`app-worker`), but it is
+commented out of the deploy flow. Whether a worker runs on the servers is not visible in the
+repository. Until one does, with a non-sync connection, matches are queued but never generated.
+After enabling it, deploys should restart the worker (`queue:restart`) so new code is loaded.

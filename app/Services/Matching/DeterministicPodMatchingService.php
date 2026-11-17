@@ -3,6 +3,7 @@
 namespace App\Services\Matching;
 
 use App\Contracts\HasAccountType;
+use App\Contracts\PodMatchingAlgorithm;
 use App\Enums\Matching\MatchStatus;
 use App\Models\Pod;
 use App\Models\PodMatch;
@@ -23,9 +24,14 @@ use Illuminate\Database\Eloquent\Collection;
  *
  * It never creates or changes a membership, workspace access, permissions, state history or
  * notifications, and therefore never grants Outer or Inner Circle access.
+ *
+ * UNA-016: the default App\Contracts\PodMatchingAlgorithm (key "deterministic", version =
+ * config('pod_matching.version')), used by the queued GenerateEmployeePodMatch job.
  */
-class DeterministicPodMatchingService
+class DeterministicPodMatchingService implements PodMatchingAlgorithm
 {
+    public const KEY = 'deterministic';
+
     /** Status precedence for the best match: eligible first, then disqualified, then not scorable. */
     public const STATUS_PRECEDENCE = [
         MatchStatus::ELIGIBLE->value => 0,
@@ -39,15 +45,25 @@ class DeterministicPodMatchingService
     ) {
     }
 
+    public function key(): string
+    {
+        return self::KEY;
+    }
+
+    public function version(): string
+    {
+        return $this->scorer->version();
+    }
+
     /**
      * Evaluate $candidate against every active worker requirement of $pod at one evaluation time
      * (now() once, when none is given) and persist all results atomically.
      *
      * @throws IneligibleCandidate for anything but a regular employee with a saved profile
      */
-    public function match(Pod $pod, HasAccountType $candidate, ?DateTimeInterface $evaluatedAt = null): PodMatchingResult
+    public function match(Pod $pod, HasAccountType $candidate, ?DateTimeInterface $generatedAt = null): PodMatchingResult
     {
-        return $this->matchWith($pod, $this->activeRequirements($pod), $this->matches->assertCandidate($candidate), $this->timestamp($evaluatedAt));
+        return $this->matchWith($pod, $this->activeRequirements($pod), $this->matches->assertCandidate($candidate), $this->timestamp($generatedAt));
     }
 
     /**
@@ -93,11 +109,13 @@ class DeterministicPodMatchingService
     {
         $version = $this->scorer->version();
         if ($requirements->isEmpty()) {
-            return new PodMatchingResult((int) $pod->id, (int) $candidate->id, $at, $version, [], null, null, PodMatchingResult::NO_ACTIVE_REQUIREMENTS);
+            return new PodMatchingResult((int) $pod->id, (int) $candidate->id, $at, $version, [], null, null, PodMatchingResult::NO_ACTIVE_REQUIREMENTS, self::KEY);
         }
 
         $entries = $requirements->map(fn (PodWorkerRequirement $r) => [$r, $this->scorer->score($r, $candidate, $at)])->values()->all();
-        $persisted = $this->matches->persistMany($candidate, $entries);
+        // A delayed, older generation never overwrites newer rows (UNA-016); the stored rows are returned.
+        $generation = $this->matches->persistGeneration($candidate, $entries, self::KEY);
+        $persisted = $generation->matches;
 
         $byRequirement = $requirements->keyBy('id');
         foreach ($persisted as $requirementId => $match) {
@@ -115,6 +133,9 @@ class DeterministicPodMatchingService
             $persisted,
             $best,
             MatchQualification::of($best, $best->requirement, $pod),
+            $generation->isStale() ? PodMatchingResult::STALE_GENERATION : null,
+            self::KEY,
+            $generation->isStale(),
         );
     }
 

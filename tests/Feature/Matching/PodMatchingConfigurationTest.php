@@ -13,8 +13,9 @@ use App\Models\PodUser;
 use App\Models\UserWorkspace;
 use App\Models\WorkspaceWorkerRequirement;
 use App\Services\Company\BusinessOnboardingService;
-use App\Services\Matching\PodMatchRecalculationService;
+use App\Jobs\Matching\GenerateMatchesForPod;
 use App\Services\Pod\UnauthorizedPodMutation;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -146,9 +147,9 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
             ->assertSee('changing these defaults never updates existing PODs', false);
     }
 
-    // ------------------------------------------------------------------ recalculation
+    // ------------------------------------------------------------------ recalculation (queued since UNA-016)
 
-    public function test_publishing_processes_existing_matches_after_commit(): void
+    public function test_publishing_queues_generation_after_commit(): void
     {
         $this->completeBusinessProfile($this->company);
         $pod = $this->configuredDraft(); // pending_approval, Backend Developer + PHP/SQL
@@ -158,16 +159,17 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
 
         $this->workflow()->evaluateAndApply($requirement, $candidate->fresh(), $this->at());
         $this->assertSame(0, PodUser::where('user_id', $candidate->id)->count(), 'draft: score only');
+        $this->assertSame(0, $this->podJobsFor($pod->id), 'draft edits queue nothing');
 
-        $spy = $this->spyRecalculation();
         $this->pods()->publish($pod, $this->company);
 
-        $this->assertSame([['pod', $pod->id, 0]], $spy->calls, 'after commit, outside any transaction');
+        $this->assertSame(1, $this->podJobsFor($pod->id));
+        $this->assertSame(0, PodUser::where('user_id', $candidate->id)->count(), 'nothing runs in the request');
+        $this->drainMatchingJobs();
         $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $candidate->id)->sole()->state);
-        $this->assertSame(['evaluated' => 1, 'qualified' => 1, 'created' => 1, 'advanced' => 0, 'unchanged' => 0, 'skipped' => 0, 'failed' => 0, 'invalidated' => 0], $spy->lastSummary()->toArray());
     }
 
-    public function test_lowering_the_threshold_reprocesses_and_acts_forward(): void
+    public function test_lowering_the_threshold_queues_generation_that_acts_forward(): void
     {
         $pod = $this->configurePod('pending_approval', 70);
         $requirement = $this->partialRequirement(); // 68.75
@@ -175,12 +177,11 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
         $this->apply($requirement, $candidate);
         $this->assertSame(0, PodUser::where('user_id', $candidate->id)->count());
 
-        $spy = $this->spyRecalculation();
         $this->pods()->updateDraft($pod, $this->company, ['minimum_match_threshold' => 65]);
+        $this->assertSame(1, $this->podJobsFor($pod->id));
+        $this->drainMatchingJobs();
 
-        $this->assertSame([['pod', $pod->id, 0]], $spy->calls);
         $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $candidate->id)->sole()->state);
-        $this->assertSame([1, 1, 1], [$spy->lastSummary()->evaluated, $spy->lastSummary()->qualified, $spy->lastSummary()->created]);
     }
 
     public function test_raising_the_threshold_or_lowering_scores_never_demotes_or_removes(): void
@@ -192,12 +193,12 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
         $this->assertSame(State::OUTER_CIRCLE, PodUser::where('user_id', $candidate->id)->sole()->state);
         $before = $this->memberships();
 
-        $this->spyRecalculation();
         $this->pods()->updateDraft($pod, $this->company, [
             'minimum_match_threshold' => 100,
             'requirements_present' => 1,
             'requirements' => [$this->requirementRow($requirement, ['skill_ids' => [$this->php->id, $this->docker->id]])],
         ]);
+        $this->drainMatchingJobs();
 
         $match = PodMatch::sole();
         $this->assertSame(['68.75', MatchStatus::ELIGIBLE], [$match->score, $match->status], 're-scored');
@@ -206,6 +207,7 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
 
         // Switching to recommend-only does not undo the placement either.
         $this->pods()->updateDraft($pod, $this->company, ['matching_mode' => 'recommend_only']);
+        $this->drainMatchingJobs();
         $this->assertEquals($before, $this->memberships());
     }
 
@@ -216,14 +218,13 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
         $candidate = $this->qualifiedEmployee();
         $this->apply($requirement, $candidate);
 
-        $spy = $this->spyRecalculation();
         $this->pods()->updateDraft($pod, $this->company, ['matching_mode' => 'automatic']);
+        $this->drainMatchingJobs();
 
         $this->assertSame(State::OUTER_CIRCLE, PodUser::where('user_id', $candidate->id)->sole()->state);
-        $this->assertSame(1, $spy->lastSummary()->advanced);
     }
 
-    public function test_requirement_criteria_and_mandatory_changes_recalculate_existing_matches(): void
+    public function test_requirement_criteria_and_mandatory_changes_regenerate_matches(): void
     {
         $pod = $this->configurePod('recommend_only', 70);
         $requirement = $this->perfectRequirement();
@@ -231,22 +232,24 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
         $candidate = $this->qualifiedEmployee();
         $this->apply($requirement, $candidate);
         $this->apply($other, $candidate);
-        $otherEvaluatedAt = PodMatch::where('pod_worker_requirement_id', $other->id)->value('evaluated_at');
 
-        $spy = $this->spyRecalculation();
         $this->pods()->updateDraft($pod, $this->company, ['requirements_present' => 1, 'requirements' => [
             $this->requirementRow($requirement, ['skill_ids' => [$this->php->id, $this->docker->id]]),
             $this->requirementRow($other),
         ]]);
-        $this->assertSame([['requirements', [$requirement->id], 0]], $spy->calls, 'only the changed requirement');
-        $this->assertSame('68.75', PodMatch::where('pod_worker_requirement_id', $requirement->id)->value('score'));
-        $this->assertEquals($otherEvaluatedAt, PodMatch::where('pod_worker_requirement_id', $other->id)->value('evaluated_at'), 'unchanged requirement not re-evaluated');
+        $this->assertSame(1, $this->podJobsFor($pod->id));
+        $this->drainMatchingJobs();
+        $this->assertSame(['68.75', '100.00'], [
+            PodMatch::where('pod_worker_requirement_id', $requirement->id)->value('score'),
+            PodMatch::where('pod_worker_requirement_id', $other->id)->value('score'),
+        ]);
 
         // A new mandatory criterion the candidate fails disqualifies the stored match.
         $this->pods()->updateDraft($pod, $this->company, ['requirements_present' => 1, 'requirements' => [
             $this->requirementRow($requirement),
             $this->requirementRow($other, ['project_type' => 'hourly', 'mandatory_criteria' => ['project_type']]),
         ]]);
+        $this->drainMatchingJobs();
         $match = PodMatch::where('pod_worker_requirement_id', $other->id)->sole()->load('reasons');
         $this->assertSame(MatchStatus::DISQUALIFIED, $match->status);
         $this->assertTrue($match->reasons->firstWhere('criterion', \App\Enums\Matching\MatchCriterion::PROJECT_TYPE)->disqualifying);
@@ -262,12 +265,14 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
 
         $this->pods()->updateDraft($pod, $this->company, ['requirements_present' => 1, 'requirements' => [$this->requirementRow($requirement, ['is_active' => 0])]]);
 
-        $this->assertSame(0, PodMatch::count(), 'no stale qualified recommendation remains');
+        $this->assertSame(0, PodMatch::count(), 'no stale qualified recommendation remains (same transaction)');
+        $this->drainMatchingJobs();
+        $this->assertSame(0, PodMatch::count(), 'the POD has no active requirement left to generate');
         $this->expectException(\App\Services\Matching\InactiveRequirement::class);
         $this->apply($requirement, $this->qualifiedEmployee());
     }
 
-    public function test_unrelated_edits_and_template_edits_trigger_no_recalculation(): void
+    public function test_unrelated_edits_and_template_edits_queue_nothing(): void
     {
         $workspace = $this->completeBusinessProfile($this->company);
         $template = WorkspaceWorkerRequirement::where('workspace_id', $workspace->id)->sole();
@@ -277,7 +282,6 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
         $this->apply($requirement, $this->qualifiedEmployee());
         $evaluatedAt = PodMatch::sole()->evaluated_at;
 
-        $spy = $this->spyRecalculation();
         $this->pods()->updateDraft($pod, $this->company, ['title' => 'Renamed', 'description' => 'New words', 'skills' => [$this->sql->id]]);
         $this->pods()->updateDraft($pod, $this->company, ['requirements_present' => 1, 'requirements' => [$this->requirementRow($requirement, ['headcount' => 9, 'description' => 'More'])]]);
         app(BusinessOnboardingService::class)->save($this->company, ['requirements_present' => 1, 'requirements' => [[
@@ -285,59 +289,31 @@ class PodMatchingConfigurationTest extends WorkflowTestCase
             'preferred_work_mode' => 'onsite', 'preferred_engagement_type' => 'contract', 'is_active' => 1,
         ]]]);
 
-        $this->assertSame([], $spy->calls);
+        Bus::assertNotDispatched(GenerateMatchesForPod::class);
         $this->assertEquals($evaluatedAt, PodMatch::sole()->evaluated_at);
         $this->assertSame([$this->php->id], $requirement->fresh()->skills->pluck('id')->all(), 'POD snapshot unchanged');
     }
 
-    public function test_recalculation_waits_for_commit_and_is_dropped_on_rollback(): void
+    public function test_generation_is_queued_only_after_commit_and_never_on_rollback(): void
     {
         $pod = $this->configurePod('pending_approval', 70);
         $this->apply($this->partialRequirement(), $candidate = $this->qualifiedEmployee());
-        $spy = $this->spyRecalculation();
 
         try {
-            DB::transaction(function () use ($pod, $spy) {
+            DB::transaction(function () use ($pod) {
                 $this->pods()->updateDraft($pod, $this->company, ['minimum_match_threshold' => 50]);
-                $this->assertSame([], $spy->calls, 'not inside the transaction');
+                Bus::assertNotDispatched(GenerateMatchesForPod::class);
                 throw new \RuntimeException('rolled back');
             });
         } catch (\RuntimeException) {
         }
 
-        $this->assertSame([], $spy->calls);
+        Bus::assertNotDispatched(GenerateMatchesForPod::class);
         $this->assertSame(70, $pod->fresh()->minimum_match_threshold);
-        $this->assertSame(0, PodUser::where('user_id', $candidate->id)->count());
 
         DB::transaction(fn () => $this->pods()->updateDraft($pod, $this->company, ['minimum_match_threshold' => 50]));
-        $this->assertSame([['pod', $pod->id, 0]], $spy->calls, 'once, after the outer commit');
+        $this->assertSame(1, $this->podJobsFor($pod->id), 'once, after the outer commit');
+        $this->drainMatchingJobs();
         $this->assertSame(State::PENDING_BUSINESS_APPROVAL, PodUser::where('user_id', $candidate->id)->sole()->state);
-    }
-
-    public function test_one_failing_candidate_does_not_stop_the_others(): void
-    {
-        config(['pod_matching.recalculation_chunk_size' => 1]);
-        $pod = $this->configurePod('automatic', 70);
-        $requirement = $this->perfectRequirement();
-        [$a, $broken, $c] = [$this->qualifiedEmployee(), $this->qualifiedEmployee(), $this->qualifiedEmployee()];
-        $incomplete = $this->incompleteEmployee();
-        $pod->forceFill(['status' => PodStatus::DRAFT])->save();
-        foreach ([$a, $broken, $c, $incomplete] as $candidate) {
-            $this->apply($requirement, $candidate);
-        }
-        $pod->forceFill(['status' => PodStatus::PUBLISHED])->save();
-        DB::statement("CREATE TRIGGER fail_one BEFORE UPDATE ON pod_matches WHEN NEW.user_id = {$broken->id} BEGIN SELECT RAISE(ABORT, 'injected'); END");
-
-        $summary = app(PodMatchRecalculationService::class)->recalculatePod($pod->id, $this->at());
-
-        $this->assertSame(['evaluated' => 3, 'qualified' => 3, 'created' => 2, 'advanced' => 0, 'unchanged' => 0, 'skipped' => 1, 'failed' => 1, 'invalidated' => 0], $summary->toArray());
-        $this->assertSame([State::OUTER_CIRCLE, State::OUTER_CIRCLE], [PodUser::where('user_id', $a->id)->sole()->state, PodUser::where('user_id', $c->id)->sole()->state]);
-        $this->assertSame(0, PodUser::whereIn('user_id', [$broken->id, $incomplete->id])->count());
-
-        // Running again changes nothing (idempotent).
-        DB::statement('DROP TRIGGER fail_one');
-        $again = app(PodMatchRecalculationService::class)->recalculatePod($pod->id, $this->at());
-        $this->assertSame([1, 2, 1, 0], [$again->created, $again->unchanged, $again->skipped, $again->failed]);
-        $this->assertSame(3, PodUser::where('pod_id', $pod->id)->where('state', State::OUTER_CIRCLE->value)->count());
     }
 }

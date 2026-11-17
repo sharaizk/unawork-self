@@ -11,6 +11,8 @@ use App\Models\ProfilePortfolio;
 use App\Models\ProfilePreferredRole;
 use App\Models\ProfileProjectType;
 use App\Models\User;
+use App\Services\Matching\EmployeeMatchingFingerprint;
+use App\Services\Matching\MatchGenerationDispatcher;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -30,6 +32,14 @@ class ProfileService
 {
     public const CV_DISK = 'public';
     private const ATTEMPTS = 3;
+
+    public function __construct(
+        private ?EmployeeMatchingFingerprint $matchingFingerprint = null,
+        private ?MatchGenerationDispatcher $matchGeneration = null,
+    ) {
+        $this->matchingFingerprint ??= app(EmployeeMatchingFingerprint::class);
+        $this->matchGeneration ??= app(MatchGenerationDispatcher::class);
+    }
 
     /** Scalar profile columns an employee may edit. */
     public const PROFILE_FIELDS = [
@@ -60,7 +70,7 @@ class ProfileService
     {
         $sync = array_values(array_intersect($data['sync'] ?? [], self::SYNCABLE));
 
-        $profile = $this->withCvReplacement($cv, function (?string $newCv) use ($user, $data, $sync) {
+        $profile = $this->withCvReplacement($user, $cv, function (?string $newCv) use ($user, $data, $sync) {
             $profile = Profile::where('user_id', $user->id)->lockForUpdate()->first() ?? new Profile();
             $previousCv = $profile->cv_file;
 
@@ -117,7 +127,7 @@ class ProfileService
         $cv = $data['cv_file'] ?? null;
         unset($data['cv_file'], $data['user_id'], $data['profile_id']);
 
-        return $this->withCvReplacement($cv instanceof UploadedFile ? $cv : null, function (?string $newCv) use ($user, $data) {
+        return $this->withCvReplacement($user, $cv instanceof UploadedFile ? $cv : null, function (?string $newCv) use ($user, $data) {
             $profile = Profile::where('user_id', $user->id)->lockForUpdate()->first() ?? new Profile();
             $previousCv = $profile->cv_file;
             $profile->forceFill(['user_id' => $user->id]);
@@ -142,13 +152,25 @@ class ProfileService
      * Run $write in a transaction with an optional, already uploaded replacement CV. $write returns
      * [Profile, previous cv path]. The new file is removed if the transaction fails; the previous
      * file is removed only after a successful commit.
+     *
+     * UNA-016: the employee's matching fingerprint is taken before and after $write inside the same
+     * transaction; when it changed, GenerateMatchesForEmployee is queued after commit (never on
+     * rollback). Matching never runs here and never changes onboarding state.
      */
-    private function withCvReplacement(?UploadedFile $cv, \Closure $write): Profile
+    private function withCvReplacement(User $user, ?UploadedFile $cv, \Closure $write): Profile
     {
         $newCv = $cv ? $this->uploadFile($cv) : null;
 
         try {
-            [$profile, $previousCv] = DB::transaction(fn () => $write($newCv), self::ATTEMPTS);
+            [$profile, $previousCv] = DB::transaction(function () use ($user, $write, $newCv) {
+                $before = $this->matchingFingerprint->of($user->id);
+                $written = $write($newCv);
+                if ($this->matchingFingerprint->of($user->id) !== $before) {
+                    $this->matchGeneration->employeeAfterCommit((int) $user->id);
+                }
+
+                return $written;
+            }, self::ATTEMPTS);
         } catch (\Throwable $e) {
             if ($newCv !== null) {
                 Storage::disk(self::CV_DISK)->delete($newCv);

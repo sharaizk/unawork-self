@@ -28,7 +28,7 @@ class PodMatchServiceTest extends MatchingTestCase
         $match = $this->service()->evaluate($requirement, $candidate, $this->at());
 
         $this->assertSame([$this->pod->id, $requirement->id, $candidate->id, '100.00', MatchStatus::ELIGIBLE, 100, 'una-013.1', self::AT],
-            [$match->pod_id, $match->pod_worker_requirement_id, $match->user_id, $match->score, $match->status, $match->active_weight, $match->scoring_version, $match->evaluated_at->format('Y-m-d H:i:s')]);
+            [$match->pod_id, $match->pod_worker_requirement_id, $match->user_id, $match->score, $match->status, $match->active_weight, $match->scoring_version, $match->evaluated_at->utc()->format('Y-m-d H:i:s')]);
         $this->assertSame(C::values(), $match->reasons->map(fn ($r) => $r->criterion->value)->all());
         $this->assertSame(range(0, 8), $match->reasons->pluck('position')->all());
 
@@ -51,7 +51,7 @@ class PodMatchServiceTest extends MatchingTestCase
 
         $this->assertSame($first->id, $second->id);
         $this->assertSame(1, PodMatch::count());
-        $this->assertSame([MatchStatus::DISQUALIFIED, '62.50', '2026-06-16'], [$second->status, $second->score, $second->evaluated_at->format('Y-m-d')]);
+        $this->assertSame([MatchStatus::DISQUALIFIED, '62.50', '2026-06-16'], [$second->status, $second->score, $second->evaluated_at->utc()->format('Y-m-d')]);
         $this->assertSame(count(C::cases()), PodMatchReason::count(), 'reasons replaced, not appended');
         $this->assertSame([], array_intersect($oldReasonIds, PodMatchReason::pluck('id')->all()));
         $this->assertTrue(PodMatchReason::where('criterion', 'role')->sole()->disqualifying);

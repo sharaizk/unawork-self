@@ -34,8 +34,27 @@ return [
     // their company's default (workspaces.default_minimum_match_threshold) or, without one, this.
     'default_minimum_threshold' => 70,
 
-    // UNA-014: persisted matches are reprocessed in chunks of this size after a configuration change.
-    'recalculation_chunk_size' => 100,
+    // UNA-016: the active user-to-POD algorithm (a key of 'algorithms'). Each driver must implement
+    // App\Contracts\PodMatchingAlgorithm; its version is reported by the class itself (the
+    // deterministic one uses 'version' above). Only listed drivers can be selected.
+    'algorithm' => 'deterministic',
+    'algorithms' => [
+        'deterministic' => [
+            'class' => App\Services\Matching\DeterministicPodMatchingService::class,
+        ],
+    ],
+
+    // UNA-016: queued match generation.
+    'queue' => 'matching',
+    'jobs' => [
+        'coordinator_chunk_size' => 200, // PODs or employees discovered per chunk
+        'tries' => 5,
+        'backoff' => [30, 120, 300], // seconds between attempts (the last value repeats)
+        // Seconds per attempt. Must stay below the queue connection's retry_after (database: 90),
+        // otherwise a running job can be handed to a second worker; raise both together.
+        'timeout' => 80,
+        'unique_for' => 3600,        // seconds a queued duplicate is collapsed for
+    ],
 
     // Upper bound for pod_worker_requirements.timezone_tolerance_hours.
     'max_timezone_tolerance_hours' => 14,

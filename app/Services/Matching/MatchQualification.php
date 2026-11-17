@@ -15,7 +15,8 @@ use App\Models\PodWorkerRequirement;
  *   AND the worker requirement is active  AND the POD is published.
  *
  * Equality qualifies. The comparison is in integer hundredths (score 69.99 < threshold 70). A high
- * score never overrides a failed mandatory criterion. Changing the threshold never changes a score.
+ * score never overrides a failed mandatory criterion (neither the stored status nor, when the
+ * reasons are loaded, any stored disqualifying reason). Changing the threshold never changes a score.
  */
 final class MatchQualification
 {
@@ -34,8 +35,11 @@ final class MatchQualification
         $threshold = $pod->minimumMatchThreshold();
         $score = self::hundredths($match->score);
 
+        // UNA-016: a stored disqualifying reason wins even if an algorithm reported "eligible".
+        $disqualified = $match->relationLoaded('reasons') && $match->reasons->contains(fn ($r) => (bool) $r->disqualifying);
+
         $reason = match (true) {
-            $match->status !== MatchStatus::ELIGIBLE => QualificationReason::NOT_ELIGIBLE,
+            $match->status !== MatchStatus::ELIGIBLE, $disqualified => QualificationReason::NOT_ELIGIBLE,
             !self::meetsThreshold($score, $threshold) => QualificationReason::BELOW_THRESHOLD,
             !$requirement->is_active => QualificationReason::REQUIREMENT_INACTIVE,
             !$pod->isPublished() => QualificationReason::POD_NOT_PUBLISHED,
