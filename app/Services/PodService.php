@@ -13,6 +13,7 @@ use App\Models\Utility;
 use App\Models\Workspace;
 use App\Models\WorkspaceWorkerRequirement;
 use App\Services\Company\BusinessOnboardingCompletionService;
+use App\Services\Matching\MatchingConfiguration;
 use App\Services\Pod\IncompleteBusinessOnboarding;
 use App\Services\Pod\IncompletePodConfiguration;
 use App\Services\Pod\PodAlreadyPublished;
@@ -46,6 +47,8 @@ class PodService
     public const REQUIREMENT_FIELDS = [
         'job_title_id', 'headcount', 'minimum_years_experience', 'minimum_skill_proficiency',
         'preferred_work_mode', 'preferred_engagement_type', 'location', 'description', 'is_active',
+        // UNA-013 matching targets (mandatory_criteria is handled by MatchingConfiguration::fill()).
+        'required_start_date', 'minimum_hours_per_week', 'timezone', 'timezone_tolerance_hours', 'project_type',
     ];
 
     public function __construct(
@@ -325,8 +328,8 @@ class PodService
         $existing = PodWorkerRequirement::where('pod_id', $pod->id)->lockForUpdate()->get()->keyBy('id');
         $keep = [];
 
-        foreach ($rows as $row) {
-            $attributes = Arr::only($row, self::REQUIREMENT_FIELDS);
+        foreach ($rows as $index => $row) {
+            $attributes = MatchingConfiguration::withMandatory(Arr::only($row, self::REQUIREMENT_FIELDS), $row);
             $attributes['is_active'] = filter_var($row['is_active'] ?? true, FILTER_VALIDATE_BOOLEAN);
             $id = isset($row['id']) && $row['id'] !== '' ? (int) $row['id'] : null;
             $source = isset($row['source_workspace_requirement_id']) && $row['source_workspace_requirement_id'] !== ''
@@ -342,6 +345,8 @@ class PodService
                 $requirement->forceFill(['pod_id' => $pod->id])->save();
             }
             $requirement->skills()->sync(array_values(array_unique(array_map('intval', $row['skill_ids'] ?? []))));
+            // UNA-013: only configured criteria may be mandatory (rolls the whole save back otherwise).
+            MatchingConfiguration::assertValid($requirement, "requirements.{$index}.mandatory_criteria");
             $keep[] = $requirement->id;
         }
 
@@ -357,11 +362,15 @@ class PodService
     {
         foreach (array_unique(array_map('intval', $templateIds)) as $templateId) {
             $template = $this->ownedTemplate($templateId, $companyWorkspace)->load('skills');
+            // A snapshot: UNA-010 fields plus the UNA-013 matching configuration (incl. mandatory criteria).
             $copy = new PodWorkerRequirement(
-                Arr::only($template->getAttributes(), self::REQUIREMENT_FIELDS) + ['source_workspace_requirement_id' => $template->id]
+                $template->matchingAttributes()
+                + Arr::only($template->getAttributes(), self::REQUIREMENT_FIELDS)
+                + ['source_workspace_requirement_id' => $template->id]
             );
             $copy->forceFill(['pod_id' => $pod->id])->save();
             $copy->skills()->sync($template->skills->pluck('id')->all());
+            MatchingConfiguration::assertValid($copy, 'import_template_ids');
         }
     }
 

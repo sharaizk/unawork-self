@@ -40,7 +40,7 @@
         'location' => $r->location,
         'description' => $r->description,
         'is_active' => $r->is_active,
-    ])->all();
+    ] + $r->matchingAttributes())->all();
     $nextIndex = count($requirementRows) ? max(array_map('intval', array_keys($requirementRows))) + 1 : 0;
     $selectedSkills = array_map('strval', $submitted || old('skills_present') !== null ? old('skills', []) : $pod->skills->pluck('id')->all());
     $currentMatching = old('matching_mode', $enumValue($pod->matching_mode));
@@ -228,7 +228,7 @@
                                                 'preferred_engagement_type' => $enumValue($template->preferred_engagement_type),
                                                 'location' => $template->location,
                                                 'description' => $template->description,
-                                            ]) }}"
+                                            ] + $template->matchingAttributes()) }}"
                                             aria-label="{{ __('Import :role', ['role' => $template->jobTitle?->title ?? __('requirement')]) }}">
                                             <i class="ti ti-download" aria-hidden="true"></i>
                                             {{ $template->jobTitle?->title ?? __('Untitled requirement') }}@if ($template->headcount) × {{ $template->headcount }}@endif

@@ -98,6 +98,65 @@
                 name="requirements[{{ $index }}][location]" value="{{ $row['location'] ?? '' }}" maxlength="255">
             @error("$p.location") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
         </div>
+        {{-- UNA-013 matching targets: every field is optional; an empty one is simply not scored. --}}
+        <div class="col-12">
+            <p class="fw-semibold small mb-0 mt-1">{{ __('Matching criteria') }}</p>
+            <p class="small text-muted mb-0">{{ __('Only the criteria you configure are scored. Mark a criterion as mandatory to rule out candidates who do not meet it; nobody is invited or accepted automatically.') }}</p>
+        </div>
+        <div class="col-md-4 col-6">
+            <label class="form-label" for="req-{{ $index }}-start">{{ __('Required start date') }}</label>
+            <input type="date" class="form-control @error("$p.required_start_date") is-invalid @enderror" id="req-{{ $index }}-start"
+                name="requirements[{{ $index }}][required_start_date]" value="{{ $row['required_start_date'] ?? '' }}">
+            @error("$p.required_start_date") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4 col-6">
+            <label class="form-label" for="req-{{ $index }}-hours">{{ __('Minimum hours per week') }}</label>
+            <input type="number" class="form-control @error("$p.minimum_hours_per_week") is-invalid @enderror" id="req-{{ $index }}-hours"
+                name="requirements[{{ $index }}][minimum_hours_per_week]" value="{{ $row['minimum_hours_per_week'] ?? '' }}" min="1" max="168" step="1" inputmode="numeric">
+            @error("$p.minimum_hours_per_week") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="req-{{ $index }}-project-type">{{ __('Project type') }}</label>
+            <select class="form-select @error("$p.project_type") is-invalid @enderror" id="req-{{ $index }}-project-type" name="requirements[{{ $index }}][project_type]">
+                <option value="">{{ __('Any') }}</option>
+                @foreach (\App\Enums\Profile\ProjectType::options() as $value => $label)
+                    <option value="{{ $value }}" @selected(($row['project_type'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            @error("$p.project_type") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-8">
+            <label class="form-label" for="req-{{ $index }}-timezone">{{ __('Timezone') }}</label>
+            <select class="form-select @error("$p.timezone") is-invalid @enderror" id="req-{{ $index }}-timezone" name="requirements[{{ $index }}][timezone]">
+                <option value="">{{ __('Any timezone') }}</option>
+                @foreach (\DateTimeZone::listIdentifiers(\DateTimeZone::ALL) as $timezone)
+                    <option value="{{ $timezone }}" @selected(($row['timezone'] ?? '') === $timezone)>{{ $timezone }}</option>
+                @endforeach
+            </select>
+            @error("$p.timezone") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="req-{{ $index }}-tolerance">{{ __('Timezone tolerance (hours)') }}</label>
+            <input type="number" class="form-control @error("$p.timezone_tolerance_hours") is-invalid @enderror" id="req-{{ $index }}-tolerance"
+                name="requirements[{{ $index }}][timezone_tolerance_hours]" value="{{ $row['timezone_tolerance_hours'] ?? '' }}" min="0" max="{{ config('pod_matching.max_timezone_tolerance_hours', 14) }}" step="1" inputmode="numeric">
+            @error("$p.timezone_tolerance_hours") <span class="invalid-feedback" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-12">
+            @php $mandatory = array_map('strval', (array) ($row['mandatory_criteria'] ?? [])); @endphp
+            <input type="hidden" name="requirements[{{ $index }}][mandatory_criteria_present]" value="1">
+            <span class="form-label d-block">{{ __('Mandatory criteria') }}</span>
+            <div class="d-flex flex-wrap gap-3 @error("$p.mandatory_criteria") is-invalid @enderror @error("$p.mandatory_criteria.*") is-invalid @enderror">
+                @foreach (\App\Enums\Matching\MatchCriterion::options() as $value => $label)
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="req-{{ $index }}-mandatory-{{ $value }}" value="{{ $value }}"
+                            name="requirements[{{ $index }}][mandatory_criteria][]" data-co-mandatory @checked(in_array($value, $mandatory, true))>
+                        <label class="form-check-label small" for="req-{{ $index }}-mandatory-{{ $value }}">{{ $label }}</label>
+                    </div>
+                @endforeach
+            </div>
+            @error("$p.mandatory_criteria") <span class="invalid-feedback d-block" role="alert">{{ $message }}</span> @enderror
+            @error("$p.mandatory_criteria.*") <span class="invalid-feedback d-block" role="alert">{{ $message }}</span> @enderror
+        </div>
         <div class="col-12">
             <label class="form-label" for="req-{{ $index }}-notes">{{ __('Notes') }}</label>
             <textarea class="form-control @error("$p.description") is-invalid @enderror" id="req-{{ $index }}-notes" rows="2"

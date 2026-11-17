@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Profile\EngagementType;
 use App\Enums\Profile\SkillProficiency;
 use App\Enums\Profile\WorkMode;
+use App\Models\Concerns\HasMatchingConfiguration;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PodWorkerRequirement extends Model
 {
+    use HasMatchingConfiguration; // UNA-013 matching targets and mandatory criteria
+
     protected $table = 'pod_worker_requirements';
 
     protected $fillable = [
@@ -43,6 +46,12 @@ class PodWorkerRequirement extends Model
     public function jobTitle()
     {
         return $this->belongsTo(JobTitle::class, 'job_title_id');
+    }
+
+    /** Persisted match snapshots against this requirement (UNA-013). */
+    public function matches()
+    {
+        return $this->hasMany(PodMatch::class);
     }
 
     public function skills()

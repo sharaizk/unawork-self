@@ -42,7 +42,7 @@
         'location' => $r->location,
         'description' => $r->description,
         'is_active' => $r->is_active,
-    ])->all();
+    ] + $r->matchingAttributes())->all();
     $nextIndex = count($requirementRows) ? max(array_map('intval', array_keys($requirementRows))) + 1 : 0;
     $currentMatching = old('matching_mode', $enumValue($workspace->matching_mode));
 @endphp

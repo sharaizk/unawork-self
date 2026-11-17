@@ -299,6 +299,9 @@ trait UsesInMemorySqlite
         });
         // UNA-011: POD draft/publish lifecycle and POD-owned requirements.
         (require database_path('migrations/2026_11_18_000400_add_publication_lifecycle_to_pods.php'))->up();
+        // UNA-013: matching targets on both requirement tables, and the persisted match snapshots.
+        (require database_path('migrations/2026_11_19_000000_add_matching_configuration_to_worker_requirements.php'))->up();
+        (require database_path('migrations/2026_11_19_000100_create_pod_matches_tables.php'))->up();
     }
 
     /**

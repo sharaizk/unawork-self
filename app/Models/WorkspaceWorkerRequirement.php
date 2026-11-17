@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Profile\EngagementType;
 use App\Enums\Profile\SkillProficiency;
 use App\Enums\Profile\WorkMode;
+use App\Models\Concerns\HasMatchingConfiguration;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WorkspaceWorkerRequirement extends Model
 {
+    use HasMatchingConfiguration; // UNA-013 matching targets and mandatory criteria
+
     protected $table = 'workspace_worker_requirements';
 
     protected $fillable = [

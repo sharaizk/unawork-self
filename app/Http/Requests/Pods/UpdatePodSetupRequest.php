@@ -8,6 +8,7 @@ use App\Enums\Profile\SkillProficiency;
 use App\Enums\Profile\WorkMode;
 use App\Models\Pod;
 use App\Services\Company\BusinessOnboardingCompletionService;
+use App\Http\Requests\Concerns\ValidatesMatchingConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -20,6 +21,8 @@ use Illuminate\Validation\Rules\Enum;
  */
 class UpdatePodSetupRequest extends FormRequest
 {
+    use ValidatesMatchingConfiguration; // UNA-013
+
     public const STEPS = ['basics', 'skills', 'requirements', 'matching', 'review'];
 
     private const REQUIREMENT_VALUE_FIELDS = [
@@ -42,7 +45,7 @@ class UpdatePodSetupRequest extends FormRequest
                 if (!is_array($row) || (isset($row['id']) && $row['id'] !== '') || !empty($row['skill_ids'])) {
                     return true;
                 }
-                foreach (self::REQUIREMENT_VALUE_FIELDS as $field) {
+                foreach (array_merge(self::REQUIREMENT_VALUE_FIELDS, self::matchingValueFields()) as $field) {
                     if (isset($row[$field]) && trim((string) $row[$field]) !== '') {
                         return true;
                     }
@@ -93,7 +96,7 @@ class UpdatePodSetupRequest extends FormRequest
             'requirements.*.location' => ['nullable', 'string', 'max:255'],
             'requirements.*.description' => ['nullable', 'string', 'max:2000'],
             'requirements.*.is_active' => ['nullable', 'boolean'],
-        ];
+        ] + $this->matchingRequirementRules();
     }
 
     public function attributes(): array
@@ -116,6 +119,6 @@ class UpdatePodSetupRequest extends FormRequest
             'requirements.*.preferred_engagement_type' => __('engagement type'),
             'requirements.*.location' => __('location'),
             'requirements.*.description' => __('notes'),
-        ];
+        ] + $this->matchingRequirementAttributes();
     }
 }

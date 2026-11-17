@@ -30,8 +30,15 @@
         }
 
         ['job_title_id', 'headcount', 'minimum_years_experience', 'minimum_skill_proficiency',
-            'preferred_work_mode', 'preferred_engagement_type', 'location', 'description'].forEach(function (field) {
+            'preferred_work_mode', 'preferred_engagement_type', 'location', 'description',
+            // UNA-013 matching targets
+            'required_start_date', 'minimum_hours_per_week', 'timezone', 'timezone_tolerance_hours', 'project_type'].forEach(function (field) {
             setValue(row, field, template[field]);
+        });
+
+        var mandatory = (template.mandatory_criteria || []).map(String);
+        Array.prototype.forEach.call(row.querySelectorAll('[data-co-mandatory]'), function (checkbox) {
+            checkbox.checked = mandatory.indexOf(checkbox.value) !== -1;
         });
 
         var source = row.querySelector('[data-co-source]');
