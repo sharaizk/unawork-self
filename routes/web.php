@@ -196,6 +196,12 @@ Route::get('/pods/{pod}/news/{news}', [PodNewsController::class, 'show'])->name(
 // Company profile / business onboarding (UNA-010). Registered before /company/{company} so the
 // literal path is not captured by the public company page.
 Route::middleware(['auth', 'verified', 'XSS'])->group(function () {
+    // UNA-017: employee POD recommendations (manual discovery stays at pods.list).
+    Route::get('/recommendations/pods', [\App\Http\Controllers\PodRecommendationController::class, 'index'])
+        ->name('pod-recommendations.index')->middleware('profile.complete');
+    Route::post('/recommendations/pods/{pod}/dismiss', [\App\Http\Controllers\PodRecommendationController::class, 'dismiss'])
+        ->whereNumber('pod')->name('pod-recommendations.dismiss')->middleware('profile.complete');
+
     Route::get('/company/onboarding', [CompanyOnboardingController::class, 'edit'])->name('company.onboarding.edit');
     Route::post('/company/onboarding', [CompanyOnboardingController::class, 'update'])->name('company.onboarding.update');
 });

@@ -1,0 +1,630 @@
+/*
+ * Employee POD recommendations (UNA-017). A warm, calm career dashboard on the Dash theme:
+ * white rounded cards on a soft warm surface, navy typography, restrained gold accents.
+ * Scoped to .pod-recommendations. Surfaces use theme variables (--bs-*) so the dark stylesheet
+ * applies; .pr-theme-dark (set by pod-recommendations.js when style-dark.css is active) swaps the
+ * navy ink and warm tint for readable dark equivalents. Logical properties keep RTL mirrored.
+ */
+.pod-recommendations {
+    --pr-navy: #022d4d;
+    --pr-gold: #cfaa40;
+    --pr-gold-soft: rgba(207, 170, 64, 0.16);
+    --pr-ink: var(--pr-navy);
+    --pr-muted: var(--bs-secondary-color, #6c757d);
+    --pr-surface: #fbf7ef;
+    --pr-card: var(--bs-card-bg, #fff);
+    --pr-border: var(--bs-border-color, rgba(2, 45, 77, 0.09));
+    --pr-success: #2a9d6f;
+    --pr-success-soft: rgba(42, 157, 111, 0.13);
+    --pr-warning: #b7791f;
+    --pr-warning-soft: rgba(183, 121, 31, 0.14);
+    --pr-danger: #c2410c;
+    --pr-danger-soft: rgba(194, 65, 12, 0.12);
+    --pr-radius: 20px;
+    --pr-shadow: 0 1px 2px rgba(2, 45, 77, 0.04), 0 8px 24px rgba(2, 45, 77, 0.06);
+
+    background: var(--pr-surface);
+    border-radius: calc(var(--pr-radius) + 6px);
+    padding: clamp(16px, 3vw, 32px);
+    color: var(--bs-body-color);
+}
+
+.pod-recommendations.pr-theme-dark {
+    /* style-dark.css scopes --bs-card-bg to .card, so the dark card surface is set here (#292A33 is its card colour). */
+    --pr-card: #292a33;
+    --pr-border: rgba(255, 255, 255, 0.09);
+    --pr-muted: #a9afbb;
+    --pr-ink: #e9eef4;
+    --pr-surface: rgba(207, 170, 64, 0.06);
+    --pr-gold: #e0bf62;
+    --pr-shadow: none;
+    --pr-success: #4cc795;
+    --pr-warning: #e2a94b;
+    --pr-danger: #f08a5d;
+}
+
+/* ---------------------------------------------------------------- hero */
+
+.pod-recommendations .pr-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+    margin-block-end: 24px;
+}
+
+.pod-recommendations .pr-eyebrow {
+    margin: 0 0 4px;
+    color: var(--pr-gold);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.pod-recommendations .pr-hero__title {
+    margin: 0;
+    color: var(--pr-ink);
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.pod-recommendations .pr-hero__lead {
+    margin: 6px 0 0;
+    color: var(--pr-muted);
+    max-inline-size: 60ch;
+}
+
+.pod-recommendations .pr-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.pod-recommendations .btn {
+    border-radius: 999px;
+    min-block-size: 40px;
+    padding-inline: 18px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pod-recommendations .pr-btn-primary {
+    background: var(--pr-navy);
+    border: 1px solid var(--pr-navy);
+    color: #fff;
+}
+
+.pod-recommendations .pr-btn-primary:hover,
+.pod-recommendations .pr-btn-primary:focus-visible {
+    background: #0c3a63;
+    color: #fff;
+}
+
+.pod-recommendations.pr-theme-dark .pr-btn-primary {
+    background: var(--pr-gold);
+    border-color: var(--pr-gold);
+    color: #1b1d24;
+}
+
+.pod-recommendations .pr-btn-browse {
+    background: var(--pr-card);
+    border: 1px solid var(--pr-gold);
+    color: var(--pr-ink);
+}
+
+.pod-recommendations .pr-btn-browse:hover,
+.pod-recommendations .pr-btn-browse:focus-visible {
+    background: var(--pr-gold-soft);
+}
+
+.pod-recommendations .pr-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--pr-border);
+    color: var(--pr-ink);
+}
+
+.pod-recommendations .pr-btn-ghost:hover,
+.pod-recommendations .pr-btn-ghost:focus-visible {
+    border-color: var(--pr-ink);
+}
+
+.pod-recommendations .pr-btn-dismiss {
+    background: transparent;
+    border: 0;
+    color: var(--pr-muted);
+    padding-inline: 10px;
+}
+
+.pod-recommendations .pr-btn-dismiss:hover,
+.pod-recommendations .pr-btn-dismiss:focus-visible {
+    color: var(--pr-ink);
+    text-decoration: underline;
+}
+
+.pod-recommendations .pr-link {
+    color: var(--pr-ink);
+    font-weight: 600;
+}
+
+.pod-recommendations .btn:focus-visible,
+.pod-recommendations a:focus-visible,
+.pod-recommendations .pr-why-toggle:focus-visible {
+    outline: 3px solid var(--pr-gold);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.pod-recommendations .btn[disabled] {
+    opacity: 0.65;
+    cursor: progress;
+}
+
+/* ---------------------------------------------------------------- metrics */
+
+.pod-recommendations .pr-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-block-end: 24px;
+}
+
+.pod-recommendations .pr-metric {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    align-items: center;
+    background: var(--pr-card);
+    border: 1px solid var(--pr-border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: var(--pr-shadow);
+}
+
+.pod-recommendations .pr-metric__icon {
+    grid-row: span 2;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--pr-gold-soft);
+    color: var(--pr-gold);
+    font-size: 1.25rem;
+}
+
+.pod-recommendations .pr-metric__value {
+    color: var(--pr-ink);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.pod-recommendations .pr-metric__label {
+    color: var(--pr-muted);
+    font-size: 0.82rem;
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.pod-recommendations .pr-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+    gap: 18px;
+    align-items: start; /* an expanded card must not stretch its neighbour */
+}
+
+.pod-recommendations .pr-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-inline-size: 0;
+    background: var(--pr-card);
+    border: 1px solid var(--pr-border);
+    border-radius: var(--pr-radius);
+    padding: 20px;
+    box-shadow: var(--pr-shadow);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.pod-recommendations .pr-card.is-leaving {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+.pod-recommendations .pr-card__head {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+}
+
+.pod-recommendations .pr-card__media {
+    inline-size: 56px;
+    block-size: 56px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--pr-gold-soft);
+}
+
+.pod-recommendations .pr-card__media img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+.pod-recommendations .pr-card__placeholder {
+    inline-size: 100%;
+    block-size: 100%;
+    display: grid;
+    place-items: center;
+    color: var(--pr-gold);
+    font-size: 1.6rem;
+}
+
+.pod-recommendations .pr-card__title {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+/* Classed on purpose: the theme colours every unclassed link (body.theme-N a:not([class])). */
+.pod-recommendations .pr-card__link {
+    color: var(--pr-ink);
+    text-decoration: none;
+}
+
+.pod-recommendations .pr-card__link:hover {
+    text-decoration: underline;
+}
+
+.pod-recommendations .pr-card__sub {
+    margin: 4px 0 0;
+    color: var(--pr-muted);
+    font-size: 0.86rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* score */
+.pod-recommendations .pr-score {
+    min-inline-size: 84px;
+    text-align: end;
+}
+
+.pod-recommendations .pr-score__value {
+    display: block;
+    color: var(--pr-ink);
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.pod-recommendations .pr-score__value small {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-inline-start: 1px;
+}
+
+.pod-recommendations .pr-score__label {
+    display: block;
+    color: var(--pr-muted);
+    font-size: 0.74rem;
+    margin-block: 2px 6px;
+}
+
+.pod-recommendations .pr-score__bar {
+    display: block;
+    block-size: 6px;
+    border-radius: 999px;
+    background: var(--pr-gold-soft);
+    overflow: hidden;
+}
+
+.pod-recommendations .pr-score__bar span {
+    display: block;
+    block-size: 100%;
+    border-radius: inherit;
+    background: var(--pr-gold);
+}
+
+/* reasons and metadata */
+.pod-recommendations .pr-chips,
+.pod-recommendations .pr-meta {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pod-recommendations .pr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--pr-success-soft);
+    color: var(--pr-success);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.pod-recommendations .pr-meta {
+    column-gap: 16px;
+}
+
+.pod-recommendations .pr-meta li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--pr-muted);
+    font-size: 0.84rem;
+}
+
+.pod-recommendations .pr-card__time {
+    margin: 0;
+    color: var(--pr-muted);
+    font-size: 0.8rem;
+}
+
+/* actions */
+.pod-recommendations .pr-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-block-start: auto;
+}
+
+.pod-recommendations .pr-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-block-size: 40px;
+    padding-inline: 14px;
+    border-radius: 999px;
+    background: var(--pr-gold-soft);
+    color: var(--pr-ink);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.pod-recommendations .pr-status--done {
+    background: var(--pr-success-soft);
+    color: var(--pr-success);
+}
+
+/* ---------------------------------------------------------------- why this matches */
+
+.pod-recommendations .pr-why-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    inline-size: 100%;
+    background: transparent;
+    border: 0;
+    border-block-start: 1px solid var(--pr-border);
+    padding: 12px 0 0;
+    color: var(--pr-ink);
+    font-weight: 600;
+    text-align: start;
+}
+
+.pod-recommendations .pr-why-toggle i {
+    transition: transform 0.2s ease;
+}
+
+.pod-recommendations .pr-why-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.pod-recommendations .pr-why__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.pod-recommendations .pr-why__item {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--pr-surface);
+    border-inline-start: 3px solid var(--pr-border);
+}
+
+.pod-recommendations .pr-why__item--met {
+    border-inline-start-color: var(--pr-success);
+}
+
+.pod-recommendations .pr-why__item--partial {
+    border-inline-start-color: var(--pr-warning);
+}
+
+.pod-recommendations .pr-why__item--missed {
+    border-inline-start-color: var(--pr-danger);
+}
+
+.pod-recommendations .pr-why__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 10px;
+}
+
+.pod-recommendations .pr-why__label {
+    color: var(--pr-ink);
+    font-weight: 600;
+}
+
+.pod-recommendations .pr-why__badges {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.pod-recommendations .pr-why__points {
+    color: var(--pr-muted);
+    font-size: 0.8rem;
+}
+
+.pod-recommendations .pr-why__text {
+    margin: 4px 0 0;
+    color: var(--bs-body-color);
+    font-size: 0.86rem;
+}
+
+.pod-recommendations .pr-why__meta {
+    margin: 12px 0 0;
+    color: var(--pr-muted);
+    font-size: 0.76rem;
+}
+
+.pod-recommendations .pr-badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.pod-recommendations .pr-badge--met {
+    background: var(--pr-success-soft);
+    color: var(--pr-success);
+}
+
+.pod-recommendations .pr-badge--partial {
+    background: var(--pr-warning-soft);
+    color: var(--pr-warning);
+}
+
+.pod-recommendations .pr-badge--missed {
+    background: var(--pr-danger-soft);
+    color: var(--pr-danger);
+}
+
+.pod-recommendations .pr-badge--mandatory {
+    background: var(--pr-gold-soft);
+    color: var(--pr-ink);
+}
+
+/* ---------------------------------------------------------------- empty state, pagination */
+
+.pod-recommendations .pr-empty {
+    text-align: center;
+    background: var(--pr-card);
+    border: 1px dashed var(--pr-border);
+    border-radius: var(--pr-radius);
+    padding: clamp(28px, 5vw, 48px) 20px;
+}
+
+.pod-recommendations .pr-empty[hidden] {
+    display: none;
+}
+
+.pod-recommendations .pr-empty__icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 64px;
+    block-size: 64px;
+    border-radius: 50%;
+    background: var(--pr-gold-soft);
+    color: var(--pr-gold);
+    font-size: 1.8rem;
+    margin-block-end: 12px;
+}
+
+.pod-recommendations .pr-empty__title {
+    color: var(--pr-ink);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.pod-recommendations .pr-empty__text {
+    color: var(--pr-muted);
+    max-inline-size: 52ch;
+    margin: 8px auto 18px;
+}
+
+.pod-recommendations .pr-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pod-recommendations .pr-pagination {
+    margin-block-start: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ---------------------------------------------------------------- small screens, motion */
+
+@media (max-width: 575.98px) {
+    /* Keep the summary compact so the first recommendation stays near the top. */
+    .pod-recommendations .pr-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .pod-recommendations .pr-metric {
+        grid-template-columns: 1fr;
+        align-content: start;
+        padding: 12px;
+    }
+
+    .pod-recommendations .pr-metric__icon {
+        display: none;
+    }
+
+    .pod-recommendations .pr-card__head {
+        grid-template-columns: 48px minmax(0, 1fr);
+    }
+
+    .pod-recommendations .pr-card__media {
+        inline-size: 48px;
+        block-size: 48px;
+    }
+
+    .pod-recommendations .pr-score {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        column-gap: 10px;
+        text-align: start;
+    }
+
+    .pod-recommendations .pr-score__bar {
+        grid-column: 1 / -1;
+    }
+
+    .pod-recommendations .pr-actions .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+
+[dir="rtl"] .pod-recommendations .ti-chevron-down {
+    display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pod-recommendations .pr-card,
+    .pod-recommendations .pr-why-toggle i {
+        transition: none;
+    }
+}

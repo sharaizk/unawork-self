@@ -306,6 +306,8 @@ trait UsesInMemorySqlite
         (require database_path('migrations/2026_11_19_000200_add_matching_thresholds.php'))->up();
         // UNA-016: pod_matches.algorithm.
         (require database_path('migrations/2026_11_19_000300_add_algorithm_to_pod_matches.php'))->up();
+        // UNA-017: recommendation dismissals.
+        (require database_path('migrations/2026_11_19_000400_create_pod_recommendation_dismissals_table.php'))->up();
     }
 
     /**

@@ -70,7 +70,7 @@ Route::delete('/pod/{id}', [PodController::class, 'destroy'])->name('api.pod.del
 Route::post('/pod/{id}/users', [PodUserController::class, 'inviteExistedUser']);
 Route::post('/pod/{id}/users/new', [PodUserController::class, 'inviteNewUser']);
 
-Route::post('/pods/{id}/requests', [PodUserController::class, 'join'])->name('api.pods.join');
+Route::post('/pods/{id}/requests', [PodUserController::class, 'join'])->name('api.pods.join')->middleware('profile.complete'); // UNA-017
 Route::get('/pods/{id}/requests', [PodUserController::class, 'listing']);
 Route::post('pods/{id}/requests/{requestId}', [PodUserController::class, 'update']);
 

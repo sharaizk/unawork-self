@@ -68,7 +68,10 @@ class PodMatchPresenter
             'awarded_points' => (string) $reason->awarded_points,
             'possible_points' => $reason->possible_points,
             'code' => $reason->code->value,
+            'position' => $reason->position,
             'explanation' => $this->explanation($reason->code, $context),
+            // UNA-017: short positive phrase for a passed criterion (reason chips), null otherwise.
+            'highlight' => $reason->active && $reason->passed ? $this->highlight($reason->code) : null,
             'details' => $context,
         ];
     }
@@ -130,6 +133,24 @@ class PodMatchPresenter
             Code::WORK_MODE_INCOMPATIBLE => __('Work mode is not compatible (:actual for :required).', ['actual' => WorkMode::tryFrom((string) ($c['actual'] ?? ''))?->label() ?? __('Not set'), 'required' => WorkMode::tryFrom((string) ($c['required'] ?? ''))?->label() ?? '']),
             Code::ENGAGEMENT_COMPATIBLE => __('Engagement type matches (:required).', ['required' => EngagementType::tryFrom((string) ($c['required'] ?? ''))?->label() ?? '']),
             Code::ENGAGEMENT_INCOMPATIBLE => __('Engagement type does not match (:actual for :required).', ['actual' => EngagementType::tryFrom((string) ($c['actual'] ?? ''))?->label() ?? __('Not set'), 'required' => EngagementType::tryFrom((string) ($c['required'] ?? ''))?->label() ?? '']),
+        };
+    }
+
+    /** Short, supportive phrase for a passed criterion (UNA-017 recommendation chips). */
+    public function highlight(Code $code): ?string
+    {
+        return match ($code) {
+            Code::SKILLS_ALL_MATCHED => __('All required skills matched'),
+            Code::PROFICIENCY_MET => __('Skill level meets the requirement'),
+            Code::EXPERIENCE_MET => __('Enough relevant experience'),
+            Code::ROLE_PRIMARY => __('Matches your primary role'),
+            Code::ROLE_PREFERRED => __('One of your preferred roles'),
+            Code::AVAILABILITY_MET => __('Availability aligned'),
+            Code::LOCATION_MET => __('Location and timezone compatible'),
+            Code::PROJECT_TYPE_MATCHED => __('Your preferred project type'),
+            Code::WORK_MODE_COMPATIBLE => __('Work mode compatible'),
+            Code::ENGAGEMENT_COMPATIBLE => __('Engagement type matches'),
+            default => null,
         };
     }
 

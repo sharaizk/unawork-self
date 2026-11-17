@@ -213,8 +213,8 @@ class PodPolicy
      */
     public function requestToJoin(User $user, Pod $pod): bool
     {
-        // UNA-011: only published PODs accept applications.
-        return $pod->isPublished() && !$this->isOwner($user, $pod) && $pod->workspace !== null;
+        // UNA-011: only published PODs accept applications. UNA-017: only employees apply.
+        return $user->isEmployee() && $pod->isPublished() && !$this->isOwner($user, $pod) && $pod->workspace !== null;
     }
 
     /**

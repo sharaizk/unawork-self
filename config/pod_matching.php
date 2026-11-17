@@ -56,6 +56,12 @@ return [
         'unique_for' => 3600,        // seconds a queued duplicate is collapsed for
     ],
 
+    // UNA-017: employee recommendation screen.
+    'recommendations' => [
+        'per_page' => 9,
+        'strong_score' => 80, // display-only: "strong matches" summary metric
+    ],
+
     // Upper bound for pod_worker_requirements.timezone_tolerance_hours.
     'max_timezone_tolerance_hours' => 14,
 

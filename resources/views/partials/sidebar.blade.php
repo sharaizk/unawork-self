@@ -120,6 +120,15 @@
                                     </a>
                                 </li>
                         @endif
+                        {{-- UNA-017: employee POD recommendations (no queries here). --}}
+                        @if (\Auth::user()->isEmployee())
+                            <li class="dash-item {{ Request::route()->getName() == 'pod-recommendations.index' ? ' active' : '' }}">
+                                <a href="{{ route('pod-recommendations.index') }}" class="dash-link">
+                                    <span class="dash-micon"><i class="ti ti-bulb"></i></span>
+                                    <span class="dash-mtext">{{ __('PODs for you') }}</span>
+                                </a>
+                            </li>
+                        @endif
                         @if ($adminSetting['enable_chat'] == 'on' && !Auth::user()->isAdministrator())
                             <li class="dash-item {{ Request::route()->getName() == 'chats' ? ' active' : '' }}">
                                 <a href="{{ route('chats') }}" class="dash-link">
