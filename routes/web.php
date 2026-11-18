@@ -121,6 +121,45 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/pods/{podId}/news/create', [NewsController::class, 'create'])->name('pods.news.create');
     Route::get('/account/pods/{podId}/news/{NewsId}', [NewsController::class, 'edit'])->name('pods.news.edit');
 
+    // UNA-020, UNA-021: POD Knowledge Base documents, onboarding materials, private files, version history
+    Route::get('/account/pods/{pod}/documents', [\App\Http\Controllers\PodDocumentController::class, 'index'])
+        ->whereNumber('pod')->name('pods.documents.index');
+    Route::post('/account/pods/{pod}/documents/reorder', [\App\Http\Controllers\PodDocumentController::class, 'reorder'])
+        ->whereNumber('pod')->name('pods.documents.reorder');
+    Route::get('/account/pods/{pod}/documents/create', [\App\Http\Controllers\PodDocumentController::class, 'create'])
+        ->whereNumber('pod')->name('pods.documents.create');
+    Route::post('/account/pods/{pod}/documents', [\App\Http\Controllers\PodDocumentController::class, 'store'])
+        ->whereNumber('pod')->name('pods.documents.store')->middleware('XSS');
+    Route::get('/account/pods/{pod}/documents/{document}', [\App\Http\Controllers\PodDocumentController::class, 'show'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.show');
+    Route::get('/account/pods/{pod}/documents/{document}/download', [\App\Http\Controllers\PodDocumentController::class, 'download'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.download');
+    Route::get('/account/pods/{pod}/documents/{document}/edit', [\App\Http\Controllers\PodDocumentController::class, 'edit'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.edit');
+    Route::put('/account/pods/{pod}/documents/{document}', [\App\Http\Controllers\PodDocumentController::class, 'update'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.update')->middleware('XSS');
+    Route::post('/account/pods/{pod}/documents/{document}/archive', [\App\Http\Controllers\PodDocumentController::class, 'archive'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.archive');
+    Route::delete('/account/pods/{pod}/documents/{document}', [\App\Http\Controllers\PodDocumentController::class, 'destroy'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.destroy');
+
+    Route::get('/account/pods/{pod}/documents/{document}/versions/create', [\App\Http\Controllers\PodDocumentController::class, 'createVersion'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.versions.create');
+    Route::post('/account/pods/{pod}/documents/{document}/versions', [\App\Http\Controllers\PodDocumentController::class, 'storeVersion'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.versions.store')->middleware('XSS');
+    Route::get('/account/pods/{pod}/documents/{document}/versions/{version}', [\App\Http\Controllers\PodDocumentController::class, 'showVersion'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.show');
+    Route::get('/account/pods/{pod}/documents/{document}/versions/{version}/download', [\App\Http\Controllers\PodDocumentController::class, 'downloadVersion'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.download');
+    Route::get('/account/pods/{pod}/documents/{document}/versions/{version}/edit', [\App\Http\Controllers\PodDocumentController::class, 'editVersion'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.edit');
+    Route::put('/account/pods/{pod}/documents/{document}/versions/{version}', [\App\Http\Controllers\PodDocumentController::class, 'updateVersion'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.update')->middleware('XSS');
+    Route::post('/account/pods/{pod}/documents/{document}/versions/{version}/publish', [\App\Http\Controllers\PodDocumentController::class, 'publishVersion'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.publish');
+    Route::delete('/account/pods/{pod}/documents/{document}/versions/{version}', [\App\Http\Controllers\PodDocumentController::class, 'destroyVersion'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.destroy');
+
     Route::get('/pods/{podId}/invite', [PodUserController::class, 'create'])->name('pods.invite');
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');
     Route::delete('/pods/{podId}/users/{userId}', [PodUserController::class, 'remove'])->name('pods.remove');

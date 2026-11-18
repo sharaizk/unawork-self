@@ -1,6 +1,7 @@
 @php
-    // UNA-018: keep the POD model; the legacy links below reassign $pod to an id ($pod=$podId).
-    $reviewPod = isset($pod) && $pod instanceof \App\Models\Pod ? $pod : null;
+    // UNA-018/UNA-020: keep the POD model; the legacy links below reassign $pod to an id ($pod=$podId).
+    $navPod = isset($pod) && $pod instanceof \App\Models\Pod ? $pod : (isset($podId) ? \App\Models\Pod::find($podId) : null);
+    $reviewPod = $navPod;
 @endphp
 <!-- <div class="navbar-wrapper">
     <div class="navbar-content">
@@ -35,6 +36,11 @@
         {{-- UNA-018: policy-gated; no counts are queried here. --}}
         @if ($reviewPod && auth()->user()->can('viewMatchReviews', $reviewPod))
             <a href="{{ route('pods.match-reviews.index', $reviewPod) }}" class="list-group-item list-group-item-action border-0 @if(request()->routeIs('pods.match-reviews.*')) active @endif">{{ __('Match reviews') }} <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+        @endif
+
+        {{-- UNA-020: POD Knowledge Base --}}
+        @if ($navPod && auth()->user()->can('viewDocuments', $navPod))
+            <a href="{{ route('pods.documents.index', $navPod) }}" class="list-group-item list-group-item-action border-0 @if(request()->routeIs('pods.documents.*')) active @endif">{{ __('Knowledge Base') }} <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
         @endif
         
         

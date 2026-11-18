@@ -6,6 +6,8 @@ use App\Enums\PodUser\State;
 use App\Enums\UserWorkspace\Permission as WorkspacePermission;
 use App\Enums\UserWorkspace\Status as WorkspaceStatus;
 use App\Models\Pod;
+use App\Models\PodDocument;
+use App\Models\PodDocumentVersion;
 use App\Models\PodUser;
 use App\Models\User;
 use App\Models\UserWorkspace;
@@ -238,6 +240,109 @@ class PodPolicy
     public function moderateJoinRequest(User $user, Pod $pod, PodUser $joinRequest): bool
     {
         return (int) $joinRequest->pod_id === (int) $pod->id && $this->manageMembers($user, $pod);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Knowledge Base Document Authorization (UNA-020)
+    |--------------------------------------------------------------------------
+    |
+    | Manager = POD owner or active workspace member with users_edit.
+    | Document management (create, edit, publish, delete) is restricted to managers.
+    | Applicants and active members may view published documents and published versions only.
+    | Unrelated accounts, guests, and removed/rejected members have no access.
+    */
+
+    /**
+     * Authorized business users for the POD: owner or workspace manager.
+     */
+    public function manageDocuments(User $user, Pod $pod): bool
+    {
+        return $this->isOwner($user, $pod) || $this->manageMembers($user, $pod);
+    }
+
+    /**
+     * View the Knowledge Base documents list for a POD.
+     */
+    public function viewDocuments(User $user, Pod $pod): bool
+    {
+        if ($this->manageDocuments($user, $pod)) {
+            return true;
+        }
+
+        $membership = $this->podMembership($pod, $user);
+        if ($membership === null) {
+            return false;
+        }
+
+        if (in_array($membership->state, [State::REMOVED, State::REJECTED], true)) {
+            return false;
+        }
+
+        return in_array($membership->state, [...State::applicants(), ...State::activeMembers()], true);
+    }
+
+    /**
+     * View a specific document.
+     * Managers can view any document belonging to this POD.
+     * Associated applicants and members can only view if the document is published
+     * and has an active ready published version.
+     */
+    public function viewDocument(User $user, Pod $pod, PodDocument $document): bool
+    {
+        if ((int) $document->pod_id !== (int) $pod->id) {
+            return false;
+        }
+
+        if ($this->manageDocuments($user, $pod)) {
+            return true;
+        }
+
+        if (!$this->viewDocuments($user, $pod)) {
+            return false;
+        }
+
+        if (!$document->isPublished()) {
+            return false;
+        }
+
+        $publishedVersion = $document->publishedVersion();
+        return $publishedVersion !== null && $publishedVersion->isUploadReady();
+    }
+
+    /**
+     * View a specific document version.
+     * Managers can view any version.
+     * Associated applicants and members can only view the published version of a published document
+     * with ready upload status.
+     */
+    public function viewDocumentVersion(User $user, Pod $pod, PodDocument $document, PodDocumentVersion $version): bool
+    {
+        if ((int) $document->pod_id !== (int) $pod->id || (int) $version->pod_document_id !== (int) $document->id) {
+            return false;
+        }
+
+        if ($this->manageDocuments($user, $pod)) {
+            return true;
+        }
+
+        if (!$this->viewDocument($user, $pod, $document)) {
+            return false;
+        }
+
+        return $version->isPublished() && $version->isUploadReady();
+    }
+
+    /**
+     * Download a specific document version file.
+     */
+    public function downloadDocumentVersion(User $user, Pod $pod, PodDocument $document, PodDocumentVersion $version): bool
+    {
+        if (!$this->viewDocumentVersion($user, $pod, $document, $version)) {
+            return false;
+        }
+
+        return $version->isFile();
     }
 
     private function canRespondToMembership(User $user, Pod $pod, User $member): bool

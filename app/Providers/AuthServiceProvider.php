@@ -55,6 +55,8 @@ class AuthServiceProvider extends ServiceProvider
         ZoomMeeting::class => ZoomMeetingPolicy::class,
         // Employee profiles (UNA-007).
         \App\Models\Profile::class => \App\Policies\ProfilePolicy::class,
+        // Knowledge Base documents (UNA-020).
+        \App\Models\PodDocument::class => \App\Policies\PodDocumentPolicy::class,
     ];
 
     /**

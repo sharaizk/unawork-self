@@ -76,6 +76,18 @@ class Pod extends Model
         return $this->hasMany(PodWorkerRequirement::class)->orderBy('id');
     }
 
+    /** POD Knowledge Base documents (UNA-020). */
+    public function documents()
+    {
+        return $this->hasMany(PodDocument::class)->orderBy('id', 'desc');
+    }
+
+    /** Published POD Knowledge Base documents (UNA-020). */
+    public function publishedDocuments()
+    {
+        return $this->hasMany(PodDocument::class)->published()->orderBy('id', 'desc');
+    }
+
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'pods_skills', 'pod_id', 'skill_id');

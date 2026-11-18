@@ -532,4 +532,48 @@ trait UsesInMemorySqlite
             $t->primary(['permission_id', 'role_id']);
         });
     }
+
+    /** Tables used by POD Knowledge Base documents and onboarding materials (UNA-020, UNA-021). */
+    protected function createPodDocumentSchema(): void
+    {
+        Schema::create('pod_documents', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('pod_id');
+            $t->string('title');
+            $t->text('description')->nullable();
+            $t->string('type', 32);
+            $t->string('status', 20)->default('draft');
+            $t->unsignedInteger('position')->default(0);
+            $t->unsignedBigInteger('created_by');
+            $t->unsignedBigInteger('updated_by')->nullable();
+            $t->timestamps();
+            $t->index(['pod_id', 'status']);
+            $t->index(['pod_id', 'type']);
+            $t->index(['pod_id', 'position']);
+        });
+
+        Schema::create('pod_document_versions', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('pod_document_id');
+            $t->unsignedInteger('version_number');
+            $t->string('title')->nullable();
+            $t->longText('content')->nullable();
+            $t->string('change_summary')->nullable();
+            $t->string('file_path')->nullable();
+            $t->string('file_name')->nullable();
+            $t->string('link_url', 2048)->nullable();
+            $t->unsignedBigInteger('file_size')->nullable();
+            $t->string('file_mime', 100)->nullable();
+            $t->string('status', 20)->default('draft');
+            $t->string('upload_status', 20)->default('ready');
+            $t->text('failure_message')->nullable();
+            $t->unsignedBigInteger('created_by');
+            $t->timestamp('published_at')->nullable();
+            $t->timestamp('archived_at')->nullable();
+            $t->timestamps();
+            $t->unique(['pod_document_id', 'version_number']);
+            $t->index(['pod_document_id', 'status']);
+            $t->index(['pod_document_id', 'upload_status']);
+        });
+    }
 }
