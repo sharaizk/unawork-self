@@ -414,4 +414,37 @@ class PodDocumentController extends Controller
             ->route('pods.documents.index', $pod)
             ->with('success', __('Draft document deleted successfully.'));
     }
+
+    /**
+     * Retry text extraction for a specific document version (UNA-022).
+     */
+    public function retryExtraction(Request $request, Pod $pod, PodDocument $document, PodDocumentVersion $version)
+    {
+        $this->authorize('manageDocuments', $pod);
+        abort_if((int) $document->pod_id !== (int) $pod->id || (int) $version->pod_document_id !== (int) $document->id, 404);
+
+        $this->documentService->retryExtraction($version, $request->user());
+
+        return redirect()
+            ->route('pods.documents.show', [$pod, $document])
+            ->with('success', __('Text extraction queued for retry.'));
+    }
+
+    /**
+     * Retry text extraction for the active or latest version of a document (UNA-022).
+     */
+    public function retryExtractionForDocument(Request $request, Pod $pod, PodDocument $document)
+    {
+        $this->authorize('manageDocuments', $pod);
+        abort_if((int) $document->pod_id !== (int) $pod->id, 404);
+
+        $version = $document->publishedVersion() ?? $document->latestVersion();
+        abort_if(!$version, 404, __('No version found for document.'));
+
+        $this->documentService->retryExtraction($version, $request->user());
+
+        return redirect()
+            ->route('pods.documents.show', [$pod, $document])
+            ->with('success', __('Text extraction queued for retry.'));
+    }
 }

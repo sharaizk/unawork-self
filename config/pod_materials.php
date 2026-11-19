@@ -33,4 +33,22 @@ return [
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Asynchronous Text Extraction Configuration (UNA-022)
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for extracting searchable plain text asynchronously from
+    | uploaded POD documents and materials (PDF, DOC, DOCX).
+    |
+    */
+    'extraction' => [
+        'enabled' => env('POD_MATERIALS_EXTRACTION_ENABLED', true),
+        'queue' => env('POD_MATERIALS_EXTRACTION_QUEUE', 'default'),
+        'timeout' => (int) env('POD_MATERIALS_EXTRACTION_TIMEOUT', 120),
+        'tries' => (int) env('POD_MATERIALS_EXTRACTION_TRIES', 3),
+        'backoff' => [15, 60, 180],
+        'max_extracted_characters' => (int) env('POD_MATERIALS_MAX_EXTRACTED_CHARS', 500000),
+    ],
 ];

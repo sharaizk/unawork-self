@@ -544,12 +544,14 @@ trait UsesInMemorySqlite
             $t->string('type', 32);
             $t->string('status', 20)->default('draft');
             $t->unsignedInteger('position')->default(0);
+            $t->boolean('is_mandatory')->default(false);
             $t->unsignedBigInteger('created_by');
             $t->unsignedBigInteger('updated_by')->nullable();
             $t->timestamps();
             $t->index(['pod_id', 'status']);
             $t->index(['pod_id', 'type']);
             $t->index(['pod_id', 'position']);
+            $t->index(['pod_id', 'is_mandatory']);
         });
 
         Schema::create('pod_document_versions', function (Blueprint $t) {
@@ -567,6 +569,11 @@ trait UsesInMemorySqlite
             $t->string('status', 20)->default('draft');
             $t->string('upload_status', 20)->default('ready');
             $t->text('failure_message')->nullable();
+            $t->longText('extracted_text')->nullable();
+            $t->string('extraction_status', 20)->default('pending');
+            $t->string('extraction_token', 64)->nullable();
+            $t->timestamp('extracted_at')->nullable();
+            $t->text('extraction_failure_message')->nullable();
             $t->unsignedBigInteger('created_by');
             $t->timestamp('published_at')->nullable();
             $t->timestamp('archived_at')->nullable();
@@ -574,6 +581,21 @@ trait UsesInMemorySqlite
             $t->unique(['pod_document_id', 'version_number']);
             $t->index(['pod_document_id', 'status']);
             $t->index(['pod_document_id', 'upload_status']);
+            $t->index(['pod_document_id', 'extraction_status']);
+        });
+
+        Schema::create('pod_document_completions', function (Blueprint $t) {
+            $t->id();
+            $t->unsignedBigInteger('user_id');
+            $t->unsignedBigInteger('pod_id');
+            $t->unsignedBigInteger('pod_document_id');
+            $t->unsignedBigInteger('pod_document_version_id');
+            $t->timestamp('completed_at');
+            $t->timestamps();
+            $t->unique(['user_id', 'pod_document_version_id']);
+            $t->index(['user_id', 'pod_id']);
+            $t->index(['pod_document_id', 'user_id']);
+            $t->index(['pod_id', 'user_id']);
         });
     }
 }

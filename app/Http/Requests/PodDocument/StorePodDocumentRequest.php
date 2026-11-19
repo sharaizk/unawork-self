@@ -35,6 +35,7 @@ class StorePodDocumentRequest extends FormRequest
             'link_url' => ['nullable', 'url', 'max:2048', 'required_without_all:content,file'],
             'file' => ['nullable', 'file', "mimes:{$allowedExtensions}", "mimetypes:{$allowedMimes}", "max:{$maxKb}", 'required_without_all:content,link_url'],
             'change_summary' => ['nullable', 'string', 'max:255'],
+            'is_mandatory' => ['nullable', 'boolean'],
             'publish' => ['nullable', 'boolean'],
         ];
     }

@@ -35,6 +35,7 @@ class UpdatePodDocumentRequest extends FormRequest
             'link_url' => ['nullable', 'url', 'max:2048'],
             'file' => ['nullable', 'file', "mimes:{$allowedExtensions}", "mimetypes:{$allowedMimes}", "max:{$maxKb}"],
             'change_summary' => ['nullable', 'string', 'max:255'],
+            'is_mandatory' => ['nullable', 'boolean'],
             'publish' => ['nullable', 'boolean'],
         ];
     }

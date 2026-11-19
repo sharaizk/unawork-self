@@ -262,6 +262,34 @@ class PodPolicy
     }
 
     /**
+     * View and access the Outer Circle learning flow for a POD (UNA-023).
+     * Accessible by managers (owner or workspace managers) and authorized Outer Circle applicants/members.
+     * Strictly blocked for guests, unrelated users, removed/rejected/suspended members,
+     * and unpublished (draft) PODs.
+     */
+    public function accessLearning(User $user, Pod $pod): bool
+    {
+        if (!$pod->isPublished()) {
+            return false;
+        }
+
+        if ($this->manageDocuments($user, $pod)) {
+            return true;
+        }
+
+        $membership = $this->podMembership($pod, $user);
+        if ($membership === null) {
+            return false;
+        }
+
+        if (in_array($membership->state, [State::REMOVED, State::REJECTED, State::SUSPENDED], true)) {
+            return false;
+        }
+
+        return in_array($membership->state, State::outerCircle(), true);
+    }
+
+    /**
      * View the Knowledge Base documents list for a POD.
      */
     public function viewDocuments(User $user, Pod $pod): bool

@@ -31,13 +31,18 @@
                     <h5 class="mb-1">{{ __('Knowledge Base & Onboarding Materials') }}</h5>
                     <p class="text-muted small mb-0">{{ __('Official documentation, instructions, guidelines, uploaded files, and links for this POD.') }}</p>
                 </div>
-                @if ($isManager)
-                    <div>
+                <div class="d-flex gap-2">
+                    @if (auth()->user()->can('accessLearning', $pod))
+                        <a href="{{ route('pods.learning.index', $pod) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="ti ti-school me-1"></i> {{ __('Outer Circle Learning') }}
+                        </a>
+                    @endif
+                    @if ($isManager)
                         <a href="{{ route('pods.documents.create', $pod) }}" class="btn btn-sm btn-primary">
                             <i class="ti ti-plus"></i> {{ __('Add Material') }}
                         </a>
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
             <div class="card-body border-bottom py-3">
                 <form method="GET" action="{{ route('pods.documents.index', $pod) }}" class="row g-2 align-items-center">
@@ -162,9 +167,16 @@
                                             </td>
                                         @endif
                                         <td>
-                                            <a href="{{ route('pods.documents.show', [$pod, $doc]) }}" class="fw-bold text-dark d-block">
-                                                {{ $doc->title }}
-                                            </a>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <a href="{{ route('pods.documents.show', [$pod, $doc]) }}" class="fw-bold text-dark">
+                                                    {{ $doc->title }}
+                                                </a>
+                                                @if ($doc->isMandatory())
+                                                    <span class="badge bg-danger-light text-danger"><i class="ti ti-star me-1"></i>{{ __('Mandatory') }}</span>
+                                                @else
+                                                    <span class="badge bg-light text-secondary">{{ __('Optional') }}</span>
+                                                @endif
+                                            </div>
                                             @if ($doc->description)
                                                 <small class="text-muted d-block text-truncate" style="max-width: 320px;">
                                                     {{ $doc->description }}

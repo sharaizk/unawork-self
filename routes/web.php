@@ -159,6 +159,20 @@ Route::middleware(['auth'])->group(function () {
         ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.publish');
     Route::delete('/account/pods/{pod}/documents/{document}/versions/{version}', [\App\Http\Controllers\PodDocumentController::class, 'destroyVersion'])
         ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.destroy');
+    Route::post('/account/pods/{pod}/documents/{document}/versions/{version}/retry-extraction', [\App\Http\Controllers\PodDocumentController::class, 'retryExtraction'])
+        ->whereNumber('pod')->whereNumber('document')->whereNumber('version')->name('pods.documents.versions.retry_extraction');
+    Route::post('/account/pods/{pod}/documents/{document}/retry-extraction', [\App\Http\Controllers\PodDocumentController::class, 'retryExtractionForDocument'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.documents.retry_extraction');
+
+    // UNA-023: Outer Circle POD learning materials flow
+    Route::get('/account/pods/{pod}/learning', [\App\Http\Controllers\PodLearningController::class, 'index'])
+        ->whereNumber('pod')->name('pods.learning.index');
+    Route::get('/account/pods/{pod}/learning/resume', [\App\Http\Controllers\PodLearningController::class, 'resume'])
+        ->whereNumber('pod')->name('pods.learning.resume');
+    Route::get('/account/pods/{pod}/learning/{document}', [\App\Http\Controllers\PodLearningController::class, 'show'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.learning.show');
+    Route::post('/account/pods/{pod}/learning/{document}/complete', [\App\Http\Controllers\PodLearningController::class, 'complete'])
+        ->whereNumber('pod')->whereNumber('document')->name('pods.learning.complete');
 
     Route::get('/pods/{podId}/invite', [PodUserController::class, 'create'])->name('pods.invite');
     Route::post('/pods/{podId}/checkUserExists', [PodUserController::class, 'checkUserExists'])->name('pods.user.exists');

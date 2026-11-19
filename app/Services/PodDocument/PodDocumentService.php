@@ -2,6 +2,8 @@
 
 namespace App\Services\PodDocument;
 
+use App\Enums\Pod\PodStatus;
+use App\Enums\PodDocument\PodDocumentExtractionStatus;
 use App\Enums\PodDocument\PodDocumentStatus;
 use App\Enums\PodDocument\PodDocumentType;
 use App\Enums\PodDocument\PodDocumentUploadStatus;
@@ -11,6 +13,7 @@ use App\Exceptions\PodDocument\CannotDeletePublishedVersionException;
 use App\Exceptions\PodDocument\CannotModifyImmutableVersionException;
 use App\Exceptions\PodDocument\CannotPublishIncompleteUploadException;
 use App\Exceptions\PodDocument\CannotPublishNonDraftVersionException;
+use App\Jobs\PodDocument\ExtractPodDocumentVersionText;
 use App\Models\Pod;
 use App\Models\PodDocument;
 use App\Models\PodDocumentVersion;
@@ -259,13 +262,15 @@ class PodDocumentService
                 'type' => $type,
                 'status' => $isPublish ? PodDocumentStatus::PUBLISHED : PodDocumentStatus::DRAFT,
                 'position' => $position,
+                'is_mandatory' => !empty($data['is_mandatory']),
                 'created_by' => $creator->id,
                 'updated_by' => $creator->id,
             ]);
 
             $content = $this->resolveContent($data, $uploadData);
 
-            PodDocumentVersion::create([
+            $hasFile = !empty($uploadData['file_path']);
+            $version = PodDocumentVersion::create([
                 'pod_document_id' => $document->id,
                 'version_number' => 1,
                 'title' => $document->title,
@@ -278,10 +283,17 @@ class PodDocumentService
                 'file_mime' => $uploadData['file_mime'],
                 'upload_status' => $uploadData['upload_status'],
                 'failure_message' => $uploadData['failure_message'],
+                'extraction_status' => $hasFile ? PodDocumentExtractionStatus::PENDING : PodDocumentExtractionStatus::COMPLETED,
+                'extracted_text' => $hasFile ? null : $content,
+                'extracted_at' => $hasFile ? null : now(),
                 'status' => $isPublish ? PodDocumentVersionStatus::PUBLISHED : PodDocumentVersionStatus::DRAFT,
                 'created_by' => $creator->id,
                 'published_at' => $isPublish ? now() : null,
             ]);
+
+            if ($version->isFile() && $version->isUploadReady()) {
+                $this->dispatchExtractionAfterCommit($version);
+            }
 
             return $document->fresh(['versions', 'creator']);
         });
@@ -306,6 +318,9 @@ class PodDocumentService
             }
             if (isset($data['type'])) {
                 $lockedDoc->type = $data['type'] instanceof PodDocumentType ? $data['type'] : PodDocumentType::from($data['type']);
+            }
+            if (array_key_exists('is_mandatory', $data)) {
+                $lockedDoc->is_mandatory = !empty($data['is_mandatory']);
             }
             $lockedDoc->updated_by = $user->id;
 
@@ -343,14 +358,31 @@ class PodDocumentService
                     $latestVersion->file_mime = $uploadData['file_mime'];
                     $latestVersion->upload_status = $uploadData['upload_status'];
                     $latestVersion->failure_message = $uploadData['failure_message'];
+                    $fileChanged = ($uploadData['file_path'] !== $oldFilePath);
+                    if ($fileChanged) {
+                        $latestVersion->extraction_status = !empty($uploadData['file_path']) ? PodDocumentExtractionStatus::PENDING : PodDocumentExtractionStatus::COMPLETED;
+                        $latestVersion->extracted_text = !empty($uploadData['file_path']) ? null : $content;
+                        $latestVersion->extracted_at = !empty($uploadData['file_path']) ? null : now();
+                        $latestVersion->extraction_failure_message = null;
+                        $latestVersion->extraction_token = null;
+                    } elseif (!$latestVersion->isFile()) {
+                        $latestVersion->extracted_text = $content;
+                        $latestVersion->extraction_status = PodDocumentExtractionStatus::COMPLETED;
+                        $latestVersion->extraction_token = null;
+                    }
                     $latestVersion->save();
                     $versionToPublish = $latestVersion;
 
                     // Clean up replaced draft file after database transaction commits
                     $this->cleanupReplacedDraftFileAfterCommit($this->getPrivateDisk(), $oldFilePath, $uploadData['file_path']);
+
+                    if ($fileChanged && $latestVersion->isFile() && $latestVersion->isUploadReady()) {
+                        $this->dispatchExtractionAfterCommit($latestVersion);
+                    }
                 } else {
                     // Otherwise, create a new draft version to preserve history.
                     $nextVersionNumber = (PodDocumentVersion::where('pod_document_id', $lockedDoc->id)->max('version_number') ?? 0) + 1;
+                    $hasFile = !empty($uploadData['file_path']);
                     $newVersion = PodDocumentVersion::create([
                         'pod_document_id' => $lockedDoc->id,
                         'version_number' => $nextVersionNumber,
@@ -364,10 +396,17 @@ class PodDocumentService
                         'file_mime' => $uploadData['file_mime'],
                         'upload_status' => $uploadData['upload_status'],
                         'failure_message' => $uploadData['failure_message'],
+                        'extraction_status' => $hasFile ? PodDocumentExtractionStatus::PENDING : PodDocumentExtractionStatus::COMPLETED,
+                        'extracted_text' => $hasFile ? null : $content,
+                        'extracted_at' => $hasFile ? null : now(),
                         'status' => PodDocumentVersionStatus::DRAFT,
                         'created_by' => $user->id,
                     ]);
                     $versionToPublish = $newVersion;
+
+                    if ($newVersion->isFile() && $newVersion->isUploadReady()) {
+                        $this->dispatchExtractionAfterCommit($newVersion);
+                    }
                 }
             }
 
@@ -437,13 +476,30 @@ class PodDocumentService
                 $existingDraft->file_mime = $uploadData['file_mime'];
                 $existingDraft->upload_status = $uploadData['upload_status'];
                 $existingDraft->failure_message = $uploadData['failure_message'];
+                $fileChanged = ($uploadData['file_path'] !== $oldFilePath);
+                if ($fileChanged) {
+                    $existingDraft->extraction_status = !empty($uploadData['file_path']) ? PodDocumentExtractionStatus::PENDING : PodDocumentExtractionStatus::COMPLETED;
+                    $existingDraft->extracted_text = !empty($uploadData['file_path']) ? null : $content;
+                    $existingDraft->extracted_at = !empty($uploadData['file_path']) ? null : now();
+                    $existingDraft->extraction_failure_message = null;
+                    $existingDraft->extraction_token = null;
+                } elseif (!$existingDraft->isFile()) {
+                    $existingDraft->extracted_text = $content;
+                    $existingDraft->extraction_status = PodDocumentExtractionStatus::COMPLETED;
+                    $existingDraft->extraction_token = null;
+                }
                 $existingDraft->save();
                 $version = $existingDraft;
 
                 // Clean up replaced draft file after database transaction commits
                 $this->cleanupReplacedDraftFileAfterCommit($this->getPrivateDisk(), $oldFilePath, $uploadData['file_path']);
+
+                if ($fileChanged && $existingDraft->isFile() && $existingDraft->isUploadReady()) {
+                    $this->dispatchExtractionAfterCommit($existingDraft);
+                }
             } else {
                 $nextVersionNumber = (PodDocumentVersion::where('pod_document_id', $lockedDoc->id)->max('version_number') ?? 0) + 1;
+                $hasFile = !empty($uploadData['file_path']);
                 $version = PodDocumentVersion::create([
                     'pod_document_id' => $lockedDoc->id,
                     'version_number' => $nextVersionNumber,
@@ -457,9 +513,16 @@ class PodDocumentService
                     'file_mime' => $uploadData['file_mime'],
                     'upload_status' => $uploadData['upload_status'],
                     'failure_message' => $uploadData['failure_message'],
+                    'extraction_status' => $hasFile ? PodDocumentExtractionStatus::PENDING : PodDocumentExtractionStatus::COMPLETED,
+                    'extracted_text' => $hasFile ? null : $content,
+                    'extracted_at' => $hasFile ? null : now(),
                     'status' => PodDocumentVersionStatus::DRAFT,
                     'created_by' => $creator->id,
                 ]);
+
+                if ($version->isFile() && $version->isUploadReady()) {
+                    $this->dispatchExtractionAfterCommit($version);
+                }
             }
 
             if (!empty($data['publish'])) {
@@ -521,10 +584,27 @@ class PodDocumentService
             $lockedVersion->file_mime = $uploadData['file_mime'];
             $lockedVersion->upload_status = $uploadData['upload_status'];
             $lockedVersion->failure_message = $uploadData['failure_message'];
+
+            $fileChanged = ($uploadData['file_path'] !== $oldFilePath);
+            if ($fileChanged) {
+                $lockedVersion->extraction_status = !empty($uploadData['file_path']) ? PodDocumentExtractionStatus::PENDING : PodDocumentExtractionStatus::COMPLETED;
+                $lockedVersion->extracted_text = !empty($uploadData['file_path']) ? null : $content;
+                $lockedVersion->extracted_at = !empty($uploadData['file_path']) ? null : now();
+                $lockedVersion->extraction_failure_message = null;
+                $lockedVersion->extraction_token = null;
+            } elseif (!$lockedVersion->isFile()) {
+                $lockedVersion->extracted_text = $content;
+                $lockedVersion->extraction_status = PodDocumentExtractionStatus::COMPLETED;
+                $lockedVersion->extraction_token = null;
+            }
             $lockedVersion->save();
 
             // Clean up replaced draft file after database transaction commits
             $this->cleanupReplacedDraftFileAfterCommit($this->getPrivateDisk(), $oldFilePath, $uploadData['file_path']);
+
+            if ($fileChanged && $lockedVersion->isFile() && $lockedVersion->isUploadReady()) {
+                $this->dispatchExtractionAfterCommit($lockedVersion);
+            }
 
             if (!empty($data['publish'])) {
                 $this->publishVersion($lockedDoc, $lockedVersion, $user);
@@ -599,6 +679,10 @@ class PodDocumentService
             $lockedDoc->status = PodDocumentStatus::PUBLISHED;
             $lockedDoc->updated_by = $actor->id;
             $lockedDoc->save();
+
+            if ($lockedVersion->isFile() && $lockedVersion->extraction_status !== PodDocumentExtractionStatus::COMPLETED) {
+                $this->dispatchExtractionAfterCommit($lockedVersion);
+            }
 
             return $lockedVersion->fresh();
         });
@@ -805,6 +889,210 @@ class PodDocumentService
             $doc->setRelation('versions', $doc->newCollection([$singleVersion]));
             return true;
         })->values();
+    }
+
+    /**
+     * Searchable text for screening consumers (UNA-022).
+     *
+     * Returns extracted text exclusively from the active published version of a published document.
+     * Draft or archived versions, incomplete uploads, or unpublished documents return null.
+     */
+    public function getSearchableTextForScreening(Pod $pod, int $documentId): ?string
+    {
+        $version = $this->getPublishedVersionForScreening($pod, $documentId);
+        if (!$version) {
+            return null;
+        }
+
+        return $version->searchableText();
+    }
+
+    /**
+     * Search published documents for a POD by keyword (UNA-022).
+     *
+     * Searches title, description, and searchable text strictly on the active published version
+     * of each published document. Never matches or returns draft or archived version content.
+     */
+    public function searchPublishedDocuments(Pod $pod, string $query, ?PodDocumentType $type = null): Collection
+    {
+        $documents = $this->getPublishedDocuments($pod, $type);
+        $needle = mb_strtolower(trim($query));
+
+        if ($needle === '') {
+            return $documents;
+        }
+
+        return $documents->filter(function (PodDocument $doc) use ($needle) {
+            $version = $doc->versions->first();
+            if (!$version) {
+                return false;
+            }
+
+            $searchable = mb_strtolower($version->searchableText());
+            $title = mb_strtolower($doc->title);
+            $desc = mb_strtolower($doc->description ?? '');
+
+            return str_contains($title, $needle)
+                || str_contains($desc, $needle)
+                || str_contains($searchable, $needle);
+        })->values();
+    }
+
+    /**
+     * Retry text extraction for a specific document version (UNA-022).
+     * Resets extraction status to pending, clears failure messages, and dispatches job after commit.
+     * Does NOT alter or overwrite any other version.
+     */
+    public function retryExtraction(PodDocumentVersion $version, ?User $actor = null): PodDocumentVersion
+    {
+        return DB::transaction(function () use ($version) {
+            $lockedVersion = PodDocumentVersion::whereKey($version->id)->lockForUpdate()->firstOrFail();
+
+            $lockedVersion->extraction_status = PodDocumentExtractionStatus::PENDING;
+            $lockedVersion->extraction_failure_message = null;
+            $lockedVersion->extraction_token = null;
+            $lockedVersion->save();
+
+            $this->dispatchExtractionAfterCommit($lockedVersion);
+
+            return $lockedVersion->fresh();
+        });
+    }
+
+    /**
+     * Backfill text extraction for existing published POD document versions (UNA-022).
+     *
+     * Rules:
+     *  - Batched via chunkById (default 100).
+     *  - Handles published versions without an uploaded file directly: copies text content to
+     *    extracted_text, sets extracted_at, and marks extraction COMPLETED.
+     *  - For link-only versions with no text content, marks extraction COMPLETED with empty extracted text.
+     *  - Dispatches asynchronous ExtractPodDocumentVersionText jobs for file-backed versions.
+     *  - Excludes archived documents, archived versions, draft documents/versions, failed uploads,
+     *    and unpublished (draft) PODs.
+     *  - Idempotent: excludes already completed versions unless $force is true.
+     *  - Scoped to exact versions; preserves publication status and historical content.
+     *  - Can optionally be restricted to a single POD.
+     *
+     * @param int $chunkSize Number of records per chunk.
+     * @param int|null $podId Optional POD ID filter.
+     * @param bool $force Re-extract even if already completed.
+     * @return array{queued: int, completed: int, total: int} Number of document versions processed.
+     */
+    public function backfillPublishedDocumentsText(int $chunkSize = 100, ?int $podId = null, bool $force = false): array
+    {
+        $chunkSize = max(1, $chunkSize);
+
+        $baseQuery = PodDocumentVersion::query()
+            ->whereHas('document', function ($q) use ($podId) {
+                $q->where('status', PodDocumentStatus::PUBLISHED->value)
+                    ->whereNull('archived_at')
+                    ->whereHas('pod', function ($pq) {
+                        $pq->where('status', PodStatus::PUBLISHED->value);
+                    });
+                if ($podId !== null) {
+                    $q->where('pod_id', $podId);
+                }
+            })
+            ->where('status', PodDocumentVersionStatus::PUBLISHED->value)
+            ->whereNull('archived_at')
+            ->where('upload_status', PodDocumentUploadStatus::READY->value);
+
+        $completedCount = 0;
+        $queuedCount = 0;
+
+        // 1. Process non-file versions (text content and link materials) synchronously without file extraction
+        $nonFileQuery = (clone $baseQuery)
+            ->where(function ($q) {
+                $q->whereNull('file_path')
+                    ->orWhere('file_path', '');
+            });
+
+        if (!$force) {
+            $nonFileQuery->where(function ($q) {
+                $q->whereNull('extraction_status')
+                    ->orWhere('extraction_status', '!=', PodDocumentExtractionStatus::COMPLETED->value);
+            });
+        }
+
+        $nonFileQuery->chunkById($chunkSize, function ($versions) use (&$completedCount) {
+            foreach ($versions as $version) {
+                $content = (string) ($version->content ?? '');
+                $version->extracted_text = trim($content) !== '' ? $content : '';
+                $version->extraction_status = PodDocumentExtractionStatus::COMPLETED;
+                $version->extracted_at = now();
+                $version->extraction_token = null;
+                $version->extraction_failure_message = null;
+                $version->save();
+
+                $completedCount++;
+            }
+        });
+
+        // 2. Process file-backed versions asynchronously via queue
+        $fileQuery = (clone $baseQuery)
+            ->whereNotNull('file_path')
+            ->where('file_path', '!=', '');
+
+        if (!$force) {
+            $fileQuery->where(function ($q) {
+                $q->whereNull('extraction_status')
+                    ->orWhere('extraction_status', '!=', PodDocumentExtractionStatus::COMPLETED->value);
+            });
+        }
+
+        $fileQuery->chunkById($chunkSize, function ($versions) use (&$queuedCount, $force) {
+            foreach ($versions as $version) {
+                $version->extraction_status = PodDocumentExtractionStatus::PENDING;
+                $version->extraction_token = null;
+                $version->save();
+
+                ExtractPodDocumentVersionText::dispatch($version->id, $force);
+                $queuedCount++;
+            }
+        });
+
+        return [
+            'queued' => $queuedCount,
+            'completed' => $completedCount,
+            'total' => $queuedCount + $completedCount,
+        ];
+    }
+
+    /**
+     * Schedule asynchronous text extraction for a document version after commit (UNA-022).
+     */
+    public function dispatchExtractionAfterCommit(PodDocumentVersion $version): void
+    {
+        if (!config('pod_materials.extraction.enabled', true)) {
+            return;
+        }
+
+        $versionId = $version->id;
+        DB::afterCommit(function () use ($versionId) {
+            ExtractPodDocumentVersionText::dispatch($versionId);
+        });
+    }
+
+    /**
+     * Get Outer Circle learning progress and breakdown for a user in a POD (UNA-023).
+     */
+    public function getLearningProgress(User $user, Pod $pod): array
+    {
+        return app(PodLearningProgressService::class)->breakdown($user, $pod);
+    }
+
+    /**
+     * Mark an active published material as completed by an applicant (UNA-023).
+     */
+    public function completeMaterial(User $user, Pod $pod, PodDocument $document, int|PodDocumentVersion|null $version = null): \App\Models\PodDocumentCompletion
+    {
+        $targetVersion = $version ?? $document->publishedVersion();
+        if (!$targetVersion) {
+            throw new \DomainException(__('The published material does not have a ready version to complete.'));
+        }
+
+        return app(PodLearningProgressService::class)->markCompleted($user, $pod, $document, $targetVersion);
     }
 
     /**

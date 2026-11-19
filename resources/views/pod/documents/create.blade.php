@@ -119,6 +119,16 @@
                             @enderror
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-3">
+                                <input class="form-check-input" type="checkbox" name="is_mandatory" value="1" id="is_mandatory" @if(old('is_mandatory')) checked @endif>
+                                <label class="form-check-label fw-bold text-danger" for="is_mandatory">
+                                    <i class="ti ti-star me-1"></i>{{ __('Mandatory learning material') }}
+                                </label>
+                                <div class="form-text small">{{ __('Required for Outer Circle learning completion. Optional materials remain accessible without blocking progress.') }}</div>
+                            </div>
+                        </div>
+
                         <div class="col-md-6 d-flex align-items-center">
                             <div class="form-check form-switch mt-3">
                                 <input class="form-check-input" type="checkbox" name="publish" value="1" id="publish" @if(old('publish')) checked @endif>

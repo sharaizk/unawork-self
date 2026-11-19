@@ -58,6 +58,16 @@
                             @elseif ($version->isUploadFailed())
                                 <span class="badge bg-danger" title="{{ $version->failure_message }}">{{ __('Failed') }}</span>
                             @endif
+
+                            @if ($version->isExtractionCompleted())
+                                <span class="badge bg-success-light text-success ms-1"><i class="ti ti-file-search me-1"></i>{{ __('Text Extracted') }}</span>
+                            @elseif ($version->isExtractionProcessing())
+                                <span class="badge bg-info-light text-info ms-1"><i class="ti ti-loader me-1"></i>{{ __('Extracting Text...') }}</span>
+                            @elseif ($version->isExtractionPending())
+                                <span class="badge bg-warning-light text-warning ms-1"><i class="ti ti-clock me-1"></i>{{ __('Extraction Pending') }}</span>
+                            @elseif ($version->isExtractionFailed())
+                                <span class="badge bg-danger ms-1" title="{{ $version->extraction_failure_message }}"><i class="ti ti-alert-triangle me-1"></i>{{ __('Extraction Failed') }}</span>
+                            @endif
                         @endif
                     </div>
                     <h4 class="mb-0">{{ $document->title }}</h4>
@@ -91,6 +101,21 @@
                     <div class="alert alert-danger py-2 mb-3 small">
                         <i class="ti ti-alert-triangle me-1"></i>
                         <strong>{{ __('Upload Failure:') }}</strong> {{ $version->failure_message }}
+                    </div>
+                @endif
+
+                @if ($isManager && $version->isExtractionFailed())
+                    <div class="alert alert-danger d-flex justify-content-between align-items-center flex-wrap gap-2 py-2 mb-3 small">
+                        <div>
+                            <i class="ti ti-alert-triangle me-1"></i>
+                            <strong>{{ __('Extraction Failure:') }}</strong> {{ $version->extraction_failure_message ?: __('Unable to extract text.') }}
+                        </div>
+                        <form method="POST" action="{{ route('pods.documents.versions.retry_extraction', [$pod, $document, $version]) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-xs btn-danger">
+                                <i class="ti ti-refresh me-1"></i> {{ __('Retry Extraction') }}
+                            </button>
+                        </form>
                     </div>
                 @endif
 
@@ -140,6 +165,32 @@
                             <a href="{{ $version->link_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info">
                                 <i class="ti ti-external-link me-1"></i> {{ __('Open Link') }}
                             </a>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Extracted Searchable Text (Managers Only) --}}
+                @if ($isManager && !empty($version->extracted_text))
+                    <div class="card border mb-3">
+                        <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                            <span class="small fw-bold text-muted">
+                                <i class="ti ti-file-search me-1"></i>{{ __('Extracted Searchable Text') }}
+                                <span class="badge bg-secondary ms-1">{{ strlen($version->extracted_text) }} {{ __('characters') }}</span>
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <form method="POST" action="{{ route('pods.documents.versions.retry_extraction', [$pod, $document, $version]) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-xs btn-outline-secondary" title="{{ __('Re-run Text Extraction') }}">
+                                        <i class="ti ti-refresh"></i> {{ __('Re-extract') }}
+                                    </button>
+                                </form>
+                                <button class="btn btn-xs btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExtractedTextVersion" aria-expanded="false" aria-controls="collapseExtractedTextVersion">
+                                    {{ __('Toggle Preview') }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="collapse" id="collapseExtractedTextVersion">
+                            <div class="card-body bg-white small text-muted font-monospace" style="max-height: 250px; overflow-y: auto; white-space: pre-wrap;">{{ $version->extracted_text }}</div>
                         </div>
                     </div>
                 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PodDocument\PodDocumentExtractionStatus;
 use App\Enums\PodDocument\PodDocumentUploadStatus;
 use App\Enums\PodDocument\PodDocumentVersionStatus;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,6 +36,11 @@ class PodDocumentVersion extends Model
         'status',
         'upload_status',
         'failure_message',
+        'extracted_text',
+        'extraction_status',
+        'extraction_token',
+        'extracted_at',
+        'extraction_failure_message',
         'created_by',
         'published_at',
         'archived_at',
@@ -45,8 +51,10 @@ class PodDocumentVersion extends Model
         'file_size' => 'integer',
         'status' => PodDocumentVersionStatus::class,
         'upload_status' => PodDocumentUploadStatus::class,
+        'extraction_status' => PodDocumentExtractionStatus::class,
         'published_at' => 'datetime',
         'archived_at' => 'datetime',
+        'extracted_at' => 'datetime',
     ];
 
     public function document(): BelongsTo
@@ -57,6 +65,11 @@ class PodDocumentVersion extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function completions(): HasMany
+    {
+        return $this->hasMany(PodDocumentCompletion::class, 'pod_document_version_id');
     }
 
     public function scopePublished(Builder $query): Builder
@@ -82,6 +95,21 @@ class PodDocumentVersion extends Model
     public function scopeUploadFailed(Builder $query): Builder
     {
         return $query->where($query->qualifyColumn('upload_status'), PodDocumentUploadStatus::FAILED->value);
+    }
+
+    public function scopeExtractionCompleted(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('extraction_status'), PodDocumentExtractionStatus::COMPLETED->value);
+    }
+
+    public function scopeExtractionPending(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('extraction_status'), PodDocumentExtractionStatus::PENDING->value);
+    }
+
+    public function scopeExtractionFailed(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('extraction_status'), PodDocumentExtractionStatus::FAILED->value);
     }
 
     public function isPublished(): bool
@@ -112,6 +140,36 @@ class PodDocumentVersion extends Model
     public function isUploadFailed(): bool
     {
         return $this->upload_status === PodDocumentUploadStatus::FAILED;
+    }
+
+    public function isExtractionCompleted(): bool
+    {
+        return $this->extraction_status === PodDocumentExtractionStatus::COMPLETED;
+    }
+
+    public function isExtractionPending(): bool
+    {
+        return $this->extraction_status === PodDocumentExtractionStatus::PENDING
+            || ($this->isFile() && $this->extraction_status === null);
+    }
+
+    public function isExtractionProcessing(): bool
+    {
+        return $this->extraction_status === PodDocumentExtractionStatus::PROCESSING;
+    }
+
+    public function isExtractionFailed(): bool
+    {
+        return $this->extraction_status === PodDocumentExtractionStatus::FAILED;
+    }
+
+    /**
+     * Searchable plain text for this version.
+     * Prefers extracted text when available; falls back to authored content.
+     */
+    public function searchableText(): string
+    {
+        return trim($this->extracted_text ?: $this->content ?: '');
     }
 
     public function isFile(): bool

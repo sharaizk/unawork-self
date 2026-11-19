@@ -42,6 +42,11 @@
         @if ($navPod && auth()->user()->can('viewDocuments', $navPod))
             <a href="{{ route('pods.documents.index', $navPod) }}" class="list-group-item list-group-item-action border-0 @if(request()->routeIs('pods.documents.*')) active @endif">{{ __('Knowledge Base') }} <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
         @endif
+
+        {{-- UNA-023: Outer Circle Learning Material --}}
+        @if ($navPod && auth()->user()->can('accessLearning', $navPod))
+            <a href="{{ route('pods.learning.index', $navPod) }}" class="list-group-item list-group-item-action border-0 @if(request()->routeIs('pods.learning.*')) active @endif">{{ __('Outer Circle Learning') }} <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+        @endif
         
         
         

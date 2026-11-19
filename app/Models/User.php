@@ -1065,6 +1065,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasAccountType
                     ->withTimestamps();
     }
 
+    public function podDocumentCompletions(): HasMany
+    {
+        return $this->hasMany(PodDocumentCompletion::class);
+    }
+
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class)->withDefault();

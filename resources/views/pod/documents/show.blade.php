@@ -44,6 +44,11 @@
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span class="badge bg-light text-dark border">{{ $document->type?->label() }}</span>
+                            @if ($document->isMandatory())
+                                <span class="badge bg-danger"><i class="ti ti-star me-1"></i>{{ __('Mandatory') }}</span>
+                            @else
+                                <span class="badge bg-secondary">{{ __('Optional') }}</span>
+                            @endif
                             @if ($isManager)
                                 @if ($document->isPublished())
                                     <span class="badge bg-success">{{ __('Published') }}</span>
@@ -90,6 +95,25 @@
             </div>
         @endif
 
+        {{-- Text Extraction Failure Warning & Retry (Managers Only) --}}
+        @if ($isManager && $version && $version->isExtractionFailed())
+            <div class="alert alert-danger d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div class="d-flex align-items-start gap-2">
+                    <i class="ti ti-alert-triangle fs-4 mt-1"></i>
+                    <div>
+                        <h6 class="alert-heading mb-1">{{ __('Text Extraction Failed') }}</h6>
+                        <p class="mb-0">{{ $version->extraction_failure_message ?: __('The searchable text could not be extracted from this document.') }}</p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ route('pods.documents.versions.retry_extraction', [$pod, $document, $version]) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="ti ti-refresh me-1"></i> {{ __('Retry Extraction') }}
+                    </button>
+                </form>
+            </div>
+        @endif
+
         {{-- Version Content Card --}}
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -112,6 +136,16 @@
                                     <span class="badge bg-warning-light text-warning ms-1">{{ __('Pending') }}</span>
                                 @elseif ($version->isUploadFailed())
                                     <span class="badge bg-danger ms-1">{{ __('Failed') }}</span>
+                                @endif
+
+                                @if ($version->isExtractionCompleted())
+                                    <span class="badge bg-success-light text-success ms-1"><i class="ti ti-file-search me-1"></i>{{ __('Text Extracted') }}</span>
+                                @elseif ($version->isExtractionProcessing())
+                                    <span class="badge bg-info-light text-info ms-1"><i class="ti ti-loader me-1"></i>{{ __('Extracting Text...') }}</span>
+                                @elseif ($version->isExtractionPending())
+                                    <span class="badge bg-warning-light text-warning ms-1"><i class="ti ti-clock me-1"></i>{{ __('Extraction Pending') }}</span>
+                                @elseif ($version->isExtractionFailed())
+                                    <span class="badge bg-danger ms-1" title="{{ $version->extraction_failure_message }}"><i class="ti ti-alert-triangle me-1"></i>{{ __('Extraction Failed') }}</span>
                                 @endif
                             @endif
                         @else
@@ -198,6 +232,32 @@
                         </div>
                     @endif
 
+                    {{-- Extracted Searchable Text (Managers Only) --}}
+                    @if ($isManager && !empty($version->extracted_text))
+                        <div class="card border mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold text-muted">
+                                    <i class="ti ti-file-search me-1"></i>{{ __('Extracted Searchable Text') }}
+                                    <span class="badge bg-secondary ms-1">{{ strlen($version->extracted_text) }} {{ __('characters') }}</span>
+                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <form method="POST" action="{{ route('pods.documents.versions.retry_extraction', [$pod, $document, $version]) }}" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-xs btn-outline-secondary" title="{{ __('Re-run Text Extraction') }}">
+                                            <i class="ti ti-refresh"></i> {{ __('Re-extract') }}
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-xs btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExtractedText" aria-expanded="false" aria-controls="collapseExtractedText">
+                                        {{ __('Toggle Preview') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="collapse" id="collapseExtractedText">
+                                <div class="card-body bg-white small text-muted font-monospace" style="max-height: 250px; overflow-y: auto; white-space: pre-wrap;">{{ $version->extracted_text }}</div>
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Text Content --}}
                     @if ($version->content && (!$version->isFile() && !$version->isLink() || strlen($version->content) > 30))
                         <div class="p-4 bg-light rounded border" style="min-height: 200px; font-size: 1.05rem; line-height: 1.7; white-space: pre-wrap; font-family: inherit;">{{ $version->content }}</div>
@@ -245,6 +305,7 @@
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Format') }}</th>
                                     <th>{{ __('Upload') }}</th>
+                                    <th>{{ __('Extraction') }}</th>
                                     <th>{{ __('Change Summary') }}</th>
                                     <th>{{ __('Author') }}</th>
                                     <th>{{ __('Date') }}</th>
@@ -288,6 +349,19 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @if ($v->isExtractionCompleted())
+                                                <span class="badge bg-success-light text-success">{{ __('Extracted') }}</span>
+                                            @elseif ($v->isExtractionProcessing())
+                                                <span class="badge bg-info-light text-info">{{ __('Processing') }}</span>
+                                            @elseif ($v->isExtractionPending())
+                                                <span class="badge bg-warning-light text-warning">{{ __('Pending') }}</span>
+                                            @elseif ($v->isExtractionFailed())
+                                                <span class="badge bg-danger" title="{{ $v->extraction_failure_message }}">{{ __('Failed') }}</span>
+                                            @else
+                                                <span class="text-muted small">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <span class="text-muted small">{{ $v->change_summary ?? '—' }}</span>
                                         </td>
                                         <td>
@@ -307,6 +381,12 @@
                                                 <a href="{{ route('pods.documents.versions.download', [$pod, $document, $v]) }}" class="btn btn-sm btn-light text-success" title="{{ __('Download File') }}">
                                                     <i class="ti ti-download"></i>
                                                 </a>
+                                                <form method="POST" action="{{ route('pods.documents.versions.retry_extraction', [$pod, $document, $v]) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-light text-secondary" title="{{ __('Retry Text Extraction') }}">
+                                                        <i class="ti ti-refresh"></i>
+                                                    </button>
+                                                </form>
                                             @endif
 
                                             <a href="{{ route('pods.documents.versions.show', [$pod, $document, $v]) }}" class="btn btn-sm btn-light" title="{{ __('View Version Content') }}">

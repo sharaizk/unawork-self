@@ -31,6 +31,7 @@ class PodDocument extends Model
         'type',
         'status',
         'position',
+        'is_mandatory',
         'created_by',
         'updated_by',
     ];
@@ -39,6 +40,7 @@ class PodDocument extends Model
         'type' => PodDocumentType::class,
         'status' => PodDocumentStatus::class,
         'position' => 'integer',
+        'is_mandatory' => 'boolean',
     ];
 
     public function pod(): BelongsTo
@@ -49,6 +51,11 @@ class PodDocument extends Model
     public function versions(): HasMany
     {
         return $this->hasMany(PodDocumentVersion::class, 'pod_document_id')->orderBy('version_number', 'desc');
+    }
+
+    public function completions(): HasMany
+    {
+        return $this->hasMany(PodDocumentCompletion::class, 'pod_document_id');
     }
 
     public function creator(): BelongsTo
@@ -86,6 +93,26 @@ class PodDocument extends Model
     {
         return $query->orderBy($query->qualifyColumn('position'), 'asc')
             ->orderBy($query->qualifyColumn('id'), 'asc');
+    }
+
+    public function scopeMandatory(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('is_mandatory'), true);
+    }
+
+    public function scopeOptional(Builder $query): Builder
+    {
+        return $query->where($query->qualifyColumn('is_mandatory'), false);
+    }
+
+    public function isMandatory(): bool
+    {
+        return (bool) $this->is_mandatory;
+    }
+
+    public function isOptional(): bool
+    {
+        return !$this->isMandatory();
     }
 
     public function isPublished(): bool

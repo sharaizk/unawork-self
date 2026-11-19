@@ -75,4 +75,24 @@ class PodDocumentPolicy
 
         return $this->podPolicy->downloadDocumentVersion($user, $pod, $document, $version);
     }
+
+    public function viewLearning(User $user, PodDocument $document): bool
+    {
+        $pod = $document->pod;
+        if (!$pod || !$document->isPublished()) {
+            return false;
+        }
+
+        if (!$this->podPolicy->accessLearning($user, $pod)) {
+            return false;
+        }
+
+        $version = $document->publishedVersion();
+        return $version !== null && $version->isUploadReady();
+    }
+
+    public function completeLearning(User $user, PodDocument $document): bool
+    {
+        return $this->viewLearning($user, $document);
+    }
 }
