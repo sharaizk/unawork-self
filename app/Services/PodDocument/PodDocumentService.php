@@ -147,7 +147,7 @@ class PodDocumentService
                     Storage::disk($disk)->delete($oldFilePath);
                 }
             } catch (\Throwable $e) {
-                Log::warning("Failed to clean up replaced draft file [{$oldFilePath}]: " . $e->getMessage());
+                Log::warning("Failed to clean up replaced draft file [{$oldFilePath}]: [" . get_class($e) . ']');
             }
         });
     }

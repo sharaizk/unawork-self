@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Pod;
 
+use App\Contracts\DocumentTextExtractionProvider;
 use App\Enums\PodDocument\PodDocumentExtractionStatus;
 use App\Enums\PodDocument\PodDocumentStatus;
 use App\Enums\PodDocument\PodDocumentType;
@@ -14,6 +15,7 @@ use App\Exceptions\PodDocument\CannotDeletePublishedVersionException;
 use App\Exceptions\PodDocument\CannotModifyImmutableVersionException;
 use App\Exceptions\PodDocument\CannotPublishIncompleteUploadException;
 use App\Exceptions\PodDocument\CannotPublishNonDraftVersionException;
+use App\Exceptions\PodDocument\DocumentTextExtractionException;
 use App\Exceptions\PodDocument\PodMaterialVersionChangedException;
 use App\Jobs\PodDocument\ExtractPodDocumentVersionText;
 use App\Models\Pod;
@@ -23,10 +25,15 @@ use App\Models\PodDocumentVersion;
 use App\Models\PodUser;
 use App\Models\User;
 use App\Models\UserWorkspace;
+use App\Services\PodDocument\Extraction\DocumentTextExtractionResolver;
+use App\Services\PodDocument\Extraction\GeminiTextExtractionProvider;
 use App\Services\PodDocument\PodDocumentService;
 use App\Services\PodDocument\PodDocumentTextExtractorService;
 use App\Services\PodDocument\PodLearningProgressService;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
@@ -51,9 +58,35 @@ class PodKnowledgeBaseTest extends PodTestCase
         $this->createPodDocumentSchema();
         $this->service = app(PodDocumentService::class);
 
+        config([
+            'pod_materials.extraction.enabled' => true,
+            'pod_materials.extraction.provider' => 'gemini',
+            'pod_materials.extraction.providers.gemini.api_key' => 'fake-test-gemini-key',
+            'pod_materials.extraction.providers.gemini.model' => 'gemini-3.8-flash',
+        ]);
+
         // Create and publish a POD owned by $this->company
         $draft = $this->configuredDraft();
         $this->pod = $this->pods()->publish($this->company, $draft);
+    }
+
+    private function fakeGeminiExtractionResponse(string $text = 'Extracted document text from AI provider'): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    [
+                        'content' => [
+                            'parts' => [
+                                ['text' => $text],
+                            ],
+                            'role' => 'model',
+                        ],
+                        'finishReason' => 'STOP',
+                    ],
+                ],
+            ], 200),
+        ]);
     }
 
     /**
@@ -1680,6 +1713,7 @@ class PodKnowledgeBaseTest extends PodTestCase
         Storage::fake('local');
 
         $phrase = 'Specialized engineering screening rubric and competencies';
+        $this->fakeGeminiExtractionResponse($phrase);
         $file = $this->createSamplePdfFile('screening_rubric.pdf', $phrase);
 
         $doc = $this->service->createDocument($this->pod, $this->company, [
@@ -1810,6 +1844,16 @@ class PodKnowledgeBaseTest extends PodTestCase
     public function test_extraction_failure_on_corrupt_file_records_failure_message_and_allows_retry(): void
     {
         Storage::fake('local');
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => [
+                    'code' => 400,
+                    'message' => 'Invalid or corrupt document',
+                    'status' => 'INVALID_ARGUMENT',
+                ],
+            ], 400),
+        ]);
 
         // Create corrupt file (invalid PDF signature)
         $corruptTemp = tempnam(sys_get_temp_dir(), 'corrupt_');
@@ -2088,8 +2132,8 @@ class PodKnowledgeBaseTest extends PodTestCase
         $replacementFile = $this->createSamplePdfFile('replacement_draft.pdf', 'Replacement Draft File Content');
 
         // Create a mock extractor that replaces the draft attachment while extraction is in flight
-        $mockExtractor = \Mockery::mock(PodDocumentTextExtractorService::class);
-        $mockExtractor->shouldReceive('extract')
+        $mockExtractor = \Mockery::mock(DocumentTextExtractionProvider::class);
+        $mockExtractor->shouldReceive('extractText')
             ->once()
             ->andReturnUsing(function () use ($doc, $draftVersion, $replacementFile) {
                 // Mid-flight draft file replacement
@@ -2134,8 +2178,8 @@ class PodKnowledgeBaseTest extends PodTestCase
         $replacementFile = $this->createSamplePdfFile('replacement_draft_fresh.pdf', 'Fresh Content');
 
         // Mock extractor that simulates failure after replacing draft
-        $mockExtractor = \Mockery::mock(PodDocumentTextExtractorService::class);
-        $mockExtractor->shouldReceive('extract')
+        $mockExtractor = \Mockery::mock(DocumentTextExtractionProvider::class);
+        $mockExtractor->shouldReceive('extractText')
             ->once()
             ->andReturnUsing(function () use ($doc, $draftVersion, $replacementFile) {
                 $this->service->updateDraftVersion($doc, $draftVersion, $this->company, [
@@ -2143,7 +2187,7 @@ class PodKnowledgeBaseTest extends PodTestCase
                     'change_summary' => 'Replaced during failing extraction',
                 ]);
 
-                throw new \RuntimeException('Corrupt file stream from old upload');
+                throw new DocumentTextExtractionException('Corrupt file stream from old upload');
             });
 
         $job = new ExtractPodDocumentVersionText($draftVersion->id);
@@ -3132,5 +3176,675 @@ class PodKnowledgeBaseTest extends PodTestCase
         $this->assertTrue($learningService->isDocumentCompletedByUser($doc, $applicant));
         $this->assertSame(100, $learningService->percentage($applicant, $this->pod));
         $this->assertSame(2, PodDocumentCompletion::where('user_id', $applicant->id)->where('pod_document_id', $doc->id)->count());
+    }
+
+    public function test_provider_and_model_selection_via_resolver_and_config(): void
+    {
+        $resolver = app(DocumentTextExtractionResolver::class);
+
+        // 1. Default configured provider is Gemini
+        $provider = $resolver->resolve();
+        $this->assertInstanceOf(GeminiTextExtractionProvider::class, $provider);
+        $this->assertSame('gemini', $provider->key());
+        $this->assertSame('gemini-3.8-flash', $provider->model());
+
+        // 2. Change model via configuration
+        config(['pod_materials.extraction.providers.gemini.model' => 'gemini-custom-model']);
+        $updatedProvider = $resolver->resolve('gemini');
+        $this->assertSame('gemini-custom-model', $updatedProvider->model());
+
+        // 3. Register and select an alternative provider without changing job workflow
+        $mockCustomProvider = new class implements DocumentTextExtractionProvider {
+            public function key(): string { return 'custom_ai'; }
+            public function model(): string { return 'mock-model-v1'; }
+            public function extractText(string $binary, string $mime, string $extension): string {
+                return 'Text extracted by custom AI provider';
+            }
+            public function supports(string $mime, string $extension): bool { return true; }
+        };
+
+        config([
+            'pod_materials.extraction.provider' => 'custom_ai',
+            'pod_materials.extraction.providers.custom_ai' => [
+                'class' => get_class($mockCustomProvider),
+            ],
+        ]);
+        $this->app->instance(get_class($mockCustomProvider), $mockCustomProvider);
+
+        $customResolved = $resolver->resolve();
+        $this->assertSame('custom_ai', $customResolved->key());
+        $this->assertSame('mock-model-v1', $customResolved->model());
+        $this->assertSame('Text extracted by custom AI provider', $customResolved->extractText('content', 'text/plain', 'txt'));
+
+        // 4. Unconfigured provider key throws InvalidArgumentException
+        $this->expectException(\InvalidArgumentException::class);
+        $resolver->resolve('non_existent_provider');
+    }
+
+    public function test_supported_format_preparation_and_unsupported_format_rejection(): void
+    {
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => 'test-key',
+            'model' => 'gemini-3.8-flash',
+        ]);
+
+        // Supported formats
+        $this->assertTrue($provider->supports('application/pdf', 'pdf'));
+        $this->assertTrue($provider->supports('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx'));
+        $this->assertTrue($provider->supports('application/msword', 'doc'));
+        $this->assertTrue($provider->supports('text/plain', 'txt'));
+
+        // Unsupported formats
+        $this->assertFalse($provider->supports('application/x-dosexec', 'exe'));
+        $this->assertFalse($provider->supports('application/zip', 'zip'));
+
+        // Rejection of unsupported format throws DocumentTextExtractionException without making HTTP request
+        Http::fake();
+        try {
+            $provider->extractText('binary data', 'application/x-dosexec', 'exe');
+            $this->fail('Expected DocumentTextExtractionException was not thrown for unsupported format.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertStringContainsString('not supported by the AI provider', $e->getMessage());
+        }
+        Http::assertNothingSent();
+
+        // Verify correct payload MIME preparation for supported formats
+        $this->fakeGeminiExtractionResponse('Extracted text');
+
+        // PDF
+        $provider->extractText('%PDF-test', 'application/pdf', 'pdf');
+        Http::assertSent(function ($request) {
+            $inline = $request->data()['contents'][0]['parts'][1]['inlineData'];
+            return $inline['mimeType'] === 'application/pdf';
+        });
+
+        // DOCX
+        $provider->extractText('PK-docx-binary', '', 'docx');
+        Http::assertSent(function ($request) {
+            $inline = $request->data()['contents'][0]['parts'][1]['inlineData'];
+            return $inline['mimeType'] === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        });
+
+        // DOC
+        $provider->extractText('binary-doc', '', 'doc');
+        Http::assertSent(function ($request) {
+            $inline = $request->data()['contents'][0]['parts'][1]['inlineData'];
+            return $inline['mimeType'] === 'application/msword';
+        });
+
+        // TXT
+        $provider->extractText('plain text content', 'text/plain', 'txt');
+        Http::assertSent(function ($request) {
+            $inline = $request->data()['contents'][0]['parts'][1]['inlineData'];
+            return $inline['mimeType'] === 'text/plain';
+        });
+    }
+
+    public function test_provider_failure_modes_and_translated_feedback(): void
+    {
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => 'test-key',
+            'model' => 'gemini-3.8-flash',
+            'timeout' => 5,
+        ]);
+
+        // 1. Connection timeout
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => fn () => throw new ConnectionException('Operation timed out'),
+        ]);
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected timeout exception');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('The AI provider connection timed out. Please try again.'), $e->getMessage());
+        }
+
+        // 2. HTTP 429 Rate limit
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response(['error' => ['message' => 'Quota exceeded', 'status' => 'RESOURCE_EXHAUSTED']], 429),
+        ]);
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected 429 rate limit exception');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('AI provider rate limit was exceeded. Please try again shortly.'), $e->getMessage());
+        }
+
+        // 3. HTTP 500 Service outage
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response(['error' => ['message' => 'Internal server error']], 500),
+        ]);
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected 500 service error exception');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('The AI text extraction service is temporarily unavailable. Please try again later.'), $e->getMessage());
+        }
+
+        // 4. HTTP 400 Invalid API Key
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response(['error' => ['message' => 'API key not valid', 'status' => 'API_KEY_INVALID']], 400),
+        ]);
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected 400 invalid API key exception');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('AI document text extraction is misconfigured. Please check provider credentials.'), $e->getMessage());
+        }
+
+        // 5. Empty extraction result
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    ['content' => ['parts' => [['text' => '   ']]], 'finishReason' => 'STOP'],
+                ],
+            ], 200),
+        ]);
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected empty text exception');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('No readable text could be extracted from this document.'), $e->getMessage());
+        }
+
+        // 6. Missing API key
+        $unconfiguredProvider = new GeminiTextExtractionProvider(['api_key' => '']);
+        try {
+            $unconfiguredProvider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected missing API key exception');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('AI document text extraction is not configured. Please contact the administrator.'), $e->getMessage());
+        }
+    }
+
+    public function test_gemini_api_key_sent_via_header_and_never_in_url(): void
+    {
+        $apiKey = 'secret-test-api-key-999';
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => $apiKey,
+            'model' => 'gemini-3.8-flash',
+        ]);
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    ['content' => ['parts' => [['text' => 'Clean extracted header test text']]], 'finishReason' => 'STOP'],
+                ],
+            ], 200),
+        ]);
+
+        $text = $provider->extractText('%PDF-test', 'application/pdf', 'pdf');
+
+        $this->assertSame('Clean extracted header test text', $text);
+
+        Http::assertSent(function ($request) use ($apiKey) {
+            $hasHeader = $request->hasHeader('x-goog-api-key', $apiKey);
+            $urlDoesNotContainKey = !str_contains($request->url(), 'key=') && !str_contains($request->url(), $apiKey);
+            $targetsExpectedModel = str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/models/gemini-3.8-flash:generateContent');
+
+            return $hasHeader && $urlDoesNotContainKey && $targetsExpectedModel;
+        });
+    }
+
+    public function test_provider_resolution_failure_records_failed_status_with_safe_feedback_instead_of_staying_pending(): void
+    {
+        Storage::fake('local');
+
+        $file = $this->createSamplePdfFile('resolution_test.pdf', 'Provider test document');
+        $doc = $this->service->createDocument($this->pod, $this->company, [
+            'title' => 'Resolution Failure Test',
+            'type' => PodDocumentType::TECHNICAL,
+            'file' => $file,
+            'publish' => true,
+        ]);
+
+        $version = $doc->publishedVersion();
+        $this->assertSame(PodDocumentExtractionStatus::PENDING, $version->extraction_status);
+
+        // Configure an invalid/unconfigured provider
+        config(['pod_materials.extraction.provider' => 'invalid_unconfigured_provider']);
+
+        // Execute extraction job
+        $job = new ExtractPodDocumentVersionText($version->id);
+        $outcome = $job->handle(null, $this->service);
+
+        $this->assertSame('failed_provider_resolution', $outcome);
+
+        // Verify version is NOT left pending; it transitioned to FAILED with safe translated feedback
+        $version->refresh();
+        $this->assertSame(PodDocumentExtractionStatus::FAILED, $version->extraction_status);
+        $this->assertSame(
+            __('Document text extraction provider is misconfigured or unavailable. Please contact the administrator.'),
+            $version->extraction_failure_message
+        );
+        $this->assertNull($version->extraction_token);
+        $this->assertNull($version->extracted_text);
+    }
+
+    public function test_transient_failure_preserves_queue_retries_and_exhaustion_marks_failed(): void
+    {
+        Storage::fake('local');
+
+        $file = $this->createSamplePdfFile('transient_test.pdf', 'Transient retry test');
+        $doc = $this->service->createDocument($this->pod, $this->company, [
+            'title' => 'Transient Retry Test',
+            'type' => PodDocumentType::TECHNICAL,
+            'file' => $file,
+            'publish' => true,
+        ]);
+
+        $version = $doc->publishedVersion();
+
+        // 1. Transient 429 error on an active queue job where attempts < tries must rethrow for queue retry
+        $mockQueueJob = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $mockQueueJob->shouldReceive('attempts')->andReturn(1);
+
+        $job = new ExtractPodDocumentVersionText($version->id);
+        $job->setJob($mockQueueJob);
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => ['message' => 'Quota limit reached', 'status' => 'RESOURCE_EXHAUSTED'],
+            ], 429),
+        ]);
+
+        try {
+            $job->handle(null, $this->service);
+            $this->fail('Expected transient 429 exception to be rethrown for queue retry.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(429, $e->httpStatus);
+        }
+
+        // 2. On final attempt (attempts >= tries), failure is permanently recorded
+        $mockFinalJob = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $mockFinalJob->shouldReceive('attempts')->andReturn(3);
+
+        $finalJob = new ExtractPodDocumentVersionText($version->id);
+        $finalJob->setJob($mockFinalJob);
+
+        try {
+            $finalJob->handle(null, $this->service);
+            $this->fail('Expected final failure exception to be thrown to trigger queue failed handling.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(429, $e->httpStatus);
+        }
+
+        $version->refresh();
+        $this->assertSame(PodDocumentExtractionStatus::FAILED, $version->extraction_status);
+        $this->assertSame(__('AI provider rate limit was exceeded. Please try again shortly.'), $version->extraction_failure_message);
+        $this->assertNull($version->extraction_token);
+    }
+
+    public function test_gemini_provider_error_does_not_leak_raw_message_or_sensitive_details_to_logs(): void
+    {
+        $loggedMessages = [];
+        Log::shouldReceive('error')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+        Log::shouldReceive('warning')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+
+        $sensitiveString = 'CONFIDENTIAL_CUSTOMER_DATA_778899';
+        $sensitiveKey = 'AIzaSySensitiveKey999';
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => [
+                    'message' => "Invalid request: {$sensitiveString} contains secret {$sensitiveKey}",
+                    'status' => 'INVALID_ARGUMENT',
+                ],
+            ], 400),
+        ]);
+
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => 'valid-format-key',
+            'model' => 'gemini-3.8-flash',
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertStringNotContainsString($sensitiveString, $e->getMessage());
+            $this->assertStringNotContainsString($sensitiveKey, $e->getMessage());
+        }
+
+        $this->assertNotEmpty($loggedMessages, 'Expected error log to be recorded.');
+        foreach ($loggedMessages as $log) {
+            $this->assertStringNotContainsString($sensitiveString, $log);
+            $this->assertStringNotContainsString($sensitiveKey, $log);
+        }
+
+        $hasControlledLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, 'gemini')
+                && str_contains($msg, 'gemini-3.8-flash')
+                && str_contains($msg, 'HTTP 400')
+                && str_contains($msg, 'INVALID_API_KEY');
+        });
+        $this->assertTrue($hasControlledLog, 'Expected log to contain controlled provider, model, HTTP status, and category.');
+    }
+
+    public function test_provider_resolution_logging_does_not_leak_exception_message(): void
+    {
+        Storage::fake('local');
+
+        $file = $this->createSamplePdfFile('resolution_log_test.pdf', 'Document content');
+        $doc = $this->service->createDocument($this->pod, $this->company, [
+            'title' => 'Resolution Log Test',
+            'type' => PodDocumentType::TECHNICAL,
+            'file' => $file,
+            'publish' => true,
+        ]);
+        $version = $doc->publishedVersion();
+
+        $sensitiveMsg = 'SUPER_SECRET_RESOLVER_CREDENTIAL_12345';
+        $failingResolver = \Mockery::mock(DocumentTextExtractionResolver::class);
+        $failingResolver->shouldReceive('resolve')
+            ->andThrow(new \InvalidArgumentException("Connection refused for secret {$sensitiveMsg}"));
+
+        $loggedMessages = [];
+        Log::shouldReceive('error')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+        Log::shouldReceive('warning')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+
+        $job = new ExtractPodDocumentVersionText($version->id);
+        $outcome = $job->handle($failingResolver, $this->service);
+
+        $this->assertSame('failed_provider_resolution', $outcome);
+
+        $this->assertNotEmpty($loggedMessages, 'Expected error log to be recorded.');
+        foreach ($loggedMessages as $log) {
+            $this->assertStringNotContainsString($sensitiveMsg, $log);
+        }
+
+        $hasControlledLog = collect($loggedMessages)->contains(function ($msg) use ($version) {
+            return str_contains($msg, "version [{$version->id}]")
+                && str_contains($msg, 'InvalidArgumentException');
+        });
+        $this->assertTrue($hasControlledLog, 'Expected log to contain version ID and exception class name without exception message.');
+
+        $version->refresh();
+        $this->assertSame(PodDocumentExtractionStatus::FAILED, $version->extraction_status);
+        $this->assertStringNotContainsString($sensitiveMsg, (string) $version->extraction_failure_message);
+        $this->assertSame(
+            __('Document text extraction provider is misconfigured or unavailable. Please contact the administrator.'),
+            $version->extraction_failure_message
+        );
+    }
+
+    public function test_transient_retry_logging_does_not_leak_exception_message(): void
+    {
+        Storage::fake('local');
+
+        $file = $this->createSamplePdfFile('transient_log_test.pdf', 'Document content');
+        $doc = $this->service->createDocument($this->pod, $this->company, [
+            'title' => 'Transient Log Test',
+            'type' => PodDocumentType::TECHNICAL,
+            'file' => $file,
+            'publish' => true,
+        ]);
+        $version = $doc->publishedVersion();
+
+        $sensitiveToken = 'SECRET_INTERNAL_RATE_LIMIT_TOKEN_554433';
+
+        $mockQueueJob = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $mockQueueJob->shouldReceive('attempts')->andReturn(1);
+
+        $job = new ExtractPodDocumentVersionText($version->id);
+        $job->setJob($mockQueueJob);
+
+        $loggedMessages = [];
+        Log::shouldReceive('error')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+        Log::shouldReceive('warning')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => [
+                    'message' => "Quota exhausted for {$sensitiveToken}",
+                    'status' => 'RESOURCE_EXHAUSTED',
+                ],
+            ], 429),
+        ]);
+
+        try {
+            $job->handle(null, $this->service);
+            $this->fail('Expected transient 429 exception to be rethrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(429, $e->httpStatus);
+            $this->assertStringNotContainsString($sensitiveToken, $e->getMessage());
+        }
+
+        $this->assertNotEmpty($loggedMessages, 'Expected warning log to be recorded.');
+        foreach ($loggedMessages as $log) {
+            $this->assertStringNotContainsString($sensitiveToken, $log);
+        }
+
+        $hasControlledLog = collect($loggedMessages)->contains(function ($msg) use ($version) {
+            return str_contains($msg, "attempt 1 of 3 for version [{$version->id}]")
+                && str_contains($msg, 'HTTP 429')
+                && str_contains($msg, 'RATE_LIMIT');
+        });
+        $this->assertTrue($hasControlledLog, 'Expected transient retry log to contain controlled fields and no sensitive token.');
+    }
+
+    public function test_error_status_allowlist_enforces_safe_fallback_and_blocks_unlisted_strings(): void
+    {
+        $loggedMessages = [];
+        Log::shouldReceive('error')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+        Log::shouldReceive('warning')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+
+        $unlistedStatusSecret = 'LEAKED_ERROR_STATUS_SECRET_CODE_98765';
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => [
+                    'message' => 'Malformed query payload',
+                    'status' => $unlistedStatusSecret,
+                ],
+            ], 400),
+        ]);
+
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => 'valid-format-key',
+            'model' => 'gemini-3.8-flash',
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            // Secret must not be present in exception message or exception providerErrorStatus
+            $this->assertStringNotContainsString($unlistedStatusSecret, $e->getMessage());
+            $this->assertNotSame($unlistedStatusSecret, $e->providerErrorStatus);
+            $this->assertSame('OTHER', $e->providerErrorStatus);
+        }
+
+        $this->assertNotEmpty($loggedMessages);
+        foreach ($loggedMessages as $log) {
+            $this->assertStringNotContainsString($unlistedStatusSecret, $log);
+        }
+
+        // Verify fallback [OTHER] was logged
+        $hasFallbackLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, '[OTHER]') && str_contains($msg, 'HTTP 400');
+        });
+        $this->assertTrue($hasFallbackLog, 'Expected log to record [OTHER] fallback for unlisted error status.');
+
+        // Verify documented enum retains useful diagnostics
+        $loggedMessages = [];
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'error' => [
+                    'message' => 'Quota exhausted',
+                    'status' => 'RESOURCE_EXHAUSTED',
+                ],
+            ], 429),
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame('RESOURCE_EXHAUSTED', $e->providerErrorStatus);
+        }
+
+        $hasDocumentedLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, '[RESOURCE_EXHAUSTED]') && str_contains($msg, 'HTTP 429');
+        });
+        $this->assertTrue($hasDocumentedLog, 'Expected documented status to be preserved in log.');
+    }
+
+    public function test_safety_block_reason_allowlist_enforces_safe_fallback_and_blocks_unlisted_strings(): void
+    {
+        $loggedMessages = [];
+        Log::shouldReceive('error')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+        Log::shouldReceive('warning')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+
+        $unlistedBlockSecret = 'LEAKED_BLOCK_REASON_SECRET_1234';
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [],
+                'promptFeedback' => [
+                    'blockReason' => $unlistedBlockSecret,
+                ],
+            ], 200),
+        ]);
+
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => 'valid-format-key',
+            'model' => 'gemini-3.8-flash',
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('The document content was blocked by AI provider safety filters.'), $e->getMessage());
+            $this->assertStringNotContainsString($unlistedBlockSecret, $e->getMessage());
+        }
+
+        $this->assertNotEmpty($loggedMessages);
+        foreach ($loggedMessages as $log) {
+            $this->assertStringNotContainsString($unlistedBlockSecret, $log);
+        }
+
+        // Verify fallback [OTHER] was logged for unlisted block reason
+        $hasFallbackLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, 'content blocked by safety filters') && str_contains($msg, '[OTHER]');
+        });
+        $this->assertTrue($hasFallbackLog, 'Expected log to record [OTHER] fallback for unlisted block reason.');
+
+        // Verify documented enum SAFETY retains useful diagnostics
+        $loggedMessages = [];
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [],
+                'promptFeedback' => [
+                    'blockReason' => 'SAFETY',
+                ],
+            ], 200),
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('The document content was blocked by AI provider safety filters.'), $e->getMessage());
+        }
+
+        $hasDocumentedLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, 'content blocked by safety filters') && str_contains($msg, '[SAFETY]');
+        });
+        $this->assertTrue($hasDocumentedLog, 'Expected documented SAFETY block reason to be preserved in log.');
+    }
+
+    public function test_finish_reason_allowlist_enforces_safe_fallback_and_blocks_unlisted_strings(): void
+    {
+        $loggedMessages = [];
+        Log::shouldReceive('error')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+        Log::shouldReceive('warning')->zeroOrMoreTimes()->andReturnUsing(function ($message) use (&$loggedMessages) {
+            $loggedMessages[] = (string) $message;
+        });
+
+        $unlistedFinishSecret = 'LEAKED_FINISH_REASON_SECRET_567';
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    [
+                        'content' => ['parts' => [['text' => '   ']]],
+                        'finishReason' => $unlistedFinishSecret,
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $provider = new GeminiTextExtractionProvider([
+            'api_key' => 'valid-format-key',
+            'model' => 'gemini-3.8-flash',
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('No readable text could be extracted from this document.'), $e->getMessage());
+            $this->assertStringNotContainsString($unlistedFinishSecret, $e->getMessage());
+        }
+
+        $this->assertNotEmpty($loggedMessages);
+        foreach ($loggedMessages as $log) {
+            $this->assertStringNotContainsString($unlistedFinishSecret, $log);
+        }
+
+        // Verify fallback [finishReason: UNKNOWN] was logged for unlisted finish reason
+        $hasFallbackLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, 'produced empty text') && str_contains($msg, '[finishReason: UNKNOWN]');
+        });
+        $this->assertTrue($hasFallbackLog, 'Expected log to record [finishReason: UNKNOWN] fallback for unlisted finish reason.');
+
+        // Verify documented enum MAX_TOKENS retains useful diagnostics
+        $loggedMessages = [];
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    [
+                        'content' => ['parts' => [['text' => '   ']]],
+                        'finishReason' => 'MAX_TOKENS',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        try {
+            $provider->extractText('%PDF-data', 'application/pdf', 'pdf');
+            $this->fail('Expected DocumentTextExtractionException was not thrown.');
+        } catch (DocumentTextExtractionException $e) {
+            $this->assertSame(__('No readable text could be extracted from this document.'), $e->getMessage());
+        }
+
+        $hasDocumentedLog = collect($loggedMessages)->contains(function ($msg) {
+            return str_contains($msg, 'produced empty text') && str_contains($msg, '[finishReason: MAX_TOKENS]');
+        });
+        $this->assertTrue($hasDocumentedLog, 'Expected documented MAX_TOKENS finish reason to be preserved in log.');
     }
 }

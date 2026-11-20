@@ -2,16 +2,20 @@
 
 namespace App\Jobs\PodDocument;
 
+use App\Contracts\DocumentTextExtractionProvider;
 use App\Enums\PodDocument\PodDocumentExtractionStatus;
+use App\Exceptions\PodDocument\DocumentTextExtractionException;
 use App\Models\PodDocumentVersion;
+use App\Services\PodDocument\Extraction\DocumentTextExtractionResolver;
 use App\Services\PodDocument\PodDocumentService;
-use App\Services\PodDocument\PodDocumentTextExtractorService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -24,6 +28,10 @@ use Illuminate\Support\Facades\Storage;
  *  - Isolated to the target version: never modifies or overwrites any newer or other version.
  *  - Records processing metadata: status (pending, processing, completed, failed),
  *    extracted_at timestamp, and user-readable failure message.
+ *  - Provider resolution failures are safely caught, guarded by change tokens, and marked
+ *    as FAILED with user-safe translated feedback rather than crashing in DI container.
+ *  - Transient network failures (timeouts, 429 rate limits, 5xx server errors) are retried
+ *    via queue retries up to $tries times.
  */
 class ExtractPodDocumentVersionText implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
@@ -51,10 +59,16 @@ class ExtractPodDocumentVersionText implements ShouldQueue, ShouldBeUniqueUntilP
     /**
      * Execute text extraction job.
      *
+     * @param DocumentTextExtractionProvider|DocumentTextExtractionResolver|null $extractor
+     * @param PodDocumentService|null $documentService
      * @return string Description of outcome (for testing and logging)
      */
-    public function handle(PodDocumentTextExtractorService $extractor, PodDocumentService $documentService): string
-    {
+    public function handle(
+        DocumentTextExtractionProvider|DocumentTextExtractionResolver|null $extractor = null,
+        ?PodDocumentService $documentService = null
+    ): string {
+        $documentService ??= app(PodDocumentService::class);
+
         $version = PodDocumentVersion::query()->with('document')->find($this->versionId);
 
         if (!$version) {
@@ -126,6 +140,7 @@ class ExtractPodDocumentVersionText implements ShouldQueue, ShouldBeUniqueUntilP
                 $current->extraction_status = PodDocumentExtractionStatus::COMPLETED;
                 $current->extracted_at = now();
                 $current->extraction_failure_message = null;
+                $current->extraction_token = null;
                 $current->save();
 
                 return 'completed_text_only';
@@ -136,52 +151,72 @@ class ExtractPodDocumentVersionText implements ShouldQueue, ShouldBeUniqueUntilP
         try {
             $disk = $documentService->getPrivateDisk();
         } catch (\Throwable $e) {
-            return DB::transaction(function () use ($capturedFilePath, $capturedToken, $e) {
-                $current = PodDocumentVersion::whereKey($this->versionId)->lockForUpdate()->first();
-                if (!$current) {
-                    return 'skipped_missing';
-                }
-
-                if ($current->file_path !== $capturedFilePath || $current->extraction_token !== $capturedToken || $current->extraction_status !== PodDocumentExtractionStatus::PROCESSING) {
-                    return 'stale_failure_discarded';
-                }
-
-                $current->extraction_status = PodDocumentExtractionStatus::FAILED;
-                $current->extraction_failure_message = $e->getMessage();
-                $current->save();
-
-                return 'failed_invalid_disk';
-            });
+            return $this->recordPermanentFailure(
+                $capturedFilePath,
+                $capturedToken,
+                $e->getMessage(),
+                'failed_invalid_disk'
+            );
         }
 
         // Check if file exists on private storage
         if (!Storage::disk($disk)->exists($capturedFilePath)) {
-            return DB::transaction(function () use ($capturedFilePath, $capturedToken) {
-                $current = PodDocumentVersion::whereKey($this->versionId)->lockForUpdate()->first();
-                if (!$current) {
-                    return 'skipped_missing';
-                }
-
-                if ($current->file_path !== $capturedFilePath || $current->extraction_token !== $capturedToken || $current->extraction_status !== PodDocumentExtractionStatus::PROCESSING) {
-                    return 'stale_failure_discarded';
-                }
-
-                $current->extraction_status = PodDocumentExtractionStatus::FAILED;
-                $current->extraction_failure_message = __('The document file was not found on private storage.');
-                $current->save();
-
-                return 'failed_missing_file';
-            });
+            return $this->recordPermanentFailure(
+                $capturedFilePath,
+                $capturedToken,
+                __('The document file was not found on private storage.'),
+                'failed_missing_file'
+            );
         }
 
-        // Perform text extraction
+        // Resolve document text extraction provider safely inside handle()
         try {
-            $text = $extractor->extract(
+            if ($extractor instanceof DocumentTextExtractionProvider) {
+                $provider = $extractor;
+            } elseif ($extractor instanceof DocumentTextExtractionResolver) {
+                $provider = $extractor->resolve();
+            } else {
+                /** @var DocumentTextExtractionResolver $resolver */
+                $resolver = app(DocumentTextExtractionResolver::class);
+                $provider = $resolver->resolve();
+            }
+        } catch (\Throwable $e) {
+            $exceptionClass = get_class($e);
+            Log::error("Failed to resolve document text extraction provider for version [{$this->versionId}]: [{$exceptionClass}].");
+
+            return $this->recordPermanentFailure(
                 $capturedFilePath,
-                $capturedMime,
-                $capturedExt,
-                $disk
+                $capturedToken,
+                __('Document text extraction provider is misconfigured or unavailable. Please contact the administrator.'),
+                'failed_provider_resolution'
             );
+        }
+
+        // Validate format support with resolved provider
+        if (!$provider->supports($capturedMime ?: '', $capturedExt ?: '')) {
+            return $this->recordPermanentFailure(
+                $capturedFilePath,
+                $capturedToken,
+                __('The document format (:extension) is not supported by the AI provider.', ['extension' => strtoupper($capturedExt ?: 'UNKNOWN')]),
+                'failed_unsupported_format'
+            );
+        }
+
+        // Perform text extraction via configured AI provider
+        try {
+            $binary = Storage::disk($disk)->get($capturedFilePath);
+            if ($binary === null || strlen($binary) === 0) {
+                throw new DocumentTextExtractionException(__('The document file was not found or is empty.'));
+            }
+
+            $rawText = $provider->extractText(
+                $binary,
+                $capturedMime ?: '',
+                $capturedExt ?: ''
+            );
+
+            $text = $this->cleanExtractedText($rawText);
+            $text = $this->limitLength($text);
 
             // Reacquire row lock before saving extracted text and confirm state has not changed
             return DB::transaction(function () use ($capturedFilePath, $capturedToken, $text) {
@@ -199,28 +234,153 @@ class ExtractPodDocumentVersionText implements ShouldQueue, ShouldBeUniqueUntilP
                 $current->extraction_status = PodDocumentExtractionStatus::COMPLETED;
                 $current->extracted_at = now();
                 $current->extraction_failure_message = null;
+                $current->extraction_token = null;
                 $current->save();
 
                 return 'completed';
             });
         } catch (\Throwable $e) {
-            // Apply the exact same guard for failure recording
-            return DB::transaction(function () use ($capturedFilePath, $capturedToken, $e) {
-                $current = PodDocumentVersion::whereKey($this->versionId)->lockForUpdate()->first();
-                if (!$current) {
-                    return 'skipped_missing';
+            $userMessage = $e instanceof DocumentTextExtractionException
+                ? $e->getMessage()
+                : __('Text extraction failed.');
+
+            // Check for transient failure when running inside a queue worker
+            if ($this->job && $this->isTransientFailure($e)) {
+                if ($this->attempts() < $this->tries) {
+                    $exceptionClass = get_class($e);
+                    $category = match (true) {
+                        $e instanceof ConnectionException => 'TIMEOUT',
+                        $e instanceof DocumentTextExtractionException && $e->httpStatus === 429 => 'RATE_LIMIT',
+                        $e instanceof DocumentTextExtractionException && $e->httpStatus >= 500 => 'SERVER_ERROR',
+                        $e instanceof DocumentTextExtractionException && $e->httpStatus === 408 => 'TIMEOUT',
+                        default => 'TRANSIENT_NETWORK_ERROR',
+                    };
+                    $httpStatus = ($e instanceof DocumentTextExtractionException && $e->httpStatus !== null)
+                        ? " HTTP {$e->httpStatus}"
+                        : '';
+
+                    Log::warning("Transient text extraction failure on attempt {$this->attempts()} of {$this->tries} for version [{$this->versionId}]: [{$exceptionClass}]{$httpStatus} [category: {$category}].");
+                    throw $e;
                 }
 
-                if ($current->file_path !== $capturedFilePath || $current->extraction_token !== $capturedToken || $current->extraction_status !== PodDocumentExtractionStatus::PROCESSING) {
-                    return 'stale_failure_discarded';
-                }
+                // Retries exhausted on queue
+                $this->recordPermanentFailure(
+                    $capturedFilePath,
+                    $capturedToken,
+                    $userMessage,
+                    'failed_extraction'
+                );
 
-                $current->extraction_status = PodDocumentExtractionStatus::FAILED;
-                $current->extraction_failure_message = $e->getMessage() ?: __('Text extraction failed.');
-                $current->save();
+                throw $e;
+            }
 
-                return 'failed:' . $e->getMessage();
-            });
+            return $this->recordPermanentFailure(
+                $capturedFilePath,
+                $capturedToken,
+                $userMessage,
+                'failed_extraction'
+            );
         }
+    }
+
+    /**
+     * Handle queue failure after all retries have been exhausted.
+     */
+    public function failed(?\Throwable $exception = null): void
+    {
+        $message = $exception instanceof DocumentTextExtractionException
+            ? $exception->getMessage()
+            : __('Text extraction failed after multiple attempts.');
+
+        DB::transaction(function () use ($message) {
+            $current = PodDocumentVersion::whereKey($this->versionId)->lockForUpdate()->first();
+            if (!$current || $current->extraction_status === PodDocumentExtractionStatus::COMPLETED) {
+                return;
+            }
+
+            $current->extraction_status = PodDocumentExtractionStatus::FAILED;
+            $current->extraction_failure_message = $message;
+            $current->extraction_token = null;
+            $current->save();
+        });
+    }
+
+    /**
+     * Determine whether an extraction failure is transient and eligible for retry.
+     */
+    protected function isTransientFailure(\Throwable $e): bool
+    {
+        if ($e instanceof ConnectionException) {
+            return true;
+        }
+
+        if ($e instanceof DocumentTextExtractionException) {
+            $status = $e->httpStatus;
+            if ($status === 408 || $status === 429 || ($status !== null && $status >= 500)) {
+                return true;
+            }
+
+            if ($e->getPrevious() instanceof ConnectionException) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Record a permanent failure under lock with change token verification.
+     */
+    protected function recordPermanentFailure(
+        ?string $capturedFilePath,
+        ?string $capturedToken,
+        string $message,
+        string $outcome
+    ): string {
+        return DB::transaction(function () use ($capturedFilePath, $capturedToken, $message, $outcome) {
+            $current = PodDocumentVersion::whereKey($this->versionId)->lockForUpdate()->first();
+            if (!$current) {
+                return 'skipped_missing';
+            }
+
+            if ($capturedFilePath !== null && $current->file_path !== $capturedFilePath) {
+                return 'stale_failure_discarded';
+            }
+
+            if ($capturedToken !== null && $current->extraction_token !== $capturedToken) {
+                return 'stale_failure_discarded';
+            }
+
+            if ($current->extraction_status !== PodDocumentExtractionStatus::PROCESSING) {
+                return 'stale_failure_discarded';
+            }
+
+            $current->extraction_status = PodDocumentExtractionStatus::FAILED;
+            $current->extraction_failure_message = $message;
+            $current->extraction_token = null;
+            $current->save();
+
+            return $outcome;
+        });
+    }
+
+    private function cleanExtractedText(string $text): string
+    {
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+        $text = preg_replace('/[ \t]+/', ' ', $text);
+        $text = preg_replace('/\n\s*\n\s*\n+/', "\n\n", $text);
+
+        return trim($text);
+    }
+
+    private function limitLength(string $text): string
+    {
+        $maxChars = (int) config('pod_materials.extraction.max_extracted_characters', 500000);
+        if ($maxChars > 0 && mb_strlen($text) > $maxChars) {
+            return mb_substr($text, 0, $maxChars);
+        }
+
+        return $text;
     }
 }

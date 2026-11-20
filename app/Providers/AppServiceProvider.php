@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // UNA-016: the configured POD matching algorithm (deterministic by default).
         $this->app->bind(\App\Contracts\PodMatchingAlgorithm::class, fn ($app) => $app->make(\App\Services\Matching\PodMatchingAlgorithmResolver::class)->resolve());
+
+        // UNA-022: the configured AI document text extraction provider (Gemini by default).
+        $this->app->bind(\App\Contracts\DocumentTextExtractionProvider::class, fn ($app) => $app->make(\App\Services\PodDocument\Extraction\DocumentTextExtractionResolver::class)->resolve());
     }
 
     /**
